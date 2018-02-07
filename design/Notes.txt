@@ -1,0 +1,55 @@
+.erl Datei zu erst compilen.
+ - in erlangeditor mit c(dateiname).
+ - z.b. so: in CMD in richtigen Ordner, dann "werl", dann dort eben compilen. Somit ist der Erlangeditor im richtigen Directory.
+ - Dann im erlang editor mit dateiname:funktionsname(input) starten.
+
+Also kurz:
+(CMD, in richtigem Directory) werl
+(Werl) c(client).
+(Werl) client:start(name).
+
+Erlang Threads sind auf einem node nur solang aktiv wie sie auch rechnen / warten, ohne Rekursion nicht möglich. 
+Darin dann eben auch Zustandswechsel lösen.
+
+Auslesen von .cfg Dateien mit "{ok, ConfigKeyValueList} = file:consult("FileNameOrPath")."
+
+In werkzeug.erl enthalten:
+get_config_value(Key, KeyValueList) -> Holt Value aus List wenn Key existent
+logging(Datei, Inhalt) -> Schreibt Inhalt in Datei und Printed
+logstop() -> Zerstört den Log Prozess
+logloop(Y) -> NICHT EXPORTIERT
+openSe(Addr, Port) -> Sich dem Prozess bekannt geben?
+openSeA(Addr, Port) -> ???
+openRec(MultiCast, Addr, Port) -> ???
+openRecA(IP, Port) -> ???
+createBinaryS(Station) -> ???
+createBinaryD(Data) -> ???
+createBinaryT(Timestamp) -> ???
+createBinaryNS(NextSlot) -> ???
+concat(List, Between) -> NICHT EXPORTIERT
+klebe(List, Between,Text) -> NICHT EXPORTIERT
+minTwo(List) -> NICHT EXPORTIERT
+concatBinary(BinStation, BinData, BinNextSlot, BinTime) -> ???
+concatBinary(BinStation, BinData, BinNextSlot) -> ???
+message_to_string(Packet) -> Siehe Funktionskommentar wie genau das Packet auszusehen hat.
+shuffle(List) -> Mischt die Elemente der Liste
+generiereRZOD(ANZ, Datei) -> Generiert Anz(ahl) an ungleichen Zufallszahlen und gibt sie in die Datei aus.
+timeMilliSecond() -> "MM.DD HH:MM:SS,SSS"
+reset_timer(Timer, Sekunden, Message) -> Cancelt eingegebenen Timer und erstellt einen Neuen.
+compareNow(TS1, TS2) -> TS1 is "afterw" / "before" or "concurrent" to TS2 
+getUTC() -> Now in Millisekunden
+compareUTC(UTC1, UTC2) -> UTC1 is "afterw"/ "before" or "concurrent" to UTC2
+now2UTC(Now) -> Now in UTC in Millisekunden
+type_is(Value) -> Gibt den Typ von Value als Atom zurück.
+to_String(Value) -> Gibt Value als String zurück.
+validTS(TS) -> prüft ob eingegebener TS valide ist (erlang:timestamp()!)
+lessTS(TS1, TS2) -> gibt boolean zurück ob TS1 vor (also weniger als) TS2 ist.
+lessoeqTS(TS1, TS2) -> gibt boolean zurück ob TS1 vor oder gleich TS2 ist.
+equalTS(TS1, TS2) -> gibt boolean zurück ob TS1 gleich TS2 ist.
+diffTS(TS1, TS2) -> gibt boolean zurück ob TS1 und TS2 ungleich ist.
+now2string(TS) -> Gibt Das heutige Datum anhand des eingegebenen Timestamps zurück
+now2stringD() -> ???
+bestimme_mis(WggT, GGTsCount) -> Generiert die benötigte Anzahl an Zahlen die alle den ggT haben, in einer Liste.
+einmi(List, Akku) -> NICHT EXPORTIERT
+testeMI(Wggt, GGTsCount) -> Testet ob bestimme_mis/2 funktioniert.
+schreibeListe(List, Datei) -> NICHT EXPORTIERT UND UNGENUTZT

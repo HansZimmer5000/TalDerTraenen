@@ -1,0 +1,162 @@
+Offene Fragen:
+    Wie sieht die CMEM aus?
+    Wie sieht die DLQ aus?
+    Wie sieht die HBQ aus?
+    Wie sieht der Server aus?
+    Wie sieht der Client aus?
+    Wie sieht der Redakteur aus?
+    Wie sieht der Leser aus?
+
+Sonstige Anforderung:
+    HBQ, DLQ, CMEM vollständig in eigenen Dateien.
+    Höchstens eine gemeinsame Werkzeug Datei.
+    Eine Nachricht ist zu jeder Zeit entweder: Beim Redakteur (verfassen), in der HBQ oder in der DLQ.
+
+
+Redakteur (Client):
+    Schreibt die Nachrichtennummer der geschriebenen Nachrichten in eine Liste, die wird an den Leser weitergegeben.
+    Der Nachrichtentext enthält: Rechnername, Praktikumsgruppe, Teamnummer und aktuelle Systemzeit.
+    Nachrichten werden nach Xms (Zeitintervall) nach erhalt der NNR an den Server geschickt.
+    Dieses Zeitintervall wird alle 5 Nachrichten neu berechnet, per Zufall 50% schneller / langsamer, jedoch nie unter 2 Sekunden.
+    Der Redakteur schickt die 5. Nachricht nicht ab und vermertk dies im Log (NNR, aktuelle Zeit, "vergessen zu senden").
+    Danach wechselt er zum Leser.
+
+    Sequenz:
+        -> Redakteur_Loop
+            -> Fragt NNr beim Server an
+            -> Mit NNr Nachricht erstellen und in GeschriebeneNNrListe einfügen.
+            -> Nachricht an Server schicken oder wenn 5. Nachricht, verwerfen und loggen und berechne neuen Intervall
+            -> Zu Leser_Loop wechseln und GeschriebeneNNrListe mitgeben.
+
+
+Leser (Client):
+    Der Leser bekommt die vom Redakteur erstellte Liste von Nachrichtennummern.
+    Leser fragt beim Server nach neuen Nachrichten, nach erhalt "printed" er sie raus, Sonderfälle:
+        Bekommt der Leser eine Nachricht seines Redakteurs, so hängt er vorne "*******" an.
+        Kommt eine Nachricht aus der Zukunft, wird die Zeitdifferenz am Ende der Zeichenkette markiert.
+    Sind keine neuen Nachrichten mehr da, so wechselt er zum Redakteur
+
+    Sequenz:
+        -> Leser_Loop
+            -> Beim Server nach neuen Nachrichten abfragen
+            -> Checken ob die empfangene Nachricht von meinem Redakteur ist (GeschriebeneNNrListe).
+            -> Checken ob die empfangene Nachricht TerminatedFlag = true hat
+                -> Wenn ja -> Wechsel zu Redakteur_Loop
+                -> Wenn Nein -> Nächste Nachricht abfragen
+
+Server API:
+Die vom Server vergebene NNR beginnt bei 1 und geht in einser Schritten ggf. ins unendliche.
+Gibt es laut CMEM für einen Client keine neue Nachricht wird ihm eine nicht leere Dummy Nachricht mit TerminatedFlag = True gesendet.
+Bekommt der Server für eine gewisste Zeit (Timer) keine Nachricht fährt er herunter.
+
+    -> Abfragen der nächsten NNR
+        -> Interne Variable antworten und um 1 erhöhen.
+
+    -> Abfragen der nächsten Nachricht
+        -> ???? CMEM/DLQ?
+
+    -> Erhalten einer neuen Nachricht
+        -> ???? HBQ?
+
+    Name: Abfragen der nächsten Message
+    receive: {AbsenderPID, getmessages}
+    return: {reply, MSG, TerminatedFlag}
+
+    Name: Senden einer Nachricht an den Server
+    receive: {dropmessage, MSG}
+    return: nothing
+
+    Name: Abfragen der nächsten Nachrichtennummer (NNR)
+    receive: {AbsenderPID, getmsgid}
+    return: {nid, NNR}
+
+HBQ API:
+Enthält nur Nachrichten die noch nicht an die DLQ weitergeleitet werden konnten.
+Eine Nachricht kann in die DLQ gepusht werden wenn ihre NNR der erwartenden gleicht.
+Entspricht die Anzahl der Nachrichten der HBQ 2/3 des DLQ Limits so wird:
+    Die aktuelle Lücke mit einer Nachricht geschlossen.
+    Alle Nachricthen bis zu nächsten Lücke in die DLQ gepusht.
+    
+    -> Erhalten einer neuen Nachricht
+        -> ????
+
+    -> Sende Nachricht mit NNR X and Y
+        -> ????
+
+    Name: Initialiseren der HBQ
+    receive: {AbsenderPID, {request, initHBQ}}
+    return: {reply, ok}
+
+    Name: Neue Nachricht in HBQ speichern
+    receive: {AbsenderPID, {request, pushHBQ, MSG}}
+    return: {reply, ok}
+
+    Name: Abfragen einer Nachricht
+    receive: {AbsenderPID, {request, deliverMSG, NNR, CLIENTPID}}
+    return: {reply, SendNNR}
+    Anmerkung: SendNNR ggf. ungleich angeforderte NNR
+
+    Name: Terminierung der HBQ
+    receive: {AbsenderPID, {request, dellHBQ}}
+    return: {reply, ok}
+
+
+DLQ API:
+(Kein extra Prozess! Deswegen Funktionsorientiert)
+Enthält nur Nachrichten die an Leser (Clients) ausgeliefert werden dürfen.
+Ist das Limit einmal erreicht und es kommt eine neue Nachricht wird die älteste Nachrichte aus der Liste geschmissen.
+
+    Name: Initialisieren der DLQ
+    call: initDLQ(Size, LogDatei)
+    Datentypen: Zahl x Atom -> DLQ
+    return: neue leere DLQ
+
+    Name: Abfrage welche NNR als nächstes erwartet wird.
+    call: expectedNr(DLQ)
+    Datentypen: DLQ -> Zahl
+    return: nächste erwartete NNR
+
+    Name: Nachricht in DLQ speichern
+    call: push2DLQ(MSG, DLQ, LogDatei)
+    Datentypen: MSG x DLQ x Atom -> DLQ
+    return: DLQ mit neuer Nachricht
+
+    Name: Nachricht an Leser senden
+    call: deliverMSG(NNR, ClientPID, DLQ, LogDatei):
+    Datentypen: Zahl, ClientPID, DLQ, Atom -> Zahl
+    return: Gesendete NNR
+
+
+CMEM API:
+(Kein extra Prozess! Deswegen Funktionsorientiert)
+CMEM merkt sich jede Server - Client Verbindung und welche Nachricht der client zuletzt bekam.
+Meldet sich ein Client nicht mehr wird er gelöscht und wird beim nächsten Mal wie ein neuer Client behandelt.
+
+    Name: Initialiseren der CMEM
+    call: initCMEM(RemTime, LogDatei)
+    Datentypen: Zahl x Atom -> CMEM
+    return: Neue leere CMEM
+
+    Name: Aktualisieren der Clientdaten in der CMEM
+    call: updateClient(CMEM, ClientPID, NNR, LogDatei)
+    Datentypen: CMEM x PID x Zahl x Atom -> CMEM
+    return: aktualisierte CMEM
+
+    Name: Nachrichtennummer die als nächstes an gegebenen Kunden geschickt werden darf
+    call: getClientNNr(CMEM, ClientPID)
+    Datentypen: CMEM x PID -> Zahl
+    return: siehe Name
+
+
+MSG:
+    Minimal 3, Maximal 6 Elemente.
+        1. Nachrichtennummer
+        2. Die eigentliche Nachricht
+        3. Timestamp als die Nachricht den Redakteur (client) verlassen hat.
+        4. Timestamp als die Nachricht in die HBQ kam
+        5. Timestamp als die Nachricht in die DLQ kam
+        6. Timestamp als die Nachricht die DLQ verlässt
+    Min: [NNR, Msg, TSclientout]
+    Max: [NNR, Msg, TSclientout, TShbqin, TSdlqin, TSdlqout]
+
+
