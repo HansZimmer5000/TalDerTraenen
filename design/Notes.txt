@@ -53,3 +53,22 @@ bestimme_mis(WggT, GGTsCount) -> Generiert die benötigte Anzahl an Zahlen die a
 einmi(List, Akku) -> NICHT EXPORTIERT
 testeMI(Wggt, GGTsCount) -> Testet ob bestimme_mis/2 funktioniert.
 schreibeListe(List, Datei) -> NICHT EXPORTIERT UND UNGENUTZT
+
+
+Unterschiede von Werkzeug.erl zu vsutil.erl:
+message_to_string fehlt
+neu ist logging logstop shufle generiereRZOD timeMilliSecond type_is to_String
+
+vsutil.erl EXPORT
+-export([get_config_value/2,
+         openSe/2,openSeA/2,openRec/3,openRecA/3,createBinaryS/1,createBinaryD/1,createBinaryT/1,createBinaryNS/1,concatBinary/4,concatBinary/3,message_to_string/1,
+		 reset_timer/3,compareNow/2,getUTC/0,compareUTC/2,now2UTC/1,now2string/1,now2stringD/1,
+		 validTS/1,lessTS/2,lessoeqTS/2,equalTS/2,diffTS/2,
+		 bestimme_mis/2,testeMI/2]).
+
+werkzeug.erl EXPORT
+-export([get_config_value/2,logging/2,logstop/0,openSe/2,openSeA/2,openRec/3,openRecA/3,createBinaryS/1,createBinaryD/1,createBinaryT/1,createBinaryNS/1,concatBinary/4,concatBinary/3,message_to_string/1,
+		 shuffle/1,generiereRZOD/2,timeMilliSecond/0,reset_timer/3,compareNow/2,getUTC/0,compareUTC/2,now2UTC/1,
+		 type_is/1,to_String/1,validTS/1,lessTS/2,lessoeqTS/2,equalTS/2,diffTS/2,now2string/1,now2stringD/1,
+		 bestimme_mis/2,testeMI/2]).
+         

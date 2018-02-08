@@ -14,25 +14,28 @@
 start() -> 
     %CMEM = a.
     %HBQ = b.
-    ServerPid = spawn(fun() -> receive_loop(0) end),
+    ServerPid = spawn(fun() -> receive_loop(1) end),
     register(?SERVERNAME, ServerPid),
     ServerPid.
 
 
-receive_loop(LetzteNNR) ->
+receive_loop(NextNNR) ->
+    io:fwrite("receive_loop\n"),
+    io:fwrite(?SERVERNAME),
     receive
         {AbsenderPID, getmessages} ->   getmessages_abfertigen(AbsenderPID),
-                                        receive_loop(LetzteNNR);
+                                        receive_loop(NextNNR);
         {dropmessage, Nachricht} ->     dropmessage_abfertigen(Nachricht),
-                                        receive_loop(LetzteNNR);
-        {AbsenderPID, getmsgid} ->  NeueLetzteNNR = getmsgid_abfertigen(AbsenderPID, LetzteNNR),
-                                    receive_loop(NeueLetzteNNR)
+                                        receive_loop(NextNNR);
+        {AbsenderPID, getmsgid} ->  NeueNextNNR = getmsgid_abfertigen(AbsenderPID, NextNNR),
+                                    receive_loop(NeueNextNNR)
     end.
 
 
-getmessages_abfertigen(EmpfaengerPID) ->    
-    TS = werkzeug:now2string(erlang:timestamp()),
-    Nachricht = {1, "Text", TS, TS, TS, TS},
+getmessages_abfertigen(EmpfaengerPID) ->  
+    io:fwrite("Got getmessages"),  
+    TS = vsutil:now2string(erlang:timestamp()),
+    Nachricht = [1, "Text", TS, TS, TS, TS],
     TerminatedFlag = rand:uniform() > 0.5,
     EmpfaengerPID ! {reply, Nachricht, TerminatedFlag}.
 
@@ -41,8 +44,9 @@ dropmessage_abfertigen(_Nachricht) ->
     io:fwrite("Got dropmessage").
 
 
-getmsgid_abfertigen(EmpfaengerPID, LetzteNNR) -> 
-    EmpfaengerPID ! {nid, LetzteNNR},
+getmsgid_abfertigen(AbsenderPID, LetzteNNR) -> 
+    io:fwrite("Got getmsgid"),  
+    AbsenderPID ! {nid, LetzteNNR},
     LetzteNNR + 1.
 
 
@@ -50,5 +54,5 @@ getmsgid_abfertigen(EmpfaengerPID, LetzteNNR) ->
 hohle_wert_aus_config_mit_key(Key) ->
     %log_status(extractValueFromConfig,io_lib:format("Key: ~p",[Key])),
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
-    {ok, Value} = werkzeug:get_config_value(Key, ConfigListe),
+    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
     Value.

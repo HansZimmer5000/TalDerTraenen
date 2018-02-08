@@ -7,7 +7,7 @@
         zufalls_boolean/0,
         element_ist_in_liste/2,
         empfangene_nachricht_ist_von_meinem_redakteur/2,
-        logge_dass_nicht_senden_von_nachricht/1,
+        logge_das_nicht_senden_von_nachricht/1,
         logge_empfangene_nachricht/2,
         frage_nach_neuer_nnr/0,
         nachricht_zu_text/1,
@@ -34,11 +34,16 @@ start() ->
 % LOOPS
 redakteur_loop(Intervall, GeschriebeneNNRListe) -> 
     io:fwrite("redakteur"),
-    NNR = frage_nach_neuer_nachricht(),
-    TS = werkzeug:now2string(erlang:timestamp()),
+    NNR = frage_nach_neuer_nnr(),
+    io:fwrite("got number"),
+    TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = erstelle_nachricht(NNR, TS),
     NeueGeschriebeneNNRListe = lists:flatten([NNR, GeschriebeneNNRListe]),
-    sende_nachricht(Nachricht, NeueGeschriebeneNNRListe),
+    io:fwrite("before send\n"),
+    io:fwrite("~p", [Nachricht]),
+    io:fwrite("\n"),
+    pruefe_nnr_und_sende_nachricht(Nachricht, NeueGeschriebeneNNRListe),
+    io:fwrite("after send"),
     NeuerIntervall = kalkuliere_neuen_intervall_sek(Intervall),
     case length(NeueGeschriebeneNNRListe) of
         5 -> leser_loop(NeueGeschriebeneNNRListe);
@@ -57,7 +62,7 @@ leser_loop(GeschriebeneNNRListe) ->
 
 
 % FUNKTIONEN
-frage_nach_neuer_nnr()->
+frage_nach_neuer_nnr() ->
     SERVER = {?SERVERNAME, ?SERVERNODE},
     SERVER ! {self(), getmsgid},
     receive
@@ -77,7 +82,7 @@ erstelle_nachrichten_text() ->
     Hostname = hostname1,
     Praktikumsgruppe = gruppe1,
     Teamnummer = team1,
-    NowTs = werkzeug:now2string(erlang:timestamp()),
+    NowTs = vsutil:now2string(erlang:timestamp()),
     Nachricht = io_lib:format("~p, ~p, ~p, ~s", [Hostname, Praktikumsgruppe, Teamnummer, NowTs]),
     NachrichteFlatten = lists:flatten(Nachricht),
     NachrichteFlatten.
@@ -89,13 +94,13 @@ neue_nnr_einfuegen(NNR, NNRListe) ->
     NeueNNRListe.
 
 
-sende_nachricht(Nachricht, NNRListe) ->
+pruefe_nnr_und_sende_nachricht(Nachricht, NNRListe) ->
     Anzahl_Erstellter_Nachrichten = length(NNRListe),
     case Anzahl_Erstellter_Nachrichten of
-        5 -> logge_dass_nicht_senden_von_nachricht(Nachricht);
+        5 -> logge_das_nicht_senden_von_nachricht(Nachricht);
         _Any -> Server = {?SERVERNAME, ?SERVERNODE},
                 Server ! {dropmessage, Nachricht},
-                logge_dass_senden_von_nachricht(Nachricht)
+                logge_das_senden_von_nachricht(Nachricht)
     end.
 
 
@@ -131,38 +136,34 @@ zufalls_boolean() ->
     rand:uniform() > 0.5.
 
 hohle_text_aus_nachricht(Nachricht) ->
-    case Nachricht of
-        {NNR, Text, TSclientout, TShbqin, TSdlqin, TSdlqout} -> Text;
-        {NNR, Text, TSclientout, TShbqin, TSdlqin} -> Text;
-        {NNR, Text, TSclientout, TShbqin} -> Text;
-        {NNR, Text, TSclientout} -> Text
-    end.
+    [_NNR, Textnachricht | _Rest] = Nachricht,
+    Textnachricht.
 
 logge_empfangene_nachricht(Nachricht, NummernListe) ->
-    [_NNR, Textnachricht | _Rest] = Nachricht, %Nachricht ist keine Liste! Sondern ein Tupel mit N Stellen!! (Siehe Anzahl TS)
+    [_NNR, Textnachricht | _Rest] = Nachricht, 
     case empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NummernListe) of
         true ->
             NeueTextnachricht = lists:flatten(io_lib:format("~s ~s", ["Ist von meinem Redakteur", Textnachricht])),
-            werkzeug:logging(?LOG_DATEI_NAME, NeueTextnachricht);
-        false -> werkzeug:logging(?LOG_DATEI_NAME, Textnachricht)
+            util:logging(?LOG_DATEI_NAME, NeueTextnachricht);
+        false -> util:logging(?LOG_DATEI_NAME, Textnachricht)
     end,
-    werkzeug:logging(?LOG_DATEI_NAME, "\n").
+    util:logging(?LOG_DATEI_NAME, "\n").
 
 
-logge_dass_nicht_senden_von_nachricht(Nachricht) -> 
+logge_das_nicht_senden_von_nachricht(Nachricht) -> 
     [NNR | _Rest] = Nachricht,
-    AktuelleZeit = werkzeug:now2string(erlang:timestamp()),
+    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
     LogNachricht = io_lib:format("~p ~p ~s", [NNR, AktuelleZeit, "vergessen zu senden."]),
     LogNachrichtenFlatten = lists:flatten(LogNachricht),
-    werkzeug:logging(?LOG_DATEI_NAME, LogNachrichtenFlatten).
+    util:logging(?LOG_DATEI_NAME, LogNachrichtenFlatten).
 
 
-logge_dass_senden_von_nachricht(Nachricht) -> 
+logge_das_senden_von_nachricht(Nachricht) -> 
     [NNR | _Rest] = Nachricht,
-    AktuelleZeit = werkzeug:now2string(erlang:timestamp()),
+    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
     LogNachricht = io_lib:format("~p ~p ~s", [NNR, AktuelleZeit, "gesendet."]),
     LogNachrichtenFlatten = lists:flatten(LogNachricht),
-    werkzeug:logging(?LOG_DATEI_NAME, LogNachrichtenFlatten).
+    util:logging(?LOG_DATEI_NAME, LogNachrichtenFlatten).
 
 
 nachricht_zu_text([]) -> "";
@@ -194,5 +195,5 @@ element_ist_in_liste(Elem, [_Head | Rest]) ->
 hohle_wert_aus_config_mit_key(Key) ->
     %log_status(extractValueFromConfig,io_lib:format("Key: ~p",[Key])),
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
-    {ok, Value} = werkzeug:get_config_value(Key, ConfigListe),
+    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
     Value.
