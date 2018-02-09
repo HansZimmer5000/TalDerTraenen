@@ -5,12 +5,12 @@
 
 %TODO        frage_nach_neuer_nnr/0,
 %        erstelle_nachricht/2,
-%TODO        erstelle_nachrichten_text/0,
+%        erstelle_nachrichten_text/1,
 %TODO        pruefe_nnr_und_sende_nachricht/2,
 %        kalkuliere_neuen_intervall_sek/1,
 
 %TODO       frage_nach_neuer_nachricht/0,
-%TODO       empfangene_nachricht_ist_von_meinem_redakteur/2,
+%       empfangene_nachricht_ist_von_meinem_redakteur/2,
 %TODO       logge_empfangene_nachricht/2,
 
 %        zufalls_boolean/0,
@@ -19,7 +19,7 @@
 %        neue_nnr_einfuegen/2
 
 frage_nach_neuer_nnr_1_test() ->
-    false.
+    false = true.
 
 erstelle_nachricht_1_test() ->
     NNR = 1,
@@ -33,10 +33,20 @@ erstelle_nachricht_1_test() ->
     io:fwrite(ResultNachricht),
     TestNachricht == ResultNachricht.
 
+erstelle_nachrichten_text_1_test() ->
+    TS = vsutil:now2string(erlang:timestamp()),
+    Text = io_lib:format("hostname1, gruppe1, team1, ~s", [TS]),
+    Result = client:erstelle_nachrichten_text(TS),
+    io:fwrite("\n"),
+    io:fwrite(Result),
+    io:fwrite("\n"),
+    io:fwrite(Text),
+    Text == Result.
+
 
 
 pruefe_nnr_und_sende_nachricht_1_test() ->
-    false.
+    false = true.
 
 kalkuliere_neuen_intervall_sek_1_test() ->
     Result = client:kalkuliere_neuen_intervall_sek(2),
@@ -56,13 +66,25 @@ kalkuliere_neuen_intervall_sek_3_test() ->
 
 
 frage_nach_neuer_nachricht_1_test() ->
-    false.
+    false = true.
 
 empfangene_nachricht_ist_von_meinem_redakteur_1_test() ->
-    false.
+    Nachricht = [1, "test", erlang:timestamp()],
+    NNRListe = [3,4,5,1],
+    true = client:empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NNRListe).
+
+empfangene_nachricht_ist_von_meinem_redakteur_2_test() ->
+    Nachricht = [1, "test", erlang:timestamp()],
+    NNRListe = [3,4,5],
+    false = client:empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NNRListe).
+
+empfangene_nachricht_ist_von_meinem_redakteur_3_test() ->
+    Nachricht = [1, "test", erlang:timestamp()],
+    NNRListe = [],
+    false = client:empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NNRListe).
 
 logge_empfangene_nachricht_1_test() ->
-    false.
+    false = true.
 
 
 

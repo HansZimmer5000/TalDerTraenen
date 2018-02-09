@@ -6,7 +6,7 @@
 
         frage_nach_neuer_nnr/0,
         erstelle_nachricht/2,
-        erstelle_nachrichten_text/0,
+        erstelle_nachrichten_text/1,
         pruefe_nnr_und_sende_nachricht/2,
         kalkuliere_neuen_intervall_sek/1,
 
@@ -77,16 +77,15 @@ frage_nach_neuer_nnr() ->
     NNR.
 
 erstelle_nachricht(NNR, ErstellungsTS) ->
-    Textnachricht = erstelle_nachrichten_text(),
+    Textnachricht = erstelle_nachrichten_text(ErstellungsTS),
     Nachricht = [NNR, Textnachricht, ErstellungsTS],
     Nachricht.
 
-erstelle_nachrichten_text() -> 
+erstelle_nachrichten_text(ErstellungsTS) -> 
     Hostname = hostname1,
     Praktikumsgruppe = gruppe1,
     Teamnummer = team1,
-    NowTs = vsutil:now2string(erlang:timestamp()),
-    Nachricht = io_lib:format("~p, ~p, ~p, ~s", [Hostname, Praktikumsgruppe, Teamnummer, NowTs]),
+    Nachricht = io_lib:format("~p, ~p, ~p, ~s", [Hostname, Praktikumsgruppe, Teamnummer, ErstellungsTS]),
     NachrichteFlatten = lists:flatten(Nachricht),
     NachrichteFlatten.
 
