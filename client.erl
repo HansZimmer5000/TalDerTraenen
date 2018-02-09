@@ -12,7 +12,9 @@
         nachricht_zu_text/1,
         erstelle_nachricht/2,
         neue_nnr_einfuegen/2,
-        start/0
+        start/0,
+        pruefe_nnr_und_sende_nachricht/2,
+        frage_nach_neuer_nachricht/0
         ]).
 
 % KONSTANTEN
@@ -138,21 +140,11 @@ kalkuliere_neuen_intervall_sek(Intervall) ->
 zufalls_boolean() ->
     rand:uniform() > 0.5.
 
-logge_empfangene_nachricht(Nachricht, NummernListe) ->
-    [_NNR, Textnachricht | _Rest] = Nachricht, 
-    case empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NummernListe) of
-        true -> logge_status(io_lib:format("Empfangene Nachricht ~s ist von meinem Redakteur", [Textnachricht]));
-        false -> logge_status(io_lib:format("Empfangene Nachricht ~s", [Textnachricht]))
-    end,
-    util:logging(?LOG_DATEI_NAME, "\n").
 
-
-nachricht_zu_text([]) -> "";
 nachricht_zu_text(Nachricht) ->
-    [NNR, Textnachricht | Timestamps] = Nachricht,
-    Akku = lists:flatten(io_lib:format("~w, ~s", [NNR, Textnachricht])),
-    nachricht_zu_text_(Timestamps, Akku).
-
+    [NNR | Rest] = Nachricht,
+    Akku = io_lib:format("~w, ", [NNR]),
+    nachricht_zu_text_(Rest, Akku).
 
 nachricht_zu_text_([], Akku) -> Akku;
 nachricht_zu_text_([NachrichtHead | NachrichtRest], Akku) ->
@@ -172,7 +164,7 @@ element_ist_in_liste(Elem, [_Head | Rest]) ->
 
 
 hohle_wert_aus_config_mit_key(Key) ->
-    %log_status(extractValueFromConfig,io_lib:format("Key: ~p",[Key])),
+    logge_status(io_lib:format("Key: ~p",[Key])),
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
     {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
     Value.
@@ -190,3 +182,9 @@ logge_nachricht_status(Nachricht, Status) ->
     LogNachrichtenFlatten = lists:flatten(LogNachricht),
     logge_status(LogNachrichtenFlatten).
 
+logge_empfangene_nachricht(Nachricht, NummernListe) ->
+    [_NNR, Textnachricht | _Rest] = Nachricht, 
+    case empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NummernListe) of
+        true -> logge_status(io_lib:format("Empfangene Nachricht ~s ist von meinem Redakteur", [Textnachricht]));
+        false -> logge_status(io_lib:format("Empfangene Nachricht ~s", [Textnachricht]))
+    end.
