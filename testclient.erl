@@ -3,6 +3,21 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
+%TODO        frage_nach_neuer_nnr/0,
+%        erstelle_nachricht/2,
+%        erstelle_nachrichten_text/0,
+%TODO        pruefe_nnr_und_sende_nachricht/2,
+%        kalkuliere_neuen_intervall_sek/1,
+
+%TODO       frage_nach_neuer_nachricht/0,
+%TODO        empfangene_nachricht_ist_von_meinem_redakteur/2,
+%TODO        logge_empfangene_nachricht/2,
+
+%        zufalls_boolean/0,
+%        element_ist_in_liste/2,
+%        nachricht_zu_text/1,
+%        neue_nnr_einfuegen/2
+
 kalkuliere_neuen_intervall_sek_1_test() ->
     Result = client:kalkuliere_neuen_intervall_sek(2),
     case Result of
