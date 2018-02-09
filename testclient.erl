@@ -45,9 +45,6 @@ nachricht_zu_text_1_test() ->
     "1, Test, 15.01 21:11:55,874|, 15.01 21:11:55,874|, 15.01 21:11:55,874|, 15.01 21:11:55,874|" = client:nachricht_zu_text(Nachricht).
 
 nachricht_zu_text_2_test() ->
-    "" = client:nachricht_zu_text([]).
-
-nachricht_zu_text_3_test() ->
     TS = {1516, 47115, 874000},
     Nachricht = [1, 
                 "Test", 
@@ -67,11 +64,6 @@ erstelle_nachricht_1_test() ->
     io:fwrite("\n"),
     io:fwrite(ResultNachricht),
     TestNachricht == ResultNachricht.
-
-erstelle_nachricht_2_test() -> 
-    NNR = 0,
-    TS = vsutil:now2string(erlang:timestamp()),
-    [] = client:erstelle_nachricht(NNR, TS).
 
 
 neue_nnr_einfuegen_1_test() ->

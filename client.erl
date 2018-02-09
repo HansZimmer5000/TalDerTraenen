@@ -2,19 +2,22 @@
 
 % API
 -export([
+        start/0,
+
+        frage_nach_neuer_nnr/0,
+        erstelle_nachricht/2,
         erstelle_nachrichten_text/0,
+        pruefe_nnr_und_sende_nachricht/2,
         kalkuliere_neuen_intervall_sek/1,
-        zufalls_boolean/0,
-        element_ist_in_liste/2,
+
+        frage_nach_neuer_nachricht/0,
         empfangene_nachricht_ist_von_meinem_redakteur/2,
         logge_empfangene_nachricht/2,
-        frage_nach_neuer_nnr/0,
+
+        zufalls_boolean/0,
+        element_ist_in_liste/2,
         nachricht_zu_text/1,
-        erstelle_nachricht/2,
-        neue_nnr_einfuegen/2,
-        start/0,
-        pruefe_nnr_und_sende_nachricht/2,
-        frage_nach_neuer_nachricht/0
+        neue_nnr_einfuegen/2
         ]).
 
 % KONSTANTEN
@@ -143,7 +146,7 @@ zufalls_boolean() ->
 
 nachricht_zu_text(Nachricht) ->
     [NNR | Rest] = Nachricht,
-    Akku = io_lib:format("~w, ", [NNR]),
+    Akku = io_lib:format("~w", [NNR]),
     nachricht_zu_text_(Rest, Akku).
 
 nachricht_zu_text_([], Akku) -> Akku;
