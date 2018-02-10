@@ -205,7 +205,7 @@ logge_status(Inhalt) ->
     case element_ist_in_liste(?ETS_TABELLENNAME, ets:all()) of
         true -> [{_Key, LogDateiName}] = ets:lookup(?ETS_TABELLENNAME, self()),
                 util:logging(lists:concat([LogDateiName,".log"]), LogNachricht);
-        false -> exit("Main Client nicht mehr aktiv")
+        false -> ok
     end.
 
 logge_nachricht_status(Nachricht, Status) ->

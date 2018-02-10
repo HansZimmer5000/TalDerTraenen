@@ -84,16 +84,16 @@ pruefe_nnr_und_sende_nachricht_2_test() ->
 kalkuliere_neuen_intervall_sek_1_test() ->
     Result = client:kalkuliere_neuen_intervall_sek(2),
     case Result of
-        3.0 -> true;
-        2.0 -> true;
+        3 -> true;
+        2 -> true;
         _Else -> false
     end.
 
 kalkuliere_neuen_intervall_sek_2_test() -> 
-    2.0 = client:kalkuliere_neuen_intervall_sek("a").
+    2 = client:kalkuliere_neuen_intervall_sek("a").
 
 kalkuliere_neuen_intervall_sek_3_test() ->
-    2.0 = client:kalkuliere_neuen_intervall_sek(a).
+    2 = client:kalkuliere_neuen_intervall_sek(a).
 
 
 
