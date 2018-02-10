@@ -86,8 +86,7 @@ erstelle_nachrichten_text(ErstellungsTS) ->
     Praktikumsgruppe = gruppe1,
     Teamnummer = team1,
     Nachricht = io_lib:format("~p, ~p, ~p, ~s", [Hostname, Praktikumsgruppe, Teamnummer, ErstellungsTS]),
-    NachrichteFlatten = lists:flatten(Nachricht),
-    NachrichteFlatten.
+    Nachricht.
 
 
 neue_nnr_einfuegen(NNR, []) -> [NNR];
@@ -171,16 +170,14 @@ hohle_wert_aus_config_mit_key(Key) ->
 
 logge_status(Inhalt) ->
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
-    LogNachricht = io_lib:format("~p ~s.", [AktuelleZeit, Inhalt]),
-    LogNachrichtenFlatten = lists:flatten(LogNachricht), %TODO Braucht man das?
-    io:fwrite(io_lib:format("~s\n" ,[LogNachrichtenFlatten])),
-    util:logging(?LOG_DATEI_NAME, LogNachrichtenFlatten).
+    LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
+    io:fwrite(LogNachricht),
+    util:logging(?LOG_DATEI_NAME, LogNachricht).
 
 logge_nachricht_status(Nachricht, Status) ->
     [NNR | _Rest] = Nachricht,
     LogNachricht = io_lib:format("NNR ~p ~s", [NNR, Status]),
-    LogNachrichtenFlatten = lists:flatten(LogNachricht),
-    logge_status(LogNachrichtenFlatten).
+    logge_status(LogNachricht).
 
 logge_empfangene_nachricht(Nachricht, NummernListe) ->
     [_NNR, Textnachricht | _Rest] = Nachricht, 
