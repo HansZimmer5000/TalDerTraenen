@@ -20,13 +20,10 @@ hohle_wert_aus_config_mit_key(Key) ->
 logge_status(Inhalt) ->
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
     LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
-    LogNachrichtenFlatten = lists:flatten(LogNachricht), %TODO Braucht man das?
-    io:fwrite(LogNachrichtenFlatten),
-    util:logging(?LOG_DATEI_NAME, LogNachrichtenFlatten).
+    io:fwrite(LogNachricht),
+    util:logging(?LOG_DATEI_NAME, LogNachricht).
 
 logge_nachricht_status(Nachricht, Status) ->
     [NNR | _Rest] = Nachricht,
     LogNachricht = io_lib:format("NNR ~p ~s", [NNR, Status]),
-    LogNachrichtenFlatten = lists:flatten(LogNachricht),
-    logge_status(LogNachrichtenFlatten).
-
+    logge_status(LogNachricht).

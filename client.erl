@@ -46,6 +46,10 @@ redakteur_loop(Intervall, GeschriebeneNNRListe) ->
     Nachricht = erstelle_nachricht(NNR, TS),
     logge_nachricht_status(Nachricht, "erstellt"),
 
+    timer:sleep(timer:seconds(Intervall)),
+    logge_status(io_lib:format("Intervall von ~p Sek. vorbei", [Intervall]))
+
+
     NeueGeschriebeneNNRListe = lists:flatten([NNR, GeschriebeneNNRListe]),
     pruefe_nnr_und_sende_nachricht(?SERVER, Nachricht, NeueGeschriebeneNNRListe),
     NeuerIntervall = kalkuliere_neuen_intervall_sek(Intervall),
