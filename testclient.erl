@@ -3,13 +3,13 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-%TODO        frage_nach_neuer_nnr/0,
+%        frage_nach_neuer_nnr/0,
 %        erstelle_nachricht/2,
 %        erstelle_nachrichten_text/1,
-%TODO        pruefe_nnr_und_sende_nachricht/2,
+%        pruefe_nnr_und_sende_nachricht/2,
 %        kalkuliere_neuen_intervall_sek/1,
 
-%TODO       frage_nach_neuer_nachricht/0,
+%       frage_nach_neuer_nachricht/0,
 %       empfangene_nachricht_ist_von_meinem_redakteur/2,
 %TODO       logge_empfangene_nachricht/2,
 
@@ -19,7 +19,13 @@
 %        neue_nnr_einfuegen/2
 
 frage_nach_neuer_nnr_1_test() ->
-    false = true.
+    TestNNR = 1,
+    ServerPid = spawn(fun() -> 
+                            receive
+                                    {AbsenderPID, getmsgid} -> AbsenderPID ! {nid, TestNNR}
+                            end
+                        end),
+    TestNNR = client:frage_nach_neuer_nnr(ServerPid).
 
 erstelle_nachricht_1_test() ->
     NNR = 1,
@@ -46,7 +52,34 @@ erstelle_nachrichten_text_1_test() ->
 
 
 pruefe_nnr_und_sende_nachricht_1_test() ->
-    false = true.
+    ThisPid = self(),
+    Nachricht = [1, "Text", vsutil:now2string(erlang:timestamp())],
+    NNRListe = [1,4,5],
+    ServerPid = spawn(fun() -> 
+                            receive
+                                    {dropmessage, _EmpfangeneNachricht} -> ThisPid ! ok
+                            end
+                        end),
+    client:pruefe_nnr_und_sende_nachricht(ServerPid, Nachricht, NNRListe),
+    receive
+        ok -> ok
+    end.
+
+pruefe_nnr_und_sende_nachricht_2_test() ->
+    ThisPid = self(),
+    Nachricht = [1, "Text", vsutil:now2string(erlang:timestamp())],
+    NNRListe = [1,4,2,3,5],
+    ServerPid = spawn(fun() -> 
+                            receive
+                                    _Any -> ThisPid ! nok
+                                    after 0 -> ThisPid ! ok
+                            end
+                        end),
+    client:pruefe_nnr_und_sende_nachricht(ServerPid, Nachricht, NNRListe),
+    receive
+        ok -> ok
+    end.
+
 
 kalkuliere_neuen_intervall_sek_1_test() ->
     Result = client:kalkuliere_neuen_intervall_sek(2),
@@ -66,7 +99,26 @@ kalkuliere_neuen_intervall_sek_3_test() ->
 
 
 frage_nach_neuer_nachricht_1_test() ->
-    false = true.
+    Nachricht = [3, "Text", vsutil:now2string(erlang:timestamp()), vsutil:now2string(erlang:timestamp()), vsutil:now2string(erlang:timestamp()), vsutil:now2string(erlang:timestamp())],
+    TerminatedFlag = false,
+    ServerPid = spawn(fun() -> 
+                        receive
+                                {AbsenderPID, getmessages} -> AbsenderPID ! {reply, Nachricht, TerminatedFlag}
+                        end
+                    end),
+    Nachricht = client:frage_nach_neuer_nachricht(ServerPid).
+
+frage_nach_neuer_nachricht_2_test() ->
+    Nachricht = [3, "Text", vsutil:now2string(erlang:timestamp()), vsutil:now2string(erlang:timestamp()), vsutil:now2string(erlang:timestamp()), vsutil:now2string(erlang:timestamp())],
+    Ergebnis = [],
+    TerminatedFlag = true,
+    ServerPid = spawn(fun() -> 
+                        receive
+                                {AbsenderPID, getmessages} -> AbsenderPID ! {reply, Nachricht, TerminatedFlag}
+                        end
+                    end),
+    Ergebnis = client:frage_nach_neuer_nachricht(ServerPid).
+
 
 empfangene_nachricht_ist_von_meinem_redakteur_1_test() ->
     Nachricht = [1, "test", erlang:timestamp()],

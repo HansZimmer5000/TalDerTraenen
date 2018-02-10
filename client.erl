@@ -4,13 +4,13 @@
 -export([
         start/0,
 
-        frage_nach_neuer_nnr/0,
+        frage_nach_neuer_nnr/1,
         erstelle_nachricht/2,
         erstelle_nachrichten_text/1,
-        pruefe_nnr_und_sende_nachricht/2,
+        pruefe_nnr_und_sende_nachricht/3,
         kalkuliere_neuen_intervall_sek/1,
 
-        frage_nach_neuer_nachricht/0,
+        frage_nach_neuer_nachricht/1,
         empfangene_nachricht_ist_von_meinem_redakteur/2,
         logge_empfangene_nachricht/2,
 
@@ -27,6 +27,7 @@
 -define(CLIENT_ANZAHL, hohle_wert_aus_config_mit_key(clientAnzahl)).
 -define(SERVERNAME, hohle_wert_aus_config_mit_key(servername)).
 -define(SERVERNODE, hohle_wert_aus_config_mit_key(servernode)).
+-define(SERVER, {?SERVERNAME, ?SERVERNODE}).
 
 % INIT
 start() ->
@@ -40,13 +41,13 @@ start() ->
 % LOOPS
 redakteur_loop(Intervall, GeschriebeneNNRListe) -> 
     logge_status("Beginne redakteur_loop"),
-    NNR = frage_nach_neuer_nnr(),
+    NNR = frage_nach_neuer_nnr(?SERVER),
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = erstelle_nachricht(NNR, TS),
     logge_nachricht_status(Nachricht, "erstellt"),
 
     NeueGeschriebeneNNRListe = lists:flatten([NNR, GeschriebeneNNRListe]),
-    pruefe_nnr_und_sende_nachricht(Nachricht, NeueGeschriebeneNNRListe),
+    pruefe_nnr_und_sende_nachricht(?SERVER, Nachricht, NeueGeschriebeneNNRListe),
     NeuerIntervall = kalkuliere_neuen_intervall_sek(Intervall),
     logge_nachricht_status(Nachricht, "abgearbeitet"),
 
@@ -58,7 +59,7 @@ redakteur_loop(Intervall, GeschriebeneNNRListe) ->
 
 leser_loop(GeschriebeneNNRListe) ->
     logge_status(io_lib:format("Beginne leser_loop mit NNRListe: ~p" , [GeschriebeneNNRListe])),
-    NeueNachricht = frage_nach_neuer_nachricht(),
+    NeueNachricht = frage_nach_neuer_nachricht(?SERVER),
     case NeueNachricht of
         [] -> redakteur_loop(?MIN_INTERVALL_ZEIT_SEK, []);
         _Any -> logge_empfangene_nachricht(NeueNachricht, GeschriebeneNNRListe),
@@ -67,9 +68,8 @@ leser_loop(GeschriebeneNNRListe) ->
 
 
 % FUNKTIONEN
-frage_nach_neuer_nnr() ->
-    SERVER = {?SERVERNAME, ?SERVERNODE},
-    SERVER ! {self(), getmsgid},
+frage_nach_neuer_nnr(Server) ->
+    Server ! {self(), getmsgid},
     logge_status("Warte auf NNR"),
     receive
         {nid, NNR} -> logge_status(io_lib:format("NNR ~w bekommen", [NNR]))
@@ -96,18 +96,16 @@ neue_nnr_einfuegen(NNR, NNRListe) ->
     NeueNNRListe.
 
 
-pruefe_nnr_und_sende_nachricht(Nachricht, NNRListe) ->
+pruefe_nnr_und_sende_nachricht(Server, Nachricht, NNRListe) ->
     Anzahl_Erstellter_Nachrichten = length(NNRListe),
     case Anzahl_Erstellter_Nachrichten of
         5 -> logge_nachricht_status(Nachricht, "vergessen zu senden");
-        _Any -> Server = {?SERVERNAME, ?SERVERNODE},
-                Server ! {dropmessage, Nachricht},
+        _Any -> Server ! {dropmessage, Nachricht},
                 logge_nachricht_status(Nachricht, "gesendet")
     end.
 
 
-frage_nach_neuer_nachricht() -> 
-    Server = {?SERVERNAME, ?SERVERNODE},
+frage_nach_neuer_nachricht(Server) -> 
     Server ! {self(), getmessages},
     logge_status("Warte auf Nachricht"),
 
