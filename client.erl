@@ -21,21 +21,35 @@
         ]).
 
 % KONSTANTEN
--define(MIN_INTERVALL_ZEIT_SEK, 2.0).
--define(LOG_DATEI_NAME, "client.log").
 -define(CONFIG_FILENAME, "client.cfg").
+-define(MIN_INTERVALL_ZEIT_SEK, 2).
 -define(CLIENT_ANZAHL, hohle_wert_aus_config_mit_key(clientAnzahl)).
 -define(SERVERNAME, hohle_wert_aus_config_mit_key(servername)).
 -define(SERVERNODE, hohle_wert_aus_config_mit_key(servernode)).
 -define(SERVER, {?SERVERNAME, ?SERVERNODE}).
+-define(ETS_TABELLENNAME, hohle_wert_aus_config_mit_key(etsTabellenname)).
 
 % INIT
 start() ->
-    util:logging(?LOG_DATEI_NAME, "Client:start wird ausgefuehrt"),
-    %TODO: Start N Clients
+    ets:new(?ETS_TABELLENNAME, [named_table, public, set]), %, {keypos, 1}]),
+    ets:insert(?ETS_TABELLENNAME, {self(), "client"}),
+    logge_status(io_lib:format("client mit PID ~p gestartet", [self()])),
+    ClientPidList = start_all_clients(?CLIENT_ANZAHL, []),
+    timer:sleep(timer:seconds(10)),
+    kill_all_clients(ClientPidList).
+
+start_all_clients(0, AlteClientPidList) -> AlteClientPidList;
+start_all_clients(AktuelleClientnummer, AlteClientPidList) ->
+    ClientPid = start_client_node(AktuelleClientnummer),
+    NeueClientPidList = [ClientPid | AlteClientPidList],
+    start_all_clients(AktuelleClientnummer - 1, NeueClientPidList).
+
+start_client_node(Clientnummer) ->
+    Clientname = lists:concat(["client", Clientnummer]),
     ClientPid = spawn(fun() -> redakteur_loop(?MIN_INTERVALL_ZEIT_SEK, []) end),
-    register(list_to_atom(lists:concat(["name",0])), ClientPid),
-    util:logging(?LOG_DATEI_NAME, "Client gestartet"),
+    register(list_to_atom(Clientname), ClientPid),
+    ets:insert(?ETS_TABELLENNAME, {ClientPid, Clientname}),
+    logge_status(lists:concat([Clientname, " mit PID ", io_lib:format("~p", [ClientPid]), " gestartet"])),
     ClientPid.
 
 % LOOPS
@@ -47,8 +61,7 @@ redakteur_loop(Intervall, GeschriebeneNNRListe) ->
     logge_nachricht_status(Nachricht, "erstellt"),
 
     timer:sleep(timer:seconds(Intervall)),
-    logge_status(io_lib:format("Intervall von ~p Sek. vorbei", [Intervall]))
-
+    logge_status(io_lib:format("Intervall von ~p Sek. vorbei", [Intervall])),
 
     NeueGeschriebeneNNRListe = lists:flatten([NNR, GeschriebeneNNRListe]),
     pruefe_nnr_und_sende_nachricht(?SERVER, Nachricht, NeueGeschriebeneNNRListe),
@@ -76,9 +89,11 @@ frage_nach_neuer_nnr(Server) ->
     Server ! {self(), getmsgid},
     logge_status("Warte auf NNR"),
     receive
-        {nid, NNR} -> logge_status(io_lib:format("NNR ~w bekommen", [NNR]))
-    end,
-    NNR.
+        {nid, NNR} -> 
+            logge_status(io_lib:format("NNR ~w bekommen", [NNR])),
+            NNR;
+        {kill} -> exit("Kill Befehl vom Main Client")
+    end.
 
 erstelle_nachricht(NNR, ErstellungsTS) ->
     Textnachricht = erstelle_nachrichten_text(ErstellungsTS),
@@ -113,15 +128,17 @@ frage_nach_neuer_nachricht(Server) ->
     logge_status("Warte auf Nachricht"),
 
     receive
-        {reply, Nachricht, TerminatedFlag} -> ok
-    end,
-    logge_nachricht_status(Nachricht, io_lib:format("erhalten mit TerminatedFlag = ~p", [TerminatedFlag])),
+        {reply, Nachricht, TerminatedFlag} -> 
+            ok,
+            logge_nachricht_status(Nachricht, io_lib:format("erhalten mit TerminatedFlag = ~p", [TerminatedFlag])),
+            case TerminatedFlag of
+                true -> Ergebnis = [];
+                false -> Ergebnis = Nachricht
+            end,
+            Ergebnis;
+        {kill} -> exit("Kill Befehl vom Main Client")
+    end.
 
-    case TerminatedFlag of
-        true -> Ergebnis = [];
-        false -> Ergebnis = Nachricht
-    end,
-    Ergebnis.
 
 
 
@@ -134,7 +151,7 @@ kalkuliere_neuen_intervall_sek(Intervall) ->
                 NeuerIntervall = Intervall * Faktor,
                 case NeuerIntervall of
                     NeuerIntervall when NeuerIntervall < ?MIN_INTERVALL_ZEIT_SEK -> ?MIN_INTERVALL_ZEIT_SEK;
-                    NeuerIntervall when NeuerIntervall >= ?MIN_INTERVALL_ZEIT_SEK -> NeuerIntervall
+                    NeuerIntervall when NeuerIntervall >= ?MIN_INTERVALL_ZEIT_SEK -> round(NeuerIntervall)
                 end;
         false -> ?MIN_INTERVALL_ZEIT_SEK
     end.
@@ -166,8 +183,17 @@ element_ist_in_liste(Elem, [_Head | Rest]) ->
     element_ist_in_liste(Elem, Rest).
 
 
+kill_all_clients([]) -> 
+	logge_status("Alle Clients wurden getötet");
+kill_all_clients([Client|RestClients]) ->
+	%exit(HeadClient,kill),
+	Client ! {kill},
+	logge_status(io_lib:format("Der Client ~p wurde zur Selbstzerstörung überredet", [Client])),
+	kill_all_clients(RestClients).
+
+
+
 hohle_wert_aus_config_mit_key(Key) ->
-    logge_status(io_lib:format("Key: ~p",[Key])),
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
     {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
     Value.
@@ -176,7 +202,11 @@ logge_status(Inhalt) ->
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
     LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
-    util:logging(?LOG_DATEI_NAME, LogNachricht).
+    case element_ist_in_liste(?ETS_TABELLENNAME, ets:all()) of
+        true -> [{_Key, LogDateiName}] = ets:lookup(?ETS_TABELLENNAME, self()),
+                util:logging(lists:concat([LogDateiName,".log"]), LogNachricht);
+        false -> exit("Main Client nicht mehr aktiv")
+    end.
 
 logge_nachricht_status(Nachricht, Status) ->
     [NNR | _Rest] = Nachricht,
