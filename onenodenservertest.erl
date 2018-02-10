@@ -4,7 +4,11 @@
 -export([start/0]).
 
 start() ->
-        ClientPid = spawn(fun() -> client_loop() end),
+        ClientPid = spawn(fun() -> 
+                                receive
+                                    Any -> io:fwrite(io_lib:format("Received: ~p \n", [Any]))
+                                end
+                            end),
         ServerPid = spawn(fun() -> server_loop(ClientPid) end).
         
 client_loop() ->
@@ -15,5 +19,5 @@ client_loop() ->
 
 server_loop(ClientPid) ->
     ClientPid ! a,
-    io:fwrite(io_lib:format("Send: a \n", [])),
-    server_loop(ClientPid).
+    io:fwrite(io_lib:format("Send: a \n", [])).
+    %server_loop(ClientPid).
