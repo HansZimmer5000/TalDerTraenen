@@ -3,7 +3,7 @@
 
 % API
 -export([start/0,
-        getmessages_abfertigen/1,
+        getmessages_abfertigen/2,
         dropmessage_abfertigen/1,
         getmsgid_abfertigen/2]).
 
@@ -12,30 +12,35 @@
 -define(LOG_DATEI_NAME, "server.log").
 -define(SERVERNAME, hohle_wert_aus_config_mit_key(servername)).
 -define(LATENZ_SEK, hohle_wert_aus_config_mit_key(latenzSek)).
+-define(CMEM_LOG_DATEI_NAME, "cmem.log").
+-define(ERINNERUNGS_ZEIT_SEK, 3).
 
 start() -> 
-    %CMEM = a.
-    %HBQPID = b.
-    ServerPid = spawn(fun() -> receive_loop(1) end),
+    CMEM = cmem:initCMEM(?ERINNERUNGS_ZEIT_SEK, ?CMEM_LOG_DATEI_NAME),
+    %HBQPID = b,
+    ServerPid = spawn(fun() -> receive_loop(CMEM, 1) end),
     register(?SERVERNAME, ServerPid),
     ServerPid.
 
 
-receive_loop(NextNNR) ->
+receive_loop(CMEM, NextNNR) ->
     logge_status("receive_loop"),
     {ok,ServerTimer} = timer:send_after(?LATENZ_SEK, self(), {request,killAll}),
     receive
-        {AbsenderPID, getmessages} ->   getmessages_abfertigen(AbsenderPID),
-                                        receive_loop(NextNNR);
-        {dropmessage, Nachricht} ->     dropmessage_abfertigen(Nachricht),
-                                        receive_loop(NextNNR);
-        {AbsenderPID, getmsgid} ->  NeueNextNNR = getmsgid_abfertigen(AbsenderPID, NextNNR),
-                                    receive_loop(NeueNextNNR);
+        {AbsenderPID, getmessages} ->   timer:cancel(ServerTimer),
+                                        NeueCMEM = getmessages_abfertigen(CMEM, AbsenderPID),
+                                        receive_loop(NeueCMEM, NextNNR);
+        {dropmessage, Nachricht} ->     timer:cancel(ServerTimer),
+                                        dropmessage_abfertigen(Nachricht),
+                                        receive_loop(CMEM, NextNNR);
+        {AbsenderPID, getmsgid} ->  timer:cancel(ServerTimer),
+                                    NeueNextNNR = getmsgid_abfertigen(AbsenderPID, NextNNR),
+                                    receive_loop(CMEM, NeueNextNNR);
         {request, killAll} -> runterfahren()
     end.
 
 
-getmessages_abfertigen(EmpfaengerPID) ->  
+getmessages_abfertigen(_CMEM, EmpfaengerPID) ->  
     logge_status("Got getmessages"),  
     TS = erlang:timestamp(),
     Nachricht = [1, "Text", TS, TS, TS, TS],
