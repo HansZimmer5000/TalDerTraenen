@@ -34,7 +34,7 @@ receive_loop(NextNNR) ->
 
 getmessages_abfertigen(EmpfaengerPID) ->  
     logge_status("Got getmessages"),  
-    TS = vsutil:now2string(erlang:timestamp()),
+    TS = erlang:timestamp(),
     Nachricht = [1, "Text", TS, TS, TS, TS],
     TerminatedFlag = rand:uniform() > 0.5,
     EmpfaengerPID ! {reply, Nachricht, TerminatedFlag}.

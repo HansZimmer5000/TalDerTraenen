@@ -35,7 +35,7 @@ start() ->
     ets:insert(?ETS_TABELLENNAME, {self(), "client"}),
     logge_status(io_lib:format("client mit PID ~p gestartet", [self()])),
     ClientPidList = start_all_clients(?CLIENT_ANZAHL, []),
-    timer:sleep(timer:seconds(10)),
+    timer:sleep(timer:seconds(10010)),
     kill_all_clients(ClientPidList).
 
 start_all_clients(0, AlteClientPidList) -> AlteClientPidList;
@@ -56,7 +56,7 @@ start_client_node(Clientnummer) ->
 redakteur_loop(Intervall, GeschriebeneNNRListe) -> 
     logge_status("Beginne redakteur_loop"),
     NNR = frage_nach_neuer_nnr(?SERVER),
-    TS = vsutil:now2string(erlang:timestamp()),
+    TS = erlang:timestamp(),
     Nachricht = erstelle_nachricht(NNR, TS),
     logge_nachricht_status(Nachricht, "erstellt"),
 
@@ -104,7 +104,7 @@ erstelle_nachrichten_text(ErstellungsTS) ->
     Hostname = hostname1,
     Praktikumsgruppe = gruppe1,
     Teamnummer = team1,
-    Nachricht = io_lib:format("~p, ~p, ~p, ~s", [Hostname, Praktikumsgruppe, Teamnummer, ErstellungsTS]),
+    Nachricht = io_lib:format("~p, ~p, ~p, ~s", [Hostname, Praktikumsgruppe, Teamnummer, vsutil:now2string(ErstellungsTS)]),
     Nachricht.
 
 
@@ -184,6 +184,7 @@ element_ist_in_liste(Elem, [_Head | Rest]) ->
 
 
 kill_all_clients([]) -> 
+    timer:sleep(timer:seconds(1)),
 	logge_status("Alle Clients wurden getötet");
 kill_all_clients([Client|RestClients]) ->
 	%exit(HeadClient,kill),
@@ -199,8 +200,8 @@ hohle_wert_aus_config_mit_key(Key) ->
     Value.
 
 logge_status(Inhalt) ->
-    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
-    LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
+    AktuelleZeit = erlang:timestamp(),
+    LogNachricht = io_lib:format("~p ~s.\n", [vsutil:now2string(AktuelleZeit), Inhalt]),
     io:fwrite(LogNachricht),
     case element_ist_in_liste(?ETS_TABELLENNAME, ets:all()) of
         true -> [{_Key, LogDateiName}] = ets:lookup(?ETS_TABELLENNAME, self()),
@@ -214,8 +215,22 @@ logge_nachricht_status(Nachricht, Status) ->
     logge_status(LogNachricht).
 
 logge_empfangene_nachricht(Nachricht, NummernListe) ->
-    [_NNR, Textnachricht | _Rest] = Nachricht, 
-    case empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NummernListe) of
-        true -> logge_status(io_lib:format("Empfangene Nachricht ~s ist von meinem Redakteur", [Textnachricht]));
-        false -> logge_status(io_lib:format("Empfangene Nachricht ~s", [Textnachricht]))
-    end.
+    [_NNR, Textnachricht, _TS, _TS, _TS, DLQoutTS] = Nachricht, 
+    
+    JetztTS = erlang:timestamp(),
+    vsutil:validTS(DLQoutTS),
+    vsutil:validTS(JetztTS),
+    NachrichtIstAusDerZukunft = vsutil:lessTS(JetztTS, DLQoutTS),
+    NachrichtIstVonMeinemRedakteur = empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NummernListe),
+
+    case NachrichtIstAusDerZukunft of
+        true -> LogZusatz1 = "ist aus der Zukunft";
+        false -> LogZusatz1 = ""
+    end,
+
+    case NachrichtIstVonMeinemRedakteur of
+        true -> LogZusatz2 = "ist von meinem Redakteur";
+        false -> LogZusatz2 = ""
+    end,
+
+    logge_status(io_lib:format("Empfangene Nachricht '~s' ~s ~s", [Textnachricht, LogZusatz1, LogZusatz2])).
