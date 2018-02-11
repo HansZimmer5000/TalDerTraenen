@@ -11,6 +11,7 @@
 -define(CONFIG_FILENAME, "server.cfg").
 -define(LOG_DATEI_NAME, "server.log").
 -define(SERVERNAME, hohle_wert_aus_config_mit_key(servername)).
+-define(LATENZ_SEK, hohle_wert_aus_config_mit_key(latenzSek)).
 
 start() -> 
     %CMEM = a.
@@ -22,13 +23,15 @@ start() ->
 
 receive_loop(NextNNR) ->
     logge_status("receive_loop"),
+    {ok,ServerTimer} = timer:send_after(?LATENZ_SEK, self(), {request,killAll}),
     receive
         {AbsenderPID, getmessages} ->   getmessages_abfertigen(AbsenderPID),
                                         receive_loop(NextNNR);
         {dropmessage, Nachricht} ->     dropmessage_abfertigen(Nachricht),
                                         receive_loop(NextNNR);
         {AbsenderPID, getmsgid} ->  NeueNextNNR = getmsgid_abfertigen(AbsenderPID, NextNNR),
-                                    receive_loop(NeueNextNNR)
+                                    receive_loop(NeueNextNNR);
+        {request, killAll} -> runterfahren()
     end.
 
 
@@ -49,6 +52,9 @@ getmsgid_abfertigen(AbsenderPID, LetzteNNR) ->
     logge_status("Got getmsgid"),  
     AbsenderPID ! {nid, LetzteNNR},
     LetzteNNR + 1.
+
+runterfahren() ->
+    logge_status("Server wird heruntergefahren").
 
 
 
