@@ -10,11 +10,21 @@
 -author("Arne Thiele & Michael Müller").
 
 %% API
--export([initDLQ/2, delDLQ/1, expectedNr/1, push2DLQ/3, deliverMSG/4]).
+-export([
+	initDLQ/2, 
+	delDLQ/1, 
 
-%% CONSTANTS
--define(DLQLOG,'dlq.log').
+	erwarteteNNr/1, 
+	holeMaxNNr/1,
 
+	push2DLQ/3, 
+	entferneLetztesListenElement/1,
+	dLQIstVoll/1,
+
+	deliverMSG/4,
+	holeNachricht/2,
+	erstelleErrNachrichtFurFehlendeNNr/0
+	]).
 
 
 %////////////////////////////////
@@ -29,83 +39,73 @@
 
 % Initialisiert die DLQ
 initDLQ(Size,Datei) ->
-  log_status(initDLQ, io_lib:format("input: Size: ~p, Datei: ~p",[Size,Datei])),
-  [Size].
+  logge_status(io_lib:format("Size: ~p, Datei: ~p",[Size,Datei]), Datei),
+  [Size, []].
 
 %------------------------------------------------------------------------------------------------------
 %										>>SCHNITTSTELLEN UND HANDLER<<
 %------------------------------------------------------------------------------------------------------
 
 % Löschen der DLQ
-delDLQ(_DLQ) ->
-  log_start(delDLQ),
-  ok.
+delDLQ(_DLQ) -> ok.
 
 % Gibt die Nachrichtennummer zurück die als nächstes erwartet wird. (Die letzte / größte Nachrichtennummer + 1)
-expectedNr([_Size|Messages]) ->
-	log_start(expectedNr),
-	MaxNr = getMaxNr(Messages),
-	log_status(expectedNr,io_lib:format("expectedNr: ~p",[MaxNr + 1])),
+erwarteteNNr([_Size, Messages]) ->
+	MaxNr = holeMaxNNr(Messages),
 	MaxNr + 1.
 
 % Gibt die höchste Nachrichtennummer heraus.
 % Wäre auch mit length(List) möglich
-getMaxNr([]) ->
-	log_status(getMaxNr,"input: Leere Messages"),
+holeMaxNNr([]) ->
 	0;
-getMaxNr([[MaxNr|_HeadRest]|_MessagesRest]) ->
-	log_status(getMaxNr,io_lib:format("input: MaxNr: ~p",[MaxNr])),
-	MaxNr.
+holeMaxNNr([AktuellsteNachricht | _RestlicheNachrichten]) ->
+	[NNr, _Text, _TS, _TS, _TS] = AktuellsteNachricht,
+	NNr.
 
 
 % Fügt eine neue Nachricht in die DLQ ein.
 % Da absteigend sortiert ist heißt das ganz vorne.
 % Vorausgesetzt die DLQ (Size) ist noch nicht voll! Wenn voll wird neue Nachricht einfach verworfen und Fehler gelogt.
-push2DLQ([NNr,Msg,TSClientOut,TSHBQin],[Size|Messages],_Datei) ->
-	log_status(push2DLQ,io_lib:format("input: NNR: ~p",[NNr])),
-	DLQIsFilled = isDLQFilled([Size|Messages]),
-	log_status(push2DLQ,io_lib:format("DLQIsFilled: ~p",[DLQIsFilled])),
+push2DLQ([NNr, Msg, TSClientOut, TSHBQin], [Size, Nachrichten], Datei) ->
+	DLQIstVoll = dLQIstVoll([Size, Nachrichten]),
+	logge_status(io_lib:format("DLQIstVoll: ~p", [DLQIstVoll]), Datei),
 	if
-		DLQIsFilled ->
-			log_status(push2DLQ,"DLQ ist voll, älteste Nachricht wird verworfen."),
-			TmpMessages = throwOldestOut(Messages);
-			%NewDLQ = [Size|NewMessages],
-			%log_status(push2DLQ,io_lib:format("DLQ ist voll, neue Nachricht (NNr: ~p) wird nicht eingefügt sondern verworfen!",[NNr]));
+		DLQIstVoll ->
+			logge_status("DLQ ist voll, älteste Nachricht wird verworfen", Datei),
+			TmpNeueNachrichten = entferneLetztesListenElement(Nachrichten);
 		true ->
-			TmpMessages = Messages
+			TmpNeueNachrichten = Nachrichten
 	end,
 	TSDLQIn = erlang:timestamp(),
-	NewMessages = [[NNr,Msg,TSClientOut,TSHBQin,TSDLQIn]|TmpMessages],
-	log_status(push2DLQ,"Neue Nachricht wurde vorne angefügt und mit TimeStamp für DLQIn versehen"),
-	NewDLQ = [Size|NewMessages],
-	NewDLQ.
+	NeueNachrichten = [[NNr, Msg, TSClientOut, TSHBQin, TSDLQIn] | TmpNeueNachrichten],
+	logge_status("Neue Nachricht wurde vorne angefügt und mit Timestamp für DLQIn versehen", Datei),
+	NeueDLQ = [Size, NeueNachrichten],
+	NeueDLQ.
 
 % Sendet eine Bestimmte Nachricht (anhand NNr) and bestimmten Client (ClientPID), gibt die gesendete Nummer zurück.
-deliverMSG(NNr,ClientPID,[_Size|Messages],_Datei) ->
-  log_status(deliverMSG,io_lib:format("input: NNr: ~p ClientPID: ~p",[NNr, ClientPID])),
+deliverMSG(NNr, ClientPID,[_Size, Nachrichten], Datei) ->
+  logge_status(io_lib:format("input: NNr: ~p ClientPID: ~p",[NNr, ClientPID]), Datei),
   % Nachricht holen & Existent -> Wenn nicht Fehler Nachricht erzeugen.
-  ReturnedMessage = getMessage(Messages,NNr),
+  GefundeneNachricht = holeNachricht(Nachrichten, NNr),
   if
-    ReturnedMessage == [] ->
-      log_status(deliverMSG, io_lib:format("Nachrichtnr: ~p nicht existent, Fehlernachricht wird erzeugt",[NNr])),
-      [ErrNNr,ErrMsg|ErrRest] = createErrMSGMissingNNr(),
-      Message = [ErrNNr,ErrMsg|ErrRest],
-      Termi = true;
-      %OutgoingNNr = ErrNNr;
+    GefundeneNachricht == [] ->
+      logge_status(io_lib:format("Nachrichtnr: ~p nicht existent, Fehlernachricht wird erzeugt",[NNr]), Datei),
+      [ErrNNr, ErrText | ErrRest] = erstelleErrNachrichtFurFehlendeNNr(),
+      Nachricht = [ErrNNr, ErrText | ErrRest],
+      TermiatedFlag = true;
     true ->
-      [FoundNNr|_FoundRestMsg] = ReturnedMessage,	
-      log_status(deliverMSG, io_lib:format("Nachrichtnr: ~p existent",[FoundNNr])),
-      Message = ReturnedMessage,
-      Termi = getMessage(Messages,NNr + 1) == []
-      %OutgoingNNr = NNr
+      [GefundeneNNr | _NachrichtRest] = GefundeneNachricht,	
+      logge_status(io_lib:format("Nachrichtnr: ~p existent", [GefundeneNNr]), Datei),
+      Nachricht = GefundeneNachricht,
+      TermiatedFlag = holeNachricht(Nachrichten, NNr + 1) == []
   end,
   % Nachricht TSDLQOut anfügen.
-  log_status(deliverMSG,io_lib:format("Message about to go out: ~p",[Message])),
-  [OutgoingNNr, Msg, TSClientOut, TSHBQin, TSDLQIn] = Message,
-  OutgoingMessage = [OutgoingNNr, Msg, TSClientOut, TSHBQin, TSDLQIn, erlang:timestamp()],
+  logge_nachricht_status(Nachricht, "zu verschicken", Datei),
+  [ZuSendendeNNr, Text, TSClientOut, TSHBQin, TSDLQIn] = Nachricht,
+  ZuSendendeNachricht = [ZuSendendeNNr, Text, TSClientOut, TSHBQin, TSDLQIn, erlang:timestamp()],
   % Nachricht versenden.
-  ClientPID ! {reply,OutgoingMessage,Termi},
-  OutgoingNNr.
+  ClientPID ! {reply, ZuSendendeNachricht, TermiatedFlag},
+  ZuSendendeNNr.
 
 
 %------------------------------------------------------------------------------------------------------
@@ -113,50 +113,47 @@ deliverMSG(NNr,ClientPID,[_Size|Messages],_Datei) ->
 %------------------------------------------------------------------------------------------------------
 
 % Schmeisst das letzte (aelteste) Element raus
-throwOldestOut(Messages) ->
-	log_start(throwOldestOut),
+entferneLetztesListenElement([]) -> [];
+entferneLetztesListenElement(Nachrichten) ->
 	%lists:reverse(tl(lists:reverse(Messages))).
-	lists:droplast(Messages).
+	lists:droplast(Nachrichten).
 
 
 % Prüft ob die DLQ schon voll ist, also ob die Size schon erreicht wurde.
-isDLQFilled([Size|Messages]) ->
-	log_start(isDLQFilled),
+dLQIstVoll([Size, Nachrichten]) ->
 	if
-		Size == length(Messages) ->
-			DLQIsFilled = true;
+		Size == length(Nachrichten) ->
+			DLQIstVoll = true;
 		true ->
-			DLQIsFilled = false
+			DLQIstVoll = false
 	end,
-	DLQIsFilled.
+	DLQIstVoll.
 
 % Holt anhand der Nachrichtennummer eine Nachrichte aus eine Liste von Messages.
 % [] wird zurückgegeben wenn die Nachricht nicht gefunden werden konnte.
-getMessage([],NNr) -> 
-	log_status(getMessage,io_lib:format("NNr: ~p nicht gefunden",[NNr])),
-	[];
-getMessage([[LastElemNNr|LastElemRest]],1) ->
-	log_status(getMessage,io_lib:format("Nummer 1 angefordert, Nummer ~p aber aktueller Anfang der DLQ",[LastElemNNr])),
-	[LastElemNNr|LastElemRest];
-getMessage([[NNr|HeadRest]|_MessagesRest], NNr) ->
-	log_status(getMessage,io_lib:format("Nachrichtennummer: ~p gefunden",[NNr])),
-	[NNr|HeadRest];
-getMessage([_Head|MessagesRest], NNr) ->
-	getMessage(MessagesRest,NNr).
+holeNachricht([], _NNr) -> [];
+holeNachricht([[NNr | NachrichtRest] | _RestlicheNachrichten], NNr) -> 
+	[NNr | NachrichtRest];
+holeNachricht([_AktuellsteNachricht | RestlicheNachrichten], NNr) -> 
+	holeNachricht(RestlicheNachrichten, NNr).
 
 % Erstellt eine Error Nachricht aufgrund des nicht vorhanden seins der gesuchten Nachrichtennummer in der DLQ.
-createErrMSGMissingNNr() ->
+erstelleErrNachrichtFurFehlendeNNr() ->
 	TS = erlang:timestamp(),
-	[0,["Angeforderte Nachricht nicht vorhanden."],TS,TS,TS].
+	[0, ["Angeforderte Nachricht nicht vorhanden."], TS, TS, TS].
 
 
 %------------------------------------------------------------------------------------------------------
 %											>>LOGGING UND CONFIG<<
 %------------------------------------------------------------------------------------------------------
 
-% Logt start einer Funktion
-log_start(Funktion) -> log_status(Funktion, io_lib:format("~p started. ~n",[Funktion])).
+logge_status(Inhalt, LogDatei) ->
+    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
+    LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
+    io:fwrite(LogNachricht),
+    util:logging(LogDatei, LogNachricht).
 
-% Logt den aktuellen Status / Wert / ... einer Funktion.
-log_status_file(Funktion,Status,Datei) -> werkzeug:logging(Datei, io_lib:format("~p ~p hat status: ~s. ~n",[werkzeug:timeMilliSecond(), Funktion, Status])).
-log_status(Funktion,Status) -> log_status_file(Funktion,Status,?DLQLOG).
+logge_nachricht_status(Nachricht, Status, LogDatei) ->
+    [NNR | _Rest] = Nachricht,
+    LogNachricht = io_lib:format("NNR ~p ~s", [NNR, Status]),
+    logge_status(LogNachricht, LogDatei).

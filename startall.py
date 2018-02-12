@@ -40,10 +40,11 @@ if __name__ == "__main__":
         __make_all_modules()
     elif user_input == "1":
         __make_all_modules()
-        __test_module("testallgemein")
-        __test_module("testclient")
+        print("Nicht alle Tests werden ausgeführt!")
+        #__test_module("testallgemein")
+        #__test_module("testclient")
         __test_module("testserver")
-        __test_module("testcmem")
+        #__test_module("testcmem")
         __test_module("testhbq")
         __test_module("testdlq")
     elif user_input == "2":
