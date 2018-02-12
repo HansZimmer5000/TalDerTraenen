@@ -13,6 +13,7 @@
         frage_nach_neuer_nachricht/1,
         empfangene_nachricht_ist_von_meinem_redakteur/2,
         logge_empfangene_nachricht/2,
+        erstelle_empfangene_nachricht_logtext/2,
 
         zufalls_boolean/0,
         element_ist_in_liste/2,
@@ -215,6 +216,10 @@ logge_nachricht_status(Nachricht, Status) ->
     logge_status(LogNachricht).
 
 logge_empfangene_nachricht(Nachricht, NummernListe) ->
+    LogText = erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe),
+    logge_status(LogText).
+
+erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe) ->
     [_NNR, Textnachricht, _TS, _TS, _TS, DLQoutTS] = Nachricht, 
     
     JetztTS = erlang:timestamp(),
@@ -233,4 +238,4 @@ logge_empfangene_nachricht(Nachricht, NummernListe) ->
         false -> LogZusatz2 = ""
     end,
 
-    logge_status(io_lib:format("Empfangene Nachricht '~s' ~s ~s", [Textnachricht, LogZusatz1, LogZusatz2])).
+    io_lib:format("Empfangene Nachricht '~s' ~s ~s", [Textnachricht, LogZusatz1, LogZusatz2]).

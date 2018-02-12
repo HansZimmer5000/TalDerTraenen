@@ -136,8 +136,48 @@ empfangene_nachricht_ist_von_meinem_redakteur_3_test() ->
     false = client:empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NNRListe).
 
 logge_empfangene_nachricht_1_test() ->
-    false = true.
+    io:fwrite("Möglichkeit output anzuschauen? Da kein Logeintrag in der Datei, Eigentliche Arbeit in erstelle_empfangene_nachricht_logtext"),
+    true = false.
 
+erstelle_empfangene_nachricht_logtext_1_test() ->
+    JetztTS = erlang:timestamp(),
+    {JetztMegaSec, JetztSec, JetztMicroSec} = JetztTS,
+    TS = {JetztMegaSec, JetztSec + 50, JetztMicroSec},
+
+    Nachricht = [2, "Testtext", TS, TS, TS, TS],
+    NummernListe = [1,2],
+    LogText = client:erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe),
+    iolist_to_binary("Empfangene Nachricht 'Testtext' ist aus der Zukunft ist von meinem Redakteur") =:= iolist_to_binary(LogText).
+
+erstelle_empfangene_nachricht_logtext_2_test() ->
+    JetztTS = erlang:timestamp(),
+    {JetztMegaSec, JetztSec, JetztMicroSec} = JetztTS,
+    TS = {JetztMegaSec, JetztSec - 50, JetztMicroSec},
+
+    Nachricht = [2, "Testtext", TS, TS, TS, TS],
+    NummernListe = [1,2],
+    LogText = client:erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe),
+    iolist_to_binary("Empfangene Nachricht 'Testtext'  ist von meinem Redakteur") =:= iolist_to_binary(LogText).
+
+erstelle_empfangene_nachricht_logtext_3_test() ->
+    JetztTS = erlang:timestamp(),
+    {JetztMegaSec, JetztSec, JetztMicroSec} = JetztTS,
+    TS = {JetztMegaSec, JetztSec - 50, JetztMicroSec},
+
+    Nachricht = [2, "Testtext", TS, TS, TS, TS],
+    NummernListe = [1],
+    LogText = client:erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe),
+    iolist_to_binary("Empfangene Nachricht 'Testtext'  ") =:= iolist_to_binary(LogText).
+
+erstelle_empfangene_nachricht_logtext_4_test() ->
+    JetztTS = erlang:timestamp(),
+    {JetztMegaSec, JetztSec, JetztMicroSec} = JetztTS,
+    TS = {JetztMegaSec, JetztSec + 50, JetztMicroSec},
+
+    Nachricht = [2, "Testtext", TS, TS, TS, TS],
+    NummernListe = [1],
+    LogText = client:erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe),
+    iolist_to_binary("Empfangene Nachricht 'Testtext' ist aus der Zukunft ") =:= iolist_to_binary(LogText).
 
 
 zufalls_boolean_1_test() ->
