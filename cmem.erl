@@ -5,35 +5,57 @@
 -export([
     initCMEM/2,
     updateClient/4,
-    getClientNNr/2
+    getClientNNr/2,
+    pruefeTSUndGibNNrZuruck/3,
+    tSIstAbglaufen/2
 ]).
-
-% CONSTANT
--define(ETS_TABELLENNAME, 'cmem_table').
--define(ERINNERUNGSZEIT_KEY, erinnerungsZeit).
-
 
 
 initCMEM(ErinnerungsZeit, LogDatei) ->
-    ?ETS_TABELLENNAME = ets:new(?ETS_TABELLENNAME, [named_table, public, set]),
-    true = ets:insert(?ETS_TABELLENNAME, {erinnerungsZeit, ErinnerungsZeit}),
-    logge_status("CMEM initalisiert", LogDatei).
+    CMEM = [ErinnerungsZeit, []],
+    logge_status("CMEM initalisiert", LogDatei),
+    CMEM.
 
 
-updateClient(_CMEM, ClientPid, NNR, LogDatei) ->
-    ets:insert(?ETS_TABELLENNAME, {ClientPid, NNR, erlang:timestamp()}),
-    logge_status(io_lib:format("~p bekommt als nächstes NNR ~p", [ClientPid, NNR]), LogDatei).
+updateClient([Zeit, TupelListe], ClientPid, NNr, LogDatei) ->
+    NeueTupelListe = updateClient_(TupelListe, ClientPid, NNr),
+    logge_status(io_lib:format("~p bekommt als nächstes NNr ~p", [ClientPid, NNr]), LogDatei),
+    CMEM = [Zeit, NeueTupelListe],
+    CMEM.
 
+updateClient_([], ClientPid, NNr) ->
+    [{ClientPid, NNr, erlang:timestamp()}];
+updateClient_(TupelListe, ClientPid, NNr) ->
+    [KopfTupel | RestTupel] = TupelListe,
+    case KopfTupel of
+        {ClientPid, _AltNNr, _AltTS} -> NeuesTupel = {ClientPid, NNr, erlang:timestamp()},
+                                        NeueTupelListe = [NeuesTupel | RestTupel];
+        _Any -> NeueRestTupel = updateClient_(RestTupel, ClientPid, NNr),
+                NeueTupelListe = [KopfTupel | NeueRestTupel]
+    end,
+    NeueTupelListe.
 
-getClientNNr(_CMEM, ClientPid) ->   
-    Ergebnis = ets:lookup(?ETS_TABELLENNAME, ClientPid),
-    case Ergebnis of
-        %TODO vergleiche TS! Ob Client vergessen wurde.
-        [{_Any, NNR, TS}] -> NNR;
-        _Any -> 1
+getClientNNr([Zeit, TupelListe], ClientPid) ->
+    NNr = getClientNNr_(TupelListe, Zeit, ClientPid),
+    NNr.
+
+getClientNNr_([], _Zeit, _ClientPid) -> 1;
+getClientNNr_([KopfTupel | RestTupel], Zeit, ClientPid) ->
+    case KopfTupel of
+        {ClientPid, NNr, OldTS} -> pruefeTSUndGibNNrZuruck(OldTS, Zeit, NNr);
+        _Any -> getClientNNr_(RestTupel, Zeit, ClientPid)
     end.
 
+pruefeTSUndGibNNrZuruck(OldTS, Zeit, SavedNNr) ->
+    case tSIstAbglaufen(OldTS, Zeit) of
+        true ->  getClientNNr_([], ok, ok);
+        false -> SavedNNr
+    end.
 
+tSIstAbglaufen(OldTS, Zeit) ->
+    JetztTS = erlang:timestamp(),
+    {_DiffMegaSec, DiffSec, _DiffMicroSec} = vsutil:diffTS(JetztTS, OldTS),
+    DiffSec > Zeit.
 
 
 logge_status(Inhalt, LogDatei) ->
