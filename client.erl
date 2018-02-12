@@ -76,7 +76,7 @@ redakteur_loop(Intervall, GeschriebeneNNRListe) ->
 
 
 leser_loop(GeschriebeneNNRListe) ->
-    logge_status(io_lib:format("Beginne leser_loop mit NNRListe: ~p" , [GeschriebeneNNRListe])),
+    logge_status(io_lib:format("Beginne leser_loop mit NNRListe: ~w" , [GeschriebeneNNRListe])),
     NeueNachricht = frage_nach_neuer_nachricht(?SERVER),
     case NeueNachricht of
         [] -> redakteur_loop(?MIN_INTERVALL_ZEIT_SEK, []);
