@@ -35,7 +35,7 @@ start() ->
 
 receive_loop(CMEM, NextNNR) ->
     logge_status("receive_loop"),
-    {ok,ServerTimer} = timer:send_after(?LATENZ_SEK, self(), {request,killAll}),
+    {ok,ServerTimer} = timer:send_after(timer:seconds(?LATENZ_SEK), self(), {request,killAll}),
     receive
         {AbsenderPid, getmessages} ->   logge_status("Got getmessages"),
                                         timer:cancel(ServerTimer),
