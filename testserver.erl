@@ -8,12 +8,14 @@ getmessages_abfertigen_1_test() ->
     %TODO Gib Server Nachricht 1, und frage dann nach Nachricht, ergebnis sollte Nachricht 1 sein! Erst richtig machbar wenn HBQ/DLQ voll implementiert.
     ServerPid = starte_server(),
     fahre_server_vorzeitig_herunter(ServerPid),
+    io:fwrite("Warten auf HBQ/DLQ Implementation"),
     true = false.
 
 dropmessage_abfertigen_1_test() ->
-    %TODO Wie genau testen?
+    %TODO Wie genau testen? Irgendwie an HbQ rankommen -> da rein schauen?
     ServerPid = starte_server(),
     fahre_server_vorzeitig_herunter(ServerPid),
+    io:fwrite("Warten auf HBQ/DLQ Implementation"),
     true = false.
 
 getmsgid_abfertigen_1_test() ->
@@ -29,10 +31,10 @@ getmsgid_abfertigen_2_test() ->
     ServerPid = starte_server(),
     ServerPid ! {self(), getmsgid},
     receive
-        {nid, LetzteNNr} -> LetzteNNr
-    end,
-    fahre_server_vorzeitig_herunter(ServerPid),
-    LetzteNNr = 1.
+        {nid, 1} -> fahre_server_vorzeitig_herunter(ServerPid)
+        after 3 ->  io:fwrite("Nichts bekommen."),
+                    fahre_server_vorzeitig_herunter(ServerPid)
+    end.
 
 
 
