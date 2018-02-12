@@ -6,12 +6,12 @@
 -define(LOG_DATEI_NAME, "test.log").
 
 
-hohle_wert_aus_config_mit_key_1_test() ->
-    "testname" = hohle_wert_aus_config_mit_key(testname).
+hole_wert_aus_config_mit_key_1_test() ->
+    "testname" = hole_wert_aus_config_mit_key(testname).
 
 
 % Allgemeine Funktionen in jedem .erl vorhanden.
-hohle_wert_aus_config_mit_key(Key) ->
+hole_wert_aus_config_mit_key(Key) ->
     logge_status(io_lib:format("Key: ~p",[Key])),
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
     {ok, Value} = vsutil:get_config_value(Key, ConfigListe),

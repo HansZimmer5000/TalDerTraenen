@@ -15,8 +15,8 @@
 
 
 initCMEM(ErinnerungsZeit, LogDatei) ->
-    ets:new(?ETS_TABELLENNAME, [named_table, public, set]),
-    ets:insert(?ETS_TABELLENNAME, {erinnerungsZeit, ErinnerungsZeit}),
+    ?ETS_TABELLENNAME = ets:new(?ETS_TABELLENNAME, [named_table, public, set]),
+    true = ets:insert(?ETS_TABELLENNAME, {erinnerungsZeit, ErinnerungsZeit}),
     logge_status("CMEM initalisiert", LogDatei).
 
 
@@ -28,7 +28,8 @@ updateClient(_CMEM, ClientPid, NNR, LogDatei) ->
 getClientNNr(_CMEM, ClientPid) ->   
     Ergebnis = ets:lookup(?ETS_TABELLENNAME, ClientPid),
     case Ergebnis of
-        [{_Any, NNR}] -> NNR;
+        %TODO vergleiche TS! Ob Client vergessen wurde.
+        [{_Any, NNR, TS}] -> NNR;
         _Any -> 1
     end.
 

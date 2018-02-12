@@ -23,11 +23,11 @@
 % KONSTANTEN
 -define(CONFIG_FILENAME, "client.cfg").
 -define(MIN_INTERVALL_ZEIT_SEK, 2).
--define(CLIENT_ANZAHL, hohle_wert_aus_config_mit_key(clientAnzahl)).
--define(SERVERNAME, hohle_wert_aus_config_mit_key(servername)).
--define(SERVERNODE, hohle_wert_aus_config_mit_key(servernode)).
+-define(CLIENT_ANZAHL, hole_wert_aus_config_mit_key(clientAnzahl)).
+-define(SERVERNAME, hole_wert_aus_config_mit_key(servername)).
+-define(SERVERNODE, hole_wert_aus_config_mit_key(servernode)).
 -define(SERVER, {?SERVERNAME, ?SERVERNODE}).
--define(ETS_TABELLENNAME, hohle_wert_aus_config_mit_key(etsTabellenname)).
+-define(ETS_TABELLENNAME, hole_wert_aus_config_mit_key(etsTabellenname)).
 
 % INIT
 start() ->
@@ -194,7 +194,7 @@ kill_all_clients([Client|RestClients]) ->
 
 
 
-hohle_wert_aus_config_mit_key(Key) ->
+hole_wert_aus_config_mit_key(Key) ->
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
     {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
     Value.
