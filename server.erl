@@ -63,7 +63,8 @@ hole_naechste_nnr_fur_leser(CMEM, LeserPid) ->
     cmem:getClientNNr(CMEM, LeserPid).
     
 update_gesendete_nnr_fur_leser(CMEM, LeserPid, LetzteGesendeteNNr) ->
-    cmem:updateClient(CMEM, LeserPid, LetzteGesendeteNNr, ?CMEM_LOG_DATEI_NAME).
+    NeueCMEM = cmem:updateClient(CMEM, LeserPid, LetzteGesendeteNNr, ?CMEM_LOG_DATEI_NAME),
+    NeueCMEM.
 
 sendeNNr(ZuSendendeNNr, LeserPid) ->
     TS = erlang:timestamp(),
