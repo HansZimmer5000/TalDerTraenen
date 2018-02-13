@@ -10,7 +10,21 @@
 -author("Arne Thiele & Michael Müller").
 
 %% API
--export([start/0]).
+-export([
+    start/0,
+    waitForInit/0,
+    initHBQHandler/1,
+
+    receive_loop/2,
+
+    pushHBQHandler/4,
+    inHBQeinfuegen/2,
+
+    pruefeLimitUndFuelleSpalte/3,
+    sucheUndFuelleSpalte/2,
+    sucheSpalte/2,
+    erstelleSpaltNachricht/2
+]).
 
 -define(CONFIG_FILENAME, "hbq.cfg").
 -define(LOG_DATEI_NAME, 'hbq.log').
@@ -25,32 +39,32 @@
 %Methode um den HBQ-Prozess an sich anzustoßen
 start() ->
   logge_status("HBQ wird gestartet"),
-  HBQPID = spawn(fun() -> waitForInit(?DLQLIMIT) end),
+  HBQPID = spawn(fun() -> waitForInit() end),
   register(?HBQNAME, HBQPID),
   HBQPID.
 
-waitForInit(DLQLimit) ->
+waitForInit() ->
   %Receive Block für die Initialisierung der HBQ
   receive
   %Initialisiert die intern verwendete Listenstruktur
     {PID, {request, initHBQ}} ->
-      DLQ = dlq:initDLQ(DLQLimit, ?DLQ_LOG_DATEI),
+      DLQ = dlq:initDLQ(?DLQLIMIT, ?DLQ_LOG_DATEI),
       initHBQHandler(PID), 
-      work([], DLQ, DLQLimit)
+      receive_loop([], DLQ)
   end.
 
-work(HoldbackQueue, DeliveryQueue, DLQLimit) ->
+receive_loop(HoldbackQueue, DeliveryQueue) ->
   %Receive Block für die Schnittstellen der HBQ
   receive
   %Sortiert eine neu erhaltene Nachricht in die Listenstruktur ein
     {PID, {request, pushHBQ, MessageAsList}} ->
-      {NewHBQ, NewDLQ} = pushHBQHandler(PID, MessageAsList, HoldbackQueue, DeliveryQueue, DLQLimit),
-      work(NewHBQ, NewDLQ, DLQLimit);
+      {NewHBQ, NewDLQ} = pushHBQHandler(PID, MessageAsList, HoldbackQueue, DeliveryQueue),
+      receive_loop(NewHBQ, NewDLQ);
 
   %Delegationsmethode an die DLQ, damit diese die spezifizierte Nachricht an einen spezifizierten Client ausliefert
     {PID, {request, deliverMSG, NNr, ToClient}} ->
       deliverMSGHandler(PID, NNr, ToClient, DeliveryQueue),
-      work(HoldbackQueue, DeliveryQueue, DLQLimit);
+      receive_loop(HoldbackQueue, DeliveryQueue);
 
   %An dieser Stelle kein weiterer rekursiver Aufruf, weil die HBQ terminieren soll
     {PID, {request, dellHBQ}} -> deleteHBQHandler(PID, DeliveryQueue)
@@ -64,27 +78,27 @@ work(HoldbackQueue, DeliveryQueue, DLQLimit) ->
 initHBQHandler(PID) ->
   PID ! {reply, ok}.
 
-pushHBQHandler(PID, [NNr, MessageLST, TSClientout], HoldbackQueue, DeliveryQueue, DLQLimit) ->
+pushHBQHandler(PID, [NNr, MessageLST, TSClientout], HBQ, DLQ) ->
   % 1) Prüfen ob die geschickte Nachrichtennummer bereits auslieferbar ist
   logge_status(io_lib:format("pushHBQHandler PID: ~p, MsgNr: ~p", [PID, NNr])),
   TShbqin = erlang:timestamp(),
   IsFuture = vsutil:lessTS(TShbqin,TSClientout),
   logge_status(io_lib:format("Kommt die Nachricht aus der Zukunft? ~p",[IsFuture])),
   MessageWithAddedTS = [NNr, MessageLST, TSClientout, TShbqin],
-  CanBeDelivered = isInOrder(MessageWithAddedTS, DeliveryQueue),
+  CanBeDelivered = isInOrder(MessageWithAddedTS, DLQ),
   logge_status(io_lib:format("Kann Nachricht gesendet werden? ~p", [CanBeDelivered])),
   % 2) falls ja --> mittels push2DLQ ausliefern und Reihenfolge der bereits gespeicherten Nachrichten prüfen; ggf weitere Nachrichten an die DLQ schicken
   if 
     CanBeDelivered ->
-      NewDLQ = dlq:push2DLQ(MessageWithAddedTS, DeliveryQueue, ?DLQ_LOG_DATEI), 
-      {NewHBQ, ResultDLQ} = checkNextMSGAndPush(HoldbackQueue, NewDLQ),
+      NewDLQ = dlq:push2DLQ(MessageWithAddedTS, DLQ, ?DLQ_LOG_DATEI), 
+      {NewHBQ, ResultDLQ} = pruefeNaechsteNachrichtUndPushe(HBQ, NewDLQ),
       Result = {NewHBQ, ResultDLQ};
   % 3) falls nein --> Nachricht in die HBQ einsortieren (den Nummern nach aufsteigend)
     true ->
-      NewHBQ = insertIntoHBQ(MessageWithAddedTS, HoldbackQueue),
+      NewHBQ = inHBQeinfuegen(MessageWithAddedTS, HBQ),
       % Limit abprüfen (2/3el der DLQ) und ggf Lücke schließen
-      NewDLQ = checkLimitAndCloseGap(NewHBQ, DeliveryQueue, DLQLimit),
-      {ResultHBQ,ResultDLQ} = checkNextMSGAndPush(NewHBQ,NewDLQ),
+      NewDLQ = pruefeLimitUndFuelleSpalte(NewHBQ, DLQ, ?DLQLIMIT),
+      {ResultHBQ,ResultDLQ} = pruefeNaechsteNachrichtUndPushe(NewHBQ,NewDLQ),
       Result = {ResultHBQ,ResultDLQ}
   end,
   PID ! {reply, ok},
@@ -119,38 +133,37 @@ isInOrder([NNr | _], DLQ) ->
   ExpectedNNr == NNr.
 
 %Rekursive Hilfsmethode, welche nach und nach weitere Nachrichten an die DLQ schickt, falls möglich
-checkNextMSGAndPush([], DLQ) ->
+pruefeNaechsteNachrichtUndPushe([], DLQ) ->
   logge_status("Leeres Array"),
   {[], DLQ};
-checkNextMSGAndPush([HBQHead | HBQTail], DLQ) ->
- logge_status(io_lib:format("Aktueller Head: ~p", [HBQHead])),
+pruefeNaechsteNachrichtUndPushe([HBQHead | HBQTail], DLQ) ->
+ %logge_status(io_lib:format("Aktueller Head: ~p", [HBQHead])),
   CanBeDelivered = isInOrder(HBQHead, DLQ),
   logge_status(io_lib:format("Message CanBeDelivered? ~p", [CanBeDelivered])),
   if 
     CanBeDelivered ->
       NewDLQ = dlq:push2DLQ(HBQHead, DLQ, ?DLQ_LOG_DATEI),
-      checkNextMSGAndPush(HBQTail, NewDLQ);
+      pruefeNaechsteNachrichtUndPushe(HBQTail, NewDLQ);
     true -> 
       {[HBQHead | HBQTail], DLQ}
   end.
 
-insertIntoHBQ(Message, []) ->
+inHBQeinfuegen(Message, []) ->
   logge_status("HBQ ist leer, Element wird einfach eingefügt"),
   [Message];
-insertIntoHBQ(Message, HBQ) ->
+inHBQeinfuegen(Message, HBQ) ->
   logge_status("HBQ ist nicht leer"),
-  NewHBQ = insertIntoHBQ_([], Message, HBQ),
+  NewHBQ = inHBQeinfuegen_([], Message, HBQ),
   NewHBQ.
 
 %Prüft pro Rekursionsschritt, ob das forderste Element der HBQ eine kleinere NNR hat als das einzufügende Element.
 %Wenn dem nicht so ist, wird das erste Element der HBQ in den Akku geschrieben und es erfolgt ein weiterer Rekursionsaufruf
 %Wenn dem so ist, wird das Neue Element an den Akku gehängt, dieser vor den Rest der HBQ gehängt und das ganze zurückgegeben ausgegeben.
-insertIntoHBQ_(Akku, Message, []) ->
+inHBQeinfuegen_(Akku, Message, []) ->
   logge_status("ist ganz durchgelaufen, element wird ganz hinten angehängt"),
   NewHBQ = lists:append(Akku, [Message]),
   NewHBQ;
-insertIntoHBQ_(Akku, [NNr | MessageRest], [[HBQHeadNNr | HBQHeadRest] | HBQTail]) ->
-  logge_status(io_lib:format("input: NachrichtenNummer: ~p, AktuelleHBQNummer: ~p", [NNr, HBQHeadNNr])),
+inHBQeinfuegen_(Akku, [NNr | MessageRest], [[HBQHeadNNr | HBQHeadRest] | HBQTail]) ->
   IsSmaller = NNr < HBQHeadNNr,
   if (IsSmaller) ->
     %Hier war der Fehler :)
@@ -159,19 +172,19 @@ insertIntoHBQ_(Akku, [NNr | MessageRest], [[HBQHeadNNr | HBQHeadRest] | HBQTail]
     NewHBQ = lists:append(NewFirstPartOfHBQ, RestOfHBQ);
     true ->
       NewAkku = lists:append(Akku, [[HBQHeadNNr | HBQHeadRest]]),
-      NewHBQ = insertIntoHBQ_(NewAkku, [NNr | MessageRest], HBQTail)
+      NewHBQ = inHBQeinfuegen_(NewAkku, [NNr | MessageRest], HBQTail)
   end,
   NewHBQ.
 
 %Hilfsmethode zum Überprüfen der Einhaltung des 2/3el Ansatzes
-checkLimitAndCloseGap(HBQ, DLQ, DLQLimit) ->
+pruefeLimitUndFuelleSpalte(HBQ, DLQ, DLQLimit) ->
   GapLimit = DLQLimit / 3 * 2,
   HBQSize = length(HBQ),
   if
     (HBQSize > GapLimit) ->
       logge_status("2/3 Regel erfüllt"),
       %Ist das Limit überschritten, so wird die erste Lücke geschlossen und an die DLQ weitergegeben
-      NewDLQ = searchForGapAndClose(HBQ, DLQ),
+      NewDLQ = sucheUndFuelleSpalte(HBQ, DLQ),
       NewDLQ;
     true ->
       %Ist das Limit nicht überschritten, bleiben die beiden Queues unverändert
@@ -180,25 +193,25 @@ checkLimitAndCloseGap(HBQ, DLQ, DLQLimit) ->
   end.
 
 % Hilfsmethode die herausfindet wo genau die Lücke ist und die Lücke schließt.
-searchForGapAndClose(HBQ, DLQ) ->
+sucheUndFuelleSpalte(HBQ, DLQ) ->
   % Wo ist die Lücke?
-  {GapStartNNr,GapEndNNr} = searchForGap(HBQ,DLQ),
+  {SpaltStartNNr, SpaltEndeNNr} = sucheSpalte(HBQ, DLQ),
   % Erstelle Fehlernachricht und logge
-  GapMessageList = createGapMessage(GapStartNNr,GapEndNNr),
+  GapMessageList = erstelleSpaltNachricht(SpaltStartNNr, SpaltEndeNNr),
   % Schließe diese Lücke
   NewDLQ = dlq:push2DLQ(GapMessageList, DLQ, ?LOG_DATEI_NAME),
   NewDLQ.
 
 % Hilfsmethode die herausfindet wo genau die Lücke ist.
-searchForGap([[ActualNNr|_]|_HBQRest],DLQ) ->
-  ExpectedNNr = dlq:expectedNr(DLQ),
-  logge_status(io_lib:format("Gaprange: ~p-~p",[ExpectedNNr,ActualNNr-1])),
-  {ExpectedNNr, ActualNNr - 1}.
+sucheSpalte([[AktuelleNNr | _AktuelleNachrichtRest] | _HBQRest],DLQ) ->
+  ErwarteteNNr = dlq:expectedNr(DLQ),
+  logge_status(io_lib:format("Gaprange: ~p-~p",[ErwarteteNNr, AktuelleNNr - 1])),
+  {ErwarteteNNr, AktuelleNNr - 1}.
 
 % Erstellt eine Mock Nachricht um die Lücke schließen zu können.
-createGapMessage(GapStartNNr,GapEndNNr) ->
+erstelleSpaltNachricht(SpaltStartNNr,SpaltEndeNNr) ->
   TS = erlang:timestamp(),
-  [GapEndNNr,[io_lib:format("Error Nachricht zum Lücke von ~p bis ~p zu füllen",[GapStartNNr, GapEndNNr])],TS,TS].
+  [SpaltEndeNNr, lists:flatten(io_lib:format("Error Nachricht zum Luecke von ~p bis ~p zu fuellen", [SpaltStartNNr, SpaltEndeNNr])), TS, TS].
 
 %------------------------------------------------------------------------------------------------------
 %																					>>LOGGING UND CONFIG<<

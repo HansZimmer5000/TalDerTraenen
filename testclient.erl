@@ -83,19 +83,7 @@ pruefe_nnr_und_sende_nachricht_2_test() ->
 
 kalkuliere_neuen_intervall_sek_1_test() ->
     Result = client:kalkuliere_neuen_intervall_sek(2),
-    case Result of
-        3 -> true;
-        2 -> true;
-        _Else -> false
-    end.
-
-kalkuliere_neuen_intervall_sek_2_test() -> 
-    2 = client:kalkuliere_neuen_intervall_sek("a").
-
-kalkuliere_neuen_intervall_sek_3_test() ->
-    2 = client:kalkuliere_neuen_intervall_sek(a).
-
-
+    ?assert((Result == 3) or (Result == 2)).
 
 
 frage_nach_neuer_nachricht_1_test() ->
@@ -134,10 +122,6 @@ empfangene_nachricht_ist_von_meinem_redakteur_3_test() ->
     Nachricht = [1, "test", erlang:timestamp()],
     NNRListe = [],
     false = client:empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NNRListe).
-
-logge_empfangene_nachricht_1_test() ->
-    io:fwrite("Möglichkeit output anzuschauen? Da kein Logeintrag in der Datei, Eigentliche Arbeit in erstelle_empfangene_nachricht_logtext"),
-    true = false.
 
 erstelle_empfangene_nachricht_logtext_1_test() ->
     JetztTS = erlang:timestamp(),

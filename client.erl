@@ -70,18 +70,18 @@ redakteur_loop(Intervall, GeschriebeneNNRListe) ->
     logge_nachricht_status(Nachricht, "abgearbeitet"),
 
     case length(NeueGeschriebeneNNRListe) of
-        5 -> leser_loop(NeueGeschriebeneNNRListe);
+        5 -> leser_loop(NeuerIntervall, NeueGeschriebeneNNRListe);
         _Any -> redakteur_loop(NeuerIntervall, NeueGeschriebeneNNRListe)
     end.
 
 
-leser_loop(GeschriebeneNNRListe) ->
+leser_loop(Intervall, GeschriebeneNNRListe) ->
     logge_status(io_lib:format("Beginne leser_loop mit NNRListe: ~w" , [GeschriebeneNNRListe])),
     NeueNachricht = frage_nach_neuer_nachricht(?SERVER),
     case NeueNachricht of
-        [] -> redakteur_loop(?MIN_INTERVALL_ZEIT_SEK, []);
+        [] -> redakteur_loop(Intervall, []);
         _Any -> logge_empfangene_nachricht(NeueNachricht, GeschriebeneNNRListe),
-                leser_loop(GeschriebeneNNRListe)
+                leser_loop(Intervall, GeschriebeneNNRListe)
     end.
 
 
@@ -106,7 +106,7 @@ erstelle_nachrichten_text(ErstellungsTS) ->
     Praktikumsgruppe = gruppe1,
     Teamnummer = team1,
     Nachricht = io_lib:format("~p, ~p, ~p, ~s", [Hostname, Praktikumsgruppe, Teamnummer, vsutil:now2string(ErstellungsTS)]),
-    Nachricht.
+    lists:flatten(Nachricht).
 
 
 neue_nnr_einfuegen(NNR, []) -> [NNR];
@@ -144,17 +144,14 @@ frage_nach_neuer_nachricht(Server) ->
 
 
 kalkuliere_neuen_intervall_sek(Intervall) ->
-    case is_float(Intervall) of
-        true -> case zufalls_boolean() of
-                        true -> Faktor = 1.5;
-                        _Else -> Faktor =  0.5
-                end,
-                NeuerIntervall = Intervall * Faktor,
-                case NeuerIntervall of
-                    NeuerIntervall when NeuerIntervall < ?MIN_INTERVALL_ZEIT_SEK -> ?MIN_INTERVALL_ZEIT_SEK;
-                    NeuerIntervall when NeuerIntervall >= ?MIN_INTERVALL_ZEIT_SEK -> round(NeuerIntervall)
-                end;
-        false -> ?MIN_INTERVALL_ZEIT_SEK
+    case zufalls_boolean() of
+                true -> Faktor = 1.5;
+                _Else -> Faktor =  0.5
+        end,
+        NeuerIntervall = Intervall * Faktor,
+        case NeuerIntervall of
+            NeuerIntervall when NeuerIntervall < ?MIN_INTERVALL_ZEIT_SEK -> ?MIN_INTERVALL_ZEIT_SEK;
+            NeuerIntervall when NeuerIntervall >= ?MIN_INTERVALL_ZEIT_SEK -> round(NeuerIntervall)
     end.
 
 
@@ -220,7 +217,7 @@ logge_empfangene_nachricht(Nachricht, NummernListe) ->
     logge_status(LogText).
 
 erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe) ->
-    [_NNR, Textnachricht, _TS, _TS, _TS, DLQoutTS] = Nachricht, 
+    [_NNR, Textnachricht, _TSCOut, _TSHIn, _TSDIn, DLQoutTS] = Nachricht, 
     
     JetztTS = erlang:timestamp(),
     vsutil:validTS(DLQoutTS),

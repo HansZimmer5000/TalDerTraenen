@@ -10,16 +10,16 @@
 initDLQ_1_test() ->
     [?SIZE, []] = dlq:initDLQ(?SIZE, ?LOG_DATEI).
 
-erwarteteNNr_1_test() ->
+expectedNr_1_test() ->
     TS = erlang:timestamp(),
     Nachricht = [1, "Text", TS, TS, TS],
-    2 = dlq:erwarteteNNr([?SIZE, [Nachricht]]).
+    2 = dlq:expectedNr([?SIZE, [Nachricht]]).
 
-erwarteteNNr_2_test() ->
+expectedNr_2_test() ->
     TS = erlang:timestamp(),
     Nachricht1 = [2, "Text", TS, TS, TS],
     Nachricht2 = [1, "Text", TS, TS, TS],
-    3 = dlq:erwarteteNNr([?SIZE, [Nachricht1, Nachricht2]]).
+    3 = dlq:expectedNr([?SIZE, [Nachricht1, Nachricht2]]).
 
 holeMaxNNr_1_test() ->
     TS = erlang:timestamp(),
@@ -111,4 +111,4 @@ holeNachricht_2_test() ->
 
 
 erstelleErrNachrichtFurFehlendeNNr_1_test() ->
-    [0,["Angeforderte Nachricht nicht vorhanden."] | _Timestamps] = dlq:erstelleErrNachrichtFurFehlendeNNr().
+    [0, "Angeforderte Nachricht nicht vorhanden." | _Timestamps] = dlq:erstelleErrNachrichtFurFehlendeNNr().

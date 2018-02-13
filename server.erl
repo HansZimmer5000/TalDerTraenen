@@ -27,10 +27,17 @@
 
 start() -> 
     CMEM = cmem:initCMEM(?ERINNERUNGS_ZEIT_SEK, ?CMEM_LOG_DATEI_NAME),
-    %HBQPid = b,
+    initHBQ(),
     ServerPid = spawn(fun() -> receive_loop(CMEM, 1) end),
     register(?SERVERNAME, ServerPid),
     ServerPid.
+
+initHBQ() ->
+    ?HBQ ! {self(), {request, initHBQ}},
+    receive
+        {reply, ok} -> logge_status("HBQ initalisiert")
+    end.
+    
 
 
 receive_loop(CMEM, NextNNR) ->
@@ -55,8 +62,9 @@ receive_loop(CMEM, NextNNR) ->
 
 getmessages_abfertigen(CMEM, LeserPid) -> 
     ZuSendendeNNr = hole_naechste_nnr_fur_leser(CMEM, LeserPid),
-    sendeNNr(ZuSendendeNNr, LeserPid),
-    NeueCMEM = update_gesendete_nnr_fur_leser(CMEM, LeserPid, ZuSendendeNNr),
+    GesendeteNNr = sendeNNr(ZuSendendeNNr, LeserPid),
+    NaechsteNNr = GesendeteNNr + 1,
+    NeueCMEM = update_gesendete_nnr_fur_leser(CMEM, LeserPid, NaechsteNNr),
     NeueCMEM.
 
 hole_naechste_nnr_fur_leser(CMEM, LeserPid) ->
@@ -67,14 +75,21 @@ update_gesendete_nnr_fur_leser(CMEM, LeserPid, LetzteGesendeteNNr) ->
     NeueCMEM.
 
 sendeNNr(ZuSendendeNNr, LeserPid) ->
-    TS = erlang:timestamp(),
-    Nachricht = [ZuSendendeNNr, "Text", TS, TS, TS, TS],
-    TerminatedFlag = rand:uniform() > 0.5,
-    LeserPid ! {reply, Nachricht, TerminatedFlag}.
+    ?HBQ ! {self(), {request, deliverMSG, ZuSendendeNNr, LeserPid}},
+    receive
+        {reply, GesendeteNNr} -> GesendeteNNr
+    end.
+    %TS = erlang:timestamp(),
+    %Nachricht = [ZuSendendeNNr, "Text", TS, TS, TS, TS],
+    %TerminatedFlag = rand:uniform() > 0.5,
+    %LeserPid ! {reply, Nachricht, TerminatedFlag}.
 
 
 dropmessage_abfertigen(Nachricht) ->
-    logge_nachricht_status(Nachricht, "erhalten").
+    ?HBQ ! {self(), {request, pushHBQ, Nachricht}},
+    receive
+        {reply, ok} -> ok
+    end.
 
 
 getmsgid_abfertigen(AbsenderPid, LetzteNNR) -> 

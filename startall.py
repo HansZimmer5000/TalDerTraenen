@@ -2,6 +2,7 @@
 import os
 import sys
 import glob
+import time
 
 #TODO: Test file muss dieses include_lib enthalten und kann nach compilen mit "MODULENAME:test()." getestet werden, geht auch in bash mit "erl -noshell -s MODULENAME test"
 
@@ -40,18 +41,18 @@ if __name__ == "__main__":
         __make_all_modules()
     elif user_input == "1":
         __make_all_modules()
-        print("Nicht alle Tests werden ausgeführt!")
-        #__test_module("testallgemein")
-        #__test_module("testclient")
+        __test_module("testallgemein")
+        __test_module("testclient")
         __test_module("testserver")
-        #__test_module("testcmem")
+        __test_module("testcmem")
         __test_module("testhbq")
         __test_module("testdlq")
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
-        __start_node("client", "client")
         __start_node("server", "server")
         __start_node("hbq", "hbq")
+        time.sleep(2)
+        __start_node("client", "client")
     else:
         print("Argument: '" + user_input + "' unkonwn.")

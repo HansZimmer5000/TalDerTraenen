@@ -14,7 +14,7 @@
 	initDLQ/2, 
 	delDLQ/1, 
 
-	erwarteteNNr/1, 
+	expectedNr/1, 
 	holeMaxNNr/1,
 
 	push2DLQ/3, 
@@ -50,7 +50,7 @@ initDLQ(Size,Datei) ->
 delDLQ(_DLQ) -> ok.
 
 % Gibt die Nachrichtennummer zurück die als nächstes erwartet wird. (Die letzte / größte Nachrichtennummer + 1)
-erwarteteNNr([_Size, Messages]) ->
+expectedNr([_Size, Messages]) ->
 	MaxNr = holeMaxNNr(Messages),
 	MaxNr + 1.
 
@@ -59,7 +59,7 @@ erwarteteNNr([_Size, Messages]) ->
 holeMaxNNr([]) ->
 	0;
 holeMaxNNr([AktuellsteNachricht | _RestlicheNachrichten]) ->
-	[NNr, _Text, _TS, _TS, _TS] = AktuellsteNachricht,
+	[NNr, _Text, _TSCOut, _TSHIn ,_TSDIn] = AktuellsteNachricht,
 	NNr.
 
 
@@ -140,7 +140,7 @@ holeNachricht([_AktuellsteNachricht | RestlicheNachrichten], NNr) ->
 % Erstellt eine Error Nachricht aufgrund des nicht vorhanden seins der gesuchten Nachrichtennummer in der DLQ.
 erstelleErrNachrichtFurFehlendeNNr() ->
 	TS = erlang:timestamp(),
-	[0, ["Angeforderte Nachricht nicht vorhanden."], TS, TS, TS].
+	[0, "Angeforderte Nachricht nicht vorhanden.", TS, TS, TS].
 
 
 %------------------------------------------------------------------------------------------------------
