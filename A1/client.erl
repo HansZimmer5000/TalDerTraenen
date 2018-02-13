@@ -25,6 +25,7 @@
 -define(CONFIG_FILENAME, "client.cfg").
 -define(MIN_INTERVALL_ZEIT_SEK, 2).
 -define(CLIENT_ANZAHL, hole_wert_aus_config_mit_key(clientAnzahl)).
+-define(LIFETIME, hole_wert_aus_config_mit_key(lifetime)).
 -define(SERVERNAME, hole_wert_aus_config_mit_key(servername)).
 -define(SERVERNODE, hole_wert_aus_config_mit_key(servernode)).
 -define(SERVER, {?SERVERNAME, ?SERVERNODE}).
@@ -36,7 +37,7 @@ start() ->
     ets:insert(?ETS_TABELLENNAME, {self(), "client"}),
     logge_status(io_lib:format("client mit PID ~p gestartet", [self()])),
     ClientPidList = start_all_clients(?CLIENT_ANZAHL, []),
-    timer:sleep(timer:seconds(10010)),
+    timer:sleep(timer:seconds(?LIFETIME)),
     kill_all_clients(ClientPidList).
 
 start_all_clients(0, AlteClientPidList) -> AlteClientPidList;

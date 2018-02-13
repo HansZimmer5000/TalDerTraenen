@@ -18,9 +18,9 @@
 -define(CONFIG_FILENAME, "server.cfg").
 -define(LOG_DATEI_NAME, "server.log").
 -define(SERVERNAME, hole_wert_aus_config_mit_key(servername)).
--define(LATENZ_SEK, hole_wert_aus_config_mit_key(latenzSek)).
+-define(LATENZ_SEK, hole_wert_aus_config_mit_key(latency)).
 -define(CMEM_LOG_DATEI_NAME, "cmem.log").
--define(ERINNERUNGS_ZEIT_SEK, 3).
+-define(ERINNERUNGS_ZEIT_SEK, hole_wert_aus_config_mit_key(clientlifetime)).
 -define(HBQNAME, hole_wert_aus_config_mit_key(hbqname)).
 -define(HBQNODE, hole_wert_aus_config_mit_key(hbqnode)).
 -define(HBQ, {?HBQNAME, ?HBQNODE}).
