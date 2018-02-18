@@ -6,18 +6,17 @@ Offene Fragen:
     - Warum wird beim start gesagt dass der starter mit dem nameservice spricht?
         Aber später nicht mehr aufgeführt und der starter nur mit dem koordinator spricht?
     - Was bedeuten die Variablen?
-        ArbeitsZeit ->
-        TermZeit    ->
+        ArbeitsZeit -> 
+        TermZeit    -> 
         GGTProAnz   -> Anzahl an ggT-Prozessen
         GGTProName  -> Name des ggT-Prozessen
         CMi     -> Client Mi
         CZeit   -> Client Zeit des abschickens
-        LCMi    ->
-        WggT    ->    
+        LCMi    -> 
+        WggT    -> Wunsch ggT?
         LeftN   -> Node links des aktuellen (Im Kreis, Uhrzeigersinn)
         RightN  -> Node rechts des aktuellen (Im Kreis, Gegen den Uhrzeigersinn)
-        MiNeu   -> 
-        Initiator   -> 
+        MiNeu   -> Neues Mi für gewissen ggT-Prozess
     - Was ist die "Abstimmung"?
     - Warum hat Koordinator manchmal eine Response auf {briefterm, ...} vom Starter oder ggT-Prozess?
     - Was ist das 2. Argument bei starter:go?
@@ -28,8 +27,6 @@ Geschlossene Fragen:
         Alle haben die selbe Zahl, oder wenn die Zahlen nicht zusammenpassen (z.b. 27, 4) und nichts mehr geht.
     - Welche Startnummern haben die Prozesse?
         Die von der Folie oder eben selbst ausdenken.
-    - Wie genau wird die erste Nummer gesendet?
-        Durch {abstimmung, Initiator} Nachricht vom koordinator zum starter
     - Was passiert wenn Y == X bzw. Y > X?
         Keine Zahl verändert sich, keine Nachricht wird aufgrund dessen geschickt.
         Der Prozess der durch einkommendes Y nicht verändert wird logt "Teminierung mit ggT XY".
@@ -82,18 +79,20 @@ Komponenten:
 
 API:
     nameservice
-        (vom koordinator)
+        (vom koordinator, ggT-Process)
         {AbsenderPid, {bind, Name, node()}} -> ok | in_use
         {AbsenderPid, {rebind, Name, node()}} -> ok
         {AbsenderPid, {lookup, Name}} -> {pin, {Name, Node}} | not_found
         {AbsenderPid, {unbind, Name}} -> ok
+        {AbsenderPid, {multicast, vote, MeinName}} -> {AbsenderPid, {vote, MeinName}} (I guess, an alle ggT-Prozesse + koordinator?)
+        {AbsenderPid, reset} -> ok
 
     koordinator
         (vom starter & ggT-Prozess)
-        {getsteeringval, AbsenderPid} -> {steeringval, ArbeitsZeit, TermZeit, GGTProAnz}
+        {AbsenderPid, getsteeringval} -> {steeringval, ArbeitsZeit, TermZeit, Quota, GGTProAnz}
         {hello, GGTProName} -> none
         {briefmi, {GGTProName, CMi, CZeit}} -> none
-        {briefterm, {GGTProName, CMi, CZeit}, AbsenderPid} -> {sendy, LCMi}
+        {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> {sendy, LCMi}
 
         (manuell)
         reset -> none
@@ -106,14 +105,14 @@ API:
 
     starter & ggT-Prozess
         (vom koordinator & ggT-Prozess)
-        {steeringval, ArbeitsZeit, TermZeit, GGTProAnz} -> none
-        {setneighbors, LeftN, RightN} -> none (MISPELLING?)
+        {steeringval, ArbeitsZeit, TermZeit, Quota, GGTProAnz} -> none
+        {setneighbors, LeftN, RightN} -> none 
         {setpm, MiNeu} -> none
         {sendy, Y} -> {sendy, MiNeu}
-        {abstimmung, Initiator} -> {abstimmung, Initiator}
-        {tellmi, AbsenderPid} -> {mi, Mi}
-        {pingGGT, AbsenderPid} -> {pongGGT, GGTProName}
-        none -> {briefmi, {GGTProName, CMi, CZeit}}
-        none -> {briefterm, {GGTProName, CMi, CZeit}, self()}
+        {briefmi, {GGTProName, CMi, CZeit}} -> none
+        {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> none
+        {voteYes, GGTProName} -> none
+        {AbsenderPid, tellmi} -> {mi, Mi}
+        {AbsenderPid, pingGGT} -> {pongGGT, GGTProName}
         kill -> none
 
