@@ -8,8 +8,8 @@ Offene Fragen:
     - Was bedeuten die Variablen?
         ArbeitsZeit ->
         TermZeit    ->
-        GGTProAnz   ->
-        GGTProName  ->
+        GGTProAnz   -> Anzahl an ggT-Prozessen
+        GGTProName  -> Name des ggT-Prozessen
         CMi     -> Client Mi
         CZeit   -> Client Zeit des abschickens
         LCMi    ->
