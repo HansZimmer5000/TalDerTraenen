@@ -2,29 +2,25 @@ Offene Fragen:
     - Sind Initial nur Nummern eingegeben die auch alle einen ggT haben?
     - Wofür ist nameservice genau zuständig?
     - Wofür ist koordinator genau zuständig?
-    - Wofür ist start_starter genau zuständig?
-    - Warum wird beim start gesagt dass der start_starter mit dem nameservice spricht?
-        Aber später nicht mehr aufgeführt und der start_starter nur mit dem koordinator spricht?
+    - Wofür ist starter genau zuständig?
+    - Warum wird beim start gesagt dass der starter mit dem nameservice spricht?
+        Aber später nicht mehr aufgeführt und der starter nur mit dem koordinator spricht?
     - Was bedeuten die Variablen?
         ArbeitsZeit ->
         TermZeit    ->
         GGTProAnz   ->
         GGTProName  ->
         CMi     -> Client Mi
-        CZeit   -> Client Zeit, Zeit des abschickens
+        CZeit   -> Client Zeit des abschickens
         LCMi    ->
         WggT    ->    
         LeftN   -> Node links des aktuellen (Im Kreis, Uhrzeigersinn)
         RightN  -> Node rechts des aktuellen (Im Kreis, Gegen den Uhrzeigersinn)
         MiNeu   -> 
         Initiator   -> 
-    - Warum steht bei Koordinator in den Folien ggT-Prozess und manchmal nicht?
-    - Warum steht bei Starter in den Folien ggT-Prozess?
     - Was ist die "Abstimmung"?
-    - Warum hat Koordinator manchmal eine Response auf {briefterm, ...} vom Starter?
-
-
-
+    - Warum hat Koordinator manchmal eine Response auf {briefterm, ...} vom Starter oder ggT-Prozess?
+    - Was ist das 2. Argument bei starter:go?
 
 
 Geschlossene Fragen:
@@ -33,7 +29,7 @@ Geschlossene Fragen:
     - Welche Startnummern haben die Prozesse?
         Die von der Folie oder eben selbst ausdenken.
     - Wie genau wird die erste Nummer gesendet?
-        Durch {abstimmung, Initiator} Nachricht vom koordinator zum start_starter
+        Durch {abstimmung, Initiator} Nachricht vom koordinator zum starter
     - Was passiert wenn Y == X bzw. Y > X?
         Keine Zahl verändert sich, keine Nachricht wird aufgrund dessen geschickt.
         Der Prozess der durch einkommendes Y nicht verändert wird logt "Teminierung mit ggT XY".
@@ -43,16 +39,26 @@ Geschlossene Fragen:
         Theoretisch in allen Prozessen mit Mi, der ja dann dem ggT entspricht.
     - Warum wird eine Nummer per Hand gesendet (Beispiel 2, Folien)?
         Weil das System sonst nicht weiterrechnet.
+    - Warum steht bei Koordinator in den Folien ggT-Prozess und manchmal nicht?
+        Weil manchmal auch der ggT-Prozess diese Calls verstehen muss.
+    - Warum steht bei Starter in den Folien ggT-Prozess?
+        Weil der ggT-Prozess die Calls auch verstehen muss.
 
 Ablauf:
     nameservice:start()     nameservice wird gestartet.
     koordinator:start()     koordinator wird gestartet und meldet sich beim nameservice an.
                             ?NAMESERVICE ! {self(), {rebind, KoName, KoNode}}
-    start_starter:go(Anzahl, Start) start_starter wird gestartet und meldet sich beim nameservice an.
-                            ?NAMESERVICE ! {self(), {rebind, Clientname, self()}} 
-                            XOR (Was ist richtig?)
-                            meldet sich beim koordinator an.
-    koordinator             bekommt {}
+    starter:go(Anzahl, Start) starter wird gestartet
+                            fordert vom koordinator {getsteeringval, self()} an.
+                            Diese Daten weiter geben an zu startende definierte Anzahl ggT-Prozesse
+    ggT-Prozess             meldet sich beim nameservice an,
+                            ?NAMESERVICE ! {self(), {rebind, Clientname, self()}}
+                            sagt dem koordinator hallo
+                            {hello, GGTProName}
+    koordinator             wartet auf alle ggT-Prozesse, dann Kreis bauen
+                            ?NAMESERVICE ! {self(), {lookup, GGTProName}}
+                            ggT-Prozess ! {setneighbors, LeftNode, RightNode}
+    
 
 Eigentlich wichtige Formel:
     ggT(x,0) = x
@@ -72,7 +78,7 @@ Komponenten:
 
     koordinator
 
-    start_starter
+    starter
 
 API:
     nameservice
@@ -83,7 +89,7 @@ API:
         {AbsenderPid, {unbind, Name}} -> ok
 
     koordinator
-        (vom start_starter)
+        (vom starter & ggT-Prozess)
         {getsteeringval, AbsenderPid} -> {steeringval, ArbeitsZeit, TermZeit, GGTProAnz}
         {hello, GGTProName} -> none
         {briefmi, {GGTProName, CMi, CZeit}} -> none
@@ -98,8 +104,8 @@ API:
         toggle -> none
         kill -> none
 
-    start_starter
-        (vom koordinator)
+    starter & ggT-Prozess
+        (vom koordinator & ggT-Prozess)
         {steeringval, ArbeitsZeit, TermZeit, GGTProAnz} -> none
         {setneighbors, LeftN, RightN} -> none (MISPELLING?)
         {setpm, MiNeu} -> none

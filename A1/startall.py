@@ -35,7 +35,10 @@ def __clear_all_log_files_in_current_dir():
 # According to given Input, either all Testfiles gonna be executed or 
 # the client, server and hbq erlang node + server will be started.
 if __name__ == "__main__":
-    user_input = sys.argv[1]
+    try: 
+        user_input = sys.argv[1]
+    except IndexError:
+        user_input = "0"
     
     if user_input == "0":
         __make_all_modules()
