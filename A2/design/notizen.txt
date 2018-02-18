@@ -46,7 +46,7 @@ Ablauf:
     koordinator:start()     koordinator wird gestartet und meldet sich beim nameservice an.
                             ?NAMESERVICE ! {self(), {rebind, KoName, KoNode}}
     starter:go(Anzahl, Start) starter wird gestartet
-                            fordert vom koordinator {getsteeringval, self()} an.
+                            fordert vom koordinator {self(), getsteeringval} an.
                             Diese Daten weiter geben an zu startende definierte Anzahl ggT-Prozesse
     ggT-Prozess             meldet sich beim nameservice an,
                             ?NAMESERVICE ! {self(), {rebind, Clientname, self()}}
