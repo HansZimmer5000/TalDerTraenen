@@ -19,9 +19,11 @@
 
 
 go_1_test() ->
+    io:fwrite("Not yet implemented"),
     true = false.
 
 init_1_test() ->
+    io:fwrite("Not yet implemented"),
     true = false.
 
 init_receive_loop_1_test() ->
@@ -49,6 +51,7 @@ empty_instance_variables_exist_2_test() ->
 
 
 receive_loop_1_test() ->
+    io:fwrite("Not yet implemented"),
     true = false.
 
 kill_1_test() ->
@@ -105,6 +108,7 @@ send_new_mi_1_test() ->
     end.
 
 voteYes_1_test() ->
+    io:fwrite("Not yet implemented"),
     true = false.
 
 tellmi_1_test() ->

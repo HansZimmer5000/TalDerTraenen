@@ -59,6 +59,7 @@ lookup_2_test() ->
 
 
 multicastvote_1_test() ->
+    io:fwrite("Not yet implemented"),
     true = fail.
 
 reset_1_test() ->
