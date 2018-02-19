@@ -1,30 +1,37 @@
 Offene Fragen:
-    - Sind Initial nur Nummern eingegeben die auch alle einen ggT haben?
-    - Wofür ist nameservice genau zuständig?
-    - Wofür ist koordinator genau zuständig?
-    - Wofür ist starter genau zuständig?
-    - Warum wird beim start gesagt dass der starter mit dem nameservice spricht?
-        Aber später nicht mehr aufgeführt und der starter nur mit dem koordinator spricht?
     - Was bedeuten die Variablen?
-        ArbeitsZeit -> 
+        ArbeitsZeit -> Delay zwischen Jetzt und der Zeit wenn der ggT-Prozess anfangen soll zu arbeiten
         TermZeit    -> 
         GGTProAnz   -> Anzahl an ggT-Prozessen
         GGTProName  -> Name des ggT-Prozessen
         CMi     -> Client Mi
         CZeit   -> Client Zeit des abschickens
         LCMi    -> 
-        WggT    -> Wunsch ggT?
+        WggT    -> Wunsch ggT
         LeftN   -> Node links des aktuellen (Im Kreis, Uhrzeigersinn)
         RightN  -> Node rechts des aktuellen (Im Kreis, Gegen den Uhrzeigersinn)
         MiNeu   -> Neues Mi für gewissen ggT-Prozess
     - Was ist die "Abstimmung"?
     - Warum hat Koordinator manchmal eine Response auf {briefterm, ...} vom Starter oder ggT-Prozess?
     - Was ist das 2. Argument bei starter:go?
+    - Was machen die Koordinator aufrufe:
+        step    -> 
+        prompt  -> ("Antreiben")
+        nudge   -> ("Anstupsen")
+        toggle  -> ("Umschalten")
 
 
 Geschlossene Fragen:
+    - Wofür ist koordinator genau zuständig?
+        Verwaltet die ggT-Prozesse
+    - Wofür ist starter genau zuständig?
+        Er startet alle ggT-Prozesse (noch ohne Mis)
+    - Sind Initial nur Nummern eingegeben die auch alle einen ggT haben?
+        Macht dann koordinator mit vsutil:bestimme_mis/2 + verschicken der Mis an die ggT-Prozesse
+    - Wofür ist nameservice genau zuständig?
+        Managen der prozess + nodenamen auf prozess Ids, wie ein DNS.
     - Wie erkennt man die Terminierung?
-        Alle haben die selbe Zahl, oder wenn die Zahlen nicht zusammenpassen (z.b. 27, 4) und nichts mehr geht.
+        Alle haben die selbe Zahl, den Wunsch ggT (WggT), oder wenn die Zahlen nicht zusammenpassen (z.b. 27, 4) und nichts mehr geht.
     - Welche Startnummern haben die Prozesse?
         Die von der Folie oder eben selbst ausdenken.
     - Was passiert wenn Y == X bzw. Y > X?
@@ -42,6 +49,7 @@ Geschlossene Fragen:
         Weil der ggT-Prozess die Calls auch verstehen muss.
 
 Ablauf:
+    INITIAL
     nameservice:start()     nameservice wird gestartet.
     koordinator:start()     koordinator wird gestartet und meldet sich beim nameservice an.
                             ?NAMESERVICE ! {self(), {rebind, KoName, KoNode}}
@@ -55,6 +63,22 @@ Ablauf:
     koordinator             wartet auf alle ggT-Prozesse, dann Kreis bauen
                             ?NAMESERVICE ! {self(), {lookup, GGTProName}}
                             ggT-Prozess ! {setneighbors, LeftNode, RightNode}
+
+    CALCULATION
+    anwender        schickt an koordinator {calc, WggT}
+    koordinator     bekommt {calc, WggT}, 
+                    ruft vsutil:bestimme_mis/2 auf 
+                    und verteilt Mis and ggT-Prozesse {setpm, MiNeu}
+                    __??__ (WIE?) Initiiert Berechnung
+    ggT-Prozess     Warten auf empfang von {setpm, MiNeu} -> Mi setzen.
+                    Warten auf empfang von {sendy, Y} -> Formel ausführen
+                    Wenn NeuMi <> Mi -> an Nachbarn schicken
+    koordinator     Sollte das System noch nicht am WggT angekommen sein,
+                    muss der anwender den koordinator bescheid geben es anzustoßen.
+                    __??__ (WIE?)
+
+    VOTING
+    __??__ (WIE?)
     
 
 Eigentlich wichtige Formel:
@@ -71,11 +95,10 @@ Hier verwendet (Verteilte) Version:
             send Mi to all neighbours - Eine Art Rekursivität
 
 Komponenten:
-    nameservice
-
-    koordinator
-
-    starter
+    nameservice - Verwaltet die Prozess- und Nodenamen und bildet auf Prozessids ab.
+    koordinator - Verwaltet die ggT-Prozesse (manuelle Kommandos, ggT-Prozessnachbarn, logging)
+    starter     - Startet die ggT-Prozesse, noch ohne Mi.
+    ggT-Prozess - Hat ein Mi und kennt ggT-Formel, berechnet eigentliches Ergebnis, den ggT.
 
 API:
     nameservice
