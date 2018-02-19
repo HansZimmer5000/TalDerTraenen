@@ -28,9 +28,12 @@ go({GGTProName, ArbeitsZeit, TermZeit, Quota}) ->
 
     GGTProPid = spawn(fun() -> init(InstanceVariables, GlobalVariables) end),
     register(GGTProName, GGTProPid),
-    ?NSPID ! {self(), {rebind, GGTProName, node()}}.
+    ?NSPID ! {GGTProPid, {rebind, GGTProName, node()}}.
 
 init(InstanceVariables, GlobalVariables) ->
+    receive
+        ok -> ok
+    end,
     FilledInstanceVariables = init_receive_loop(InstanceVariables, GlobalVariables),
     receive_loop(FilledInstanceVariables, GlobalVariables).
 
