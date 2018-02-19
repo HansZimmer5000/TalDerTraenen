@@ -19,12 +19,50 @@
 
 
 go_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    ThisPid = self(),
+    TestPid = ggtprozess:go({nameA, 1, 2, 2, ThisPid, ThisPid}),
+
+    receive
+        Any ->  ?assertEqual({TestPid, {rebind, nameA, node()}}, Any),
+                TestPid ! ok
+    end,
+
+    TestPid ! {setpm, 3},
+    TestPid ! {setneighbors, ThisPid, ThisPid},
+
+    TestPid ! {ThisPid, tellmi},
+    receive
+        Any1 -> ?assertEqual({mi, 3}, Any1), ok
+    end,
+
+    TestPid ! kill,
+    receive
+        Any2 -> ?assertEqual({TestPid, {unbind, nameA}}, Any2),
+                TestPid ! ok
+    end.
 
 init_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    ThisPid = self(),
+    InstanceVariables = {nameA, empty, empty},
+    GlobalVariables = {1, 2, 2, ThisPid, ThisPid},
+    TestPid = spawn(fun() ->
+                        ggtprozess:init(InstanceVariables, GlobalVariables)
+                    end),
+    TestPid ! ok,
+
+    TestPid ! {setpm, 3},
+    TestPid ! {setneighbors, ThisPid, ThisPid},
+
+    TestPid ! {ThisPid, tellmi},
+    receive
+        Any1 -> ?assertEqual({mi, 3}, Any1), ok
+    end,
+
+    TestPid ! kill,
+    receive
+        Any2 -> ?assertEqual({TestPid, {unbind, nameA}}, Any2),
+                TestPid ! ok
+    end.
 
 init_receive_loop_1_test() ->
     InstanceVariables = {nameA, empty, empty},
@@ -38,7 +76,6 @@ init_receive_loop_1_test() ->
 
     receive
         Any -> ?assertEqual({nameA, 3, {ThisPid, ThisPid}}, Any)
-        after 500 -> true = false
     end.
 
 empty_instance_variables_exist_1_test() ->
@@ -51,8 +88,22 @@ empty_instance_variables_exist_2_test() ->
 
 
 receive_loop_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    ThisPid = self(),
+    InstanceVariables = {nameA, 3, {ThisPid, ThisPid}},
+    GlobalVariables = {1, 2, 2, ThisPid, ThisPid},
+    TestPid = spawn(fun() ->
+                        ggtprozess:receive_loop(InstanceVariables, GlobalVariables)
+                    end),
+    TestPid ! {ThisPid, tellmi},
+    receive
+        Any1 -> ?assertEqual({mi, 3}, Any1), ok
+    end,
+
+    TestPid ! kill,
+    receive
+        Any2 -> ?assertEqual({TestPid, {unbind, nameA}}, Any2),
+                TestPid ! ok
+    end.
 
 kill_1_test() ->
     ThisPid = self(),

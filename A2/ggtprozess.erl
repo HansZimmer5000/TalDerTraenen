@@ -20,15 +20,19 @@
 -define(CONFIG_FILENAME, 'ggtprozess.cfg').
 -define(NSPID, hole_wert_aus_config_mit_key(nspid)).
 -define(KOPID, hole_wert_aus_config_mit_key(kopid)).
-
+-define(LOG_DATEI_NAME, 'ggtprozess.log').
 
 go({GGTProName, ArbeitsZeit, TermZeit, Quota}) ->
+    go({GGTProName, ArbeitsZeit, TermZeit, Quota, ?NSPID, ?KOPID});
+
+go({GGTProName, ArbeitsZeit, TermZeit, Quota, NSPid, KOPid}) ->
     InstanceVariables = {GGTProName, empty, empty},
-    GlobalVariables = {ArbeitsZeit, TermZeit, Quota, ?NSPID, ?KOPID},
+    GlobalVariables = {ArbeitsZeit, TermZeit, Quota, NSPid, KOPid},
 
     GGTProPid = spawn(fun() -> init(InstanceVariables, GlobalVariables) end),
     register(GGTProName, GGTProPid),
-    ?NSPID ! {GGTProPid, {rebind, GGTProName, node()}}.
+    NSPid ! {GGTProPid, {rebind, GGTProName, node()}},
+    GGTProPid.
 
 init(InstanceVariables, GlobalVariables) ->
     receive
@@ -49,7 +53,7 @@ init_receive_loop({GGTProName, Mi, Neighbors}, GlobalVariables) ->
             NewInstanceVariables = {GGTProName, MiNeu, Neighbors},
             case empty_instance_variables_exist(NewInstanceVariables) of
                 false -> NewInstanceVariables;
-                true ->  io:fwrite("mr"), init_receive_loop(NewInstanceVariables, GlobalVariables)
+                true ->  init_receive_loop(NewInstanceVariables, GlobalVariables)
             end
     end.
 
@@ -60,17 +64,22 @@ empty_instance_variables_exist(InstanceVariables) ->
 receive_loop({GGTProName, Mi, Neighbors}, 
             {ArbeitsZeit, TermZeit, Quota, NSPID, KOPID}) ->
     receive
-        kill ->     kill(GGTProName, NSPID);
-        {sendy, Y} ->               NewMi = calc_and_send_new_mi(Mi, Y, Neighbors),
+        kill ->     logge_status(GGTProName, "got kill"),
+                    kill(GGTProName, NSPID);
+        {sendy, Y} ->               logge_status(GGTProName, "got sendy"),
+                                    NewMi = calc_and_send_new_mi(Mi, Y, Neighbors),
                                     receive_loop({GGTProName, NewMi, Neighbors},
                                                     {ArbeitsZeit, TermZeit, Quota, NSPID, KOPID});
-        {voteYes, GGTProName} ->    voteYes(),
+        {voteYes, GGTProName} ->    logge_status(GGTProName, "got voteYes"),
+                                    voteYes(),
                                     receive_loop({GGTProName, Mi, Neighbors},
                                                  {ArbeitsZeit, TermZeit, Quota, NSPID, KOPID});
-        {AbsenderPid, tellmi} ->    tellmi(AbsenderPid, Mi),
+        {AbsenderPid, tellmi} ->    logge_status(GGTProName, "got tellmi"),
+                                    tellmi(AbsenderPid, Mi),
                                     receive_loop({GGTProName, Mi, Neighbors},
                                                 {ArbeitsZeit, TermZeit, Quota, NSPID, KOPID});
-        {AbsenderPid, pingGGT} ->   pongGGT(AbsenderPid, GGTProName),
+        {AbsenderPid, pingGGT} ->   logge_status(GGTProName, "got pingGGT"),
+                                    pongGGT(AbsenderPid, GGTProName),
                                     receive_loop({GGTProName, Mi, Neighbors},
                                                  {ArbeitsZeit, TermZeit, Quota, NSPID, KOPID})
     end.
@@ -116,3 +125,9 @@ hole_wert_aus_config_mit_key(Key) ->
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
     {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
     Value.
+
+logge_status(GGTProName, Inhalt) ->
+    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
+    LogNachricht = io_lib:format("~p ~p ~s.\n", [GGTProName, AktuelleZeit, Inhalt]),
+    io:fwrite(LogNachricht),
+    util:logging(?LOG_DATEI_NAME, LogNachricht).
