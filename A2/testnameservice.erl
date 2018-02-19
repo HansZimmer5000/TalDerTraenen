@@ -14,7 +14,7 @@ bind_1_test() ->
     NewName = nameB,
     NewPid = {nameB, nodeB},
     {NewNamesToPids, ResultMessage} = nameservice:bind(NamesToPids, NewName, NewPid),
-    ?assertEqual([{nameA, {nameA, nodeA}}, {NewName, NewPid}], NewNamesToPids),
+    ?assertEqual([{NewName, NewPid}, {nameA, {nameA, nodeA}}], NewNamesToPids),
     ?assertEqual(ok, ResultMessage).
 
 bind_2_test() ->
@@ -30,7 +30,7 @@ rebind_1_test() ->
     NewName = nameB,
     NewPid = {nameB, nodeB},
     {NewNamesToPids, ResultMessage} = nameservice:bind(NamesToPids, NewName, NewPid),
-    ?assertEqual([{nameA, {nameA, nodeA}}, {NewName, NewPid}], NewNamesToPids),
+    ?assertEqual([{NewName, NewPid}, {nameA, {nameA, nodeA}}], NewNamesToPids),
     ?assertEqual(ok, ResultMessage).
 
 rebind_2_test() ->
@@ -62,6 +62,8 @@ multicastvote_1_test() ->
     true = fail.
 
 reset_1_test() ->
-    {NewNamesToPids, ResultMessage} = nameservice:reset(self()),
+    {NewNamesToPids, ResultMessage} = nameservice:reset(),
     ?assertEqual(ok, ResultMessage),
     ?assertEqual([], NewNamesToPids).
+
+

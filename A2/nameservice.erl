@@ -39,23 +39,50 @@ receive_loop(NamesToPids) ->
     end.
 
 bind(NamesToPids, NewName, NewPid) ->
-    NewNamesToPids = NamesToPids,
-    ResultMessage = ok,
+    NewNamesToPids = bind_(NamesToPids, NewName, NewPid, []),
+    case NewNamesToPids of
+        NamesToPids -> ResultMessage = in_use;
+        _Any -> ResultMessage = ok
+    end,
     {NewNamesToPids, ResultMessage}.
+
+bind_([], NewName, NewPid, Akku) -> lists:append([{NewName, NewPid}], Akku);
+bind_([HeadTupel | RestTupels], NewName, NewPid, Akku) ->
+    {HeadName, _HeadPid} = HeadTupel,
+    case HeadName of
+        NewName ->  NewNamesToPids = lists:append([Akku, [HeadTupel], RestTupels]),
+                    NewNamesToPids;
+        _Any -> NewAkku = lists:append(Akku, [HeadTupel]),
+                bind_(RestTupels, NewName, NewPid, NewAkku)
+    end.
 
 rebind(NamesToPids, NewName, NewPid) ->
-    NewNamesToPids = NamesToPids,
-    ResultMessage = ok,
-    {NewNamesToPids, ResultMessage}.
+    {NewNamesToPids1, ok} = unbind(NamesToPids, NewName),
+    {NewNamesToPids2, ok} = bind(NewNamesToPids1, NewName, NewPid),
+    {NewNamesToPids2, ok}.
 
 unbind(NamesToPids, Name) ->
-    NewNamesToPids = NamesToPids,
+    NewNamesToPids = unbind_(NamesToPids, Name, []),
     ResultMessage = ok,
     {NewNamesToPids, ResultMessage}.
 
-lookup(NamesToPids, Name) ->
-    ResultMessage = not_found,
-    ResultMessage.
+unbind_([], _Name, Akku) -> Akku;
+unbind_([HeadTupel | RestTupels], Name, Akku) ->
+    {HeadName, _HeadPid} = HeadTupel,
+    case HeadName of
+        Name -> NewNamesToPids = lists:append(Akku, RestTupels),
+                NewNamesToPids;
+        _Any -> NewAkku = lists:append(Akku, [HeadTupel]),
+                unbind_(RestTupels, Name, NewAkku)
+    end.
+
+lookup([], _Name) -> not_found;
+lookup([HeadTupel | RestTupels], Name) ->
+    {HeadName, HeadPid} = HeadTupel,
+    case HeadName of
+        Name -> {pin, HeadPid};
+        _Any -> lookup(RestTupels, Name)
+    end.
 
 multicastvote(NewNamesToPids, InitatorName) ->
     ok.
