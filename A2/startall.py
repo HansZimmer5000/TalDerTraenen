@@ -9,6 +9,9 @@ def __make_all_modules():
     COMMAND = "erl -make"
     os.system(COMMAND)
 
+# Looks in current folder for files macthing "test*.erl"
+def __get_all_test_modulenames():
+    return glob.glob("test*.erl")
 
 # Execute the tests of the given module.
 def __test_module(modulename):
@@ -42,8 +45,9 @@ if __name__ == "__main__":
         __make_all_modules()
     elif user_input == "1":
         __make_all_modules()
-        __test_module("testnameservice")
-        __test_module("testggtprozess")
+        test_modulenames = __get_all_test_modulenames()
+        for modulename in test_modulenames:
+            __test_module(modulename)
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
