@@ -1,4 +1,4 @@
--module(ggtprozess).
+-module(ggtprocess).
 
 -export([
     ggTV/2
