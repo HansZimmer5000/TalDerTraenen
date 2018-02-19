@@ -13,15 +13,16 @@ Offene Fragen:
         MiNeu   -> Neues Mi für gewissen ggT-Prozess
     - Was ist die "Abstimmung"?
     - Warum hat Koordinator manchmal eine Response auf {briefterm, ...} vom Starter oder ggT-Prozess?
-    - Was ist das 2. Argument bei starter:go?
     - Was machen die Koordinator aufrufe:
         step    -> 
-        prompt  -> ("Antreiben")
-        nudge   -> ("Anstupsen")
+        prompt  -> ("Antreiben") ggT-Prozesse auffordern aktuellen Mi zurück zu schicken.
+        nudge   -> ("Anstupsen") Anpingen, pont zurück erwarten
         toggle  -> ("Umschalten")
 
 
 Geschlossene Fragen:
+    - Was ist das 2. Argument bei starter:go?
+        Nummer des Starters
     - Wofür ist koordinator genau zuständig?
         Verwaltet die ggT-Prozesse
     - Wofür ist starter genau zuständig?
