@@ -42,6 +42,7 @@ if __name__ == "__main__":
         __make_all_modules()
     elif user_input == "1":
         __make_all_modules()
+        __test_module("testnameservice")
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
