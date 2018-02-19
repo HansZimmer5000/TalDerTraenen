@@ -47,7 +47,8 @@ if __name__ == "__main__":
         __make_all_modules()
         test_modulenames = __get_all_test_modulenames()
         for modulename in test_modulenames:
-            __test_module(modulename)
+            pointIndex = modulename.find(".")
+            __test_module(modulename[:pointIndex])
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()

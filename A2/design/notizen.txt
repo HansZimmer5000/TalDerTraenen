@@ -138,8 +138,6 @@ API:
         {setneighbors, LeftN, RightN} -> none 
         {setpm, MiNeu} -> none
         {sendy, Y} -> {sendy, MiNeu}
-        {briefmi, {GGTProName, CMi, CZeit}} -> none
-        {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> none
         {voteYes, GGTProName} -> none
         {AbsenderPid, tellmi} -> {mi, Mi}
         {AbsenderPid, pingGGT} -> {pongGGT, GGTProName}
