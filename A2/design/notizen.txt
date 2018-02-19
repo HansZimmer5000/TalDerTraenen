@@ -100,10 +100,11 @@ Hier verwendet (Verteilte) Version:
             send Mi to all neighbours - Eine Art Rekursivität
 
 Komponenten:
-    nameservice - Verwaltet die Prozess- und Nodenamen und bildet auf Prozessids ab.
-    koordinator - Verwaltet die ggT-Prozesse (manuelle Kommandos, ggT-Prozessnachbarn, logging)
-    starter     - Startet die ggT-Prozesse, noch ohne Mi.
-    ggT-Prozess - Hat ein Mi und kennt ggT-Formel, berechnet eigentliches Ergebnis, den ggT.
+    nameservice     - Verwaltet die Prozess- und Nodenamen und bildet auf Prozessids ab.
+        NamesToPids: Liste aus Namen & Pid Tupeln {NameXY, {RegisteredName, Node}}
+    koordinator     - Verwaltet die ggT-Prozesse (manuelle Kommandos, ggT-Prozessnachbarn, logging)
+    starter         - Startet die ggT-Prozesse, noch ohne Mi.
+    ggT-Prozess     - Hat ein Mi und kennt ggT-Formel, berechnet eigentliches Ergebnis, den ggT.
 
 API:
     nameservice
