@@ -1,15 +1,8 @@
--module(vorbereitung).
+-module(ggtprozess).
 
 -export([
-    ggT/2,
     ggTV/2
 ]).
-
-ggT(X, 0) -> X;
-ggT(X, Y) ->
-    NewX = Y,
-    NewY = X rem Y,
-    ggT(NewX, NewY).
 
 ggTV(X, Y) -> 
     case Y < X of
