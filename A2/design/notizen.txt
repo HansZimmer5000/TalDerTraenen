@@ -3,7 +3,7 @@ Offene Fragen:
         ArbeitsZeit -> Delay zwischen Jetzt und der Zeit wenn der ggT-Prozess anfangen soll zu arbeiten
         TermZeit    -> 
         GGTProAnz   -> Anzahl an ggT-Prozessen
-        GGTProName  -> Name des ggT-Prozessen
+        GGTProName  -> Name des ggT-Prozesses
         CMi     -> Client Mi
         CZeit   -> Client Zeit des abschickens
         LCMi    -> 
@@ -11,6 +11,7 @@ Offene Fragen:
         LeftN   -> Node links des aktuellen (Im Kreis, Uhrzeigersinn)
         RightN  -> Node rechts des aktuellen (Im Kreis, Gegen den Uhrzeigersinn)
         MiNeu   -> Neues Mi für gewissen ggT-Prozess
+        Quota   -> 
     - Was ist die "Abstimmung"?
     - Warum hat Koordinator manchmal eine Response auf {briefterm, ...} vom Starter oder ggT-Prozess?
     - Was machen die Koordinator aufrufe:
@@ -21,6 +22,8 @@ Offene Fragen:
 
 
 Geschlossene Fragen:
+    - Wie sieht der GGTProName aus?
+        "GGT-" + StarterNummer + Praktikumsgruppennummer + Teamnummer + ggT-Prozess Nummer (von 1 bis GGTProAnz).
     - Was ist das 2. Argument bei starter:go?
         Nummer des Starters
     - Wofür ist koordinator genau zuständig?
@@ -54,9 +57,10 @@ Ablauf:
     nameservice:start()     nameservice wird gestartet.
     koordinator:start()     koordinator wird gestartet und meldet sich beim nameservice an.
                             ?NAMESERVICE ! {self(), {rebind, KoName, KoNode}}
-    starter:go(Anzahl, Start) starter wird gestartet
+    starter:go(Anzahl, StarterNummer) starter wird gestartet
                             fordert vom koordinator {self(), getsteeringval} an.
-                            Diese Daten weiter geben an zu startende definierte Anzahl ggT-Prozesse
+                            GoValues weiter geben an zu startende definierte Anzahl ggT-Prozesse
+                            GoValues = {ArbeitsZeit, TermZeit, GGTProName, Quota}
     ggT-Prozess             meldet sich beim nameservice an,
                             ?NAMESERVICE ! {self(), {rebind, Clientname, self()}}
                             sagt dem koordinator hallo
