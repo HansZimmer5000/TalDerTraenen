@@ -53,5 +53,10 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
+        __start_node("ns", "nameservice")
+        time.sleep(1)
+        __start_node("ko", "koordinator")
+        time.sleep(1)
+        __start_node("starter", "starter")
     else:
         print("Argument: '" + user_input + "' unkonwn.")
