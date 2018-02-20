@@ -1,2 +1,1 @@
-"# VS2" 
-Second Try.
+Tal der Tränen, 2.
