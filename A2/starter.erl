@@ -2,6 +2,7 @@
 
 -export([
     go/1,
+    go/2,
 
     start_all_ggtprozesse/2,
 
@@ -11,8 +12,9 @@
 -define(KOPID, {koordinator,'ko@HansZimmer-PC'}).
 
 go(StarterNummer) ->
-    KOPid = ?KOPID,
-    KOPid ! {self(), getsteeringval},
+    go(StarterNummer, ?KOPID).
+go(StarterNummer, KoPid) ->
+    KoPid ! {self(), getsteeringval},
     receive 
         {steeringval, ArbeitsZeit, TermZeit, Quota, GGTProAnz} -> 
             start_all_ggtprozesse(StarterNummer, {ArbeitsZeit, TermZeit, Quota, GGTProAnz})
@@ -30,7 +32,7 @@ create_ggtproname(StarterNummer, GGTProNummer) ->
     Praktikumsgruppennummer = 1,
     Teamnummer = 2,
     GGTProName = io_lib:format(
-                    "GGT-~p~p~p~p", 
+                    'ggt-~p~p~p~p', 
                     [StarterNummer, Praktikumsgruppennummer, Teamnummer, GGTProNummer]
                 ),
-    GGTProName.
+    list_to_atom(lists:flatten(GGTProName)).
