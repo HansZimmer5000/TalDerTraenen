@@ -7,14 +7,26 @@
     wait_and_collect_ggtpro/2,
     create_circle/2,
     set_neighbors/4,
+    get_next_to_last_and_last_elem/1,
 
-    receive_loop/1,
+    receive_loop/2,
+    briefmi/3,
+    briefterm/4,
+    reset/0,
+    step/0,
+    calc/2,
+    prompt/0,
+    nudge/2,
+    toggle/0,
+    kill/0,
 
-    get_next_to_last_and_last_elem/1
+    ggtpropid_exists/2,
+    get_ggtpropid/2
 ]).
 
 -define(NSPID, {nameservice,'ns@HansZimmer-PC'}).
 -define(KONAME, koordinator).
+-define(LOG_DATEI_NAME, "koordinator.log").
 -define(ARBEITSZEIT, 0).
 -define(TERMZEIT, 0).
 -define(QUOTA, 2).
@@ -50,7 +62,7 @@ start(NsPid) ->
     end,
     GGTProNameList = wait_and_collect_ggtpro([], ?GGTPROANZ),
     create_circle(GGTProNameList, NsPid),
-    receive_loop(GGTProNameList).
+    receive_loop(GGTProNameList, NsPid).
 
 wait_and_collect_ggtpro(GGTProNameList, 0) -> 
     GGTProNameList;
@@ -75,32 +87,14 @@ create_circle_([FirstGGTProName, SecondGGTProName, ThirdGGTProName | RestGGTProN
     create_circle_([SecondGGTProName, ThirdGGTProName | RestGGTProNames], NsPid).
 
 set_neighbors(MiddleGGTProName, LeftGGTProName, RightGGTProName, NsPid) ->
-    NsPid ! {self(), {lookup, MiddleGGTProName}},
-    receive
-        {pin, MiddleGGTProPid} -> 
-            MiddleGGTProPid ! {setneighbors, LeftGGTProName, RightGGTProName};
-        not_found -> 
+    case ggtpropid_exists(MiddleGGTProName, NsPid) of
+        true ->     continue;
+        false ->    
             io:fwrite("Circle kann nicht vervollständigt werden, ~p wurde beim nameservice nicht gefunden!", [MiddleGGTProName]),
             true = false
-    end.
-
-
-receive_loop(_GGTProNameList) ->
-    receive
-        {briefmi, {_GGTProName, _CMi, _CZeit}} -> none;
-        {_AbsenderPid, briefterm, {_GGTProName, _CMi, _CZeit}} -> 
-            LCMi = empty,
-            {sendy, LCMi};
-        reset -> none;
-        step -> none;
-        {calc, _WggT} -> none;
-        prompt -> none;
-        nudge -> none;
-        toggle -> none;
-        kill -> none
-    end.
-
-
+    end,
+    MiddleGGTProPid = get_ggtpropid(MiddleGGTProName, NsPid),
+    MiddleGGTProPid ! {setneighbors, LeftGGTProName, RightGGTProName}.
 
 get_next_to_last_and_last_elem([]) ->
     [];
@@ -110,3 +104,95 @@ get_next_to_last_and_last_elem([NextToLastElem, LastElem]) ->
     [NextToLastElem, LastElem];
 get_next_to_last_and_last_elem([_HeadElem | RestElems]) ->
     get_next_to_last_and_last_elem(RestElems).
+
+
+
+receive_loop(GGTProNameList, NsPid) ->
+    receive
+        {briefmi, {GGTProName, CMi, CZeit}} -> briefmi(GGTProName, CMi, CZeit);
+        {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> briefterm(AbsenderPid, GGTProName, CMi, CZeit); 
+        reset -> reset();
+        step -> step();
+        {calc, WggT} -> calc(WggT, GGTProNameList);
+        prompt -> prompt();
+        nudge -> nudge(GGTProNameList, NsPid);
+        toggle -> toggle();
+        kill -> kill()
+    end.
+
+
+briefmi(GGTProName, CMi, CZeit) ->
+    logge_ggtpro_status(GGTProName, CMi, CZeit, false).
+
+briefterm(_AbsenderPid, GGTProName, CMi, CZeit) ->
+    logge_ggtpro_status(GGTProName, CMi, CZeit, true).
+    %{sendy, LCMi}, wirklich etwas zurück senden?
+
+reset() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+step() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+calc(_WggT, _GGTProNameList) ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+prompt() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+nudge([], _NsPid) -> ok;
+nudge([HeadGGTProName | RestGGTProNames], NsPid) ->
+    case ggtpropid_exists(HeadGGTProName, NsPid) of
+        true -> continue;
+        false ->
+            io:fwrite("GGTProName ~p beim nameservice unbekannt!", [HeadGGTProName]),
+            true = false
+    end,
+    HeadGGTProPid = get_ggtpropid(HeadGGTProName, NsPid),
+    HeadGGTProPid ! {self(),pingGGT},
+    receive 
+        {pongGGT, HeadGGTProName} -> ok
+        after 2 -> io:fwrite("GGTProName ~p mit ~p meldet sich nicht!", [HeadGGTProName, HeadGGTProPid])
+    end,
+    nudge(RestGGTProNames, NsPid).
+
+toggle() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+kill() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+%------------
+ggtpropid_exists(GGTProName, NsPid) ->
+    NsPid ! {self(), {lookup, GGTProName}},
+    receive
+        {pin, _GGTProPid} -> true;
+        not_found -> false
+    end.
+get_ggtpropid(GGTProName, NsPid) ->
+    NsPid ! {self(), {lookup, GGTProName}},
+    receive
+        {pin, GGTProPid} -> GGTProPid;
+        not_found -> 
+            io:fwrite("GGTProName ~p beim nameservice unbekannt! Nutze vor dieser Funktion ggtpropid_exists/2 um sicher zugehen!", [GGTProName]),
+            true = false
+    end.
+
+
+
+logge_ggtpro_status(GGTProName, CMi, CZeit, TermFlag) ->
+    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
+
+    LogNachricht = lists:flatten(
+                        io_lib:format(
+                            "~p meldet ~p(CMi) ~p(TermFlag) ~p(CZeit) um ~p.\n", 
+                            [GGTProName, CMi, TermFlag, CZeit, AktuelleZeit])
+                    ),
+    io:fwrite(LogNachricht),
+    util:logging(?LOG_DATEI_NAME, LogNachricht).

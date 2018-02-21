@@ -8,10 +8,23 @@
 %    wait_and_collect_ggtpro/2,
 %    create_circle/2,
 %    set_neighbors/4,
+%    get_next_to_last_and_last_elem/1
 
 %    receive_loop/1,
+%    briefmi/3,
+%    briefterm/4,
+%    reset/0,
+%    step/0,
+%    calc/2,
+%    prompt/0,
+%    nudge/2,
+%    toggle/0,
+%    kill/0,
 
-%    get_next_to_last_and_last_elem/1
+%    ggtpropid_exists/2,
+%    get_ggtpropid/2
+
+
 
 
 start_1_test() -> 
@@ -120,11 +133,6 @@ set_neighbors_1_test() ->
             {setneighbors, nameC, nameB} = Any2
     end.
 
-
-receive_loop_1_test() -> 
-    io:fwrite("Not yet implemented"),
-    true = false.
-
 get_next_to_last_and_last_elem_1_test() -> 
     ?assertEqual(
         [1,2], 
@@ -134,3 +142,131 @@ get_next_to_last_and_last_elem_2_test() ->
     ?assertEqual(
         [1,2], 
         koordinator:get_next_to_last_and_last_elem([3,4,5,6,1,2])).
+
+receive_loop_1_test() -> 
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+briefmi_1_test() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+briefterm_1_test() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+reset_1_test() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+step_1_test() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+calc_1_test() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+prompt_1_test() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+nudge_1_test() ->
+    ThisPid = self(),
+    TestPid = spawn(fun() -> 
+                        ok = koordinator:nudge([nameA], ThisPid)
+                    end),
+    receive
+        Any1 ->
+            {TestPid, {lookup, nameA}} = Any1,
+            TestPid ! {pin, ThisPid}
+    end,
+        receive
+        Any2 ->
+            {TestPid, {lookup, nameA}} = Any2,
+            TestPid ! {pin, ThisPid}
+    end,
+    receive
+        Any3 ->
+            {TestPid, pingGGT} = Any3,
+            TestPid ! {pongGGT, nameA}
+    end.
+
+nudge_2_test() ->
+    ThisPid = self(),
+    TestPid = spawn(fun() -> 
+                        ?assertError(
+                            {badmatch, false}, 
+                            koordinator:nudge([nameA], ThisPid))
+                    end),
+    receive
+        Any1 ->
+            {TestPid, {lookup, nameA}} = Any1,
+            TestPid ! not_found
+    end.
+
+toggle_1_test() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+kill_1_test() ->
+    io:fwrite("Not yet implemented"),
+    true = false.
+
+ggtpropid_exists_1_test() ->
+    ThisPid = self(),
+    TestPid = spawn(fun() -> 
+                        Result = koordinator:ggtpropid_exists(nameA, ThisPid),
+                        ThisPid ! Result
+                    end),
+    receive
+        Any1 ->
+            {TestPid, {lookup, nameA}} = Any1,
+            TestPid ! {pin, ThisPid}
+    end,
+    receive
+        Any ->
+            ?assert(Any)
+    end.
+
+ggtpropid_exists_2_test() ->
+    ThisPid = self(),
+    TestPid = spawn(fun() -> 
+                        Result = koordinator:ggtpropid_exists(nameA, ThisPid),
+                        ThisPid ! Result
+                    end),
+    receive
+        Any1 ->
+            {TestPid, {lookup, nameA}} = Any1,
+            TestPid ! not_found
+    end,
+    receive
+        Any ->
+            ?assertEqual(false, Any)
+    end.
+
+get_ggtpropid_1_test() ->
+    ThisPid = self(),
+    TestPid = spawn(fun() -> 
+                        Result = koordinator:get_ggtpropid(nameA, ThisPid),
+                        ThisPid ! Result
+                    end),
+    receive
+        Any1 ->
+            {TestPid, {lookup, nameA}} = Any1,
+            TestPid ! {pin, ThisPid}
+    end,
+    receive
+        Any ->
+            ?assertEqual(ThisPid, Any)
+    end.
+
+get_ggtpropid_2_test() ->
+    ThisPid = self(),
+    TestPid = spawn(fun() -> 
+                        ?assertError({badmatch, false}, koordinator:get_ggtpropid(nameA, ThisPid))
+                    end),
+    receive
+        Any1 ->
+            {TestPid, {lookup, nameA}} = Any1,
+            TestPid ! not_found
+    end.

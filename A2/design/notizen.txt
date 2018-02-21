@@ -17,7 +17,7 @@ Offene Fragen:
     - Was machen die Koordinator aufrufe:
         step    -> 
         prompt  -> ("Antreiben") ggT-Prozesse auffordern aktuellen Mi zurück zu schicken.
-        nudge   -> ("Anstupsen") Anpingen, pont zurück erwarten
+        nudge   -> ("Anstupsen") Anpingen, pong zurück erwarten
         toggle  -> ("Umschalten")
 
 
