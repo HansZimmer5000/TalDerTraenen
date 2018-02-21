@@ -2,10 +2,11 @@
 
 -export([
     start/0,
+    start/1,
 
     wait_and_collect_ggtpro/2,
-    create_circle/1,
-    set_neighbors/3,
+    create_circle/2,
+    set_neighbors/4,
 
     receive_loop/1,
 
@@ -16,7 +17,7 @@
 -define(KONAME, koordinator).
 -define(ARBEITSZEIT, 0).
 -define(TERMZEIT, 0).
--define(QUOATA, 2).
+-define(QUOTA, 2).
 -define(GGTPROANZ, 5).
 
 % WARNING! Ausgelegt nur für einen Starter!! (ein Recieveblock in start/0)
@@ -28,8 +29,10 @@
 %6. mache Kreis
 %7. receive
 
-
 start() ->
+    start(?NSPID).
+
+start(NsPid) ->
 
     case ?GGTPROANZ >= 3 of
         true -> ok;
@@ -37,19 +40,19 @@ start() ->
     end,
 
     register(?KONAME, self()),
-    ?NSPID ! {self(), {bind, ?KONAME, node()}},
+    NsPid ! {self(), {bind, ?KONAME, node()}},
     receive
         ok -> ok
     end,
     receive
         {AbsenderPid, getsteeringval} ->
-            AbsenderPid ! {steeringval, ?ARBEITSZEIT, ?TERMZEIT, ?QUOATA, ?GGTPROANZ}
+            AbsenderPid ! {steeringval, ?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ?GGTPROANZ}
     end,
     GGTProNameList = wait_and_collect_ggtpro([], ?GGTPROANZ),
+    create_circle(GGTProNameList, NsPid),
     receive_loop(GGTProNameList).
 
 wait_and_collect_ggtpro(GGTProNameList, 0) -> 
-    create_circle(GGTProNameList),
     GGTProNameList;
 wait_and_collect_ggtpro(GGTProNameList, RestGGTProCount) ->
     receive
@@ -59,25 +62,26 @@ wait_and_collect_ggtpro(GGTProNameList, RestGGTProCount) ->
             wait_and_collect_ggtpro(NewGGTProNameList, NewRestGGTProCount)
     end.
 
-create_circle(GGTProNameList) ->
+create_circle(GGTProNameList, NsPid) ->
     [FirstGGTProName, SecondGGTProName | _RestGGTProNames] = GGTProNameList,
     [NextToLastGGTProName, LastGGTProName] = get_next_to_last_and_last_elem(GGTProNameList),
-    set_neighbors(FirstGGTProName, LastGGTProName, SecondGGTProName),
-    set_neighbors(LastGGTProName, NextToLastGGTProName, FirstGGTProName),
-    create_circle_(GGTProNameList).
+    set_neighbors(FirstGGTProName, LastGGTProName, SecondGGTProName, NsPid),
+    set_neighbors(LastGGTProName, NextToLastGGTProName, FirstGGTProName, NsPid),
+    create_circle_(GGTProNameList, NsPid).
 
-create_circle_([_NextToLastGGTProName, _LastGGTProName]) -> ok;
-create_circle_([FirstGGTProName, SecondGGTProName, ThirdGGTProName | RestGGTProNames]) ->
-    set_neighbors(SecondGGTProName, FirstGGTProName, ThirdGGTProName),
-    create_circle_([SecondGGTProName, ThirdGGTProName | RestGGTProNames]).
+create_circle_([_NextToLastGGTProName, _LastGGTProName], _NsPid) -> ok;
+create_circle_([FirstGGTProName, SecondGGTProName, ThirdGGTProName | RestGGTProNames], NsPid) ->
+    set_neighbors(SecondGGTProName, FirstGGTProName, ThirdGGTProName, NsPid),
+    create_circle_([SecondGGTProName, ThirdGGTProName | RestGGTProNames], NsPid).
 
-set_neighbors(MiddleGGTProName, LeftGGTProName, RightGGTProName) ->
-    ?NSPID ! {self(), {lookup, MiddleGGTProName}},
+set_neighbors(MiddleGGTProName, LeftGGTProName, RightGGTProName, NsPid) ->
+    NsPid ! {self(), {lookup, MiddleGGTProName}},
     receive
         {pin, MiddleGGTProPid} -> 
             MiddleGGTProPid ! {setneighbors, LeftGGTProName, RightGGTProName};
         not_found -> 
-            io:fwrite("Circle kann nicht vervollständigt werden, ~p wurde beim nameservice nicht gefunden!", [MiddleGGTProName])
+            io:fwrite("Circle kann nicht vervollständigt werden, ~p wurde beim nameservice nicht gefunden!", [MiddleGGTProName]),
+            true = false
     end.
 
 
@@ -98,8 +102,10 @@ receive_loop(_GGTProNameList) ->
 
 
 
-
-
+get_next_to_last_and_last_elem([]) ->
+    [];
+get_next_to_last_and_last_elem([_OneElem]) ->
+    get_next_to_last_and_last_elem([]);
 get_next_to_last_and_last_elem([NextToLastElem, LastElem]) -> 
     [NextToLastElem, LastElem];
 get_next_to_last_and_last_elem([_HeadElem | RestElems]) ->

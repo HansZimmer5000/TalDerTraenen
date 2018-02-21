@@ -49,6 +49,7 @@ if __name__ == "__main__":
         test_modulenames = __get_all_test_modulenames()
         for modulename in test_modulenames:
             pointIndex = modulename.find(".")
+            print("_________________________________________")
             __test_module(modulename[:pointIndex])
     elif user_input == "2":
         __make_all_modules()
