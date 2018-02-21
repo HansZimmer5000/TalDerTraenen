@@ -15,7 +15,13 @@
 %    briefmi/3,
 %    briefterm/4,
 %    reset/2,
-%    calc/2,
+%    calc/3,
+%    get_pms/2,
+%    select_random_some_ggtprocesses/1,
+%    send_pms_to_ggtprocesses/3,
+%    send_ys_to_ggtprocesses/3,
+%    get_first_n_elems_of_list/3,
+%    send_message_to_processname/3,
 %    prompt/0,
 %    nudge/2,
 %    toggle/0,
@@ -183,6 +189,24 @@ reset_1_test() ->
 calc_1_test() ->
     throw("Not yet implemented").
 
+get_pms_1_test() ->
+    throw("Not yet implemented").
+
+select_random_some_ggtprocesses_1_test() ->
+    throw("Not yet implemented").
+
+send_pms_to_ggtprocesses_1_test() ->
+    throw("Not yet implemented").
+
+send_ys_to_ggtprocesses_1_test() ->
+    throw("Not yet implemented").
+
+get_first_n_elems_of_list_1_test() ->
+    throw("Not yet implemented").
+
+send_message_to_processname_1_test() ->
+    throw("Not yet implemented").
+
 prompt_1_test() ->
     GGTProNameList = [nameA, nameB],
     ThisPid = self(),
@@ -206,8 +230,8 @@ prompt_1_test() ->
     TestPid ! {pin, ThisPid},
 
     receive 
-        Any1 -> 
-            {TestPid, tellmi} = Any1,
+        Any2 -> 
+            {TestPid, tellmi} = Any2,
             TestPid ! {mi, 4}
     end.
 

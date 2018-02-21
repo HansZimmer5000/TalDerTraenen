@@ -15,6 +15,12 @@
     briefterm/4,
     reset/2,
     calc/3,
+    get_pms/2,
+    select_random_some_ggtprocesses/1,
+    send_pms_to_ggtprocesses/3,
+    send_ys_to_ggtprocesses/3,
+    get_first_n_elems_of_list/3,
+    send_message_to_processname/3,
     prompt/2,
     nudge/2,
     toggle/0,
@@ -88,8 +94,48 @@ wait_and_collect_ggtpro(GGTProNameList, RestGGTProCount) ->
     end.
 
 
-calc(_WggT, _GGTProNameList, _NsPid) ->
-    throw("Not yet implemented").
+calc(WggT, GGTProNameList, NsPid) ->
+    PMList = get_pms(WggT, GGTProNameList),
+    send_pms_to_ggtprocesses(PMList, GGTProNameList, NsPid),
+    SelectedGGTProcesses = select_random_some_ggtprocesses(GGTProNameList),
+    send_ys_to_ggtprocesses(PMList, SelectedGGTProcesses, NsPid).
+
+get_pms(WggT, GGTProNameList) ->
+    GGTProAnz = length(GGTProNameList),
+    PMList = vsutil:bestimme_mis(WggT, GGTProAnz),
+    PMList.
+
+select_random_some_ggtprocesses(GGTProNameList) ->
+    ShuffledGGTProNameList = util:shuffle(GGTProNameList),
+    SelectionCount = round(length(GGTProNameList) / 5),
+    case SelectionCount < 2 of
+        true -> get_first_n_elems_of_list(2, ShuffledGGTProNameList, []);
+        false -> get_first_n_elems_of_list(SelectionCount, ShuffledGGTProNameList, [])
+    end.
+
+send_pms_to_ggtprocesses([], [], _NsPid) -> ok;
+send_pms_to_ggtprocesses([HeadPM | RestPMs], [HeadGGTProName | RestGGTProNames], NsPid) ->
+    send_message_to_processname({setpm, HeadPM}, HeadGGTProName, NsPid),
+    send_pms_to_ggtprocesses(RestPMs, RestGGTProNames, NsPid).
+
+send_ys_to_ggtprocesses(_Ys, [], _NsPid) -> done;
+send_ys_to_ggtprocesses([HeadY | RestYs], [HeadGGTProName | RestGGTProNames], NsPid) ->
+    send_message_to_processname({sendy, HeadY}, HeadGGTProName, NsPid),
+    send_ys_to_ggtprocesses(RestYs, RestGGTProNames, NsPid).
+
+get_first_n_elems_of_list(0, _List, Akku) -> Akku;
+get_first_n_elems_of_list(N, [Head | Rest], Akku) ->
+    NewAkku = [Head | Akku],
+    NewN = N - 1,
+    get_first_n_elems_of_list(NewN, Rest, NewAkku).
+
+send_message_to_processname(Message, ProName, NsPid) ->
+    case ggtpropid_exists(ProName, NsPid) of
+        true -> continue;
+        false -> throw(ggtpronameUnkownForNs)
+    end,
+    ProPid = get_ggtpropid(ProName, NsPid),
+    ProPid ! Message.
 
 create_circle(GGTProNameList, NsPid) ->
     [FirstGGTProName, SecondGGTProName | _RestGGTProNames] = GGTProNameList,

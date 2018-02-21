@@ -74,13 +74,12 @@ Ablauf:
     koordinator     bekommt {calc, WggT}, 
                     ruft vsutil:bestimme_mis/2 auf 
                     und verteilt Mis and ggT-Prozesse {setpm, MiNeu}
-                    __??__ (WIE?) Initiiert Berechnung
+                    danach  wählt er zufällig 20% bzw. min. 2 nodes aus 
+                    zu denen eine der verteilen pms schickt
     ggT-Prozess     Warten auf empfang von {setpm, MiNeu} -> Mi setzen.
                     Warten auf empfang von {sendy, Y} -> Formel ausführen
                     Wenn NeuMi <> Mi -> an Nachbarn schicken
-    koordinator     Sollte das System noch nicht am WggT angekommen sein,
-                    muss der anwender den koordinator bescheid geben es anzustoßen.
-                    __??__ (WIE?)
+    koordinator     Ende mit Voting __??__
 
     VOTING
     __??__ (WIE?)
