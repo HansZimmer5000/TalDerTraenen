@@ -78,7 +78,6 @@ set_neighbors(MiddleGGTProName, LeftGGTProName, RightGGTProName) ->
     end.
 
 
-
 receive_loop(_GGTProNameList) ->
     receive
         {briefmi, {_GGTProName, _CMi, _CZeit}} -> none;
