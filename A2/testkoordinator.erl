@@ -14,13 +14,13 @@
 %    calculation_receive_loop/1,
 %    briefmi/3,
 %    briefterm/4,
-%    reset/0,
-%    step/0,
+%    reset/2,
 %    calc/2,
 %    prompt/0,
 %    nudge/2,
 %    toggle/0,
-%    kill/0,
+%    kill/2,
+%    kill_all_ggtprocesses/2,
 
 %    ggtpropid_exists/2,
 %    get_ggtpropid/2
@@ -180,10 +180,6 @@ reset_1_test() ->
     io:fwrite("Not yet implemented"),
     true = false.
 
-step_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
-
 calc_1_test() ->
     io:fwrite("Not yet implemented"),
     true = false.
@@ -222,8 +218,57 @@ toggle_1_test() ->
     true = false.
 
 kill_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    Pro1 = spawn(fun() -> receive_lookup(nameA) end),
+    Pro2 = spawn(fun() -> receive_lookup(nameB) end),
+    ProList = [nameA, nameB],
+    ThisPid = self(),
+    TestPid = spawn(fun() -> 
+                        koordinator:kill(ProList, ThisPid)
+                    end),
+    receive_lookup(nameA),
+    TestPid ! {pin, Pro1},
+    receive_lookup(nameA),
+    TestPid ! {pin, Pro1},
+
+    receive_lookup(nameB),
+    TestPid ! {pin, Pro2},
+    receive_lookup(nameB),
+    TestPid ! {pin, Pro2},
+
+    receive
+        Any -> 
+            {TestPid, {unbind, koordinator}} = Any,
+            TestPid ! ok
+    end,
+    timer:sleep(500),
+
+    ?assertEqual(undefined, process_info(Pro1, registered_name)),
+    ?assertEqual(undefined, process_info(Pro2, registered_name)),
+    ?assertEqual(undefined, process_info(TestPid, registered_name)).
+
+kill_all_ggtprocesses_1_test() ->
+    Pro1 = spawn(fun() -> receive_lookup(nameA) end),
+    Pro2 = spawn(fun() -> receive_lookup(nameB) end),
+    ProList = [nameA, nameB],
+    ThisPid = self(),
+    TestPid = spawn(fun() -> 
+                        koordinator:kill_all_ggtprocesses(ProList, ThisPid)
+                    end),
+    receive_lookup(nameA),
+    TestPid ! {pin, Pro1},
+    receive_lookup(nameA),
+    TestPid ! {pin, Pro1},
+
+    receive_lookup(nameB),
+    TestPid ! {pin, Pro2},
+    receive_lookup(nameB),
+    TestPid ! {pin, Pro2},
+
+    timer:sleep(500),
+
+    ?assertEqual(undefined, process_info(Pro1, registered_name)),
+    ?assertEqual(undefined, process_info(Pro2, registered_name)).
+    
 
 ggtpropid_exists_1_test() ->
     ThisPid = self(),
@@ -272,6 +317,7 @@ get_ggtpropid_2_test() ->
     receive_lookup(nameA),
     TestPid ! not_found.
 %-----------------
+
 receive_lookup(Name) ->
     receive
         Any -> 
@@ -286,3 +332,4 @@ clear_mailbox() ->
         _Any -> clear_mailbox()
         after 0 -> cleared
     end.
+

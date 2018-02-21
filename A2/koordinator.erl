@@ -13,13 +13,13 @@
     calculation_receive_loop/2,
     briefmi/3,
     briefterm/4,
-    reset/0,
-    step/0,
+    reset/2,
     calc/3,
     prompt/0,
     nudge/2,
     toggle/0,
-    kill/0,
+    kill/2,
+    kill_all_ggtprocesses/2,
 
     ggtpropid_exists/2,
     get_ggtpropid/2
@@ -125,18 +125,15 @@ get_next_to_last_and_last_elem([NextToLastElem, LastElem]) ->
 get_next_to_last_and_last_elem([_HeadElem | RestElems]) ->
     get_next_to_last_and_last_elem(RestElems).
 
-
-
 calculation_receive_loop(GGTProNameList, NsPid) ->
     receive
         {briefmi, {GGTProName, CMi, CZeit}} -> briefmi(GGTProName, CMi, CZeit);
         {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> briefterm(AbsenderPid, GGTProName, CMi, CZeit); 
-        reset -> reset();
-        step -> step();
+        reset -> reset(GGTProNameList, NsPid);
         prompt -> prompt();
         nudge -> nudge(GGTProNameList, NsPid);
         toggle -> toggle();
-        kill -> kill()
+        kill -> kill(GGTProNameList, NsPid)
     end.
 
 
@@ -147,13 +144,14 @@ briefterm(_AbsenderPid, GGTProName, CMi, CZeit) ->
     logge_ggtpro_status(GGTProName, CMi, CZeit, true).
     %{sendy, LCMi}, wirklich etwas zurück senden?
 
-reset() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
-
-step() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+reset(GGTProNameList, NsPid) ->
+    kill_all_ggtprocesses(GGTProNameList, NsPid),
+    NsPid ! {self(), {unbind, ?KONAME}},
+    receive
+        ok -> continue
+    end,
+    unregister(?KONAME),
+    start(NsPid).
 
 prompt() ->
     io:fwrite("Not yet implemented"),
@@ -179,9 +177,23 @@ toggle() ->
     io:fwrite("Not yet implemented"),
     true = false.
 
-kill() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+kill(GGTProNameList, NsPid) ->
+    kill_all_ggtprocesses(GGTProNameList, NsPid),
+    NsPid ! {self(), {unbind, ?KONAME}},
+    receive
+        ok -> finish
+    end.
+
+kill_all_ggtprocesses([], _NsPid) -> done;
+kill_all_ggtprocesses([HeadGGTProName | RestGGTProNames], NsPid) ->
+    case ggtpropid_exists(HeadGGTProName, NsPid) of
+        true -> 
+            HeadGGTProPid = get_ggtpropid(HeadGGTProName, NsPid),
+            exit(HeadGGTProPid, kill),
+            kill_all_ggtprocesses(RestGGTProNames, NsPid);
+        false -> 
+            kill_all_ggtprocesses(RestGGTProNames, NsPid)
+    end.
 
 %------------
 ggtpropid_exists(GGTProName, NsPid) ->
