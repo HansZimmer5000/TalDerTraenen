@@ -15,7 +15,7 @@
     briefterm/4,
     reset/2,
     calc/3,
-    prompt/0,
+    prompt/2,
     nudge/2,
     toggle/0,
     kill/2,
@@ -130,7 +130,7 @@ calculation_receive_loop(GGTProNameList, NsPid) ->
         {briefmi, {GGTProName, CMi, CZeit}} -> briefmi(GGTProName, CMi, CZeit);
         {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> briefterm(AbsenderPid, GGTProName, CMi, CZeit); 
         reset -> reset(GGTProNameList, NsPid);
-        prompt -> prompt();
+        prompt -> prompt(GGTProNameList, NsPid);
         nudge -> nudge(GGTProNameList, NsPid);
         toggle -> toggle();
         kill -> kill(GGTProNameList, NsPid)
@@ -153,9 +153,23 @@ reset(GGTProNameList, NsPid) ->
     unregister(?KONAME),
     start(NsPid).
 
-prompt() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+prompt(GGTProNameList, NsPid) ->
+    send_and_receive_mi(GGTProNameList, NsPid).
+
+send_and_receive_mi([], _NsPid) -> done;
+send_and_receive_mi([HeadGGTProName | RestGGTProNames], NsPid) ->
+    case ggtpropid_exists(HeadGGTProName, NsPid) of
+        true -> continue;
+        false -> io:fwrite("GGTProName ~p beim nameservice unbekannt!", [HeadGGTProName]),
+                 true = false
+    end,
+    HeadGGTProPid = get_ggtpropid(HeadGGTProName, NsPid),
+    HeadGGTProPid ! {self(), tellmi},
+    receive
+        {mi, Mi} -> logge_ggtpro_status(HeadGGTProName, Mi) 
+    end,
+    send_and_receive_mi(RestGGTProNames, NsPid).
+
 
 nudge([], _NsPid) -> ok;
 nudge([HeadGGTProName | RestGGTProNames], NsPid) ->
@@ -212,14 +226,23 @@ get_ggtpropid(GGTProName, NsPid) ->
     end.
 
 
-
+logge_ggtpro_status(GGTProName, CMi) ->
+    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
+    LogNachricht = lists:flatten(
+                        io_lib:format(
+                            "~p meldet ~p(CMi) um ~p.\n", 
+                            [GGTProName, CMi, AktuelleZeit])
+                    ),
+    io:fwrite(LogNachricht),
+    util:logging(?LOG_DATEI_NAME, LogNachricht),
+    LogNachricht.
 logge_ggtpro_status(GGTProName, CMi, CZeit, TermFlag) ->
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
-
     LogNachricht = lists:flatten(
                         io_lib:format(
                             "~p meldet ~p(CMi) ~p(TermFlag) ~p(CZeit) um ~p.\n", 
                             [GGTProName, CMi, TermFlag, CZeit, AktuelleZeit])
                     ),
     io:fwrite(LogNachricht),
-    util:logging(?LOG_DATEI_NAME, LogNachricht).
+    util:logging(?LOG_DATEI_NAME, LogNachricht),
+    LogNachricht.

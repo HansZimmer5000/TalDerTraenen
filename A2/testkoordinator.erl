@@ -170,11 +170,13 @@ calculation_receive_loop_1_test() ->
     true = false.
 
 briefmi_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    LogNachricht = koordinator:briefmi(nameA, 3, empty),
+    ["nameA", "meldet", "3(CMi)", "false(TermFlag)" | _Rest] = string:tokens(LogNachricht, " ").
+
+
 briefterm_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    LogNachricht = koordinator:briefterm(self(), nameA, 3, empty),
+    ["nameA", "meldet", "3(CMi)", "true(TermFlag)" | _Rest] = string:tokens(LogNachricht, " ").
 
 reset_1_test() ->
     io:fwrite("Not yet implemented"),
@@ -185,8 +187,33 @@ calc_1_test() ->
     true = false.
 
 prompt_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    GGTProNameList = [nameA, nameB],
+    ThisPid = self(),
+    TestPid = spawn(fun() -> 
+                       koordinator:prompt(GGTProNameList, ThisPid)
+                    end),
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+
+    receive 
+        Any1 -> 
+            {TestPid, tellmi} = Any1,
+            TestPid ! {mi, 3}
+    end,
+
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+
+    receive 
+        Any1 -> 
+            {TestPid, tellmi} = Any1,
+            TestPid ! {mi, 4}
+    end.
+
 
 nudge_1_test() ->
     ThisPid = self(),

@@ -122,6 +122,8 @@ API:
         {hello, GGTProName} -> none
         {briefmi, {GGTProName, CMi, CZeit}} -> none
         {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> {sendy, LCMi}
+        {pongGGT, GGTProName} -> none (Antwort auf Ping)
+        {mi, Mi} -> none (Antwort auf tellmi über prompt)
 
         (manuell)
         reset -> none
