@@ -4,6 +4,7 @@
     start/0,
     start/1,
 
+    wait_for_starters/2,
     wait_and_collect_ggtpro/2,
     create_circle/2,
     set_neighbors/4,
@@ -14,7 +15,7 @@
     briefterm/4,
     reset/0,
     step/0,
-    calc/2,
+    calc/3,
     prompt/0,
     nudge/2,
     toggle/0,
@@ -47,22 +48,36 @@ start() ->
 start(NsPid) ->
 
     case ?GGTPROANZ >= 3 of
-        true -> ok;
-        false -> true = false
+        true -> continue;
+        false -> 
+            io:fwrite("GGTPROANZ ist ~p, sollte aber mindestens 3 sein (für Kreis wichtig)", [?GGTPROANZ]),
+            true = false
     end,
 
     register(?KONAME, self()),
     NsPid ! {self(), {bind, ?KONAME, node()}},
     receive
-        ok -> ok
+        ok -> continue
+    end,
+    StartersCount = wait_for_starters({steeringval, ?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ?GGTPROANZ}, 0),
+    GlobalGGTProAnz = StartersCount * ?GGTPROANZ,
+    GGTProNameList = wait_and_collect_ggtpro([], GlobalGGTProAnz),
+    receive
+        step -> create_circle(GGTProNameList, NsPid)
     end,
     receive
+        {calc, WggT} -> calc(WggT, GGTProNameList, NsPid),
+                        calculation_receive_loop(GGTProNameList, NsPid)
+    end.
+
+wait_for_starters(SteeringValues, CurrentStartersCount) ->
+    receive
         {AbsenderPid, getsteeringval} ->
-            AbsenderPid ! {steeringval, ?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ?GGTPROANZ}
-    end,
-    GGTProNameList = wait_and_collect_ggtpro([], ?GGTPROANZ),
-    create_circle(GGTProNameList, NsPid),
-    calculation_receive_loop(GGTProNameList, NsPid).
+            AbsenderPid ! SteeringValues,
+            NextStartersCount = CurrentStartersCount + 1,
+            wait_for_starters(SteeringValues, NextStartersCount)
+        after 3 -> CurrentStartersCount
+    end.
 
 wait_and_collect_ggtpro(GGTProNameList, 0) -> 
     GGTProNameList;
@@ -73,6 +88,11 @@ wait_and_collect_ggtpro(GGTProNameList, RestGGTProCount) ->
             NewRestGGTProCount = RestGGTProCount - 1,
             wait_and_collect_ggtpro(NewGGTProNameList, NewRestGGTProCount)
     end.
+
+
+calc(_WggT, _GGTProNameList, _NsPid) ->
+    io:fwrite("Not yet implemented"),
+    true = false.
 
 create_circle(GGTProNameList, NsPid) ->
     [FirstGGTProName, SecondGGTProName | _RestGGTProNames] = GGTProNameList,
@@ -113,7 +133,6 @@ calculation_receive_loop(GGTProNameList, NsPid) ->
         {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> briefterm(AbsenderPid, GGTProName, CMi, CZeit); 
         reset -> reset();
         step -> step();
-        {calc, WggT} -> calc(WggT, GGTProNameList);
         prompt -> prompt();
         nudge -> nudge(GGTProNameList, NsPid);
         toggle -> toggle();
@@ -133,10 +152,6 @@ reset() ->
     true = false.
 
 step() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
-
-calc(_WggT, _GGTProNameList) ->
     io:fwrite("Not yet implemented"),
     true = false.
 
