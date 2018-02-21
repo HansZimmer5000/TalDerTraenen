@@ -31,7 +31,10 @@
 
 start() ->
 
-    ?GGTPROANZ >= 3,
+    case ?GGTPROANZ >= 3 of
+        true -> ok;
+        false -> true = false
+    end,
 
     register(?KONAME, self()),
     ?NSPID ! {self(), {bind, ?KONAME, node()}},
@@ -81,7 +84,9 @@ set_neighbors(MiddleGGTProName, LeftGGTProName, RightGGTProName) ->
 receive_loop(_GGTProNameList) ->
     receive
         {briefmi, {_GGTProName, _CMi, _CZeit}} -> none;
-        {_AbsenderPid, briefterm, {_GGTProName, _CMi, _CZeit}} -> {sendy, LCMi};
+        {_AbsenderPid, briefterm, {_GGTProName, _CMi, _CZeit}} -> 
+            LCMi = empty,
+            {sendy, LCMi};
         reset -> none;
         step -> none;
         {calc, _WggT} -> none;
