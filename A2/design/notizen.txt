@@ -14,14 +14,14 @@ Offene Fragen:
         Quota   -> 
     - Was ist die "Abstimmung"?
     - Warum hat Koordinator manchmal eine Response auf {briefterm, ...} vom Starter oder ggT-Prozess?
-    - Was machen die Koordinator aufrufe:
-        step    -> 
-        prompt  -> ("Antreiben") ggT-Prozesse auffordern aktuellen Mi zurück zu schicken.
-        nudge   -> ("Anstupsen") Anpingen, pong zurück erwarten
-        toggle  -> ("Umschalten")
 
 
 Geschlossene Fragen:
+    - Was machen die Koordinator aufrufe:
+        step    -> Übergang von Sammeln der ggT-Prozess hellos zum errichten des Kreises
+        prompt  -> ("Antreiben") ggT-Prozesse auffordern aktuellen Mi zurück zu schicken.
+        nudge   -> ("Anstupsen") Anpingen, pong zurück erwarten
+        toggle  -> ("Umschalten")
     - Wie sieht der GGTProName aus?
         "GGT-" + StarterNummer + Praktikumsgruppennummer + Teamnummer + ggT-Prozess Nummer (von 1 bis GGTProAnz).
     - Was ist das 2. Argument bei starter:go?
@@ -65,7 +65,7 @@ Ablauf:
                             ?NAMESERVICE ! {self(), {rebind, Clientname, self()}}
                             sagt dem koordinator hallo
                             {hello, GGTProName}
-    koordinator             wartet auf alle ggT-Prozesse, dann Kreis bauen
+    koordinator             wartet auf alle ggT-Prozesse, bis "step" kommmt, dann wird der Kreis gebaut.
                             ?NAMESERVICE ! {self(), {lookup, GGTProName}}
                             ggT-Prozess ! {setneighbors, LeftNode, RightNode}
 

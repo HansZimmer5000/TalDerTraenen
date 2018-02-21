@@ -9,7 +9,7 @@
     set_neighbors/4,
     get_next_to_last_and_last_elem/1,
 
-    receive_loop/2,
+    calculation_receive_loop/2,
     briefmi/3,
     briefterm/4,
     reset/0,
@@ -62,7 +62,7 @@ start(NsPid) ->
     end,
     GGTProNameList = wait_and_collect_ggtpro([], ?GGTPROANZ),
     create_circle(GGTProNameList, NsPid),
-    receive_loop(GGTProNameList, NsPid).
+    calculation_receive_loop(GGTProNameList, NsPid).
 
 wait_and_collect_ggtpro(GGTProNameList, 0) -> 
     GGTProNameList;
@@ -107,7 +107,7 @@ get_next_to_last_and_last_elem([_HeadElem | RestElems]) ->
 
 
 
-receive_loop(GGTProNameList, NsPid) ->
+calculation_receive_loop(GGTProNameList, NsPid) ->
     receive
         {briefmi, {GGTProName, CMi, CZeit}} -> briefmi(GGTProName, CMi, CZeit);
         {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> briefterm(AbsenderPid, GGTProName, CMi, CZeit); 
