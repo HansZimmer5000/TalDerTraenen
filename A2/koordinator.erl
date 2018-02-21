@@ -49,9 +49,7 @@ start(NsPid) ->
 
     case ?GGTPROANZ >= 3 of
         true -> continue;
-        false -> 
-            io:fwrite("GGTPROANZ ist ~p, sollte aber mindestens 3 sein (für Kreis wichtig)", [?GGTPROANZ]),
-            true = false
+        false -> throw_error("GGTPROANZ ist ~p, sollte aber mindestens 3 sein (für Kreis wichtig)", [?GGTPROANZ])
     end,
 
     register(?KONAME, self()),
@@ -91,8 +89,7 @@ wait_and_collect_ggtpro(GGTProNameList, RestGGTProCount) ->
 
 
 calc(_WggT, _GGTProNameList, _NsPid) ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    throw("Not yet implemented").
 
 create_circle(GGTProNameList, NsPid) ->
     [FirstGGTProName, SecondGGTProName | _RestGGTProNames] = GGTProNameList,
@@ -109,9 +106,9 @@ create_circle_([FirstGGTProName, SecondGGTProName, ThirdGGTProName | RestGGTProN
 set_neighbors(MiddleGGTProName, LeftGGTProName, RightGGTProName, NsPid) ->
     case ggtpropid_exists(MiddleGGTProName, NsPid) of
         true ->     continue;
-        false ->    
-            io:fwrite("Circle kann nicht vervollständigt werden, ~p wurde beim nameservice nicht gefunden!", [MiddleGGTProName]),
-            true = false
+        false ->  
+            throw(ggtpronameUnkownForNs)  
+            %log_status("Circle kann nicht vervollständigt werden, ~p wurde beim nameservice nicht gefunden!", [MiddleGGTProName])
     end,
     MiddleGGTProPid = get_ggtpropid(MiddleGGTProName, NsPid),
     MiddleGGTProPid ! {setneighbors, LeftGGTProName, RightGGTProName}.
@@ -160,8 +157,9 @@ send_and_receive_mi([], _NsPid) -> done;
 send_and_receive_mi([HeadGGTProName | RestGGTProNames], NsPid) ->
     case ggtpropid_exists(HeadGGTProName, NsPid) of
         true -> continue;
-        false -> io:fwrite("GGTProName ~p beim nameservice unbekannt!", [HeadGGTProName]),
-                 true = false
+        false -> 
+            throw(ggtpronameUnkownForNs)
+            %throw_error("GGTProName ~p beim nameservice unbekannt!", [HeadGGTProName])
     end,
     HeadGGTProPid = get_ggtpropid(HeadGGTProName, NsPid),
     HeadGGTProPid ! {self(), tellmi},
@@ -175,9 +173,9 @@ nudge([], _NsPid) -> ok;
 nudge([HeadGGTProName | RestGGTProNames], NsPid) ->
     case ggtpropid_exists(HeadGGTProName, NsPid) of
         true -> continue;
-        false ->
-            io:fwrite("GGTProName ~p beim nameservice unbekannt!", [HeadGGTProName]),
-            true = false
+        false -> 
+            throw(ggtpronameUnkownForNs)
+            %throw_error("GGTProName ~p beim nameservice unbekannt!", [HeadGGTProName])
     end,
     HeadGGTProPid = get_ggtpropid(HeadGGTProName, NsPid),
     HeadGGTProPid ! {self(),pingGGT},
@@ -188,8 +186,7 @@ nudge([HeadGGTProName | RestGGTProNames], NsPid) ->
     nudge(RestGGTProNames, NsPid).
 
 toggle() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    throw("Not yet implemented").
 
 kill(GGTProNameList, NsPid) ->
     kill_all_ggtprocesses(GGTProNameList, NsPid),
@@ -221,10 +218,14 @@ get_ggtpropid(GGTProName, NsPid) ->
     receive
         {pin, GGTProPid} -> GGTProPid;
         not_found -> 
-            io:fwrite("GGTProName ~p beim nameservice unbekannt! Nutze vor dieser Funktion ggtpropid_exists/2 um sicher zugehen!", [GGTProName]),
-            true = false
+            throw(ggtpronameUnkownForNs)
+            %throw_error("GGTProName ~p beim nameservice unbekannt! Nutze vor dieser Funktion ggtpropid_exists/2 um sicher zugehen!", [GGTProName])
     end.
 
+throw_error(Text, List) ->
+    throw_error(lists:flatten(io_lib:format(Text,List))).
+throw_error(Text) ->
+    throw(Text).
 
 logge_ggtpro_status(GGTProName, CMi) ->
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),

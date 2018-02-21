@@ -166,8 +166,7 @@ get_next_to_last_and_last_elem_2_test() ->
         koordinator:get_next_to_last_and_last_elem([3,4,5,6,1,2])).
 
 calculation_receive_loop_1_test() -> 
-    io:fwrite("Not yet implemented"),
-    true = false.
+    throw("Not yet implemented").
 
 briefmi_1_test() ->
     LogNachricht = koordinator:briefmi(nameA, 3, empty),
@@ -179,12 +178,10 @@ briefterm_1_test() ->
     ["nameA", "meldet", "3(CMi)", "true(TermFlag)" | _Rest] = string:tokens(LogNachricht, " ").
 
 reset_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    throw("Not yet implemented").
 
 calc_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    throw("Not yet implemented").
 
 prompt_1_test() ->
     GGTProNameList = [nameA, nameB],
@@ -233,16 +230,15 @@ nudge_1_test() ->
 nudge_2_test() ->
     ThisPid = self(),
     TestPid = spawn(fun() -> 
-                        ?assertError(
-                            {badmatch, false}, 
+                        ?assertThrow(
+                            ggtpronameUnkownForNs, 
                             koordinator:nudge([nameA], ThisPid))
                     end),
     receive_lookup(nameA),
     TestPid ! not_found.
 
 toggle_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    throw("Not yet implemented").
 
 kill_1_test() ->
     Pro1 = spawn(fun() -> receive_lookup(nameA) end),
@@ -339,7 +335,9 @@ get_ggtpropid_1_test() ->
 get_ggtpropid_2_test() ->
     ThisPid = self(),
     TestPid = spawn(fun() -> 
-                        ?assertError({badmatch, false}, koordinator:get_ggtpropid(nameA, ThisPid))
+                        ?assertThrow(
+                            ggtpronameUnkownForNs,
+                            koordinator:get_ggtpropid(nameA, ThisPid))
                     end),
     receive_lookup(nameA),
     TestPid ! not_found.
