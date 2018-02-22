@@ -20,7 +20,6 @@
 -define(CONFIG_FILENAME, 'ggtprozess.cfg').
 -define(NSPID, hole_wert_aus_config_mit_key(nspid)).
 -define(KOPID, hole_wert_aus_config_mit_key(kopid)).
--define(LOG_DATEI_NAME, 'ggtprozess.log').
 
 go({GGTProName, ArbeitsZeit, TermZeit, Quota}) ->
     go({GGTProName, ArbeitsZeit, TermZeit, Quota, ?NSPID, ?KOPID});
@@ -31,29 +30,40 @@ go({GGTProName, ArbeitsZeit, TermZeit, Quota, NSPid, KOPid}) ->
 
     GGTProPid = spawn(fun() -> init(InstanceVariables, GlobalVariables) end),
     register(GGTProName, GGTProPid),
+    logge_status(GGTProName, lists:flatten(
+                                io_lib:format("gestartet mit PID ~p",[GGTProPid]))),
+
     NSPid ! {GGTProPid, {rebind, GGTProName, node()}},
     GGTProPid.
 
-init(InstanceVariables, GlobalVariables) ->
+init({GGTProName, Mi, Neighbors}, GlobalVariables) ->
     receive
-        ok -> ok
+        ok -> 
+            ok,
+            logge_status(GGTProName, "registriert und bekannt beim nameservice")
     end,
-    FilledInstanceVariables = init_receive_loop(InstanceVariables, GlobalVariables),
+    FilledInstanceVariables = init_receive_loop({GGTProName, Mi, Neighbors}, GlobalVariables),
     receive_loop(FilledInstanceVariables, GlobalVariables).
 
 init_receive_loop({GGTProName, Mi, Neighbors}, GlobalVariables) ->
     receive
         {setneighbors, LeftN, RightN} ->  
+            logge_status(GGTProName, "got setneighbors"),
             NewInstanceVariables = {GGTProName, Mi, {LeftN, RightN}},
             case empty_instance_variables_exist(NewInstanceVariables) of
                 false -> NewInstanceVariables;
-                true -> io:fwrite("nr"), init_receive_loop(NewInstanceVariables, GlobalVariables)
+                true -> 
+                    logge_status(GGTProName, "init done"),
+                    init_receive_loop(NewInstanceVariables, GlobalVariables)
             end;
         {setpm, MiNeu} -> 
+            logge_status(GGTProName, "got setpm"),
             NewInstanceVariables = {GGTProName, MiNeu, Neighbors},
             case empty_instance_variables_exist(NewInstanceVariables) of
                 false -> NewInstanceVariables;
-                true ->  init_receive_loop(NewInstanceVariables, GlobalVariables)
+                true ->  
+                    logge_status(GGTProName, "init done"),
+                    init_receive_loop(NewInstanceVariables, GlobalVariables)
             end
     end.
 
@@ -127,7 +137,8 @@ hole_wert_aus_config_mit_key(Key) ->
     Value.
 
 logge_status(GGTProName, Inhalt) ->
+    LogDateiName = lists:flatten(io_lib:format("~p.log", [GGTProName])),
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
     LogNachricht = io_lib:format("~p ~p ~s.\n", [GGTProName, AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
-    util:logging(?LOG_DATEI_NAME, LogNachricht).
+    util:logging(LogDateiName, LogNachricht).

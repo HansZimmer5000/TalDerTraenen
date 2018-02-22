@@ -12,28 +12,36 @@
 ]).
 
 -define(NSNAME, nameservice).
+-define(LOG_DATEI_NAME, "nameservice.log").
 
 start() ->
+    logge_status("nameservice gestartet"),
     register(?NSNAME, self()),
     receive_loop([]).
 
 receive_loop(NamesToPids) ->
     receive
-        {AbsenderPid, {bind, Name, Node}} ->    {NewNamesToPids, ResultMessage} = bind(NamesToPids, Name, {Name, Node}),
+        {AbsenderPid, {bind, Name, Node}} ->    logge_status("got bind"),
+                                                {NewNamesToPids, ResultMessage} = bind(NamesToPids, Name, {Name, Node}),
                                                 sendMessage(AbsenderPid, ResultMessage),
                                                 receive_loop(NewNamesToPids);
-        {AbsenderPid, {rebind, Name, Node}} ->  {NewNamesToPids, ResultMessage} = rebind(NamesToPids, Name, {Name, Node}),
+        {AbsenderPid, {rebind, Name, Node}} ->  logge_status("got rebind"),
+                                                {NewNamesToPids, ResultMessage} = rebind(NamesToPids, Name, {Name, Node}),
                                                 sendMessage(AbsenderPid, ResultMessage),
                                                 receive_loop(NewNamesToPids);
-        {AbsenderPid, {lookup, Name}} ->    ResultMessage = lookup(NamesToPids, Name),
+        {AbsenderPid, {lookup, Name}} ->    logge_status("got lookup"),
+                                            ResultMessage = lookup(NamesToPids, Name),
                                             sendMessage(AbsenderPid, ResultMessage),
                                             receive_loop(NamesToPids);
-        {AbsenderPid, {unbind, Name}} ->    {NewNamesToPids, ResultMessage} = unbind(NamesToPids, Name),
+        {AbsenderPid, {unbind, Name}} ->    logge_status("got unbind"),
+                                            {NewNamesToPids, ResultMessage} = unbind(NamesToPids, Name),
                                             sendMessage(AbsenderPid, ResultMessage),
                                             receive_loop(NewNamesToPids);
-        {_AbsenderPid, {multicast, vote, InitatorName}} ->  multicastvote(NamesToPids, InitatorName),
+        {_AbsenderPid, {multicast, vote, InitatorName}} ->  logge_status("got multicast vote"),
+                                                            multicastvote(NamesToPids, InitatorName),
                                                             receive_loop(NamesToPids);
-        {AbsenderPid, reset} -> {NewNamesToPids, ResultMessage} = reset(),
+        {AbsenderPid, reset} -> logge_status("got reset"),
+                                {NewNamesToPids, ResultMessage} = reset(),
                                 sendMessage(AbsenderPid, ResultMessage),
                                 receive_loop(NewNamesToPids)
     end.
@@ -95,3 +103,11 @@ reset() ->
 
 sendMessage(Receiver, Message) ->
     Receiver ! Message.
+
+
+
+logge_status(Inhalt) ->
+    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
+    LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
+    io:fwrite(LogNachricht),
+    util:logging(?LOG_DATEI_NAME, LogNachricht).

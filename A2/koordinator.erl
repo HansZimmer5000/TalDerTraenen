@@ -38,6 +38,7 @@
 -define(TERMZEIT, 0).
 -define(QUOTA, 2).
 -define(GGTPROANZ, 5).
+-define(STARTER_STEERINGVAL_DELAY, 3000).
 
 % WARNING! Ausgelegt nur für einen Starter!! (ein Recieveblock in start/0)
 %1. start()
@@ -52,7 +53,7 @@ start() ->
     start(?NSPID).
 
 start(NsPid) ->
-
+    logge_status("koordinator startet"), 
     case ?GGTPROANZ >= 3 of
         true -> continue;
         false -> throw_error("GGTPROANZ ist ~p, sollte aber mindestens 3 sein (für Kreis wichtig)", [?GGTPROANZ])
@@ -61,16 +62,25 @@ start(NsPid) ->
     register(?KONAME, self()),
     NsPid ! {self(), {bind, ?KONAME, node()}},
     receive
-        ok -> continue
+        ok -> logge_status("ist registriert und beim nameservice bekannt")
     end,
     StartersCount = wait_for_starters({steeringval, ?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ?GGTPROANZ}, 0),
+    logge_status(lists:flatten(io_lib:format("~p starter(s) haben steeringval angefragt", [StartersCount]))), 
+
     GlobalGGTProAnz = StartersCount * ?GGTPROANZ,
+    logge_status(lists:flatten(io_lib:format("Es sollten ~p ggT-Prozesse laufen", [GlobalGGTProAnz]))), 
+
     GGTProNameList = wait_and_collect_ggtpro([], GlobalGGTProAnz),
+    logge_status(lists:flatten(io_lib:format("~p ggT-Prozesse sind bekannt", [length(GGTProNameList)]))), 
+
     receive
         step -> create_circle(GGTProNameList, NsPid)
     end,
+    logge_status("kreis erstellt"),
     receive
-        {calc, WggT} -> calc(WggT, GGTProNameList, NsPid),
+        {calc, WggT} -> logge_status("got calc"),
+                        calc(WggT, GGTProNameList, NsPid),
+                        logge_status("calc init done"),
                         calculation_receive_loop(GGTProNameList, NsPid)
     end.
 
@@ -80,7 +90,7 @@ wait_for_starters(SteeringValues, CurrentStartersCount) ->
             AbsenderPid ! SteeringValues,
             NextStartersCount = CurrentStartersCount + 1,
             wait_for_starters(SteeringValues, NextStartersCount)
-        after 3 -> CurrentStartersCount
+        after ?STARTER_STEERINGVAL_DELAY -> CurrentStartersCount
     end.
 
 wait_and_collect_ggtpro(GGTProNameList, 0) -> 
@@ -97,8 +107,10 @@ wait_and_collect_ggtpro(GGTProNameList, RestGGTProCount) ->
 calc(WggT, GGTProNameList, NsPid) ->
     PMList = get_pms(WggT, GGTProNameList),
     send_pms_to_ggtprocesses(PMList, GGTProNameList, NsPid),
+    logge_status("pms zu ggT-Prozessen gesendet"),
     SelectedGGTProcesses = select_random_some_ggtprocesses(GGTProNameList),
-    send_ys_to_ggtprocesses(PMList, SelectedGGTProcesses, NsPid).
+    send_ys_to_ggtprocesses(PMList, SelectedGGTProcesses, NsPid),
+    logge_status(lists:flatten(io_lib:format("ys zu ~p ggT-Prozessen gesendet", [length(SelectedGGTProcesses)]))).
 
 get_pms(WggT, GGTProNameList) ->
     GGTProAnz = length(GGTProNameList),
@@ -174,13 +186,27 @@ get_next_to_last_and_last_elem([_HeadElem | RestElems]) ->
 
 calculation_receive_loop(GGTProNameList, NsPid) ->
     receive
-        {briefmi, {GGTProName, CMi, CZeit}} -> briefmi(GGTProName, CMi, CZeit);
-        {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> briefterm(AbsenderPid, GGTProName, CMi, CZeit); 
-        reset -> reset(GGTProNameList, NsPid);
-        prompt -> prompt(GGTProNameList, NsPid);
-        nudge -> nudge(GGTProNameList, NsPid);
-        toggle -> toggle();
-        kill -> kill(GGTProNameList, NsPid)
+        {briefmi, {GGTProName, CMi, CZeit}} -> 
+            logge_status("got briefmi"),
+            briefmi(GGTProName, CMi, CZeit);
+        {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> 
+            logge_status("got briefterm"),
+            briefterm(AbsenderPid, GGTProName, CMi, CZeit); 
+        reset ->    
+            logge_status("got reset"),
+            reset(GGTProNameList, NsPid);
+        prompt ->   
+            logge_status("got prompt"),
+            prompt(GGTProNameList, NsPid);
+        nudge ->    
+            logge_status("got nudge"),
+            nudge(GGTProNameList, NsPid);
+        toggle ->   
+            logge_status("got toggle"),
+            toggle();
+        kill ->     
+           logge_status("got kill"),
+             kill(GGTProNameList, NsPid)
     end.
 
 
@@ -278,22 +304,25 @@ throw_error(Text) ->
     throw(Text).
 
 logge_ggtpro_status(GGTProName, CMi) ->
-    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
     LogNachricht = lists:flatten(
                         io_lib:format(
-                            "~p meldet ~p(CMi) um ~p.\n", 
-                            [GGTProName, CMi, AktuelleZeit])
+                            "~p meldet ~p(CMi)", 
+                            [GGTProName, CMi])
                     ),
-    io:fwrite(LogNachricht),
-    util:logging(?LOG_DATEI_NAME, LogNachricht),
+    logge_status(LogNachricht),
     LogNachricht.
+
 logge_ggtpro_status(GGTProName, CMi, CZeit, TermFlag) ->
-    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
     LogNachricht = lists:flatten(
                         io_lib:format(
-                            "~p meldet ~p(CMi) ~p(TermFlag) ~p(CZeit) um ~p.\n", 
-                            [GGTProName, CMi, TermFlag, CZeit, AktuelleZeit])
+                            "~p meldet ~p(CMi) ~p(TermFlag) ~p(CZeit)", 
+                            [GGTProName, CMi, TermFlag, CZeit])
                     ),
-    io:fwrite(LogNachricht),
-    util:logging(?LOG_DATEI_NAME, LogNachricht),
+    logge_status(LogNachricht),
     LogNachricht.
+
+logge_status(Inhalt) ->
+    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
+    LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
+    io:fwrite(LogNachricht),
+    util:logging(?LOG_DATEI_NAME, LogNachricht).
