@@ -31,23 +31,16 @@
     get_ggtpropid/2
 ]).
 
--define(NSPID, {nameservice,'ns@HansZimmer-PC'}).
--define(KONAME, koordinator).
+-define(CONFIG_DATEI_NAME, "koordinator.cfg").
 -define(LOG_DATEI_NAME, "koordinator.log").
--define(ARBEITSZEIT, 0).
--define(TERMZEIT, 0).
--define(QUOTA, 2).
--define(GGTPROANZ, 5).
--define(STARTER_STEERINGVAL_DELAY, 3000).
+-define(NSPID, hole_wert_aus_config_mit_key(nspid)).
+-define(KONAME, hole_wert_aus_config_mit_key(koname)).
+-define(ARBEITSZEIT, hole_wert_aus_config_mit_key(arbeitszeit)).
+-define(TERMZEIT, hole_wert_aus_config_mit_key(termzeit)).
+-define(QUOTA, hole_wert_aus_config_mit_key(quota)).
+-define(GGTPROANZ, hole_wert_aus_config_mit_key(ggtproanz)).
+-define(STARTER_STEERINGVAL_DELAY, hole_wert_aus_config_mit_key(starter_steeringval_delay)).
 
-% WARNING! Ausgelegt nur für einen Starter!! (ein Recieveblock in start/0)
-%1. start()
-%2. register
-%3. bind
-%4. warte auf steeringval anfrage
-%5. warte auf alle ggts (hallo)
-%6. mache Kreis
-%7. receive
 
 start() ->
     start(?NSPID).
@@ -302,6 +295,11 @@ throw_error(Text, List) ->
     throw_error(lists:flatten(io_lib:format(Text,List))).
 throw_error(Text) ->
     throw(Text).
+
+hole_wert_aus_config_mit_key(Key) ->
+    {ok, ConfigListe} = file:consult(?CONFIG_DATEI_NAME),
+    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
+    Value.
 
 logge_ggtpro_status(GGTProName, CMi) ->
     LogNachricht = lists:flatten(
