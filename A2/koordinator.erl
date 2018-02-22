@@ -261,8 +261,10 @@ nudge([HeadGGTProName | RestGGTProNames], NsPid) ->
     HeadGGTProPid = get_ggtpropid(HeadGGTProName, NsPid),
     HeadGGTProPid ! {self(),pingGGT},
     receive 
-        {pongGGT, HeadGGTProName} -> ok
-        after 2000 -> io:fwrite("GGTProName ~p mit ~p meldet sich nicht!", [HeadGGTProName, HeadGGTProPid])
+        {pongGGT, HeadGGTProName} -> 
+            logge_status(lists:flatten(io_lib:format("~p pong bekommen", [HeadGGTProName])))
+        after 2000 -> 
+            logge_status(lists:flatten(io_lib:format("GGTProName ~p mit ~p meldet sich nicht!", [HeadGGTProName, HeadGGTProPid])))
     end,
     nudge(RestGGTProNames, NsPid).
 
