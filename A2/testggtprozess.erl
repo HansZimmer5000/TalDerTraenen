@@ -112,7 +112,7 @@ kill_1_test() ->
         Any -> {AbsenderPid, _} = Any,
                ?assertEqual({AbsenderPid, {unbind, nameA}}, Any),
                AbsenderPid ! ok
-        after 2 -> true = false
+        after 2 -> throw("Not implemented yet")
     end.
 
 calc_and_send_new_mi_1_test() ->
@@ -135,7 +135,9 @@ calc_and_send_new_mi_2_test() ->
     Neighbors = {self(), self()},
     NewMi = ggtprozess:calc_and_send_new_mi(Mi, Y, Neighbors),
     receive
-        Any -> io:fwrite("Sollte nichts bekommen, aber bekam: ~p", [Any]), true = false
+        Any -> 
+            io:fwrite("Sollte nichts bekommen, aber bekam: ~p", [Any]), 
+            throw("Not implemented yet")
         after 2 -> ok
     end.
 
@@ -159,8 +161,7 @@ send_new_mi_1_test() ->
     end.
 
 voteYes_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = false.
+    throw("Not implemented yet").
 
 tellmi_1_test() ->
     ggtprozess:tellmi(self(), 5),

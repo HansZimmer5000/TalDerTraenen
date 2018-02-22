@@ -59,8 +59,7 @@ lookup_2_test() ->
 
 
 multicastvote_1_test() ->
-    io:fwrite("Not yet implemented"),
-    true = fail.
+    throw("Not implemented yet").
 
 reset_1_test() ->
     {NewNamesToPids, ResultMessage} = nameservice:reset(),

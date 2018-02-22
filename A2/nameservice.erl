@@ -84,7 +84,7 @@ lookup([HeadTupel | RestTupels], Name) ->
         _Any -> lookup(RestTupels, Name)
     end.
 
-multicastvote(NewNamesToPids, InitatorName) ->
+multicastvote(_NewNamesToPids, _InitatorName) ->
     ok.
     %{AbsenderPid, {vote, MeinName}}.
 
