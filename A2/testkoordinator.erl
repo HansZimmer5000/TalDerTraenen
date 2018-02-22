@@ -187,25 +187,172 @@ reset_1_test() ->
     throw("Not yet implemented").
 
 calc_1_test() ->
-    throw("Not yet implemented").
+    ThisPid = self(),
+    GGTList = [nameA, nameB, nameC],
+    WggT = 15,
+    TestPid = spawn(fun() -> 
+                       koordinator:calc(WggT, GGTList, ThisPid)
+                    end),
+
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+
+    receive
+        Any1 -> {setpm, _Any1Pm} = Any1
+    end,
+
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+
+    receive
+        Any2 -> {setpm, _Any2Pm} = Any2
+    end,
+
+    receive_lookup(nameC),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameC),
+    TestPid ! {pin, ThisPid},
+
+    receive
+        Any3 -> {setpm, _Any3Pm} = Any3
+    end,
+
+    receive Any4 -> {TestPid, {lookup, Any4Name}} = Any4 end,
+    TestPid ! {pin, ThisPid},
+    receive Any5 -> {TestPid, {lookup, Any5Name}} = Any5 end,
+    ?assertEqual(Any4Name, Any5Name),
+    ?assert(lists:member(Any4Name, GGTList)),
+    TestPid ! {pin, ThisPid},
+
+    receive Any6 -> {sendy, _Any6Pm} = Any6 end,
+
+    receive Any7 -> {TestPid, {lookup, Any7Name}} = Any7 end,
+    TestPid ! {pin, ThisPid},
+    receive Any8 -> {TestPid, {lookup, Any8Name}} = Any8 end,
+    ?assertEqual(Any7Name, Any8Name),
+    ?assert(lists:member(Any7Name, GGTList)),
+    TestPid ! {pin, ThisPid},
+
+    receive Any9 -> {sendy, _Any9Pm} = Any9 end,
+
+    kill_pid_and_clear_this_mailbox(TestPid),
+    clear_mailbox().
+
+
 
 get_pms_1_test() ->
-    throw("Not yet implemented").
+    GGTProNameList = [nameA, nameB, nameC, nameD],
+    PMList = koordinator:get_pms(16, GGTProNameList),
+    ?assertEqual(
+        4,
+        length(PMList)
+    ).
 
 select_random_some_ggtprocesses_1_test() ->
-    throw("Not yet implemented").
+    GGTProNameList = [nameA, nameB, nameC],
+    Result = koordinator:select_random_some_ggtprocesses(GGTProNameList),
+    ResultStr = util:list2string(Result),
+    ResultTokens = lists:delete("\n", string:tokens(ResultStr, " ")),
+    io:fwrite("~p", [ResultTokens]),
+
+    ?assertEqual(2, length(ResultTokens)),
+
+    [ResultElem1, ResultElem2] = Result,
+
+    ?assertNotEqual(ResultElem1, ResultElem2),
+    ?assert(lists:member(ResultElem1, GGTProNameList)),
+    ?assert(lists:member(ResultElem2, GGTProNameList)).
+
 
 send_pms_to_ggtprocesses_1_test() ->
-    throw("Not yet implemented").
+    ThisPid = self(),
+    GGTList = [nameA, nameB, nameC],
+    Pms = [3,2,1],
+    TestPid = spawn(fun() -> 
+                       koordinator:send_pms_to_ggtprocesses(Pms, GGTList, ThisPid)
+                    end),
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+
+    receive
+        Any1 -> ?assertEqual({setpm, 3}, Any1)
+    end,
+
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+
+    receive
+        Any2 -> ?assertEqual({setpm, 2}, Any2)
+    end,
+
+    receive_lookup(nameC),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameC),
+    TestPid ! {pin, ThisPid},
+
+    receive
+        Any3 -> ?assertEqual({setpm, 1}, Any3)
+    end.
 
 send_ys_to_ggtprocesses_1_test() ->
-    throw("Not yet implemented").
+    ThisPid = self(),
+    GGTList = [nameA, nameB],
+    Ys = [3,2,1],
+    TestPid = spawn(fun() -> 
+                       koordinator:send_ys_to_ggtprocesses(Ys, GGTList, ThisPid)
+                    end),
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+
+    receive
+        Any1 -> ?assertEqual({sendy, 3}, Any1)
+    end,
+
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+
+    receive
+        Any2 -> ?assertEqual({sendy, 2}, Any2)
+    end.
 
 get_first_n_elems_of_list_1_test() ->
-    throw("Not yet implemented").
+    List = [1,2,3,4,5,6,7,8],
+    ?assertEqual(
+        [2,1],
+        koordinator:get_first_n_elems_of_list(2, List, [])).
+
+get_first_n_elems_of_list_2_test() ->
+    List = [1,2,3,4,5,6,7,8],
+    ?assertEqual(
+        [],
+        koordinator:get_first_n_elems_of_list(0, List, [])).
 
 send_message_to_processname_1_test() ->
-    throw("Not yet implemented").
+    Message = hallo,
+    ThisPid = self(),
+    TestPid = spawn(fun() -> 
+                       koordinator:send_message_to_processname(Message, nameA, ThisPid)
+                    end),
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+
+    receive
+        Any -> ?assertEqual(Message, Any)
+    end.
 
 prompt_1_test() ->
     GGTProNameList = [nameA, nameB],

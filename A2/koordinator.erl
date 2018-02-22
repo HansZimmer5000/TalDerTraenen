@@ -109,9 +109,12 @@ select_random_some_ggtprocesses(GGTProNameList) ->
     ShuffledGGTProNameList = util:shuffle(GGTProNameList),
     SelectionCount = round(length(GGTProNameList) / 5),
     case SelectionCount < 2 of
-        true -> get_first_n_elems_of_list(2, ShuffledGGTProNameList, []);
-        false -> get_first_n_elems_of_list(SelectionCount, ShuffledGGTProNameList, [])
-    end.
+        true ->  
+            Result = get_first_n_elems_of_list(2, ShuffledGGTProNameList, []);
+        false -> 
+            Result = get_first_n_elems_of_list(SelectionCount, ShuffledGGTProNameList, [])
+    end,
+    Result.
 
 send_pms_to_ggtprocesses([], [], _NsPid) -> ok;
 send_pms_to_ggtprocesses([HeadPM | RestPMs], [HeadGGTProName | RestGGTProNames], NsPid) ->
@@ -123,6 +126,7 @@ send_ys_to_ggtprocesses([HeadY | RestYs], [HeadGGTProName | RestGGTProNames], Ns
     send_message_to_processname({sendy, HeadY}, HeadGGTProName, NsPid),
     send_ys_to_ggtprocesses(RestYs, RestGGTProNames, NsPid).
 
+% The order of the first n elements is switched in the Result! [1,2] -> [2,1]
 get_first_n_elems_of_list(0, _List, Akku) -> Akku;
 get_first_n_elems_of_list(N, [Head | Rest], Akku) ->
     NewAkku = [Head | Akku],
