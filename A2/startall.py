@@ -37,13 +37,13 @@ def __clear_all_log_files_in_current_dir():
         __clear_file(log_filename)
 
 # Deletes all files of the defined types in the current folder
-def __remove_all_uneccessary_files():
-    uneccesary_file_types = [".log", ".beam", ".dump"]
-    uneccesary_files = []
-    for uneccesary_file_type in uneccesary_file_types:
-        uneccesary_files = uneccesary_files + glob.glob("*" + uneccesary_file_type)
-    for uneccesary_file in uneccesary_files:
-        os.remove(uneccesary_file)
+def __remove_all_unecessary_files():
+    unecessary_file_types = [".log", ".beam", ".dump"]
+    unecessary_files = []
+    for unecessary_file_type in unecessary_file_types:
+        unecessary_files = unecessary_files + glob.glob("*" + unecessary_file_type)
+    for unecessary_file in unecessary_files:
+        os.remove(unecessary_file)
 
 
 # According to given Input, either all Testfiles gonna be executed or 
@@ -72,6 +72,6 @@ if __name__ == "__main__":
         __start_node("ko", "koordinator", "")
         __start_node("man", "man", "")
     elif user_input == "3":
-        __remove_all_uneccessary_files()
+        __remove_all_unecessary_files()
     else:
         print("Argument: '" + user_input + "' unkonwn.")
