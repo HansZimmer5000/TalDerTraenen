@@ -13,6 +13,9 @@
 -define(KOPID, {koordinator,'ko@HansZimmer-PC'}).
 -define(DEFAULT_LOG_DATEI_NAME, "starter").
 
+start([ParameterFromPython]) ->
+    {StarterNummer, []} = string:to_integer(atom_to_list(ParameterFromPython)),
+    go(StarterNummer, ?KOPID);
 start(StarterNummer) ->
     go(StarterNummer, ?KOPID).
 

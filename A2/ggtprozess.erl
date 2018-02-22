@@ -29,11 +29,12 @@ go({GGTProName, ArbeitsZeit, TermZeit, Quota, NSPid, KOPid}) ->
     GlobalVariables = {ArbeitsZeit, TermZeit, Quota, NSPid, KOPid},
 
     GGTProPid = spawn(fun() -> init(InstanceVariables, GlobalVariables) end),
-    register(GGTProName, GGTProPid),
+    true = register(GGTProName, GGTProPid),
     logge_status(GGTProName, lists:flatten(
                                 io_lib:format("gestartet mit PID ~p",[GGTProPid]))),
 
     NSPid ! {GGTProPid, {rebind, GGTProName, node()}},
+    ?KOPID ! {hello, GGTProName},
     GGTProPid.
 
 init({GGTProName, Mi, Neighbors}, GlobalVariables) ->
@@ -98,7 +99,8 @@ kill(GGTProName, NSPID) ->
     NSPID ! {self(), {unbind, GGTProName}},
     receive
         ok -> ok
-    end.
+    end,
+    unregister(GGTProName).
 
 calc_and_send_new_mi(Mi, Y, Neighbors) ->
     NewMi = calc_new_mi(Mi, Y),

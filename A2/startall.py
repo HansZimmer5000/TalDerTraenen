@@ -24,6 +24,8 @@ def __test_module(modulename):
 def __start_node(nodename, modulename, parameter):
     os.system("start erl -noshell -sname " + nodename + " -s " + modulename + " start" + " " + parameter)
 
+def __start_normal_shell(nodename):
+    os.system("start erl -sname " + nodename)
 
 # Clears a certain file (filename) of any content.
 def __clear_file(filename):
@@ -58,7 +60,9 @@ if __name__ == "__main__":
         __start_node("ns", "nameservice", "")
         time.sleep(1)
         __start_node("ko", "koordinator", "")
+        __start_node("man", "man", "")
         time.sleep(1)
         __start_node("starter", "starter", "1")
+        __start_normal_shell("test")
     else:
         print("Argument: '" + user_input + "' unkonwn.")

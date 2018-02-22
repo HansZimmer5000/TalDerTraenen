@@ -14,6 +14,7 @@ Offene Fragen:
         Quota   -> 
     - Was ist die "Abstimmung"?
     - Warum hat Koordinator manchmal eine Response auf {briefterm, ...} vom Starter oder ggT-Prozess?
+    - Reset -> Starter müssen dann auch unbinden und neu starten (neu steeringval anfragen)!
 
 
 Geschlossene Fragen:
