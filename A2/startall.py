@@ -62,7 +62,6 @@ if __name__ == "__main__":
         __start_node("ko", "koordinator", "")
         __start_node("man", "man", "")
         time.sleep(1)
-        __start_node("starter", "starter", "1")
         __start_normal_shell("test")
     else:
         print("Argument: '" + user_input + "' unkonwn.")

@@ -35,6 +35,7 @@
 -define(LOG_DATEI_NAME, "koordinator.log").
 -define(NSPID, hole_wert_aus_config_mit_key(nspid)).
 -define(KONAME, hole_wert_aus_config_mit_key(koname)).
+-define(STARTER_COUNT, hole_wert_aus_config_mit_key(startercount)).
 -define(ARBEITSZEIT, hole_wert_aus_config_mit_key(arbeitszeit)).
 -define(TERMZEIT, hole_wert_aus_config_mit_key(termzeit)).
 -define(QUOTA, hole_wert_aus_config_mit_key(quota)).
@@ -57,6 +58,7 @@ start(NsPid) ->
     receive
         ok -> logge_status("ist registriert und beim nameservice bekannt")
     end,
+    start_starters(?STARTER_COUNT),
     StartersCount = wait_for_starters({steeringval, ?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ?GGTPROANZ}, 0),
     logge_status(lists:flatten(io_lib:format("~p starter(s) haben steeringval angefragt", [StartersCount]))), 
 
@@ -76,6 +78,11 @@ start(NsPid) ->
                         logge_status("calc init done"),
                         calculation_receive_loop(GGTProNameList, NsPid)
     end.
+
+start_starters(0) -> ok;
+start_starters(RestCount) ->
+    spawn(fun() -> starter:go(RestCount) end),
+    start_starters(RestCount - 1).
 
 wait_for_starters(SteeringValues, CurrentStartersCount) ->
     receive
