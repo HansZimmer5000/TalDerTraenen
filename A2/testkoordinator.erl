@@ -172,7 +172,61 @@ get_next_to_last_and_last_elem_2_test() ->
         koordinator:get_next_to_last_and_last_elem([3,4,5,6,1,2])).
 
 calculation_receive_loop_1_test() -> 
-    throw("Not yet implemented").
+    ThisPid = self(),
+    TestPid = spawn(fun() ->
+            koordinator:calculation_receive_loop([nameA, nameB], ThisPid)
+        end),
+    TestPid ! prompt,
+
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+
+    receive 
+        Any1 -> 
+            {TestPid, tellmi} = Any1,
+            TestPid ! {mi, 3}
+    end,
+
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+
+    receive 
+        Any2 -> 
+            {TestPid, tellmi} = Any2,
+            TestPid ! {mi, 4}
+    end,
+
+    TestPid ! kill,
+
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+    receive 
+        Any3 -> ?assertEqual(kill, Any3) 
+    end,
+
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+    receive 
+        Any4 -> ?assertEqual(kill, Any4) 
+    end,
+
+    receive
+        Any5 -> 
+            {TestPid, {unbind, koordinator}} = Any5,
+            TestPid ! ok
+    end,
+    timer:sleep(500),
+
+    ?assertEqual(undefined, process_info(TestPid, registered_name)).
+
 
 briefmi_1_test() ->
     LogNachricht = koordinator:briefmi(nameA, 3, empty),
