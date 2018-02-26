@@ -46,7 +46,6 @@ if __name__ == "__main__":
     
     if user_input == "0":
         __make_all_modules()
-        __remove_all_unecessary_files([".beam"])
     elif user_input == "1":
         __make_all_modules()
         __remove_all_unecessary_files([".log"])
@@ -63,7 +62,6 @@ if __name__ == "__main__":
         time.sleep(1)
         __start_node("ko", "koordinator", "")
         __start_node("man", "man", "")
-        __remove_all_unecessary_files([".beam"])
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     else:

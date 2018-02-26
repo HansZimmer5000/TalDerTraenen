@@ -97,7 +97,7 @@ receive_loop({GGTProName, Mi, Neighbors, Timer, MissingCountForQuota},
         {sendy, Y} ->               logge_status(GGTProName, "got sendy"),
                                     NewTimer = reset_timer(Timer, TermZeit),
                                     timer:sleep(timer:seconds(ArbeitsZeit)),
-                                    NewMi = calc_and_send_new_mi(Mi, Y, Neighbors),
+                                    NewMi = calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid),
                                     receive_loop({GGTProName, NewMi, Neighbors, NewTimer, empty},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {AbsenderPid, tellmi} ->    logge_status(GGTProName, "got tellmi"),
@@ -135,11 +135,11 @@ vote(InitiatorPid, GGTProName, MissingCountForQuota) ->
         _Any -> InitiatorPid ! {voteYes, GGTProName}
     end.
 
-calc_and_send_new_mi(Mi, Y, Neighbors) ->
+calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid) ->
     NewMi = calc_new_mi(Mi, Y),
     case NewMi of
         Mi ->   ok;
-        _Any -> send_new_mi(NewMi, Neighbors)
+        _Any -> send_new_mi(NewMi, Neighbors, GGTProName, KoPid)
     end,
     NewMi.
 
@@ -150,9 +150,10 @@ calc_new_mi(Mi, Y) ->
     end,
     NewMi.
 
-send_new_mi(NewMi, {LeftN, RightN}) ->
+send_new_mi(NewMi, {LeftN, RightN}, GGTProName, KoPid) ->
     LeftN ! {sendy, NewMi},
-    RightN ! {sendy, NewMi}.
+    RightN ! {sendy, NewMi},
+    KoPid ! {briefmi, {GGTProName, NewMi, vsutil:now2string(erlang:timestamp())}}.
 
 voteYes(MissingCountForQuota) ->
     case MissingCountForQuota of

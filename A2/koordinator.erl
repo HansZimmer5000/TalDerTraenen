@@ -48,10 +48,13 @@ start() ->
 
 start(NsPid) ->
     logge_status("koordinator startet"), 
-    case ?GGTPROANZ >= 3 of
+
+    SollGGTCount = ?GGTPROANZ * ?STARTER_COUNT,
+    case SollGGTCount >= 3 of
         true -> continue;
         false -> throw_error("GGTPROANZ ist ~p, sollte aber mindestens 3 sein (für Kreis wichtig)", [?GGTPROANZ])
     end,
+    SollQuota = SollGGTCount * ?QUOTA / 100,
 
     register(?KONAME, self()),
     NsPid ! {self(), {bind, ?KONAME, node()}},
@@ -59,11 +62,11 @@ start(NsPid) ->
         ok -> logge_status("ist registriert und beim nameservice bekannt")
     end,
     start_starters(?STARTER_COUNT),
-    StartersCount = wait_for_starters({steeringval, ?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ?GGTPROANZ}, 0),
-    logge_status(lists:flatten(io_lib:format("~p starter(s) haben steeringval angefragt", [StartersCount]))), 
+    StartersCount = wait_for_starters({steeringval, ?ARBEITSZEIT, ?TERMZEIT, SollQuota, ?GGTPROANZ}, 0),
+    logge_status(lists:flatten(io_lib:format("~p von ~p starter(s) haben steeringval angefragt", [StartersCount, ?STARTER_COUNT]))), 
 
     GlobalGGTProAnz = StartersCount * ?GGTPROANZ,
-    logge_status(lists:flatten(io_lib:format("Es sollten ~p ggT-Prozesse laufen", [GlobalGGTProAnz]))), 
+    logge_status(lists:flatten(io_lib:format("Es laufen ~p von ~p GGTProzessen", [GlobalGGTProAnz, SollGGTCount]))), 
 
     GGTProNameList = wait_and_collect_ggtpro([], GlobalGGTProAnz),
     logge_status(lists:flatten(io_lib:format("~p ggT-Prozesse sind bekannt", [length(GGTProNameList)]))), 
