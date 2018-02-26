@@ -13,18 +13,25 @@
 %    calc_and_send_new_mi/3,
 %    send_new_mi/2,
 %    voteYes/0,
+%    start_vote/4,
 %    tellmi/2,
 %    pongGGT/2,
 %    calc_new_mi/2
 
+-define(ARBEITSZEIT, 1).
+-define(TERMZEIT, 5).
+-define(QUOTA, 5).
 
 go_1_test() ->
     ThisPid = self(),
-    TestPid = ggtprozess:go({nameA, 1, 2, 2, ThisPid, ThisPid}),
+    TestPid = ggtprozess:go({nameA, ?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ThisPid, ThisPid}),
 
     receive
-        Any ->  ?assertEqual({TestPid, {rebind, nameA, node()}}, Any),
+        Any1 ->  ?assertEqual({TestPid, {rebind, nameA, node()}}, Any1),
                 TestPid ! ok
+    end,
+    receive 
+        Any2 -> ?assertEqual({hello, nameA}, Any2)
     end,
 
     TestPid ! {setpm, 3},
@@ -32,35 +39,41 @@ go_1_test() ->
 
     TestPid ! {ThisPid, tellmi},
     receive
-        Any1 -> ?assertEqual({mi, 3}, Any1), ok
+        Any3 -> ?assertEqual({mi, 3}, Any3), ok
     end,
 
     TestPid ! kill,
     receive
-        Any2 -> ?assertEqual({TestPid, {unbind, nameA}}, Any2),
+        Any4 -> ?assertEqual({TestPid, {unbind, nameA}}, Any4),
                 TestPid ! ok
     end.
 
 init_1_test() ->
     ThisPid = self(),
     InstanceVariables = {nameA, empty, empty},
-    GlobalVariables = {1, 2, 2, ThisPid, ThisPid},
+    GlobalVariables = {?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ThisPid, ThisPid},
     TestPid = spawn(fun() ->
                         ggtprozess:init(InstanceVariables, GlobalVariables)
                     end),
-    TestPid ! ok,
+    receive
+        Any1 ->  ?assertEqual({TestPid, {rebind, nameA, node()}}, Any1),
+                TestPid ! ok
+    end,
+    receive 
+        Any2 -> ?assertEqual({hello, nameA}, Any2)
+    end,
 
     TestPid ! {setpm, 3},
     TestPid ! {setneighbors, ThisPid, ThisPid},
 
     TestPid ! {ThisPid, tellmi},
     receive
-        Any1 -> ?assertEqual({mi, 3}, Any1), ok
+        Any3 -> ?assertEqual({mi, 3}, Any3), ok
     end,
 
     TestPid ! kill,
     receive
-        Any2 -> ?assertEqual({TestPid, {unbind, nameA}}, Any2),
+        Any4 -> ?assertEqual({TestPid, {unbind, nameA}}, Any4),
                 TestPid ! ok
     end.
 
@@ -89,8 +102,10 @@ empty_instance_variables_exist_2_test() ->
 
 receive_loop_1_test() ->
     ThisPid = self(),
-    InstanceVariables = {nameA, 3, {ThisPid, ThisPid}},
-    GlobalVariables = {1, 2, 2, ThisPid, ThisPid},
+    Timer = timer:send_after(timer:seconds(?TERMZEIT), timeout),
+    MissingCountForQuota = empty,
+    InstanceVariables = {nameA, 3, {ThisPid, ThisPid}, Timer, MissingCountForQuota},
+    GlobalVariables = {?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ThisPid, ThisPid},
     TestPid = spawn(fun() ->
                         ggtprozess:receive_loop(InstanceVariables, GlobalVariables)
                     end),
@@ -161,7 +176,25 @@ send_new_mi_1_test() ->
     end.
 
 voteYes_1_test() ->
-    throw("Not implemented yet").
+    ?assertEqual(2, ggtprozess:voteYes(3)).
+
+start_vote_1_test() ->
+    GGTProName = nameA,
+    Mi = 3,
+    ThisPid = self(),
+    TestPid = spawn(fun() -> 
+                    MissingCountForQuota = ggtprozess:start_vote(GGTProName, Mi, ThisPid, ?QUOTA),
+                    ThisPid ! MissingCountForQuota
+                    end),
+
+    receive
+        Any1 -> ?assertEqual({TestPid, {multicast, vote, nameA}}, Any1)
+    end,
+
+    receive
+        Any2 -> ?assertEqual(4, Any2)
+    end.
+    
 
 tellmi_1_test() ->
     ggtprozess:tellmi(self(), 5),

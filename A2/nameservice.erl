@@ -8,6 +8,7 @@
     lookup/2,
     unbind/2,
     multicastvote/2,
+    send_vote_to_all_ggtprocesses/3,
     reset/0
 ]).
 
@@ -92,9 +93,21 @@ lookup([HeadTupel | RestTupels], Name) ->
         _Any -> lookup(RestTupels, Name)
     end.
 
-multicastvote(_NewNamesToPids, _InitatorName) ->
-    ok.
-    %{AbsenderPid, {vote, MeinName}}.
+multicastvote(NamesToPids, InitatorName) ->
+    case lookup(NamesToPids, InitatorName) of
+        {pin, InitatorPid} -> send_vote_to_all_ggtprocesses(NamesToPids, InitatorPid, InitatorName);
+        not_found -> logge_status(lists:flatten(io_lib:format("vote Initiator ~p nicht bekannt", [InitatorName])))
+    end.
+
+send_vote_to_all_ggtprocesses([], _InitatorPid, _InitatorName) -> done;
+send_vote_to_all_ggtprocesses([HeadTupel | RestTupels], InitatorPid, InitatorName) ->
+    {HeadName, HeadPid} = HeadTupel,
+    case HeadName of
+        koordinator -> donothing;
+        InitatorName -> donothing;
+        _Any -> HeadPid ! {InitatorPid, {vote, InitatorName}}
+    end,
+    send_vote_to_all_ggtprocesses(RestTupels, InitatorPid, InitatorName).
 
 reset() ->
     NewNamesToPids = [],

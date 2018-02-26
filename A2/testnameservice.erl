@@ -59,7 +59,34 @@ lookup_2_test() ->
 
 
 multicastvote_1_test() ->
-    throw("Not implemented yet").
+    NamesToPids = [{nameA, self()}, {nameB, self()}],
+    nameservice:multicastvote(NamesToPids, nameA),
+    receive 
+        Any1 -> ?assertEqual({self(), {vote, nameA}}, Any1)
+    end,
+    receive
+        _Any2 -> ?assert(false)
+        after 20 -> ok
+    end.   
+
+multicastvote_2_test() ->
+    NamesToPids = [{nameB, self()}],
+    nameservice:multicastvote(NamesToPids, nameA),
+    receive
+        _Any2 -> ?assert(false)
+        after 20 -> ok
+    end.   
+
+send_vote_to_all_ggtprocesses_1_test() ->
+    NamesToPids = [{nameA, self()}, {nameB, self()}],
+    nameservice:send_vote_to_all_ggtprocesses(NamesToPids, self(), nameA),
+    receive 
+        Any1 -> ?assertEqual({self(), {vote, nameA}}, Any1)
+    end,
+    receive
+        _Any2 -> ?assert(false)
+        after 20 -> ok
+    end.  
 
 reset_1_test() ->
     {NewNamesToPids, ResultMessage} = nameservice:reset(),
