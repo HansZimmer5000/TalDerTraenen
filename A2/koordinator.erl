@@ -275,9 +275,11 @@ finalize(GGTProNameList, NsPid, Restart) ->
         ok -> continue
     end,
     case whereis(?KONAME) of
-        undefined -> ok; %Only for Test purposes! Because since its in the same process the name is always registered during normal run until unregistered here.
+        undefined -> logge_status("finalize findet ?KONAME nicht, wenn Test -> ok"),
+                     ok; %Only for Test purposes! Because since its in the same process the name is always registered during normal run until unregistered here.
         _Any -> unregister(?KONAME)
     end,
+    logge_status(lists:flatten(io_lib:format("Alle GGT-Prozesse herunter gefahren, selbst unregistered, Neustart = ~p.", [Restart]))),
     case Restart of
         true -> start(NsPid);
         false -> finish
