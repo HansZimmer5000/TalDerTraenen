@@ -194,9 +194,6 @@ calculation_receive_loop(GGTProNameList, NsPid) ->
             logge_status("got briefterm"),
             briefterm(AbsenderPid, GGTProName, CMi, CZeit),
             calculation_receive_loop(GGTProNameList, NsPid); 
-        reset ->    
-            logge_status("got reset"),
-            reset(GGTProNameList, NsPid);
         prompt ->   
             logge_status("got prompt"),
             prompt(GGTProNameList, NsPid),
@@ -209,6 +206,9 @@ calculation_receive_loop(GGTProNameList, NsPid) ->
             logge_status("got toggle"),
             toggle(),
             calculation_receive_loop(GGTProNameList, NsPid);
+        reset ->    
+            logge_status("got reset"),
+            reset(GGTProNameList, NsPid);
         kill ->     
             logge_status("got kill"),
             kill(GGTProNameList, NsPid)
@@ -221,15 +221,6 @@ briefmi(GGTProName, CMi, CZeit) ->
 briefterm(_AbsenderPid, GGTProName, CMi, CZeit) ->
     logge_ggtpro_status(GGTProName, CMi, CZeit, true).
     %{sendy, LCMi}, wirklich etwas zurück senden?
-
-reset(GGTProNameList, NsPid) ->
-    kill_all_ggtprocesses(GGTProNameList, NsPid),
-    NsPid ! {self(), {unbind, ?KONAME}},
-    receive
-        ok -> continue
-    end,
-    unregister(?KONAME),
-    start(NsPid).
 
 prompt(GGTProNameList, NsPid) ->
     send_and_receive_mi(GGTProNameList, NsPid).
@@ -271,12 +262,27 @@ nudge([HeadGGTProName | RestGGTProNames], NsPid) ->
 toggle() ->
     throw("Not yet implemented").
 
+reset(GGTProNameList, NsPid) ->
+    finalize(GGTProNameList, NsPid, true).
+
 kill(GGTProNameList, NsPid) ->
+    finalize(GGTProNameList, NsPid, false).
+
+finalize(GGTProNameList, NsPid, Restart) ->
     kill_all_ggtprocesses(GGTProNameList, NsPid),
     NsPid ! {self(), {unbind, ?KONAME}},
     receive
-        ok -> finish
+        ok -> continue
+    end,
+    case whereis(?KONAME) of
+        undefined -> ok; %Only for Test purposes! Because since its in the same process the name is always registered during normal run until unregistered here.
+        _Any -> unregister(?KONAME)
+    end,
+    case Restart of
+        true -> start(NsPid);
+        false -> finish
     end.
+
 
 kill_all_ggtprocesses([], _NsPid) -> done;
 kill_all_ggtprocesses([HeadGGTProName | RestGGTProNames], NsPid) ->

@@ -184,7 +184,39 @@ briefterm_1_test() ->
     ["nameA", "meldet", "3(CMi)", "true(TermFlag)" | _Rest] = string:tokens(LogNachricht, " ").
 
 reset_1_test() ->
-    throw("Not yet implemented").
+    ProList = [nameA, nameB],
+    ThisPid = self(),
+    TestPid = spawn(fun() -> 
+                        koordinator:reset(ProList, ThisPid)
+                    end),
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+    receive 
+        Any1 -> ?assertEqual(kill, Any1) 
+    end,
+
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+    receive 
+        Any2 -> ?assertEqual(kill, Any2) 
+    end,
+
+    receive
+        Any3 -> 
+            {TestPid, {unbind, koordinator}} = Any3,
+            TestPid ! ok
+    end,
+
+    receive
+        Any4 -> 
+            {TestPid, {bind, koordinator, _Node}} = Any4,
+            TestPid ! ok
+    end,
+    exit(TestPid, kill).
 
 calc_1_test() ->
     ThisPid = self(),
