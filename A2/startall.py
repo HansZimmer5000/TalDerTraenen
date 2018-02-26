@@ -37,8 +37,7 @@ def __clear_all_log_files_in_current_dir():
         __clear_file(log_filename)
 
 # Deletes all files of the defined types in the current folder
-def __remove_all_unecessary_files():
-    unecessary_file_types = [".log", ".beam", ".dump"]
+def __remove_all_unecessary_files(unecessary_file_types):
     unecessary_files = []
     for unecessary_file_type in unecessary_file_types:
         unecessary_files = unecessary_files + glob.glob("*" + unecessary_file_type)
@@ -47,7 +46,7 @@ def __remove_all_unecessary_files():
 
 
 # According to given Input, either all Testfiles gonna be executed or 
-# the client, server and hbq erlang node + server will be started.
+# the distributed system is going to startup
 if __name__ == "__main__":
     try: 
         user_input = sys.argv[1]
@@ -56,6 +55,7 @@ if __name__ == "__main__":
     
     if user_input == "0":
         __make_all_modules()
+        __remove_all_unecessary_files([".beam"])
     elif user_input == "1":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
@@ -64,6 +64,7 @@ if __name__ == "__main__":
             pointIndex = modulename.find(".")
             print("_________________________________________")
             __test_module(modulename[:pointIndex])
+        __remove_all_unecessary_files([".beam"])
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
@@ -71,7 +72,8 @@ if __name__ == "__main__":
         time.sleep(1)
         __start_node("ko", "koordinator", "")
         __start_node("man", "man", "")
+        __remove_all_unecessary_files([".beam"])
     elif user_input == "3":
-        __remove_all_unecessary_files()
+        __remove_all_unecessary_files([".log", ".beam", ".dump"])
     else:
         print("Argument: '" + user_input + "' unkonwn.")
