@@ -100,7 +100,12 @@ kill(GGTProName, NSPID) ->
     receive
         ok -> ok
     end,
-    unregister(GGTProName).
+
+    case whereis(GGTProName) of
+        undefined -> ok; %Only for Test purposes! Because since its in the same process the name is always registered during normal run until unregistered here.
+        _Any -> unregister(GGTProName)
+    end,
+    ok.
 
 calc_and_send_new_mi(Mi, Y, Neighbors) ->
     NewMi = calc_new_mi(Mi, Y),

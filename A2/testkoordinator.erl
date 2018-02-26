@@ -412,56 +412,59 @@ toggle_1_test() ->
     throw("Not yet implemented").
 
 kill_1_test() ->
-    Pro1 = spawn(fun() -> receive_lookup(nameA) end),
-    Pro2 = spawn(fun() -> receive_lookup(nameB) end),
     ProList = [nameA, nameB],
     ThisPid = self(),
     TestPid = spawn(fun() -> 
                         koordinator:kill(ProList, ThisPid)
                     end),
     receive_lookup(nameA),
-    TestPid ! {pin, Pro1},
+    TestPid ! {pin, ThisPid},
     receive_lookup(nameA),
-    TestPid ! {pin, Pro1},
+    TestPid ! {pin, ThisPid},
+    receive 
+        Any1 -> ?assertEqual(kill, Any1) 
+    end,
 
     receive_lookup(nameB),
-    TestPid ! {pin, Pro2},
+    TestPid ! {pin, ThisPid},
     receive_lookup(nameB),
-    TestPid ! {pin, Pro2},
+    TestPid ! {pin, ThisPid},
+    receive 
+        Any2 -> ?assertEqual(kill, Any2) 
+    end,
 
     receive
-        Any -> 
-            {TestPid, {unbind, koordinator}} = Any,
+        Any3 -> 
+            {TestPid, {unbind, koordinator}} = Any3,
             TestPid ! ok
     end,
     timer:sleep(500),
 
-    ?assertEqual(undefined, process_info(Pro1, registered_name)),
-    ?assertEqual(undefined, process_info(Pro2, registered_name)),
     ?assertEqual(undefined, process_info(TestPid, registered_name)).
 
 kill_all_ggtprocesses_1_test() ->
-    Pro1 = spawn(fun() -> receive_lookup(nameA) end),
-    Pro2 = spawn(fun() -> receive_lookup(nameB) end),
     ProList = [nameA, nameB],
     ThisPid = self(),
     TestPid = spawn(fun() -> 
                         koordinator:kill_all_ggtprocesses(ProList, ThisPid)
                     end),
     receive_lookup(nameA),
-    TestPid ! {pin, Pro1},
+    TestPid ! {pin, ThisPid},
     receive_lookup(nameA),
-    TestPid ! {pin, Pro1},
+    TestPid ! {pin, ThisPid},
+    receive 
+        Any1 -> ?assertEqual(kill, Any1) 
+    end,
 
     receive_lookup(nameB),
-    TestPid ! {pin, Pro2},
+    TestPid ! {pin, ThisPid},
     receive_lookup(nameB),
-    TestPid ! {pin, Pro2},
+    TestPid ! {pin, ThisPid},
+    receive 
+        Any2 -> ?assertEqual(kill, Any2) 
+    end,
 
-    timer:sleep(500),
-
-    ?assertEqual(undefined, process_info(Pro1, registered_name)),
-    ?assertEqual(undefined, process_info(Pro2, registered_name)).
+    timer:sleep(500).
     
 
 ggtpropid_exists_1_test() ->
