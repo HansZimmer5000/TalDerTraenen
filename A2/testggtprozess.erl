@@ -102,9 +102,8 @@ empty_instance_variables_exist_2_test() ->
 
 receive_loop_1_test() ->
     ThisPid = self(),
-    Timer = timer:send_after(timer:seconds(?TERMZEIT), timeout),
     MissingCountForQuota = empty,
-    InstanceVariables = {nameA, 3, {ThisPid, ThisPid}, Timer, MissingCountForQuota},
+    InstanceVariables = {nameA, 3, {ThisPid, ThisPid}, MissingCountForQuota},
     GlobalVariables = {?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ThisPid, ThisPid},
     TestPid = spawn(fun() ->
                         ggtprozess:receive_loop(InstanceVariables, GlobalVariables)

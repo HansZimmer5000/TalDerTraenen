@@ -45,8 +45,7 @@ init({GGTProName, Mi, Neighbors}, {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) 
     KoPid ! {hello, GGTProName},
     
     {GGTProName, FilledMi, FilledNeighbors} = init_receive_loop({GGTProName, Mi, Neighbors}, {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}),
-    NewTimer = new_timer(TermZeit),
-    receive_loop({GGTProName, FilledMi, FilledNeighbors, NewTimer, empty}, 
+    receive_loop({GGTProName, FilledMi, FilledNeighbors, empty}, 
                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}).
 
 init_receive_loop({GGTProName, Mi, Neighbors}, GlobalVariables) ->
@@ -75,49 +74,42 @@ empty_instance_variables_exist(InstanceVariables) ->
     {GGTProName, Mi, Neighbors} = InstanceVariables,
     (GGTProName == empty) or (Mi == empty) or (Neighbors == empty).
 
-receive_loop({GGTProName, Mi, _Neighbors, Timer, 0}, 
+receive_loop({GGTProName, Mi, _Neighbors, 0}, 
                 {_ArbeitsZeit, _TermZeit, _Quota, NsPid, KoPid}) ->
-    kill_timer(Timer),
     KoPid ! {self(), briefterm, {GGTProName, Mi, vsutil:now2string(erlang:timestamp())}},
     logge_status(GGTProName, "Genuegend Votes bekommen, briefterm gesendet, warte auf 'kill' im 'vote_loop'"),
     vote_loop(GGTProName, NsPid);
-receive_loop({GGTProName, Mi, Neighbors, Timer, MissingCountForQuota}, 
+receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota}, 
                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
     receive
         {InitiatorPid, {vote, InitatorName}} -> logge_status_vote(GGTProName, InitatorName),
-                                                NewTimer = reset_timer(Timer, TermZeit),
                                                 vote(InitiatorPid, GGTProName, MissingCountForQuota),
-                                                receive_loop({GGTProName, Mi, Neighbors, NewTimer, MissingCountForQuota},
+                                                receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
                                                                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {voteYes, OtherGGTProName} ->   logge_status_voteyes(GGTProName, OtherGGTProName),
-                                        NewTimer = reset_timer(Timer, TermZeit),
                                         NewMissingCountForQuota = voteYes(MissingCountForQuota),
-                                        receive_loop({GGTProName, Mi, Neighbors, NewTimer, NewMissingCountForQuota},
+                                        receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota},
                                                         {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {sendy, Y} ->               logge_status(GGTProName, "got sendy"),
-                                    NewTimer = reset_timer(Timer, TermZeit),
                                     timer:sleep(timer:seconds(ArbeitsZeit)),
                                     NewMi = calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid),
-                                    receive_loop({GGTProName, NewMi, Neighbors, NewTimer, empty},
+                                    receive_loop({GGTProName, NewMi, Neighbors, empty},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {AbsenderPid, tellmi} ->    logge_status(GGTProName, "got tellmi"),
-                                    NewTimer = reset_timer(Timer, TermZeit),
                                     tellmi(AbsenderPid, Mi),
-                                    receive_loop({GGTProName, Mi, Neighbors, NewTimer, MissingCountForQuota},
+                                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {AbsenderPid, pingGGT} ->   logge_status(GGTProName, "got pingGGT"),
-                                    NewTimer = reset_timer(Timer, TermZeit),
                                     pongGGT(AbsenderPid, GGTProName),
-                                    receive_loop({GGTProName, Mi, Neighbors, NewTimer, MissingCountForQuota},
+                                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         kill ->     logge_status(GGTProName, "got kill"),
-                    kill_timer(Timer),
-                    kill(GGTProName, NsPid);
-        vote ->     logge_status(GGTProName, "got vote"),
-                    NewTimer = reset_timer(Timer, TermZeit),
-                    NewMissingCountForQuota = start_vote(GGTProName, Mi, NsPid, Quota),
-                    receive_loop({GGTProName, Mi, Neighbors, NewTimer, NewMissingCountForQuota},
-                                    {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid})
+                    kill(GGTProName, NsPid)
+
+        after timer:seconds(TermZeit) ->    logge_status(GGTProName, "got vote"),
+                                            NewMissingCountForQuota = start_vote(GGTProName, Mi, NsPid, Quota),
+                                            receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota},
+                                                            {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid})
     end.
 
 vote_loop(GGTProName, NsPid) ->
@@ -186,18 +178,6 @@ start_vote(GGTProName, Mi, NsPid, Quota) ->
     NsPid ! {self(), {multicast, vote, GGTProName}},
     MissingCountForQuota = Quota - 1, % '-1' because, this GGT-Process said 'yes' by starting the vote
     MissingCountForQuota.
-
-reset_timer(OldTimer, SendAfterXSeconds) ->
-    kill_timer(OldTimer),
-    NewTimer = new_timer(timer:seconds(SendAfterXSeconds)),
-    NewTimer.
-
-kill_timer(OldTimer) ->
-    timer:cancel(OldTimer).
-
-new_timer(SendAfterXSeconds) ->
-    NewTimer = timer:send_after(timer:seconds(SendAfterXSeconds), vote),
-    NewTimer.
 
 hole_wert_aus_config_mit_key(Key) ->
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
