@@ -11,8 +11,8 @@
     vote_loop/2,
     vote/3,
     kill/2,
-    calc_and_send_new_mi/3,
-    send_new_mi/2,
+    calc_and_send_new_mi/5,
+    send_new_mi/4,
     voteYes/1,
     start_vote/4,
     tellmi/2,
@@ -189,7 +189,7 @@ start_vote(GGTProName, Mi, NsPid, Quota) ->
 
 reset_timer(OldTimer, SendAfterXSeconds) ->
     kill_timer(OldTimer),
-    NewTimer = new_timer(SendAfterXSeconds),
+    NewTimer = new_timer(timer:seconds(SendAfterXSeconds)),
     NewTimer.
 
 kill_timer(OldTimer) ->

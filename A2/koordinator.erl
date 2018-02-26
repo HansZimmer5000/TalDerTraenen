@@ -40,7 +40,7 @@
 -define(TERMZEIT, hole_wert_aus_config_mit_key(termzeit)).
 -define(QUOTA, hole_wert_aus_config_mit_key(quota)).
 -define(GGTPROANZ, hole_wert_aus_config_mit_key(ggtproanz)).
--define(STARTER_STEERINGVAL_DELAY, hole_wert_aus_config_mit_key(starter_steeringval_delay)).
+-define(STARTER_STEERINGVAL_TIMEOUT, hole_wert_aus_config_mit_key(starter_steeringval_timeout)).
 
 
 start() ->
@@ -54,7 +54,7 @@ start(NsPid) ->
         true -> continue;
         false -> throw_error("GGTPROANZ ist ~p, sollte aber mindestens 3 sein (für Kreis wichtig)", [?GGTPROANZ])
     end,
-    SollQuota = SollGGTCount * ?QUOTA / 100,
+    SollQuota = round((SollGGTCount * ?QUOTA) / 100),
 
     register(?KONAME, self()),
     NsPid ! {self(), {bind, ?KONAME, node()}},
@@ -93,7 +93,7 @@ wait_for_starters(SteeringValues, CurrentStartersCount) ->
             AbsenderPid ! SteeringValues,
             NextStartersCount = CurrentStartersCount + 1,
             wait_for_starters(SteeringValues, NextStartersCount)
-        after ?STARTER_STEERINGVAL_DELAY -> CurrentStartersCount
+        after ?STARTER_STEERINGVAL_TIMEOUT -> CurrentStartersCount
     end.
 
 wait_and_collect_ggtpro(GGTProNameList, 0) -> 

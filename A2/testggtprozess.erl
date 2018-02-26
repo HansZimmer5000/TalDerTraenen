@@ -135,12 +135,21 @@ calc_and_send_new_mi_1_test() ->
     NewMi = 2,
     Y = 2,
     Neighbors = {self(), self()},
-    NewMi = ggtprozess:calc_and_send_new_mi(Mi, Y, Neighbors),
+    GGTProName = nameA,
+    KoPid = self(),
+    NewMi = ggtprozess:calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid),
     receive
-        {sendy, NewMi} ->
-            receive
-                {sendy, NewMi} -> ok
-            end
+        Any1 -> ?assertEqual({sendy, NewMi}, Any1)
+    end,
+    receive
+        Any2 -> ?assertEqual({sendy, NewMi}, Any2)
+    end,
+    receive
+        Any3 -> {briefmi, {GGTProName, NewMi, _Timestamp}} = Any3
+    end,
+    receive 
+        _Any4 -> ?assert(false)
+        after 20 -> ok
     end.
 
 calc_and_send_new_mi_2_test() ->
@@ -148,7 +157,9 @@ calc_and_send_new_mi_2_test() ->
     NewMi = 2,
     Y = 42,
     Neighbors = {self(), self()},
-    NewMi = ggtprozess:calc_and_send_new_mi(Mi, Y, Neighbors),
+    GGTProName = nameA,
+    KoPid = self(),
+    NewMi = ggtprozess:calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid),
     receive
         Any -> 
             io:fwrite("Sollte nichts bekommen, aber bekam: ~p", [Any]), 
@@ -167,12 +178,21 @@ calc_new_mi_3_test() ->
 
 send_new_mi_1_test() ->
     NewMi = 5,
-    ggtprozess:send_new_mi(NewMi, {self(), self()}),
+    GGTProName = nameA,
+    KoPid = self(),
+    ggtprozess:send_new_mi(NewMi, {self(), self()}, GGTProName, KoPid),
     receive
-        {sendy, NewMi} ->
-            receive
-                {sendy, NewMi} -> ok
-            end
+        Any1 -> ?assertEqual({sendy, NewMi}, Any1)
+    end,
+    receive
+        Any2 -> ?assertEqual({sendy, NewMi}, Any2)
+    end,
+    receive
+        Any3 -> {briefmi, {GGTProName, NewMi, _Timestamp}} = Any3
+    end,
+    receive 
+        _Any4 -> ?assert(false)
+        after 20 -> ok
     end.
 
 voteYes_1_test() ->

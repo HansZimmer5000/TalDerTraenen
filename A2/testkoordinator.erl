@@ -49,7 +49,11 @@ start_1_test() ->
     end,
     kill_pid_and_clear_this_mailbox(TestKoPid).
 
-start_2_test() -> 
+start_2_test() ->
+    ArbeitsZeit = 1,
+    TermZeit = 5,
+    SollQuota = 20,
+    GGTProAnz = 5,
     ThisPid = self(),
     TestKoPid = spawn(fun() -> 
                     koordinator:start(ThisPid)
@@ -64,7 +68,7 @@ start_2_test() ->
     receive
         Any2 ->
             io:fwrite("Wenn hier fail, speziell die gesetzten SteeringValues (hier und in koordinator.erl) pruefen!"),
-            ?assertEqual({steeringval, 0, 0, 2, 5}, Any2)
+            ?assertEqual({steeringval, ArbeitsZeit, TermZeit, SollQuota, GGTProAnz}, Any2)
     end,
     kill_pid_and_clear_this_mailbox(TestKoPid).
 
