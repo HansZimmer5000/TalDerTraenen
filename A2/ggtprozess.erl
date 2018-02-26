@@ -106,7 +106,7 @@ receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
         kill ->     logge_status(GGTProName, "got kill"),
                     kill(GGTProName, NsPid)
 
-        after timer:seconds(TermZeit) ->    logge_status(GGTProName, "got vote"),
+        after timer:seconds(TermZeit) ->    logge_status(GGTProName, "in receive-after"),
                                             NewMissingCountForQuota = start_vote(GGTProName, Mi, NsPid, Quota),
                                             receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota},
                                                             {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid})
