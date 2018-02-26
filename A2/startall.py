@@ -27,15 +27,6 @@ def __start_node(nodename, modulename, parameter):
 def __start_normal_shell(nodename):
     os.system("start erl -sname " + nodename)
 
-# Clears a certain file (filename) of any content.
-def __clear_file(filename):
-    open(filename, "w").close()
-
-def __clear_all_log_files_in_current_dir():
-    log_filenames = glob.glob("*.log")
-    for log_filename in log_filenames:
-        __clear_file(log_filename)
-
 # Deletes all files of the defined types in the current folder
 def __remove_all_unecessary_files(unecessary_file_types):
     unecessary_files = []
@@ -58,7 +49,7 @@ if __name__ == "__main__":
         __remove_all_unecessary_files([".beam"])
     elif user_input == "1":
         __make_all_modules()
-        __clear_all_log_files_in_current_dir()
+        __remove_all_unecessary_files([".log"])
         test_modulenames = __get_all_test_modulenames()
         for modulename in test_modulenames:
             pointIndex = modulename.find(".")
@@ -67,7 +58,7 @@ if __name__ == "__main__":
         __remove_all_unecessary_files([".beam"])
     elif user_input == "2":
         __make_all_modules()
-        __clear_all_log_files_in_current_dir()
+        __remove_all_unecessary_files([".log"])
         __start_node("ns", "nameservice", "")
         time.sleep(1)
         __start_node("ko", "koordinator", "")
