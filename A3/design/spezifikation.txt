@@ -1,0 +1,19 @@
+Fragen:
+    - Was ist der Unterschied von Typ A und Typ B Stationen? Die Uhr Synchronisation?
+    - Darf man Erlang oder muss JAVA?
+
+Komponenten:
+    - Empfängereinheit
+    - Uhrensynchronisation
+    - Slotreservierung
+    - Sendeeinheit
+    - Nachrichtengenerierung
+
+How-To-Uhren-Synch für Typ A
+    - Uhrensynchronisation (Komponente) schickt an alle Typ A Stationen seine Zeit
+    - Bekommt dann von allen deren Abweichung zurück
+    - Ermittelt draus dann ein arithmetisches Mittel
+    - Damit dann: Abweichung * -1 + arithmetisches Mittel
+    - Ergebnis an die Type A Stationen zurück senden
+    - Die ändern dann ihre innere Uhr dem empfangenen Ergebnis entsprechend (aktuelle Uhr + Ergebnis)
+
