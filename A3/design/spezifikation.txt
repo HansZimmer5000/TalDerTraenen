@@ -1,15 +1,17 @@
 Fragen:
-    - Was ist der genaue Unterschied von Typ A und Typ B Stationen? Die Uhr Synchronisation?
     - (Folie 36) Wer braucht Slot für sich selbst, warum?
     - Wie genau ist der "nach Slot 2 oder nach Slot 24" Hinweis zu verstehen?
     - Wie ist der genau Ablauf?
     - Wann / wie / wo werden die Zeitstempel aus den Nachrichten geholt?
     - Wann / wie / wo werden die Uhren synchronisiert?
     - (Folie 38) was heißt "jeder ist Koordinator"?
+    - Wie wird gesendet / empfangen?
 
 Antworten:
     - Darf man Erlang oder muss JAVA?
-        Java
+        JAVA
+    - Was ist der genaue Unterschied von Typ A und Typ B Stationen? Die Uhr Synchronisation?
+        Typ B Stationen synchronisieren anhand von Typ A Stationen, Typ A Stationen haben eine genau Uhr und synchronisieren mit anderen Typ A stationen
 
 Aufgabenbeschreibung:
     Es werden Nachrichten von einer Datenquelle zu einer Datensenke per Multicast geschickt.
