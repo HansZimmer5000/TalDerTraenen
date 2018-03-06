@@ -1,17 +1,56 @@
 Fragen:
-    - Was ist der Unterschied von Typ A und Typ B Stationen? Die Uhr Synchronisation?
+    - Was ist der genaue Unterschied von Typ A und Typ B Stationen? Die Uhr Synchronisation?
+    - (Folie 36) Wer braucht Slot für sich selbst, warum?
+    - Wie genau ist der "nach Slot 2 oder nach Slot 24" Hinweis zu verstehen?
+    - Wie ist der genau Ablauf?
+    - Wann / wie / wo werden die Zeitstempel aus den Nachrichten geholt?
+    - Wann / wie / wo werden die Uhren synchronisiert?
+    - (Folie 38) was heißt "jeder ist Koordinator"?
+
+Antworten:
     - Darf man Erlang oder muss JAVA?
+        Java
+
+Aufgabenbeschreibung:
+    Es werden Nachrichten von einer Datenquelle zu einer Datensenke per Multicast geschickt.
+    Die Nachrichten müssen jedoch in einem Zeitslot geschickt werden.
+    Ein Zeitslot ist wiederum in einem Frame.
+
+Nachrichtenaufbau:
+    Gesamt 34 Byte
+    - Byte 0        A oder B    Stationsklasse
+    - Byte 1-24     -team-4711- Nutzdaten
+    - Byte 25       4           reservierte Slotnummer
+    - Byte 26-33    77394825    in ms, 8-Byte Integer, Big Endian
+
+Zeitaufbau:
+    - Jede Sekunde kommt ein neuer Frame
+    - Ein Frame enthält genau 25 (0 - 24) Slots mit je 40ms Dauer / Größe
+    - Es gibt unendlich frames, jedoch nacheinander und nicht nebenläufig
 
 Komponenten:
-    - Empfängereinheit
-    - Uhrensynchronisation
-    - Slotreservierung
-    - Sendeeinheit
-    - Nachrichtengenerierung
+    - Empfängereinheit          Bekommt Nachrichten, erkennt & behandelt Kollisionen
+    - Uhrensynchronisation      wertet Typ A Zeitstempel aus
+    - Slotreservierung          Kennt reservierte Slots, stellt random gewählten Slot zu jedem Zeitpunkt
+    - Sendeeinheit              holt sich einen Slot im nächsten Frame, prüft Slotzeit & eigene Zeit, wurde es verpasst im nächsten Slot wiedereinsteigen
+    - Nachrichtengenerierung    Erstellt die zu sendende Nachricht (ohne Sendezeit), errechnet Sendezeit aus der Slotzeit so dass Sendeeinheit rechtzeitig aktiviert wird
+    - Station                   Besteht aus Sender- und Empfängereinheit, ist entweder Typ A oder B
+
+Ablauf:
+    - Nachrichtengenerierung    bekommt Input
+                                fordert Sendeeinheit auf Slot zu holen
+    - Sendeeinheit              holt Slot
+    - Slotreservierung          bestimmt random Slot im nächsten Frame
+    - Nachrichtengenerierung    mit Slot errechnen wann Nachricht weg muss
+                                Nachricht erstellen, weiter geben an Sendeeinheit
+    - Sendeeinheit              Nachricht mit Sendezeit füllen und senden
+    - Empfängereinheit          Bekommt Nachricht(en)
+                                erkennt pro Slot ob Kollision entstand
+    ???Uhrensynchronisation???!!!
 
 How-To-Uhren-Synch für Typ A
-    - Uhrensynchronisation (Komponente) schickt an alle Typ A Stationen seine Zeit
-    - Bekommt dann von allen deren Abweichung zurück
+    - Uhrensynchronisation bekommt von Nachrichten, aus den Typ A Nachrichten wird die Zeit entnommen
+    - Daraus wird dann die Abweichung zur jetztigen Zeit errechnet
     - Ermittelt draus dann ein arithmetisches Mittel
     - Damit dann: Abweichung * -1 + arithmetisches Mittel
     - Ergebnis an die Type A Stationen zurück senden
