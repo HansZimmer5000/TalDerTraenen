@@ -6,6 +6,7 @@ Fragen:
     - Wann / wie / wo werden die Uhren synchronisiert?
     - (Folie 38) was heißt "jeder ist Koordinator"?
     - Wie wird gesendet / empfangen?
+    - Müssen wir den UDP Kanal selbst bauen?
 
 Antworten:
     - Darf man Erlang oder muss JAVA?
@@ -45,10 +46,22 @@ Ablauf:
     - Slotreservierung          bestimmt random Slot im nächsten Frame
     - Nachrichtengenerierung    mit Slot errechnen wann Nachricht weg muss
                                 Nachricht erstellen, weiter geben an Sendeeinheit
-    - Sendeeinheit              Nachricht mit Sendezeit füllen und senden
-    - Empfängereinheit          Bekommt Nachricht(en)
+    - Sendeeinheit              Nachricht mit Sendezeit füllen und senden (Multicast an alle, auch sich selbst)
+    - Empfängereinheit          Bekommt Nachrichten (Also alle gesendeten, da Multicast und eigene Nachricht)
                                 erkennt pro Slot ob Kollision entstand
     ???Uhrensynchronisation???!!!
+
+    - Wird der Sendeslot verpasst, wird im aktuellen Frame für den nächsten Frame ein Slot gefordert
+    - Erst dann darf man wieder zu hören (also alle Multicast Nachrichten empfangen / lesen)
+
+Stationsphasen:
+    - Wiedereinstieg
+        Station fordert Slot im nächsten Frame
+        Ist der dann vorhanden wird dann gesendet und ab dem Vater-Frame auch wieder zugehört
+    - Zuhören
+        Station fordert Slot im nächsten Frame
+        Ist der dann vorhanden wird gesendet, zugehört wird die ganze Zeit schon (Aber was macht man mit dem zugehörten?)
+        Verpasst man den Slot irgendwie ist man wieder in der Wiedereinstieg-Phase
 
 How-To-Uhren-Synch für Typ A
     - Uhrensynchronisation bekommt von Nachrichten, aus den Typ A Nachrichten wird die Zeit entnommen
@@ -57,4 +70,7 @@ How-To-Uhren-Synch für Typ A
     - Damit dann: Abweichung * -1 + arithmetisches Mittel
     - Ergebnis an die Type A Stationen zurück senden
     - Die ändern dann ihre innere Uhr dem empfangenen Ergebnis entsprechend (aktuelle Uhr + Ergebnis)
+
+How-To-Uhren-Synch für Typ B
+    - ???
 
