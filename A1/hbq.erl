@@ -1,13 +1,4 @@
-%%%-------------------------------------------------------------------
-%%% @author Arne Thiele & Michael Müller
-%%% @copyright (C) 2017, <COMPANY>
-%%% @doc
-%%%
-%%% @end
-%%% Created : 13. Apr 2017 13:29
-%%%-------------------------------------------------------------------
 -module(hbq).
--author("Arne Thiele & Michael Müller").
 
 %% API
 -export([
@@ -26,17 +17,13 @@
     erstelleSpaltNachricht/2
 ]).
 
+% KOnSTANTEN
 -define(CONFIG_FILENAME, "hbq.cfg").
 -define(LOG_DATEI_NAME, 'hbq.log').
 -define(DLQ_LOG_DATEI, 'dlq.log').
 -define(HBQNAME, extractValueFromConfig(hbqname)).
 -define(DLQLIMIT, extractValueFromConfig(dlqlimit)).
 
-%------------------------------------------------------------------------------------------------------
-%																					>>INIT UND LOOPS<<
-%------------------------------------------------------------------------------------------------------
-
-%Methode um den HBQ-Prozess an sich anzustoßen
 start() ->
   logge_status("HBQ wird gestartet"),
   HBQPID = spawn(fun() -> waitForInit() end),

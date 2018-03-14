@@ -9,14 +9,14 @@ getmessages_abfertigen_1_test() ->
     ServerPid = starte_server(),
     fahre_server_vorzeitig_herunter(ServerPid),
     io:fwrite("Warten auf HBQ/DLQ Implementation"),
-    true = false.
+    ?assert(false).
 
 dropmessage_abfertigen_1_test() ->
     %TODO Wie genau testen? Irgendwie an HbQ rankommen -> da rein schauen?
     ServerPid = starte_server(),
     fahre_server_vorzeitig_herunter(ServerPid),
     io:fwrite("Warten auf HBQ/DLQ Implementation"),
-    true = false.
+    ?assert(false).
 
 getmsgid_abfertigen_1_test() ->
     AktuelleNNR = server:getmsgid_abfertigen(self(), 0),
@@ -39,7 +39,9 @@ getmsgid_abfertigen_2_test() ->
 
 
 
-starte_server() ->
+starte_server() ->    
+    io:fwrite("initHBQ in server:start verhindert testserver:start_server"),
+    ?assert(false),
     ServerPid = server:start(),
     ServerPid.
 

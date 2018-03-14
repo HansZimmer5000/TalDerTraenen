@@ -31,9 +31,8 @@
 -define(SERVER, {?SERVERNAME, ?SERVERNODE}).
 -define(ETS_TABELLENNAME, hole_wert_aus_config_mit_key(etsTabellenname)).
 
-% INIT
 start() ->
-    ets:new(?ETS_TABELLENNAME, [named_table, public, set]), %, {keypos, 1}]),
+    ets:new(?ETS_TABELLENNAME, [named_table, public, set]), 
     ets:insert(?ETS_TABELLENNAME, {self(), "client"}),
     logge_status(io_lib:format("client mit PID ~p gestartet", [self()])),
     ClientPidList = start_all_clients(?CLIENT_ANZAHL, []),

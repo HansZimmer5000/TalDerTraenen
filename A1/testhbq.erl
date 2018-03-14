@@ -10,37 +10,49 @@ start_1_test() ->
     HBQPid ! {self(), {request, initHBQ}},
     receive
         {reply, ok} -> ?assert(true)
-        after 5 -> ?assert(false)
+        after 1000 -> ?assert(false)
     end,
     exit(HBQPid, kill).
 
 waitForInit_1_test() ->
-    ?assert(false).
+    HBQPid = spawn(fun() -> hbq:waitForInit() end),
+    HBQPid ! {self(), {request, initHBQ}},
+    receive
+        {reply, ok} -> ?assert(true)
+        after 1000 -> ?assert(false)
+    end,
+    exit(HBQPid, kill).
 
 initHBQHandler_1_test() ->
     hbq:initHBQHandler(self()),
     receive
         {reply, ok} -> ?assert(true)
-        after 5 -> ?assert(false)
+        after 1000 -> ?assert(false)
     end.
 
 receive_loop_1_test() ->
+    io:fwrite("Not implemented yet"),
     ?assert(false).
 
 pushHBQHandler_1_test() ->
+    io:fwrite("Not implemented yet"),
     ?assert(false).
     %hbq:pushHBQHandler(PID, Nachricht, HoldbackQueue, DeliveryQueue)
 
 deliverMSGHandler_1_test() ->
+    io:fwrite("Not implemented yet"),
     ?assert(false).
 
 deleteHBQHandler_1_test() ->
+    io:fwrite("Not implemented yet"),
     ?assert(false).
 
 isInOrder_1_test() ->
+    io:fwrite("Not implemented yet"),
     ?assert(false).
 
 pruefeNaechsteNachrichtUndPushe_1_test() ->
+    io:fwrite("Not implemented yet"),
     ?assert(false).
 
 inHBQeinfuegen_1_test() ->
