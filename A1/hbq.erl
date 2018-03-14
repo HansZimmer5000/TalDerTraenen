@@ -10,7 +10,11 @@
 
     pushHBQHandler/4,
     inHBQeinfuegen/2,
+    deliverMSGHandler/4,
+    deleteHBQHandler/2,
 
+    isInOrder/2,
+    pruefeNaechsteNachrichtUndPushe/2,
     pruefeLimitUndFuelleSpalte/3,
     sucheUndFuelleSpalte/2,
     sucheSpalte/2,
@@ -127,11 +131,11 @@ pruefeNaechsteNachrichtUndPushe([HBQHead | HBQTail], DLQ) ->
  %logge_status(io_lib:format("Aktueller Head: ~p", [HBQHead])),
   CanBeDelivered = isInOrder(HBQHead, DLQ),
   logge_status(io_lib:format("Message CanBeDelivered? ~p", [CanBeDelivered])),
-  if 
-    CanBeDelivered ->
+  case CanBeDelivered of
+    true ->
       NewDLQ = dlq:push2DLQ(HBQHead, DLQ, ?DLQ_LOG_DATEI),
       pruefeNaechsteNachrichtUndPushe(HBQTail, NewDLQ);
-    true -> 
+    false -> 
       {[HBQHead | HBQTail], DLQ}
   end.
 

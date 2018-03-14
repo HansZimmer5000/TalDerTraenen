@@ -4,13 +4,14 @@
 -include_lib("eunit/include/eunit.hrl").
 
 -define(DLQSIZE, 5).
+-define(MAX_DELAY, 1000).
 
 start_1_test() ->
     HBQPid = hbq:start(),
     HBQPid ! {self(), {request, initHBQ}},
     receive
         {reply, ok} -> ?assert(true)
-        after 1000 -> ?assert(false)
+        after ?MAX_DELAY -> ?assert(false)
     end,
     exit(HBQPid, kill).
 
@@ -19,7 +20,7 @@ waitForInit_1_test() ->
     HBQPid ! {self(), {request, initHBQ}},
     receive
         {reply, ok} -> ?assert(true)
-        after 1000 -> ?assert(false)
+        after ?MAX_DELAY -> ?assert(false)
     end,
     exit(HBQPid, kill).
 
@@ -27,7 +28,7 @@ initHBQHandler_1_test() ->
     hbq:initHBQHandler(self()),
     receive
         {reply, ok} -> ?assert(true)
-        after 1000 -> ?assert(false)
+        after ?MAX_DELAY -> ?assert(false)
     end.
 
 receive_loop_1_test() ->
@@ -35,25 +36,110 @@ receive_loop_1_test() ->
     ?assert(false).
 
 pushHBQHandler_1_test() ->
-    io:fwrite("Not implemented yet"),
-    ?assert(false).
-    %hbq:pushHBQHandler(PID, Nachricht, HoldbackQueue, DeliveryQueue)
+    TS = vsutil:now2string(erlang:timestamp()),
+    Nachricht1 = [1, "Text", TS, TS, TS],
+    Nachricht2 = [2, "Text", TS],
+    HBQ = [],
+    DLQ = [?DLQSIZE, [Nachricht1]],
+    ServerPid = self(),
+    ThisPid = self(),
+    _HBQPid = spawn(fun() -> 
+                        Result = hbq:pushHBQHandler(ServerPid, Nachricht2, HBQ, DLQ),
+                        ThisPid ! Result 
+                    end),
+    receive
+        Any -> ?assertEqual({reply, ok}, Any)
+        after ?MAX_DELAY -> ?assert(false)
+    end,
+    receive
+        Result -> 
+            {NeueHBQ, NeueDLQ} = Result,
+            [?DLQSIZE, NeueDLQNachrichten] = NeueDLQ,
+            [DLQNachricht1, DLQNachricht2] = NeueDLQNachrichten,
+            
+            [2, "Text", TS, _HBQInTS, _DLQInTS] = DLQNachricht1,
+            ?assertEqual(Nachricht1, DLQNachricht2),
+            ?assertEqual(HBQ, NeueHBQ)
+        after ?MAX_DELAY -> ?assert(false)
+    end.
+    
 
 deliverMSGHandler_1_test() ->
-    io:fwrite("Not implemented yet"),
-    ?assert(false).
+    TS = vsutil:now2string(erlang:timestamp()),
+    Nachricht = [1, "Text", TS, TS, TS],
+    DLQ = [?DLQSIZE, [Nachricht]],
+    ClientPid = self(),
+    ServerPid = self(),
+    _HBQPid = spawn(fun() -> hbq:deliverMSGHandler(ServerPid, 1, ClientPid, DLQ) end),
+    receive
+        {reply, SentMsgNum} -> ?assertEqual(1, SentMsgNum)
+        after ?MAX_DELAY -> ?assert(false)
+    end,
+    receive
+        {reply, ZuSendendeNachricht, TermiatedFlag} -> 
+            [1, "Text", TS, TS, TS, _DLQOutTS] = ZuSendendeNachricht,
+            ?assert(TermiatedFlag)
+        after ?MAX_DELAY -> ?assert(false)
+    end.
+
+deliverMSGHandler_2_test() ->
+    TS = vsutil:now2string(erlang:timestamp()),
+    Nachricht = [2, "Text", TS, TS, TS],
+    DLQ = [?DLQSIZE, [Nachricht]],
+    ClientPid = self(),
+    ServerPid = self(),
+    _HBQPid = spawn(fun() -> hbq:deliverMSGHandler(ServerPid, 1, ClientPid, DLQ) end),
+    receive
+        {reply, SentMsgNum} -> ?assertEqual(0, SentMsgNum)
+        after ?MAX_DELAY -> ?assert(false)
+    end,
+    receive
+        {reply, ZuSendendeNachricht, TermiatedFlag} -> 
+            [0, "Angeforderte Nachricht nicht vorhanden.", _TS, _TS, _TS, _TS] = ZuSendendeNachricht,
+            ?assert(TermiatedFlag)
+        after ?MAX_DELAY -> ?assert(false)
+    end.
 
 deleteHBQHandler_1_test() ->
-    io:fwrite("Not implemented yet"),
-    ?assert(false).
+    DLQ = [?DLQSIZE, []],
+    ThisPid = self(),
+    _HBQPid = spawn(fun() -> hbq:deleteHBQHandler(ThisPid, DLQ) end),
+    receive
+        Any -> ?assertEqual({reply, ok}, Any)
+        after ?MAX_DELAY -> ?assert(false)
+    end. 
 
 isInOrder_1_test() ->
-    io:fwrite("Not implemented yet"),
-    ?assert(false).
+    TS = vsutil:now2string(erlang:timestamp()),
+    DLQ = [?DLQSIZE, [[1, "Text", TS, TS ,TS]]],
+    Nachricht = [2, "Text2", TS, TS],
+    ?assert(hbq:isInOrder(Nachricht, DLQ)).
 
 pruefeNaechsteNachrichtUndPushe_1_test() ->
-    io:fwrite("Not implemented yet"),
-    ?assert(false).
+    HBQ = [],
+    DLQ = [?DLQSIZE, []],
+    ?assertEqual({[], DLQ}, hbq:pruefeNaechsteNachrichtUndPushe(HBQ, DLQ)).
+
+pruefeNaechsteNachrichtUndPushe_2_test() ->
+    TS = vsutil:now2string(erlang:timestamp()),
+    Nachricht = [1, "Text", TS, TS],
+    HBQ = [Nachricht],
+    DLQ = [?DLQSIZE, []],
+    {NeueHBQ, NeueDLQ} = hbq:pruefeNaechsteNachrichtUndPushe(HBQ, DLQ),
+
+    [?DLQSIZE, NeueDLQNachrichten] = NeueDLQ,
+    [ErsteDLQNachricht | _Rest] = NeueDLQNachrichten,
+    [1, "Text", TS, TS, _DLQINTS] = ErsteDLQNachricht,
+    ?assertEqual([], NeueHBQ).
+
+pruefeNaechsteNachrichtUndPushe_3_test() ->
+    TS = vsutil:now2string(erlang:timestamp()),
+    Nachricht = [2, "Text", TS, TS],
+    HBQ = [Nachricht],
+    DLQ = [?DLQSIZE, []],
+    ?assertEqual(
+        {[Nachricht], [?DLQSIZE, []]}, 
+        hbq:pruefeNaechsteNachrichtUndPushe(HBQ, DLQ)).
 
 inHBQeinfuegen_1_test() ->
     TS = erlang:timestamp(),
