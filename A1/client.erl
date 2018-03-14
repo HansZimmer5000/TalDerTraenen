@@ -31,6 +31,9 @@
 -define(SERVER, {?SERVERNAME, ?SERVERNODE}).
 -define(ETS_TABELLENNAME, hole_wert_aus_config_mit_key(etsTabellenname)).
 
+%------------------------------------------------------------------------------------------------------
+%																	>>START / INIT<<
+%------------------------------------------------------------------------------------------------------
 start() ->
     ets:new(?ETS_TABELLENNAME, [named_table, public, set]), 
     ets:insert(?ETS_TABELLENNAME, {self(), "client"}),
@@ -53,7 +56,9 @@ start_client_node(Clientnummer) ->
     logge_status(lists:concat([Clientname, " mit PID ", io_lib:format("~p", [ClientPid]), " gestartet"])),
     ClientPid.
 
-% LOOPS
+%------------------------------------------------------------------------------------------------------
+%																	>>LOOPS<<
+%------------------------------------------------------------------------------------------------------
 redakteur_loop(Intervall, GeschriebeneNNRListe) -> 
     logge_status("Beginne redakteur_loop"),
     NNR = frage_nach_neuer_nnr(?SERVER),
@@ -85,7 +90,10 @@ leser_loop(Intervall, GeschriebeneNNRListe) ->
     end.
 
 
-% FUNKTIONEN
+%------------------------------------------------------------------------------------------------------
+%																	>>EIGENTLICHE FUNKTIONEN<<
+%------------------------------------------------------------------------------------------------------
+
 frage_nach_neuer_nnr(Server) ->
     Server ! {self(), getmsgid},
     logge_status("Warte auf NNR"),
@@ -190,8 +198,9 @@ kill_all_clients([Client|RestClients]) ->
 	logge_status(io_lib:format("Der Client ~p wurde zur Selbstzerstörung überredet", [Client])),
 	kill_all_clients(RestClients).
 
-
-
+%------------------------------------------------------------------------------------------------------
+%																	>>GENERELLE FUNKTIONEN<<
+%------------------------------------------------------------------------------------------------------
 hole_wert_aus_config_mit_key(Key) ->
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
     {ok, Value} = vsutil:get_config_value(Key, ConfigListe),

@@ -1,15 +1,7 @@
-%%%-------------------------------------------------------------------
-%%% @author Arne Thiele & Michael Müller
-%%% @copyright (C) 2017, <COMPANY>
-%%% @doc
-%%%
-%%% @end
-%%% Created : 13. Apr 2017 13:30
-%%%-------------------------------------------------------------------
 -module(dlq).
 -author("Arne Thiele & Michael Müller").
 
-%% API
+% API
 -export([
 	initDLQ/2, 
 	delDLQ/1, 

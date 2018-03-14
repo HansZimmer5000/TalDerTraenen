@@ -14,7 +14,7 @@
         getmsgid_abfertigen/2
         ]).
 
-% CONSTANTS
+% KONSTANTEN
 -define(CONFIG_FILENAME, "server.cfg").
 -define(LOG_DATEI_NAME, "server.log").
 -define(SERVERNAME, hole_wert_aus_config_mit_key(servername)).
@@ -25,6 +25,9 @@
 -define(HBQNODE, hole_wert_aus_config_mit_key(hbqnode)).
 -define(HBQ, {?HBQNAME, ?HBQNODE}).
 
+%------------------------------------------------------------------------------------------------------
+%																	>>START / INIT<<
+%------------------------------------------------------------------------------------------------------
 start() -> 
     CMEM = cmem:initCMEM(?ERINNERUNGS_ZEIT_SEK, ?CMEM_LOG_DATEI_NAME),
     initHBQ(),
@@ -38,8 +41,9 @@ initHBQ() ->
         {reply, ok} -> logge_status("HBQ initalisiert")
     end.
     
-
-
+%------------------------------------------------------------------------------------------------------
+%																	>>LOOP<<
+%------------------------------------------------------------------------------------------------------
 receive_loop(CMEM, NextNNR) ->
     logge_status("receive_loop"),
     {ok,ServerTimer} = timer:send_after(timer:seconds(?LATENZ_SEK), self(), {request,killAll}),
@@ -60,6 +64,9 @@ receive_loop(CMEM, NextNNR) ->
     end.
 
 
+%------------------------------------------------------------------------------------------------------
+%																	>>EIGENTLICHE FUNKTIONEN<<
+%------------------------------------------------------------------------------------------------------
 getmessages_abfertigen(CMEM, LeserPid) -> 
     ZuSendendeNNr = hole_naechste_nnr_fur_leser(CMEM, LeserPid),
     GesendeteNNr = sendeNNr(ZuSendendeNNr, LeserPid),
@@ -101,8 +108,9 @@ getmsgid_abfertigen(AbsenderPid, LetzteNNR) ->
 runterfahren() ->
     logge_status("Server wird heruntergefahren").
 
-
-
+%------------------------------------------------------------------------------------------------------
+%																	>>GENERELLE FUNKTIONEN<<
+%------------------------------------------------------------------------------------------------------
 hole_wert_aus_config_mit_key(Key) ->
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
     {ok, Value} = vsutil:get_config_value(Key, ConfigListe),

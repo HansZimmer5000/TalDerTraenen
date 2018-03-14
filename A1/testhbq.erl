@@ -15,8 +15,8 @@ start_1_test() ->
     end,
     exit(HBQPid, kill).
 
-waitForInit_1_test() ->
-    HBQPid = spawn(fun() -> hbq:waitForInit() end),
+wait_for_init_1_test() ->
+    HBQPid = spawn(fun() -> hbq:wait_for_init() end),
     HBQPid ! {self(), {request, initHBQ}},
     receive
         {reply, ok} -> ?assert(true)
@@ -24,8 +24,8 @@ waitForInit_1_test() ->
     end,
     exit(HBQPid, kill).
 
-initHBQHandler_1_test() ->
-    hbq:initHBQHandler(self()),
+init_hbq_handler_1_test() ->
+    hbq:init_hbq_handler(self()),
     receive
         {reply, ok} -> ?assert(true)
         after ?MAX_DELAY -> ?assert(false)
@@ -35,7 +35,7 @@ receive_loop_1_test() ->
     io:fwrite("Not implemented yet"),
     ?assert(false).
 
-pushHBQHandler_1_test() ->
+push_hbq_handler_1_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht1 = [1, "Text", TS, TS, TS],
     Nachricht2 = [2, "Text", TS],
@@ -44,7 +44,7 @@ pushHBQHandler_1_test() ->
     ServerPid = self(),
     ThisPid = self(),
     _HBQPid = spawn(fun() -> 
-                        Result = hbq:pushHBQHandler(ServerPid, Nachricht2, HBQ, DLQ),
+                        Result = hbq:push_hbq_handler(ServerPid, Nachricht2, HBQ, DLQ),
                         ThisPid ! Result 
                     end),
     receive
@@ -64,13 +64,13 @@ pushHBQHandler_1_test() ->
     end.
     
 
-deliverMSGHandler_1_test() ->
+deliver_nachricht_handler_1_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = [1, "Text", TS, TS, TS],
     DLQ = [?DLQSIZE, [Nachricht]],
     ClientPid = self(),
     ServerPid = self(),
-    _HBQPid = spawn(fun() -> hbq:deliverMSGHandler(ServerPid, 1, ClientPid, DLQ) end),
+    _HBQPid = spawn(fun() -> hbq:deliver_nachricht_handler(ServerPid, 1, ClientPid, DLQ) end),
     receive
         {reply, SentMsgNum} -> ?assertEqual(1, SentMsgNum)
         after ?MAX_DELAY -> ?assert(false)
@@ -82,13 +82,13 @@ deliverMSGHandler_1_test() ->
         after ?MAX_DELAY -> ?assert(false)
     end.
 
-deliverMSGHandler_2_test() ->
+deliver_nachricht_handler_2_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = [2, "Text", TS, TS, TS],
     DLQ = [?DLQSIZE, [Nachricht]],
     ClientPid = self(),
     ServerPid = self(),
-    _HBQPid = spawn(fun() -> hbq:deliverMSGHandler(ServerPid, 1, ClientPid, DLQ) end),
+    _HBQPid = spawn(fun() -> hbq:deliver_nachricht_handler(ServerPid, 1, ClientPid, DLQ) end),
     receive
         {reply, SentMsgNum} -> ?assertEqual(0, SentMsgNum)
         after ?MAX_DELAY -> ?assert(false)
@@ -100,48 +100,48 @@ deliverMSGHandler_2_test() ->
         after ?MAX_DELAY -> ?assert(false)
     end.
 
-deleteHBQHandler_1_test() ->
+delete_hbq_handler_1_test() ->
     DLQ = [?DLQSIZE, []],
     ThisPid = self(),
-    _HBQPid = spawn(fun() -> hbq:deleteHBQHandler(ThisPid, DLQ) end),
+    _HBQPid = spawn(fun() -> hbq:delete_hbq_handler(ThisPid, DLQ) end),
     receive
         Any -> ?assertEqual({reply, ok}, Any)
         after ?MAX_DELAY -> ?assert(false)
     end. 
 
-isInOrder_1_test() ->
+is_in_order_1_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     DLQ = [?DLQSIZE, [[1, "Text", TS, TS ,TS]]],
     Nachricht = [2, "Text2", TS, TS],
-    ?assert(hbq:isInOrder(Nachricht, DLQ)).
+    ?assert(hbq:is_in_order(Nachricht, DLQ)).
 
-pruefeNaechsteNachrichtUndPushe_1_test() ->
+pruefe_naechste_nachricht_und_pushe_1_test() ->
     HBQ = [],
     DLQ = [?DLQSIZE, []],
-    ?assertEqual({[], DLQ}, hbq:pruefeNaechsteNachrichtUndPushe(HBQ, DLQ)).
+    ?assertEqual({[], DLQ}, hbq:pruefe_naechste_nachricht_und_pushe(HBQ, DLQ)).
 
-pruefeNaechsteNachrichtUndPushe_2_test() ->
+pruefe_naechste_nachricht_und_pushe_2_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = [1, "Text", TS, TS],
     HBQ = [Nachricht],
     DLQ = [?DLQSIZE, []],
-    {NeueHBQ, NeueDLQ} = hbq:pruefeNaechsteNachrichtUndPushe(HBQ, DLQ),
+    {NeueHBQ, NeueDLQ} = hbq:pruefe_naechste_nachricht_und_pushe(HBQ, DLQ),
 
     [?DLQSIZE, NeueDLQNachrichten] = NeueDLQ,
     [ErsteDLQNachricht | _Rest] = NeueDLQNachrichten,
     [1, "Text", TS, TS, _DLQINTS] = ErsteDLQNachricht,
     ?assertEqual([], NeueHBQ).
 
-pruefeNaechsteNachrichtUndPushe_3_test() ->
+pruefe_naechste_nachricht_und_pushe_3_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = [2, "Text", TS, TS],
     HBQ = [Nachricht],
     DLQ = [?DLQSIZE, []],
     ?assertEqual(
         {[Nachricht], [?DLQSIZE, []]}, 
-        hbq:pruefeNaechsteNachrichtUndPushe(HBQ, DLQ)).
+        hbq:pruefe_naechste_nachricht_und_pushe(HBQ, DLQ)).
 
-inHBQeinfuegen_1_test() ->
+in_hbq_einfuegen_1_test() ->
     TS = erlang:timestamp(),
     Nachricht1 = [1, "Text", TS, TS],
     Nachricht4 = [4, "Text", TS, TS],
@@ -149,19 +149,19 @@ inHBQeinfuegen_1_test() ->
     HBQ = [Nachricht1, Nachricht4],
     ?assertEqual(
         [Nachricht1, Nachricht4, Nachricht5],
-        hbq:inHBQeinfuegen(Nachricht5, HBQ)
+        hbq:in_hbq_einfuegen(Nachricht5, HBQ)
     ).
 
-inHBQeinfuegen_2_test() ->
+in_hbq_einfuegen_2_test() ->
     TS = erlang:timestamp(),
     Nachricht1 = [1, "Text", TS, TS],
     HBQ = [],
     ?assertEqual(
         [Nachricht1],
-        hbq:inHBQeinfuegen(Nachricht1, HBQ)
+        hbq:in_hbq_einfuegen(Nachricht1, HBQ)
     ).
 
-inHBQeinfuegen_3_test() ->
+in_hbq_einfuegen_3_test() ->
     TS = erlang:timestamp(),
     Nachricht1 = [1, "Text", TS, TS],
     Nachricht4 = [4, "Text", TS, TS],
@@ -169,10 +169,10 @@ inHBQeinfuegen_3_test() ->
     HBQ = [Nachricht1, Nachricht5],
     ?assertEqual(
         [Nachricht1, Nachricht4, Nachricht5],
-        hbq:inHBQeinfuegen(Nachricht4, HBQ)
+        hbq:in_hbq_einfuegen(Nachricht4, HBQ)
     ).
 
-pruefeLimitUndFuelleSpalte_1_test() ->    
+pruefe_limit_und_fuelle_spalte_1_test() ->    
     TS = erlang:timestamp(),
     Nachricht1 = [1, "Text", TS, TS, TS],
     Nachricht4 = [4, "Text", TS, TS],
@@ -181,11 +181,11 @@ pruefeLimitUndFuelleSpalte_1_test() ->
     Nachricht7 = [7, "Text", TS, TS],
     HBQ = [Nachricht4, Nachricht5, Nachricht6, Nachricht7],
     DLQ = [?DLQSIZE, [Nachricht1]],
-    [?DLQSIZE, [DLQNachricht1, DLQNachricht2]] = hbq:pruefeLimitUndFuelleSpalte(HBQ, DLQ, ?DLQSIZE),
+    [?DLQSIZE, [DLQNachricht1, DLQNachricht2]] = hbq:pruefe_limit_und_fuelle_spalte(HBQ, DLQ, ?DLQSIZE),
     [3, "Error Nachricht zum Luecke von 2 bis 3 zu fuellen", TS, TS, _TS] = DLQNachricht1,
     [1, "Text", TS, TS, TS] = DLQNachricht2.
 
-pruefeLimitUndFuelleSpalte_2_test() ->    
+pruefe_limit_und_fuelle_spalte_2_test() ->    
     TS = erlang:timestamp(),
     Nachricht1 = [1, "Text", TS, TS, TS],
     Nachricht4 = [4, "Text", TS, TS],
@@ -193,20 +193,20 @@ pruefeLimitUndFuelleSpalte_2_test() ->
     Nachricht6 = [6, "Text", TS, TS],
     HBQ = [Nachricht4, Nachricht5, Nachricht6],
     DLQ = [?DLQSIZE, [Nachricht1]],
-    [?DLQSIZE, [DLQNachricht1]] = hbq:pruefeLimitUndFuelleSpalte(HBQ, DLQ, ?DLQSIZE),
+    [?DLQSIZE, [DLQNachricht1]] = hbq:pruefe_limit_und_fuelle_spalte(HBQ, DLQ, ?DLQSIZE),
     [1, "Text", TS, TS, TS] = DLQNachricht1.
 
-sucheUndFuelleSpalte_1_test() ->
+suche_und_fuelle_spalte_1_test() ->
     TS = erlang:timestamp(),
     Nachricht1 = [1, "Text", TS, TS, TS],
     Nachricht4 = [4, "Text", TS, TS],
     HBQ = [Nachricht4],
     DLQ = [?DLQSIZE, [Nachricht1]],
-    [?DLQSIZE, [DLQNachricht1, DLQNachricht2]] = hbq:sucheUndFuelleSpalte(HBQ, DLQ),
+    [?DLQSIZE, [DLQNachricht1, DLQNachricht2]] = hbq:suche_und_fuelle_spalte(HBQ, DLQ),
     [3, "Error Nachricht zum Luecke von 2 bis 3 zu fuellen", TS, TS, _TS] = DLQNachricht1,
     [1, "Text", TS, TS, TS] = DLQNachricht2.
 
-sucheSpalte_1_test() ->
+suche_spalte_1_test() ->
     TS = erlang:timestamp(),
     Nachricht1 = [1, "Text", TS, TS, TS],
     Nachricht4 = [4, "Text", TS, TS],
@@ -214,13 +214,13 @@ sucheSpalte_1_test() ->
     DLQ = [?DLQSIZE, [Nachricht1]],
     ?assertEqual(
         {2, 3},
-        hbq:sucheSpalte(HBQ, DLQ)
+        hbq:suche_spalte(HBQ, DLQ)
     ).
 
-erstelleSpaltNachricht_1_test() ->
+erstelle_spalt_nachricht_1_test() ->
     SpaltStartNNr = 2,
     SpaltEndeNNr = 3,
-    [SpaltNNr, SpaltText, _TS, _TS] = hbq:erstelleSpaltNachricht(SpaltStartNNr, SpaltEndeNNr),
+    [SpaltNNr, SpaltText, _TS, _TS] = hbq:erstelle_spalt_nachricht(SpaltStartNNr, SpaltEndeNNr),
     ?assertEqual(SpaltEndeNNr, SpaltNNr),
     ?assertEqual("Error Nachricht zum Luecke von 2 bis 3 zu fuellen", SpaltText).
 
