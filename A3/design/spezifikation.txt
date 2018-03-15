@@ -32,12 +32,15 @@ Zeitaufbau:
     - Es gibt unendlich frames, jedoch nacheinander und nicht nebenläufig
 
 Komponenten:
+    - Sendekanal                ??????
     - Empfängereinheit          Bekommt Nachrichten, erkennt & behandelt Kollisionen
     - Uhrensynchronisation      wertet Typ A Zeitstempel aus
     - Slotreservierung          Kennt reservierte Slots, stellt random gewählten Slot zu jedem Zeitpunkt
     - Sendeeinheit              holt sich einen Slot im nächsten Frame, prüft Slotzeit & eigene Zeit, wurde es verpasst im nächsten Slot wiedereinsteigen
     - Nachrichtengenerierung    Erstellt die zu sendende Nachricht (ohne Sendezeit), errechnet Sendezeit aus der Slotzeit so dass Sendeeinheit rechtzeitig aktiviert wird
     - Station                   Besteht aus Sender- und Empfängereinheit, ist entweder Typ A oder B
+                                Jede Station sendet genau ein Mal pro Frame
+                                Jede Station hört (wenn in der richtigen Phase) alle Nachrichten ab
 
 Ablauf:
     - Nachrichtengenerierung    bekommt Input
