@@ -1,7 +1,7 @@
 Offene Fragen:
     - Was bedeuten die Variablen?
         ArbeitsZeit -> Delay zwischen Jetzt und der Zeit wenn der ggT-Prozess anfangen soll zu arbeiten
-        TermZeit    -> 
+        TermZeit    -> Die TermZeit gilt für den ggT-Prozess, Mit jeder empfangenen Nachricht (außerhalb der Abstimmung) wird die Zeit resetet, läuft sie ab, initiert der betroffene ggT-Prozess eine Abstimmung.
         GGTProAnz   -> Anzahl an ggT-Prozessen
         GGTProName  -> Name des ggT-Prozesses
         CMi     -> Client Mi
@@ -11,13 +11,16 @@ Offene Fragen:
         LeftN   -> Node links des aktuellen (Im Kreis, Uhrzeigersinn)
         RightN  -> Node rechts des aktuellen (Im Kreis, Gegen den Uhrzeigersinn)
         MiNeu   -> Neues Mi für gewissen ggT-Prozess
-        Quota   -> 
-    - Was ist die "Abstimmung"?
+        Quota   -> Anzahl an ggT-Prozessen die (evtl. vorerst) am Ende der Berechnung angekommen sind und sich dem Abstimmungsinitiator zurückgemeldet haben
     - Warum hat Koordinator manchmal eine Response auf {briefterm, ...} vom Starter oder ggT-Prozess?
-    - Reset -> Starter müssen dann auch unbinden und neu starten (neu steeringval anfragen)!
 
 
 Geschlossene Fragen:
+    - Reset -> Starter müssen dann auch unbinden und neu starten (neu steeringval anfragen)!
+        Ja.
+    - Was ist die "Abstimmung"?
+        Läuft die TermZeit eines ggT-Prozesses ab, initiert er mit Hilfe des nameservice eine Abstimmung unter allen ggT-Prozessen.
+        Meldet sich eine gewisse Anzahl an ggT-Prozessen zurück deren TermZeit auch erreicht wurde (=Quota erfüllt), wird die gesamte über alle Prozesse Kalkulation beendet.
     - Was machen die Koordinator aufrufe:
         step    -> Übergang von Sammeln der ggT-Prozess hellos zum errichten des Kreises
         prompt  -> ("Antreiben") ggT-Prozesse auffordern aktuellen Mi zurück zu schicken.
@@ -80,10 +83,18 @@ Ablauf:
     ggT-Prozess     Warten auf empfang von {setpm, MiNeu} -> Mi setzen.
                     Warten auf empfang von {sendy, Y} -> Formel ausführen
                     Wenn NeuMi <> Mi -> an Nachbarn schicken
-    koordinator     Ende mit Voting __??__
 
     VOTING
-    __??__ (WIE?)
+    ggT-Prozess#1   Läuft die TermZeit eines ggT-Prozess ab, initiert er mit Hilfe des nameservice eine Abstimmung
+                    ?NAMESERVICE ! {InitiatorPid, {multicast, vote, GGTProName}} (InitiatorPid = self())
+    nameservice     Schickt an alle (außer den Initiator) ggT-Prozesse die Aufforderung zur Abstimmung.
+                    GGTProPid ! {InitiatorPid, {vote, InitiatorGGTProName}}
+    ggT-Prozess#n   Falls bei #n auch die TermZeit abgelaufen ist;
+                    Antwortet der ggT-Prozess auf die Aufforderung mit:
+                    InitiatorPid ! {voteYes, GGTProName}
+    ggT-Prozess#1   Er wartet dann auf genügend Rückmeldungen, ist eine gewisse Anzahl erreicht (Quota), beendet der ggT-Prozess seine Berechnung
+                    Er reagiert dann nur noch auf Abstimmungen mit einer Rückmeldung
+                    Wird die Quota nicht erreicht, so geht er wieder in die Kalkulation zurück.
     
 
 Eigentlich wichtige Formel:
