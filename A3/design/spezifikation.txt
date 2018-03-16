@@ -22,21 +22,21 @@ Antworten:
 
 Aufgabenbeschreibung:
     Es werden Nachrichten per Multicast an alle Stationen geschickt.
-    Die Nachrichten müssen jedoch in einem Zeitslot geschickt werden.
+    Die Nachrichten müssen jedoch in einem Zeitslot geschickt werden, die Stationen müssen selbstständig einen Zeitslot wählen.
     Ein Zeitslot ist wiederum in einem Frame (insgesamt 25 slots pro frame).
     In einem Slot darf nur eine Station senden, senden 2 Stationen in einem Slot entsteht eine Kollision
     Ziel ist es, dass irgendwann alle Stationen (bis zu 25) ohne Kollision senden.
 
 Nachrichtenaufbau:
-    Gesamt 34 Byte
+    Gesamt 34 Byte // TTL = 1!
     - Byte 0        A oder B    Stationsklasse
     - Byte 1-24     -team-4711- Nutzdaten
-    - Byte 25       4           reservierte Slotnummer
-    - Byte 26-33    77394825    in ms, 8-Byte Integer, Big Endian
+    - Byte 25       4           reservierte Slotnummer für den nächsten Frame!
+    - Byte 26-33    77394825    Zeit (gesendet) in ms seit 01.01.1970, 8-Byte Integer, Big Endian
 
 Komponenten:
     - Frames/Slots              Frame umfasst eine Sekunde, Slot 40ms, Slots & Frames nacheinander und nicht nebenläufig
-    - Sendekanal                ?????? IP Multicast
+    - Sendekanal                ?????? IP Multicast mit Adresse 225.10.1.2 mit Port 15000 + Teamnummer
     - Station                   Besteht aus Sender- und Empfängereinheit, ist entweder Typ A oder B
                                 Jede Station sendet genau ein Mal pro Frame
                                 Jede Station hört (wenn in der richtigen Phase) alle Nachrichten ab
@@ -61,13 +61,13 @@ Ablauf:
     - Wird der Sendeslot verpasst / es entstand eine Kollision wird der aktuelle Frame zu Ende gehorcht und dann im näcshten Frame versucht wieder einzusteigen.
 
 Stationsphasen:
-    - Wiedereinstieg
+    - Einstieg
         Station fordert Slot im nächsten Frame
         Ist der dann vorhanden wird dann gesendet und ab dem Vater-Frame auch wieder zugehört
     - Zuhören
         Station fordert Slot im nächsten Frame
-        Ist der dann vorhanden wird gesendet, zugehört wird die ganze Zeit schon (Aber was macht man mit dem zugehörten?)
-        Verpasst man den Slot irgendwie ist man wieder in der Wiedereinstieg-Phase
+        Ist der dann vorhanden wird gesendet, zugehört wird die ganze Zeit schon, demenstprechend auch die Uhr synchronisiert
+        Verpasst man den Slot / entstand Kollision ist man wieder in der Einstieg-Phase
 
 How-To-Uhren-Synch
     - Uhrensynchronisation bekommt von Nachrichten, aus den Typ A Nachrichten wird die Zeit entnommen
