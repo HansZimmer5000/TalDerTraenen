@@ -1,23 +1,31 @@
 Fragen:
-    - (Folie 36) Wer braucht Slot für sich selbst, warum?
     - Wie genau ist der "nach Slot 2 oder nach Slot 24" Hinweis zu verstehen?
     - Wie ist der genau Ablauf?
-    - Wann / wie / wo werden die Zeitstempel aus den Nachrichten geholt?
-    - Wann / wie / wo werden die Uhren synchronisiert?
+    - Was sind die Phasen?
+    - Wenn es 2 Phasen gibt (man konnte Senden / man konnte nicht erfolgreich Senden), hört man in beiden Phasen alle Multicast Nachrichten ab?
     - (Folie 38) was heißt "jeder ist Koordinator"?
-    - Wie wird gesendet / empfangen?
-    - Müssen wir den UDP Kanal selbst bauen?
+    - Müssen wir den Kommunikations Kanal selbst bauen?
 
 Antworten:
+    - Wann / wie / wo werden die Zeitstempel aus den Nachrichten geholt?
+        Da jede Station stets alle Nachrichten per IP Multicast empfängt, liest es einfach die empfangenen Nachrichten aus
+    - Wann / wie / wo werden die Uhren synchronisiert?
+        In dem man die per Multicast empfangenen Nachrichten auswertet
+    - (Folie 36) Wer braucht Slot für sich selbst, warum?
+        Eine beliebige und bestimmte Station
+    - Wie wird gesendet / empfangen?
+        Die Stationen schicken per IP Multicast und empfangen auf dem selben Weg
     - Darf man Erlang oder muss JAVA?
         JAVA
     - Was ist der genaue Unterschied von Typ A und Typ B Stationen? Die Uhr Synchronisation?
         Typ B Stationen synchronisieren anhand von Typ A Stationen, Typ A Stationen haben eine genau Uhr und synchronisieren mit anderen Typ A stationen
 
 Aufgabenbeschreibung:
-    Es werden Nachrichten von einer Datenquelle zu einer Datensenke per Multicast geschickt.
+    Es werden Nachrichten per Multicast an alle Stationen geschickt.
     Die Nachrichten müssen jedoch in einem Zeitslot geschickt werden.
-    Ein Zeitslot ist wiederum in einem Frame.
+    Ein Zeitslot ist wiederum in einem Frame (insgesamt 25 slots pro frame).
+    In einem Slot darf nur eine Station senden, senden 2 Stationen in einem Slot entsteht eine Kollision
+    Ziel ist es, dass irgendwann alle Stationen (bis zu 25) ohne Kollision senden.
 
 Nachrichtenaufbau:
     Gesamt 34 Byte
@@ -26,21 +34,17 @@ Nachrichtenaufbau:
     - Byte 25       4           reservierte Slotnummer
     - Byte 26-33    77394825    in ms, 8-Byte Integer, Big Endian
 
-Zeitaufbau:
-    - Jede Sekunde kommt ein neuer Frame
-    - Ein Frame enthält genau 25 (0 - 24) Slots mit je 40ms Dauer / Größe
-    - Es gibt unendlich frames, jedoch nacheinander und nicht nebenläufig
-
 Komponenten:
-    - Sendekanal                ??????
-    - Empfängereinheit          Bekommt Nachrichten, erkennt & behandelt Kollisionen
-    - Uhrensynchronisation      wertet Typ A Zeitstempel aus
-    - Slotreservierung          Kennt reservierte Slots, stellt random gewählten Slot zu jedem Zeitpunkt
-    - Sendeeinheit              holt sich einen Slot im nächsten Frame, prüft Slotzeit & eigene Zeit, wurde es verpasst im nächsten Slot wiedereinsteigen
-    - Nachrichtengenerierung    Erstellt die zu sendende Nachricht (ohne Sendezeit), errechnet Sendezeit aus der Slotzeit so dass Sendeeinheit rechtzeitig aktiviert wird
+    - Frames/Slots              Frame umfasst eine Sekunde, Slot 40ms, Slots & Frames nacheinander und nicht nebenläufig
+    - Sendekanal                ?????? IP Multicast
     - Station                   Besteht aus Sender- und Empfängereinheit, ist entweder Typ A oder B
                                 Jede Station sendet genau ein Mal pro Frame
                                 Jede Station hört (wenn in der richtigen Phase) alle Nachrichten ab
+        - Empfängereinheit          Bekommt Nachrichten, erkennt & behandelt Kollisionen
+        - Sendeeinheit              holt sich einen Slot im nächsten Frame, prüft Slotzeit & eigene Zeit, wurde es verpasst im nächsten Slot wiedereinsteigen
+            - Uhrensynchronisation      wertet Typ A Zeitstempel aus
+            - Slotreservierung          Kennt reservierte Slots, stellt random gewählten Slot zu jedem Zeitpunkt
+            - Nachrichtengenerierung    Erstellt die zu sendende Nachricht (ohne Sendezeit), errechnet Sendezeit aus der Slotzeit so dass Sendeeinheit rechtzeitig aktiviert wird
 
 Ablauf:
     - Nachrichtengenerierung    bekommt Input
@@ -52,10 +56,9 @@ Ablauf:
     - Sendeeinheit              Nachricht mit Sendezeit füllen und senden (Multicast an alle, auch sich selbst)
     - Empfängereinheit          Bekommt Nachrichten (Also alle gesendeten, da Multicast und eigene Nachricht)
                                 erkennt pro Slot ob Kollision entstand
-    ???Uhrensynchronisation???!!!
+    - Uhrensynchronisation      Wenn keine Kollision entstand, wertet die Komponente die aktuelle Zeit der Station mit der Zeit in der empfangen Nachricht aus und korrigiert
 
-    - Wird der Sendeslot verpasst, wird im aktuellen Frame für den nächsten Frame ein Slot gefordert
-    - Erst dann darf man wieder zu hören (also alle Multicast Nachrichten empfangen / lesen)
+    - Wird der Sendeslot verpasst / es entstand eine Kollision wird der aktuelle Frame zu Ende gehorcht und dann im näcshten Frame versucht wieder einzusteigen.
 
 Stationsphasen:
     - Wiedereinstieg
@@ -66,14 +69,10 @@ Stationsphasen:
         Ist der dann vorhanden wird gesendet, zugehört wird die ganze Zeit schon (Aber was macht man mit dem zugehörten?)
         Verpasst man den Slot irgendwie ist man wieder in der Wiedereinstieg-Phase
 
-How-To-Uhren-Synch für Typ A
+How-To-Uhren-Synch
     - Uhrensynchronisation bekommt von Nachrichten, aus den Typ A Nachrichten wird die Zeit entnommen
     - Daraus wird dann die Abweichung zur jetztigen Zeit errechnet
     - Ermittelt draus dann ein arithmetisches Mittel
     - Damit dann: Abweichung * -1 + arithmetisches Mittel
     - Ergebnis an die Type A Stationen zurück senden
     - Die ändern dann ihre innere Uhr dem empfangenen Ergebnis entsprechend (aktuelle Uhr + Ergebnis)
-
-How-To-Uhren-Synch für Typ B
-    - ???
-
