@@ -41,8 +41,8 @@ Komponenten:
                                 Jede Station sendet genau ein Mal pro Frame
                                 Jede Station hört (wenn in der richtigen Phase) alle Nachrichten ab
         - Empfängereinheit          Bekommt Nachrichten, erkennt & behandelt Kollisionen
-        - Sendeeinheit              holt sich einen Slot im nächsten Frame, prüft Slotzeit & eigene Zeit, wurde es verpasst im nächsten Slot wiedereinsteigen
             - Uhrensynchronisation      wertet Typ A Zeitstempel aus
+        - Sendeeinheit              holt sich einen Slot im nächsten Frame, prüft Slotzeit & eigene Zeit, wurde es verpasst im nächsten Slot wiedereinsteigen
             - Slotreservierung          Kennt reservierte Slots, stellt random gewählten Slot zu jedem Zeitpunkt
             - Nachrichtengenerierung    Erstellt die zu sendende Nachricht (ohne Sendezeit), errechnet Sendezeit aus der Slotzeit so dass Sendeeinheit rechtzeitig aktiviert wird
 
