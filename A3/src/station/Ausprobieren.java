@@ -1,11 +1,11 @@
-package main;
+package station;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.nio.charset.StandardCharsets;
 
-public class Main {
+public class Ausprobieren {
 
 	public static void main(String[] args) {
 		// join a Multicast group and send the group salutations
