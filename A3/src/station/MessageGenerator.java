@@ -1,5 +1,7 @@
 package station;
 
+import java.nio.charset.StandardCharsets;
+
 public class MessageGenerator {
 	
 	/*Nachrichtenaufbau:
@@ -10,7 +12,7 @@ public class MessageGenerator {
 	    - Byte 26-33    77394825    Zeit (gesendet) in ms seit 01.01.1970, 8-Byte Integer, Big Endian
 	*/
 	public static String convertMessageFromByte(byte[] messageInByte){
-		return "";
+		return new String(messageInByte, StandardCharsets.UTF_8);
 	}
 	
 	public static byte[] convertMessageToByte(String message){

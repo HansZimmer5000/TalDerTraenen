@@ -4,10 +4,21 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+
+import station.MessageGenerator;
 
 public class Ausprobieren {
 
-	public static void main(String[] args) {
+	public static void main(String[] args){
+		String testString = "A-team-4711-4";
+		
+		System.out.println(testString);
+		System.out.println(Arrays.toString(testString.getBytes()));
+		System.out.println(new String(testString.getBytes(), StandardCharsets.UTF_8));
+	}
+	
+	public static void oldmain(String[] args) {
 		// join a Multicast group and send the group salutations
 		try {
 			String msg = "Hello";
