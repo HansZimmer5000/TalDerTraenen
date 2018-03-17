@@ -1,12 +1,17 @@
 Fragen:
     - Wie genau ist der "nach Slot 2 oder nach Slot 24" Hinweis zu verstehen?
-    - Wie ist der genau Ablauf?
-    - Was sind die Phasen?
-    - Wenn es 2 Phasen gibt (man konnte Senden / man konnte nicht erfolgreich Senden), hört man in beiden Phasen alle Multicast Nachrichten ab?
     - (Folie 38) was heißt "jeder ist Koordinator"?
-    - Müssen wir den Kommunikations Kanal selbst bauen?
+    - Ist es richtig, dass ein richtiger Slot/Frame mit richtiger Uhr zwar errechnet aber nie vorgegeben wird? Also man kann den Zeitpunkt von Slot X in Frame Y errechnen, aber es gibt niemanden der die Slot/Frame Objekte "vergibt"/"vorgibt".
 
 Antworten:
+    - Wenn es 2 Phasen gibt (man konnte Senden / man konnte nicht erfolgreich Senden), hört man in beiden Phasen alle Multicast Nachrichten ab?
+        Ja, da man stets die Uhr (anhand von Typ A Nachrichten) synchronisieren muss
+    - Was sind die Phasen?
+        2: Einstieg & Senden
+    - Wie ist der genau Ablauf?
+        Siehe Sequenzdiagram
+    - Müssen wir den Kommunikations Kanal selbst bauen?
+        Nein, UDP Multicast
     - Wann / wie / wo werden die Zeitstempel aus den Nachrichten geholt?
         Da jede Station stets alle Nachrichten per IP Multicast empfängt, liest es einfach die empfangenen Nachrichten aus
     - Wann / wie / wo werden die Uhren synchronisiert?
@@ -35,7 +40,6 @@ Nachrichtenaufbau:
     - Byte 26-33    77394825    Zeit (gesendet) in ms seit 01.01.1970, 8-Byte Integer, Big Endian
 
 Komponenten:
-    - Frames/Slots              Frame umfasst eine Sekunde, Slot 40ms, Slots & Frames nacheinander und nicht nebenläufig
     - Sendekanal                ?????? IP Multicast mit Adresse 225.10.1.2 mit Port 15000 + Teamnummer
     - Station                   Besteht aus Sender- und Empfängereinheit, ist entweder Typ A oder B
                                 Jede Station sendet genau ein Mal pro Frame
