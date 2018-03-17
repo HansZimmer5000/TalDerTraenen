@@ -51,27 +51,40 @@ Komponenten:
         - Nachrichtengenerierung    Erstellt die zu sendende Nachricht (ohne Sendezeit), errechnet Sendezeit aus der Slotzeit so dass Sendeeinheit rechtzeitig aktiviert wird
 
 Ablauf:
-    - Nachrichtengenerierung    bekommt Input
-                                fordert Sendeeinheit auf Slot zu holen
-    - Sendeeinheit              holt Slot
-    - Slotreservierung          bestimmt random Slot im nächsten Frame
-    - Nachrichtengenerierung    mit Slot errechnen wann Nachricht weg muss
-                                Nachricht erstellen, weiter geben an Sendeeinheit
-    - Sendeeinheit              Nachricht mit Sendezeit füllen und senden (Multicast an alle, auch sich selbst)
-    - Empfängereinheit          Bekommt Nachrichten (Also alle gesendeten, da Multicast und eigene Nachricht)
-                                erkennt pro Slot ob Kollision entstand
-    - Uhrensynchronisation      Wenn keine Kollision entstand, wertet die Komponente die aktuelle Zeit der Station mit der Zeit in der empfangen Nachricht aus und korrigiert
+    - Core              Startet Ausführung mit gewisser Verzögerung / Fehlstellung der eigenen Uhr.
+                        Fordert Receiver auf einen ganzen Frame lang auf den UDP Multicast zu hören.
+    - Receiver          Empfang die Nachrichten vom Kanal und sendet am Ende jeden Slots die empfangenen Nachrichten an den Core
+    - Core              Die Empfangen Nachrichten werden zu String konvertiert 
+    - MessageGenerator  Bekommt Nachricht und konvertiert zu String, dass wird dann zurückgegeben
+    - Core              Prüft auf Kollision
+                        Die nicht-Kollision betroffenen Nachrichten werden zur Synchronization der eigenen Uhr verwendet
+    - Synchronization   Bekommt alle Nachrichten, betrachtet jedoch nur (nicht eigene) Typ A Nachrichten, errechnet einen durchschnittlichen Offset und gibt ihn zurück.
+    - Core              Stellt eigene Uhr anhand Offset neu.
+                        Gibt alle Nachrichten weiter an SlotFinder
+    - SlotFinder        Anhand der Nachrichten sucht es random einen freien Slot im nächsten Frame und gibt die Slotnummer zurück
+    - Core              Gibt Slotnummer und Stationstyp weiter an MessageGenerator
+    - MessageGenerator  Erstellt eine Nachricht mit Slotnummer und Stationstyp, darüberhinaus noch Teamname und Nutzdaten
+    - Core              Erstellte Nachricht wird mit Slotnummer weiter an Sender gegeben.
+    - Sender            Rechnet anhand der Slotnummer aus wann die Nachricht gesendet werden muss.
+                        Wartet bis zu dem Zeitpunkt.
+                        Fügt dann die aktuelle Zeit in die  Nachricht hinten ein und schickt sie an MessageGenerator
+    - MessageGenerator  Bekommene Nachricht wird zu Bytes umgewandelt und zurückgegeben
+    - Sender            Schickt die Nachricht an alle per UDP Multicast.
+
 
     - Wird der Sendeslot verpasst / es entstand eine Kollision wird der aktuelle Frame zu Ende gehorcht und dann im näcshten Frame versucht wieder einzusteigen.
 
 Stationsphasen:
     - Einstieg
-        Station fordert Slot im nächsten Frame
-        Ist der dann vorhanden wird dann gesendet und ab dem Vater-Frame auch wieder zugehört
-    - Zuhören
-        Station fordert Slot im nächsten Frame
-        Ist der dann vorhanden wird gesendet, zugehört wird die ganze Zeit schon, demenstprechend auch die Uhr synchronisiert
-        Verpasst man den Slot / entstand Kollision ist man wieder in der Einstieg-Phase
+        Station lauscht auf alle Nachrichten einen ganzen Frame.
+        Und anhand derer wird ein zufälliger freier Slot für den nächsten Frame ausgewählt.
+        Anhand der Nachrichten wird auch die eigene Uhr gestellt.
+        Im nächsten Frame wird dann im ausgewählten Slot gesendet.
+    - Senden
+        Station lauscht auf alle Nachrichten.
+        Anhand der Nachrichten wird die eigene Uhr gestellt.
+        Im nächsten Frame wird dann im ausgewählten Slot gesendet.
+        Verpasst man den Slot / entstand Kollision mit der eigenen Nachricht ist man wieder in der Einstieg-Phase
 
 How-To-Uhren-Synch
     - Uhrensynchronisation bekommt von Nachrichten, aus den Typ A Nachrichten wird die Zeit entnommen
