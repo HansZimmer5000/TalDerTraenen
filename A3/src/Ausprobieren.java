@@ -1,13 +1,10 @@
 
 
-import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
-import station.MessageGenerator;
 
 public class Ausprobieren {
 
@@ -15,11 +12,7 @@ public class Ausprobieren {
 		String testString1 = "A-team-4711-477394825";
 		String testString2 = "A-team-4711-1277394825";
 		
-		byte a = (byte) (4 & 0xFF);
-		byte b = (byte) (25 & 0xFF);
-		byte[] bytes = new byte[]{b};
-		
-
+		System.out.println(testString2.substring(3,4));
 	}
 	
 	public static void oldmain(String[] args) {
