@@ -1,4 +1,4 @@
-package test;
+package station;
 
 import static org.junit.Assert.*;
 
@@ -11,7 +11,7 @@ import station.MessageGenerator;
 public class MessageGeneratorTests {
 
 	@Test
-	public void test_convertMessageFromByte() {
+	public void test_convertMessageFromByte_1() {
 		String isResult;
 		String shouldResult;
 		byte[] messageInByte;
@@ -23,7 +23,7 @@ public class MessageGeneratorTests {
 	}
 	
 	@Test
-	public void test_convertMessageToByte() {
+	public void test_convertMessageToByte_1() {
 		byte[] isResult;
 		byte[] shouldResult;
 		String message;
@@ -35,7 +35,7 @@ public class MessageGeneratorTests {
 	}
 	
 	@Test
-	public void test_createMessage() {
+	public void test_createMessage_1() {
 		String isResult;
 		String shouldResult;
 		

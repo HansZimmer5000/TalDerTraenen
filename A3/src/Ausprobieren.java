@@ -11,11 +11,16 @@ import station.MessageGenerator;
 public class Ausprobieren {
 
 	public static void main(String[] args){
-		String testString = "A-team-4711-4";
+		String testString1 = "A-team-4711-477394825";
+		String testString2 = "A-team-4711-1277394825";
 		
-		System.out.println(testString);
-		System.out.println(Arrays.toString(testString.getBytes()));
-		System.out.println(new String(testString.getBytes(), StandardCharsets.UTF_8));
+		int i = testString2.getBytes()[0];
+		int j = testString1.getBytes()[0];
+		System.out.println(i);
+		System.out.println(j);	
+		
+		System.out.println(Arrays.toString(testString2.getBytes()));
+		System.out.println(Arrays.toString(testString1.getBytes()));
 	}
 	
 	public static void oldmain(String[] args) {
