@@ -1,5 +1,6 @@
 
 
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -14,13 +15,11 @@ public class Ausprobieren {
 		String testString1 = "A-team-4711-477394825";
 		String testString2 = "A-team-4711-1277394825";
 		
-		int i = testString2.getBytes()[0];
-		int j = testString1.getBytes()[0];
-		System.out.println(i);
-		System.out.println(j);	
+		byte a = (byte) (4 & 0xFF);
+		byte b = (byte) (25 & 0xFF);
+		byte[] bytes = new byte[]{b};
 		
-		System.out.println(Arrays.toString(testString2.getBytes()));
-		System.out.println(Arrays.toString(testString1.getBytes()));
+
 	}
 	
 	public static void oldmain(String[] args) {
