@@ -2,6 +2,7 @@ Fragen:
     - Wie genau ist der "nach Slot 2 oder nach Slot 24" Hinweis zu verstehen?
     - Nachrichten haben 21-22 Letters(depends on slotnumber), aber 34 Byte?
     - (Folie 38) was heißt "jeder ist Koordinator"?
+    - Ist der Unterschied zwischen Typ A und B Stationen nur der, dass man B-Uhren (da nie zur synchronisation verwendet) nie teilt?
     - Ist es richtig, dass ein richtiger Slot/Frame mit richtiger Uhr zwar errechnet aber nie vorgegeben wird? Also man kann den Zeitpunkt von Slot X in Frame Y errechnen, aber es gibt niemanden der die Slot/Frame Objekte "vergibt"/"vorgibt".
 
 Antworten:
