@@ -18,7 +18,7 @@ public class MessageHelperTests {
 		
 		message = "A-team-4711-477394825";
 		expectedResult = 4;
-		isResult = MessageHelper.getSlotNumberFromMessage(message);
+		isResult = MessageHelper.getSlotNumber(message);
 		assertEquals(expectedResult, isResult);		
 	}
 	
@@ -30,7 +30,7 @@ public class MessageHelperTests {
 		
 		message = "A-team-4711-2577394825";
 		expectedResult = 25;
-		isResult = MessageHelper.getSlotNumberFromMessage(message);
+		isResult = MessageHelper.getSlotNumber(message);
 		assertEquals(expectedResult, isResult);		
 	}
 	

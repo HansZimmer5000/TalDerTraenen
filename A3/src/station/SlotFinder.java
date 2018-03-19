@@ -17,10 +17,10 @@ public class SlotFinder {
 		for(int index = 0; index < messages.size(); index++) {
 			currentMessage = messages.get(index);
 			if(messageIsFromStation(currentMessage, stationName)){
-				currentSlotNumber = MessageHelper.getSlotNumberFromMessage(currentMessage);
+				currentSlotNumber = MessageHelper.getSlotNumber(currentMessage);
 				return currentSlotNumber;
 			} else {
-				currentSlotNumber = MessageHelper.getSlotNumberFromMessage(currentMessage);
+				currentSlotNumber = MessageHelper.getSlotNumber(currentMessage);
 				usedSlotNumbers.add(currentSlotNumber);
 			}
 		}

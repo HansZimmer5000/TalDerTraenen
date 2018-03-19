@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 
 public class MessageHelper {
 	
-	public static int getSlotNumberFromMessage(String message) {
+	public static int getSlotNumber(String message) {
 		//Beispiel: "A-team-4711-477394825"
 		final int sendTimeLength = 8;
 		final int maxSlotNumberLength = 2;
@@ -21,6 +21,10 @@ public class MessageHelper {
 		}
 		
 		return Integer.valueOf(slotNumberAsString);
+	}
+	
+	public static String getStationTypeF(String message){
+		return message.substring(0, 1);
 	}
 	
 	/*Nachrichtenaufbau:
