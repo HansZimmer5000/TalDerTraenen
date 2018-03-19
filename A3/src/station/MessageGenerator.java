@@ -16,9 +16,9 @@ public class MessageGenerator {
 	}
 	
 	public static byte[] convertMessageToByte(String message){
-		//TODO Nachricht hat 21-22 Letters, das sollen dann wie 34 Byte werden?
 		return message.getBytes();
 		/*
+		//TODO Nachricht hat 21-22 Letters, das sollen dann wie 34 Byte werden?
 		byte[] stationTypeAndTeamName, slotNumber, sendTime;
 		int messageLength;
 		
