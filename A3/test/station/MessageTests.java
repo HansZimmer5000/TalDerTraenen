@@ -23,6 +23,26 @@ public class MessageTests {
 			fail(e.getMessage());
 		}
 	}
+	
+	@Test
+	public void test_createIncompleteMessage_2() {
+		
+		try {
+			Message.createIncompleteMessage("A", "-team-4711-123456789012", 4);
+		} catch (Exception e) {
+			assert(true);
+		}
+	}
+	
+	@Test
+	public void test_createIncompleteMessage_3() {
+		
+		try {
+			Message.createIncompleteMessage("A", "-team-4711-123456789dfdf012", 4);
+		} catch (Exception e) {
+			assert(true);
+		}
+	}
 
 	@Test
 	public void test_createMessageFromByte_1() {
