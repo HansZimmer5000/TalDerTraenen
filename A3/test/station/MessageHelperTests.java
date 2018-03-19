@@ -8,60 +8,84 @@ import org.junit.Test;
 
 import station.MessageHelper;
 
-public class MessageGeneratorTests {
+public class MessageHelperTests {
 
+	@Test
+	public void test_getSlotNumberFromMessage_1(){
+		int isResult;
+		int expectedResult;
+		String message;
+		
+		message = "A-team-4711-477394825";
+		expectedResult = 4;
+		isResult = MessageHelper.getSlotNumberFromMessage(message);
+		assertEquals(expectedResult, isResult);		
+	}
+	
+	@Test
+	public void test_getSlotNumberFromMessage_2(){
+		int isResult;
+		int expectedResult;
+		String message;
+		
+		message = "A-team-4711-2577394825";
+		expectedResult = 25;
+		isResult = MessageHelper.getSlotNumberFromMessage(message);
+		assertEquals(expectedResult, isResult);		
+	}
+	
 	@Test
 	public void test_convertMessageFromByte_1() {
 		String isResult;
-		String shouldResult;
+		String expectedResult;
 		byte[] messageInByte;
 		
-		shouldResult = "A-team-4711-477394825";
+		expectedResult = "A-team-4711-477394825";
 		messageInByte = new byte[] {65, 
 									45, 116, 101, 97, 109, 45, 52, 55, 49, 49, 45, 
 									4,
 									55, 55, 51, 57, 52, 56, 50, 53};
 		isResult = MessageHelper.convertMessageFromByte(messageInByte);
-		assertEquals(shouldResult, isResult);
+		assertEquals(expectedResult, isResult);
 	}
 	
 	@Test
 	public void test_convertMessageFromByte_2() {
 		String isResult;
-		String shouldResult;
+		String expectedResult;
 		byte[] messageInByte;
 		
-		shouldResult = "A-team-4711-2577394825";
+		expectedResult = "A-team-4711-2577394825";
 		messageInByte = new byte[] {65, 
 									45, 116, 101, 97, 109, 45, 52, 55, 49, 49, 45, 
 									25,
 									55, 55, 51, 57, 52, 56, 50, 53};
 		isResult = MessageHelper.convertMessageFromByte(messageInByte);
-		assertEquals(shouldResult, isResult);
+		assertEquals(expectedResult, isResult);
 	}
 	
 	@Test
 	public void test_convertMessageToByte_1() {
 		byte[] isResult;
-		byte[] shouldResult;
+		byte[] expectedResult;
 		String message;
 		
 		message = "A-team-4711-477394825";
-		shouldResult = new byte[] {65, 
+		expectedResult = new byte[] {65, 
 									45, 116, 101, 97, 109, 45, 52, 55, 49, 49, 45, 
 									52,
 									55, 55, 51, 57, 52, 56, 50, 53};
 		isResult = MessageHelper.convertMessageToByte(message);
-		assertArrayEquals(shouldResult, isResult);
+		assertArrayEquals(expectedResult, isResult);
 	}
 	
 	@Test
 	public void test_createMessage_1() {
 		String isResult;
-		String shouldResult;
+		String expectedResult;
 		
-		shouldResult = "A-team-4711-4";
+		expectedResult = "A-team-4711-4";
 		isResult = MessageHelper.createUncompleteMessage("A", "-team-4711-", 4);
-		assertEquals(shouldResult, isResult);
+		assertEquals(expectedResult, isResult);
 	}
 }
