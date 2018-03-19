@@ -10,38 +10,38 @@ public class SlotFinderTest {
 
 	@Test
 	public void test_findSlotInNextFrame_1() {
-		ArrayList<String> messages;
+		ArrayList<Message> messages;
 		String teamName;
 		int isResult;
 		int shouldResult;
 		
 		teamName = "team-6000";
-		messages = new ArrayList<String>();
-		messages.add("A-team-4711-177394825");
-		messages.add("B-team-4711-277394825");
-		messages.add("A-team-4711-377394825");
-		messages.add("B-team-4711-477394825");
-		messages.add("A-team-4711-577394825");
-		messages.add("A-team-4711-677394825");
-		messages.add("A-team-4711-777394825");
-		messages.add("A-team-4711-877394825");
+		messages = new ArrayList<Message>();
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 1));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 2));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 3));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 4));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 5));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 6));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 7));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 8));
 		
-		messages.add("A-team-4711-1077394825");
-		messages.add("A-team-4711-1177394825");
-		messages.add("A-team-4711-1277394825");
-		messages.add("A-team-4711-1377394825");
-		messages.add("A-team-4711-1477394825");
-		messages.add("A-team-4711-1577394825");
-		messages.add("A-team-4711-1677394825");
-		messages.add("A-team-4711-1777394825");
-		messages.add("A-team-4711-1877394825");
-		messages.add("A-team-4711-1977394825");
-		messages.add("A-team-4711-2077394825");
-		messages.add("A-team-4711-2177394825");
-		messages.add("A-team-4711-2277394825");
-		messages.add("A-team-4711-2377394825");
-		messages.add("A-team-4711-2477394825");
-		messages.add("A-team-4711-2577394825");
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 10));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 11));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 12));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 13));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 14));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 15));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 16));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 17));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 18));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 19));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 20));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 21));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 22));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 23));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 24));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 25));
 		shouldResult = 9;
 		isResult = SlotFinder.findSlotInNextFrame(messages, teamName);
 		
@@ -50,36 +50,38 @@ public class SlotFinderTest {
 
 	@Test
 	public void test_findSlotInNextFrame_2() {
-		ArrayList<String> messages;
+		ArrayList<Message> messages;
 		String teamName;
 		int isResult;
 		int shouldResult;
 		
 		teamName = "team-6000";
-		messages = new ArrayList<String>();
-		messages.add("A-team-4711-177394825");
-		messages.add("B-team-4711-277394825");
-		messages.add("A-team-4711-377394825");
-		messages.add("B-team-4711-477394825");
-		messages.add("A-team-4711-777394825");
-		messages.add("A-team-4711-877394825");
-		messages.add("A-team-4711-977394825");
-		messages.add("A-team-4711-1077394825");
-		messages.add("A-team-4711-1177394825");
-		messages.add("A-team-4711-1277394825");
-		messages.add("A-team-4711-1377394825");
-		messages.add("A-team-4711-1477394825");
-		messages.add("A-team-4711-1577394825");
-		messages.add("A-team-4711-1677394825");
-		messages.add("A-team-4711-1777394825");
-		messages.add("A-team-6000-1877394825");
-		messages.add("A-team-4711-1977394825");
-		messages.add("A-team-4711-2077394825");
-		messages.add("A-team-4711-2177394825");
-		messages.add("A-team-4711-2277394825");
-		messages.add("A-team-4711-2377394825");
-		messages.add("A-team-4711-2477394825");
-		messages.add("A-team-4711-2577394825");
+		messages = new ArrayList<Message>();
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 1));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 2));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 3));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 4));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 5));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 6));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 7));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 8));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 9));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 10));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 11));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 12));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 13));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 14));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 15));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 16));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 17));
+		messages.add(Message.createIncompleteMessage("A", "-team-6000123456789012-", 18));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 19));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 20));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 21));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 22));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 23));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 24));
+		messages.add(Message.createIncompleteMessage("A", "-team-4711123456789012-", 25));
 		shouldResult = 18;
 		isResult = SlotFinder.findSlotInNextFrame(messages, teamName);
 		

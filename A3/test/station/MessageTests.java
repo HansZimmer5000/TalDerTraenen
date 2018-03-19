@@ -6,19 +6,19 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import station.MessageHelper;
+import station.Message;
 
-public class MessageHelperTests {
+public class MessageTests {
 
 	@Test
 	public void test_getSlotNumberFromMessage_1(){
 		int isResult;
 		int expectedResult;
-		String message;
+		Message message;
 		
-		message = "A-team-4711-477394825";
+		message = Message.createIncompleteMessage("A","-team-4711-", 4);
 		expectedResult = 4;
-		isResult = MessageHelper.getSlotNumber(message);
+		isResult = message.getSlotNumber();
 		assertEquals(expectedResult, isResult);		
 	}
 	
@@ -26,41 +26,43 @@ public class MessageHelperTests {
 	public void test_getSlotNumberFromMessage_2(){
 		int isResult;
 		int expectedResult;
-		String message;
+		Message message;
 		
-		message = "A-team-4711-2577394825";
+		message = Message.createIncompleteMessage("A","-team-4711-", 25);
 		expectedResult = 25;
-		isResult = MessageHelper.getSlotNumber(message);
+		isResult = message.getSlotNumber();
 		assertEquals(expectedResult, isResult);		
 	}
 	
 	@Test
-	public void test_convertMessageFromByte_1() {
+	public void test_createMessageFromByte_1() {
 		String isResult;
 		String expectedResult;
 		byte[] messageInByte;
-		
-		expectedResult = "A-team-4711-477394825";
+
+		expectedResult = "A-team-4711-123456789012-477394825";
 		messageInByte = new byte[] {65, 
 									45, 116, 101, 97, 109, 45, 52, 55, 49, 49, 45, 
+									49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 45,
 									4,
 									55, 55, 51, 57, 52, 56, 50, 53};
-		isResult = MessageHelper.convertMessageFromByte(messageInByte);
+		isResult = Message.createMessageFromByte(messageInByte, 77394825).toString();
 		assertEquals(expectedResult, isResult);
 	}
 	
 	@Test
-	public void test_convertMessageFromByte_2() {
+	public void test_createMessageFromByte_2() {
 		String isResult;
 		String expectedResult;
 		byte[] messageInByte;
 		
-		expectedResult = "A-team-4711-2577394825";
+		expectedResult = "A-team-4711-123456789012-2577394825";
 		messageInByte = new byte[] {65, 
 									45, 116, 101, 97, 109, 45, 52, 55, 49, 49, 45, 
+									49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 45,
 									25,
 									55, 55, 51, 57, 52, 56, 50, 53};
-		isResult = MessageHelper.convertMessageFromByte(messageInByte);
+		isResult = Message.createMessageFromByte(messageInByte, 0).toString();
 		assertEquals(expectedResult, isResult);
 	}
 	
@@ -68,24 +70,24 @@ public class MessageHelperTests {
 	public void test_convertMessageToByte_1() {
 		byte[] isResult;
 		byte[] expectedResult;
-		String message;
+		Message message;
 		
-		message = "A-team-4711-477394825";
+		message = Message.createIncompleteMessage("A","-team-4711-",4);
 		expectedResult = new byte[] {65, 
 									45, 116, 101, 97, 109, 45, 52, 55, 49, 49, 45, 
-									52,
+									4,
 									55, 55, 51, 57, 52, 56, 50, 53};
-		isResult = MessageHelper.convertMessageToByte(message);
+		isResult = message.prepareForSending(77394825);
 		assertArrayEquals(expectedResult, isResult);
 	}
 	
 	@Test
-	public void test_createMessage_1() {
+	public void test_createIncompleteMessage_1() {
 		String isResult;
 		String expectedResult;
 		
 		expectedResult = "A-team-4711-4";
-		isResult = MessageHelper.createUncompleteMessage("A", "-team-4711-", 4);
+		isResult = Message.createIncompleteMessage("A", "-team-4711-", 4).toString();
 		assertEquals(expectedResult, isResult);
 	}
 }

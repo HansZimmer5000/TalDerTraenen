@@ -5,9 +5,9 @@ import java.util.Random;
 
 public class SlotFinder {
 	
-	public static int findSlotInNextFrame(ArrayList<String> messages, String stationName){
+	public static int findSlotInNextFrame(ArrayList<Message> messages, String stationName){
 		int currentSlotNumber;
-		String currentMessage;
+		Message currentMessage;
 		ArrayList<Integer> usedSlotNumbers;
 		ArrayList<Integer> freeSlotNumbers;
 		
@@ -17,10 +17,10 @@ public class SlotFinder {
 		for(int index = 0; index < messages.size(); index++) {
 			currentMessage = messages.get(index);
 			if(messageIsFromStation(currentMessage, stationName)){
-				currentSlotNumber = MessageHelper.getSlotNumber(currentMessage);
+				currentSlotNumber = currentMessage.getSlotNumber();
 				return currentSlotNumber;
 			} else {
-				currentSlotNumber = MessageHelper.getSlotNumber(currentMessage);
+				currentSlotNumber = currentMessage.getSlotNumber();
 				usedSlotNumbers.add(currentSlotNumber);
 			}
 		}
@@ -29,8 +29,8 @@ public class SlotFinder {
 		return selectRandomFreeSlotNumber(freeSlotNumbers);		
 	}
 	
-	private static boolean messageIsFromStation(String message, String stationName){
-		return message.contains(stationName);
+	private static boolean messageIsFromStation(Message message, String stationName){
+		return message.getStationName().contains(stationName);
 	}
 	
 	private static ArrayList<Integer> calculateFreeSlotNumbers(ArrayList<Integer> usedSlotNumbers){

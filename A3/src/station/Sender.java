@@ -13,10 +13,10 @@ public class Sender {
 	private static InetAddress group = null;
 	private static MulticastSocket socket = null;
 	
-	public static void send(String message){
+	public static void send(Message message, long sendTime){
 		byte[] messageAsByte;
 		
-		messageAsByte = MessageHelper.convertMessageToByte(message);
+		messageAsByte = message.prepareForSending(sendTime);
 		connect();
 		send(messageAsByte);
     }
