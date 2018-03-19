@@ -9,6 +9,10 @@ public class UTCClock {
 		this.offset = newOffset;
 	}
 	
+	public long getCurrentTime(){
+		return System.currentTimeMillis() + this.offset;
+	}
+	
 	public void adjust(Message message){	
 		String stationType;
 		long adjustment;
