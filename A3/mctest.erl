@@ -8,6 +8,7 @@
 -define(IP, {239,0,10,1}). %But should be 225.10.1.2
 -define(PORT, 6376). %But should be 15000 + teamNumber
 % The IP addresses 224.0.0.0 through 239.255.255.255 are multicast addresses.
+% Wohl die Sockets immer wieder schließen sonst wills nicht mehr?
 
 open(Addr,Port) ->
    {ok,S} = gen_udp:open(Port,[{reuseaddr,true}, {ip,Addr}, {multicast_ttl,1}, {multicast_loop,false}, binary]),
