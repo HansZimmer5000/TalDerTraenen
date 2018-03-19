@@ -24,7 +24,7 @@ Antworten:
     - Wie wird gesendet / empfangen?
         Die Stationen schicken per IP Multicast und empfangen auf dem selben Weg
     - Darf man Erlang oder muss JAVA?
-        JAVA
+        Erlang, muss!
     - Was ist der genaue Unterschied von Typ A und Typ B Stationen? Die Uhr Synchronisation?
         Typ B Stationen synchronisieren anhand von Typ A Stationen, Typ A Stationen haben eine genau Uhr und synchronisieren mit anderen Typ A stationen
 
