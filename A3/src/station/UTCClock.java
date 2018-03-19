@@ -17,9 +17,6 @@ public class UTCClock {
 		if(stationType == "A"){
 			adjustment = getAdjustment(message);
 			calculateNewOffset(adjustment);
-			
-			//TODO: Würden hier Zeit des Empfangs brauchen, dann wäre klar wie hoch der unterschied ist.
-			//Vom Empfang bis hier kann nämlich eine gewisse Zeit vergehen die das Ergebnsi verfälscht.
 		}
 	}
 	
