@@ -43,7 +43,7 @@ Nachrichtenaufbau:
     - Byte 26-33    77394825    Zeit (gesendet) in ms seit 01.01.1970, 8-Byte Integer, Big Endian
 
 Komponenten:
-    - Sendekanal                ?????? IP Multicast mit Adresse 225.10.1.2 mit Port 15000 + Teamnummer
+    - Sendekanal                IP Multicast (UDP) mit Adresse 225.10.1.2 mit Port 15000 + Teamnummer
     - Station                   Besteht aus Sender- und Empfängereinheit, ist entweder Typ A oder B
                                 Jede Station sendet genau ein Mal pro Frame
                                 Jede Station hört (wenn in der richtigen Phase) alle Nachrichten ab
