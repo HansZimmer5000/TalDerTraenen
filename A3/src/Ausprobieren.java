@@ -12,8 +12,7 @@ public class Ausprobieren {
 		String testString1 = "A-team-4711-477394825";
 		String testString2 = "A-team-4711-1277394825";
 		
-		HelloRunnable1.main();
-		HelloRunnable2.main();
+		System.out.println(System.currentTimeMillis());
 	}
 	
 	public static void oldmain(String[] args) {
@@ -59,71 +58,6 @@ public class Ausprobieren {
 		}
 			
 	}
-	
-	public static class HelloRunnable1 implements Runnable {
 
-	    public void run() {
-	    	InetAddress group = null;
-	    	MulticastSocket socket = null;
-			String msg = "Hello";
-			String ip = "225.10.1.2";
-			int port = 6789; //Should be but is not working: 15001
-	    	try {
-	    		if(socket == null){					
-					group = InetAddress.getByName(ip);
-					socket = new MulticastSocket(port);
-					socket.joinGroup(group);
-	    		}
-				
-				DatagramPacket hi = new DatagramPacket(msg.getBytes(), msg.length(), group, 6789);
-				socket.send(hi);
-	    	} catch(Exception e){
-	    		e.printStackTrace();
-	    	}
-	    	try {
-				Thread.sleep(20);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-	    	run();
-	    }
-
-	    public static void main() {
-	        (new Thread(new HelloRunnable1())).start();
-	    }
-
-	}
-	
-	public static class HelloRunnable2 implements Runnable {
-
-	    public void run() {
-	    	InetAddress group;
-	    	MulticastSocket socket = null;
-			String msg = "Hello";
-			String ip = "225.10.1.2";
-			int port = 6789; //Should be but is not working: 15001
-	    	try {
-	    		if(socket == null){					
-					group = InetAddress.getByName(ip);
-					socket = new MulticastSocket(port);
-					socket.joinGroup(group);
-	    		}
-				
-				// get their responses!
-				byte[] buf = new byte[1000];
-				DatagramPacket recv = new DatagramPacket(buf, buf.length);
-				socket.receive(recv);
-				System.out.println(new String(recv.getData(), StandardCharsets.UTF_8));
-	    	} catch(Exception e){
-	    		e.printStackTrace();
-	    	}
-	    	run();
-	    }
-
-	    public static void main() {
-	        (new Thread(new HelloRunnable2())).start();
-	    }
-
-	}
 
 }

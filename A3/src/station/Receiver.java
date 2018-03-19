@@ -18,16 +18,18 @@ public class Receiver {
 	public static ArrayList<byte[]> listenToFrame(){
 		ArrayList<byte[]> messages;
 		byte[] currentMessage;
+		long endTime;
 		
 		messages = new ArrayList<byte[]>();
+		endTime = System.currentTimeMillis() + 1000;
 		
 		connect();
 		
-		currentMessage = receiveMessage(socket);
-		messages.add(currentMessage);
-		// TODO 1 Sekunde (Slot) zu hören & Nachrichten abfangen. Und wie zurückgeben?
-		// TODO: irgendwie mit aktueller Zeit und dann while(AktuelleZeit <= StartZeit+1000ms)?
-		
+		while(System.currentTimeMillis() <= endTime){
+			currentMessage = receiveMessage(socket);
+			messages.add(currentMessage);
+		}
+			
 		return messages;
 	}
 	
