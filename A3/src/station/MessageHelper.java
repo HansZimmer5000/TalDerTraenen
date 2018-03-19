@@ -2,7 +2,26 @@ package station;
 
 import java.nio.charset.StandardCharsets;
 
-public class MessageGenerator {
+public class MessageHelper {
+	
+	public static int getSlotNumberFromMessage(String message) {
+		//Beispiel: "A-team-4711-477394825"
+		final int sendTimeLength = 8;
+		final int maxSlotNumberLength = 2;
+		int totalLength;
+		String slotNumberAsString;
+		
+		totalLength = message.length();
+		slotNumberAsString = message.substring(totalLength - (sendTimeLength + maxSlotNumberLength));
+		
+		if(slotNumberAsString.indexOf("-") >= 0){
+			slotNumberAsString = slotNumberAsString.substring(1, 2);
+		} else {
+			slotNumberAsString = slotNumberAsString.substring(0, 2);
+		}
+		
+		return Integer.valueOf(slotNumberAsString);
+	}
 	
 	/*Nachrichtenaufbau:
 	    Gesamt 34 Byte
@@ -56,7 +75,7 @@ public class MessageGenerator {
 		return result;
 	}
 	
-	public static String createMessage(String stationType, String teamname, int slotNumber){
+	public static String createUncompleteMessage(String stationType, String teamname, int slotNumber){
 		return stationType + teamname + String.valueOf(slotNumber);
 	}
 }

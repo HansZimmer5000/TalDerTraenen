@@ -17,10 +17,10 @@ public class SlotFinder {
 		for(int index = 0; index < messages.size(); index++) {
 			currentMessage = messages.get(index);
 			if(messageIsFromStation(currentMessage, stationName)){
-				currentSlotNumber = getSlotNumberFromMessage(currentMessage);
+				currentSlotNumber = MessageHelper.getSlotNumberFromMessage(currentMessage);
 				return currentSlotNumber;
 			} else {
-				currentSlotNumber = getSlotNumberFromMessage(currentMessage);
+				currentSlotNumber = MessageHelper.getSlotNumberFromMessage(currentMessage);
 				usedSlotNumbers.add(currentSlotNumber);
 			}
 		}
@@ -31,25 +31,6 @@ public class SlotFinder {
 	
 	private static boolean messageIsFromStation(String message, String stationName){
 		return message.contains(stationName);
-	}
-	
-	private static int getSlotNumberFromMessage(String message) {
-		//Beispiel: "A-team-4711-477394825"
-		final int sendTimeLength = 8;
-		final int maxSlotNumberLength = 2;
-		int totalLength;
-		String slotNumberAsString;
-		
-		totalLength = message.length();
-		slotNumberAsString = message.substring(totalLength - (sendTimeLength + maxSlotNumberLength));
-		
-		if(slotNumberAsString.indexOf("-") >= 0){
-			slotNumberAsString = slotNumberAsString.substring(1, 2);
-		} else {
-			slotNumberAsString = slotNumberAsString.substring(0, 2);
-		}
-		
-		return Integer.valueOf(slotNumberAsString);
 	}
 	
 	private static ArrayList<Integer> calculateFreeSlotNumbers(ArrayList<Integer> usedSlotNumbers){

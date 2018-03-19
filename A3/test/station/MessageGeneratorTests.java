@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import station.MessageGenerator;
+import station.MessageHelper;
 
 public class MessageGeneratorTests {
 
@@ -21,7 +21,7 @@ public class MessageGeneratorTests {
 									45, 116, 101, 97, 109, 45, 52, 55, 49, 49, 45, 
 									4,
 									55, 55, 51, 57, 52, 56, 50, 53};
-		isResult = MessageGenerator.convertMessageFromByte(messageInByte);
+		isResult = MessageHelper.convertMessageFromByte(messageInByte);
 		assertEquals(shouldResult, isResult);
 	}
 	
@@ -36,7 +36,7 @@ public class MessageGeneratorTests {
 									45, 116, 101, 97, 109, 45, 52, 55, 49, 49, 45, 
 									25,
 									55, 55, 51, 57, 52, 56, 50, 53};
-		isResult = MessageGenerator.convertMessageFromByte(messageInByte);
+		isResult = MessageHelper.convertMessageFromByte(messageInByte);
 		assertEquals(shouldResult, isResult);
 	}
 	
@@ -51,7 +51,7 @@ public class MessageGeneratorTests {
 									45, 116, 101, 97, 109, 45, 52, 55, 49, 49, 45, 
 									52,
 									55, 55, 51, 57, 52, 56, 50, 53};
-		isResult = MessageGenerator.convertMessageToByte(message);
+		isResult = MessageHelper.convertMessageToByte(message);
 		assertArrayEquals(shouldResult, isResult);
 	}
 	
@@ -61,7 +61,7 @@ public class MessageGeneratorTests {
 		String shouldResult;
 		
 		shouldResult = "A-team-4711-4";
-		isResult = MessageGenerator.createMessage("A", "-team-4711-", 4);
+		isResult = MessageHelper.createUncompleteMessage("A", "-team-4711-", 4);
 		assertEquals(shouldResult, isResult);
 	}
 }
