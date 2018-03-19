@@ -1,35 +1,46 @@
 package station;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class Receiver {
 
+	private static final String IP = "225.10.1.2";
+	private static final int PORT = 6789;//Should be but is not working: 15001
+	private static InetAddress group = null;
+	private static MulticastSocket socket = null;
+	
 	public static ArrayList<byte[]> listenToFrame(){
 		ArrayList<byte[]> messages;
-		String ip;
-		int port; 
-		InetAddress group;
-		MulticastSocket socket;
+		byte[] currentMessage;
 		
 		messages = new ArrayList<byte[]>();
-		ip = "225.10.1.2";
-		port = 6789; //Should be 15001 but is not working.
 		
-		try {
-			group = InetAddress.getByName(ip);
-			socket = new MulticastSocket(port);
-			socket.joinGroup(group);
-			
-			// 1 Sekunde (Slot) zu hören & Nachrichten abfangen. Und wie zurückgeben?
-		} catch(Exception e){
-			e.printStackTrace();
-		}
+		connect();
+		currentMessage = receiveMessage(socket);
+		messages.add(currentMessage);
+		// TODO 1 Sekunde (Slot) zu hören & Nachrichten abfangen. Und wie zurückgeben?
 		
 		return messages;
+	}
+	
+	private static void connect(){
+		if(socket == null || group == null){					
+			try {
+				group = InetAddress.getByName(IP);
+			} catch (UnknownHostException e) {System.out.println("Couldn't get group from IP! (Sender)");}
+			try {
+				socket = new MulticastSocket(PORT);
+			} catch (IOException e) {System.out.println("Couldn't get Socket from PORT! (Sender)");}
+			try {
+				socket.joinGroup(group);
+			} catch (IOException e) {System.out.println("Couldn't join group! (Sender)");}
+		}
 	}
 	
 	public static byte[] receiveMessage(MulticastSocket socket){
