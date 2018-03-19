@@ -10,28 +10,15 @@ import station.Message;
 
 public class MessageTests {
 
-	@Test
-	public void test_getSlotNumberFromMessage_1(){
-		int isResult;
-		int expectedResult;
-		Message message;
-		
-		message = Message.createIncompleteMessage("A","-team-4711-", 4);
-		expectedResult = 4;
-		isResult = message.getSlotNumber();
-		assertEquals(expectedResult, isResult);		
-	}
 	
 	@Test
-	public void test_getSlotNumberFromMessage_2(){
-		int isResult;
-		int expectedResult;
-		Message message;
+	public void test_createIncompleteMessage_1() {
+		String isResult;
+		String expectedResult;
 		
-		message = Message.createIncompleteMessage("A","-team-4711-", 25);
-		expectedResult = 25;
-		isResult = message.getSlotNumber();
-		assertEquals(expectedResult, isResult);		
+		expectedResult = "A-team-4711-4";
+		isResult = Message.createIncompleteMessage("A", "-team-4711-", 4).toString();
+		assertEquals(expectedResult, isResult);
 	}
 	
 	@Test
@@ -66,8 +53,59 @@ public class MessageTests {
 		assertEquals(expectedResult, isResult);
 	}
 	
+	
 	@Test
-	public void test_convertMessageToByte_1() {
+	public void test_getStationType_1(){
+		fail("Not implemented yet");
+	}
+	
+	@Test
+	public void test_getStationName_1(){
+		fail("Not implemented yet");
+	}
+	
+	@Test
+	public void test_getSlotNumber_1(){
+		int isResult;
+		int expectedResult;
+		Message message;
+		
+		message = Message.createIncompleteMessage("A","-team-4711-", 4);
+		expectedResult = 4;
+		isResult = message.getSlotNumber();
+		assertEquals(expectedResult, isResult);		
+	}
+	
+	@Test
+	public void test_getSlotNumber_2(){
+		int isResult;
+		int expectedResult;
+		Message message;
+		
+		message = Message.createIncompleteMessage("A","-team-4711-", 25);
+		expectedResult = 25;
+		isResult = message.getSlotNumber();
+		assertEquals(expectedResult, isResult);		
+	}
+	
+	
+	@Test
+	public void test_getReceivedTime_1(){
+		fail("Not implemented yet");
+	}
+	
+	@Test
+	public void test_getSendTime_1(){
+		fail("Not implemented yet");
+	}
+	
+	@Test
+	public void test_setSendtime_1(){
+		fail("Not implemented yet");
+	}
+	
+	@Test
+	public void test_prepareForSending_1() {
 		byte[] isResult;
 		byte[] expectedResult;
 		Message message;
@@ -82,12 +120,17 @@ public class MessageTests {
 	}
 	
 	@Test
-	public void test_createIncompleteMessage_1() {
-		String isResult;
-		String expectedResult;
-		
-		expectedResult = "A-team-4711-4";
-		isResult = Message.createIncompleteMessage("A", "-team-4711-", 4).toString();
-		assertEquals(expectedResult, isResult);
+	public void test_toString_1(){
+		fail("Not implemented yet");
+	}
+	
+	@Test
+	public void test_toByteArray_1(){
+		fail("Not implemented yet");
+	}
+	
+	@Test
+	public void test_unifyArrays_1(){
+		fail("Not implemented yet");
 	}
 }
