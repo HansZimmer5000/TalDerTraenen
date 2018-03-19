@@ -1,6 +1,5 @@
 package station;
 
-import java.util.ArrayList;
 
 public class UTCClock {
 
@@ -10,17 +9,42 @@ public class UTCClock {
 		this.offset = newOffset;
 	}
 	
-	public void adjust(ArrayList<Message> messages){
-		String currentStationType;
-		long currentAdjustment;
+	public void adjust(Message message){	
+		String stationType;
+		long adjustment;
 		
-		for (Message currentMessage : messages){
-			currentStationType = currentMessage.getStationType();
-			if(currentStationType == "A"){
-				//currentAdjustment = getAdjustment()
-				//TODO: Würden hier Zeit des Empfangs brauchen, dann wäre klar wie hoch der unterschied ist.
-				//Vom Empfang bis hier kann nämlich eine gewisse Zeit vergehen die das Ergebnsi verfälscht.
-			}
+		stationType = message.getStationType();
+		if(stationType == "A"){
+			adjustment = getAdjustment(message);
+			calculateNewOffset(adjustment);
+			
+			//TODO: Würden hier Zeit des Empfangs brauchen, dann wäre klar wie hoch der unterschied ist.
+			//Vom Empfang bis hier kann nämlich eine gewisse Zeit vergehen die das Ergebnsi verfälscht.
 		}
+	}
+	
+	private long getAdjustment(Message message){
+		long receivedTime;
+		long sendTime;
+		
+		try {
+			receivedTime = message.getReceivedTime();
+		} catch (Exception e) {
+			System.err.println("No ReceivedTime! (UTCClock)");
+			receivedTime = 0;
+		}
+		
+		try {
+			sendTime = message.getSendTime();
+		} catch (Exception e) {
+			System.err.println("No SendTime! (UTCClock)");
+			sendTime = 0;
+		}
+		
+		return receivedTime - sendTime;
+	}
+	
+	private void calculateNewOffset(long adjustment){
+		this.offset = this.offset + adjustment;
 	}
 }

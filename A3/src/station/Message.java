@@ -64,6 +64,24 @@ public class Message {
 		return this.slotNumber;
 	}
 	
+	public long getReceivedTime() throws Exception{
+		if(this.receivedTime == 0){
+			throw new Exception();
+		} else {
+			return this.receivedTime;
+		}
+	}
+	
+	public long getSendTime() throws Exception{
+		if(this.sendTime == 0){
+			throw new Exception();
+		} else {
+			return this.sendTime;
+		}
+	}
+	
+	
+	
 	private void setSendtime(long sendTime){
 		this.sendTime = sendTime;
 	}
@@ -119,5 +137,4 @@ public class Message {
 		
 		return result;
 	}
-
 }
