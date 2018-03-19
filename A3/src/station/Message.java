@@ -22,11 +22,18 @@ public class Message {
 	//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 	// CONSTRUCTOR
 	////////////////////////////////////////////
-	public static Message createIncompleteMessage(String stationType, String payload, int slotNumber){
+	public static Message createIncompleteMessage(String stationType, String payload, int slotNumber) throws Exception{
+		if((stationType.length() + payload.length() + 1) != 26){
+			throw new Exception("input is too short! (Message)");
+		}
 		return new Message(stationType, payload, slotNumber, 0, 0);
 	}
 	
-	public static Message createMessageFromByte(byte[] messageInByte, long newReceivedTime){
+	public static Message createMessageFromByte(byte[] messageInByte, long newReceivedTime) throws Exception{
+		if(messageInByte.length != 34){
+			throw new Exception("input is too short! (Message)");
+		}
+		
 		String receivedMessageAsString = new String(messageInByte, StandardCharsets.UTF_8);
 		String newStationType;
 		String newPayLoad;
