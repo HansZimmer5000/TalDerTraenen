@@ -22,9 +22,11 @@ public class Receiver {
 		messages = new ArrayList<byte[]>();
 		
 		connect();
+		
 		currentMessage = receiveMessage(socket);
 		messages.add(currentMessage);
 		// TODO 1 Sekunde (Slot) zu hören & Nachrichten abfangen. Und wie zurückgeben?
+		// TODO: irgendwie mit aktueller Zeit und dann while(AktuelleZeit <= StartZeit+1000ms)?
 		
 		return messages;
 	}
