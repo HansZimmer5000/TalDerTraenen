@@ -1,66 +1,72 @@
 -module(mctest).
 
--export([
-    start/0,
-    stop/1
-    ]).
+-export([start/0, client/1, open/2]).
 
--define(IP, {239,0,10,2}). %But should be 225.10.1.2
--define(PORT, 6376). %But should be 15000 + teamNumber
-% The IP addresses 224.0.0.0 through 239.255.255.255 are multicast addresses.
-% Wohl die Sockets immer wieder schließen sonst wills nicht mehr?
-
-%http://erlang.org/pipermail/erlang-questions/2014-May/079061.html
-%{ok, SockSrc} = gen_udp:open(Port, [{reuseaddr,true}, {ip, Src}, {multicast_ttl, 1}, {multicast_loop, false}, binary]),
-% inet:setopts(SockSrc, [{add_membership, {Mc, Src}}]);
-
-% OR
-
-%works in erl
-%Opts = [ { active, true },
-%           { ip, Src },
-%           { multicast_loop, true },
-%           { reuseaddr, true },
-%           list
-%         ],
-%  { ok, RecvSocket } = gen_udp:open (Port, Opts),
-%  inet:setopts(RecvSocket, [{ add_membership, { Mc, Src }}]),
-
-open(Addr,Port) ->
-    IP = {224,0,0,1},
-    Pt = 3333,
-    Opts = [    {active, true},
-                {reuseaddr, true}, 
-                %{ip, IP}, 
-                {multicast_ttl, 1}, 
-                {multicast_loop, false}, %false},
-                {multicast_if, IP}, 
-                inet,
-                binary
-            ],
-    {ok, S} = gen_udp:open(Pt, Opts),
-    inet:setopts(S, [{add_membership, {IP, {0, 0, 0, 0}}}]),
-    S.
-
-close(S) -> gen_udp:close(S).
+-define(IP, {225,0,10,1}).
+-define(PORT, 6300).
 
 start() ->
-   S = open(?IP, ?PORT),
-   Pid = spawn(fun() -> receiver() end),
-   gen_udp:controlling_process(S, Pid),
-   {S, Pid}.
+    %spawn(fun() -> server(0) end).
+    {ok, Socket} = open(?PORT, ?IP),
+    spawn(fun() -> server(Socket) end),
+    spawn(fun() -> client(Socket) end),
+    server(Socket).
 
-stop({S, Pid}) ->
-   close(S),
-   Pid ! stop.
 
-receiver() ->
-   receive
-       {udp, _Socket, IP, InPortNo, Packet} ->
-           io:format("~n~nFrom: ~p~nPort: ~p~nData: ~p~n", [IP, InPortNo, inet_dns:decode(Packet)]),
-           receiver();
-       stop -> true;
-       AnythingElse -> io:format("RECEIVED: ~p~n", [AnythingElse]),
-           receiver()
-   end. 
+open(Port, Ip) ->
+    gen_udp:open(
+        Port,
+        [
+            binary,
+            {multicast_if, Ip},
+            {add_membership, {Ip, {0,0,0,0}}},
+            %{broadcast, true},
+            {active, false}
+        ]
+    ).
 
+server(Socket) ->
+    %{ok, Socket} = open(?PORT + Offset, ?IP),
+    io:format("server opened socket:~p~n",[Socket]),
+    myreceive(Socket).
+
+myreceive(Socket) ->
+    inet:setopts(Socket, [{active, once}]),
+    receive
+        {udp, Socket, Host, Port, Bin} ->
+            io:format("server received:~p~n",[Bin]),
+            gen_udp:send(Socket, Host, Port, Bin),
+            myreceive(Socket)
+    end.
+
+% Client code
+client(Socket) ->
+    N = <<"hallo">>,
+    %{ok, Socket} = gen_udp:open(0, [binary]),
+    io:format("client opened socket=~p~n",[Socket]),
+    ok = gen_udp:send(Socket, ?IP, ?PORT, N),
+    Length = 1000,
+    {ok, {_Addr, _Port, Packet}} = gen_udp:recv(Socket, Length),
+    io:fwrite("client received:~p~n",[Packet]).
+    %gen_udp:close(Socket).
+
+
+
+
+
+
+
+loopalt(Socket) ->
+    inet:setopts(Socket, [{active, once}]),
+    receive
+        {udp, Socket, Host, Port, Bin} ->
+            io:format("server received:~p~n",[Bin]),
+            gen_udp:send(Socket, Host, Port, Bin),
+            loopalt(Socket)
+    end.
+
+myreceivealt(Socket) ->
+    Length = 1000,
+    {ok, {_Addr, _Port, Packet}} = gen_udp:recv(Socket, Length),
+    io:fwrite("server received:~p~n",[Packet]),
+    myreceivealt(Socket).

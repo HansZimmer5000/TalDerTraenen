@@ -58,10 +58,7 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __remove_all_unecessary_files([".log"])
-        __start_node("ns", "nameservice", "")
-        time.sleep(1)
-        __start_node("ko", "koordinator", "")
-        __start_node("man", "man", "")
+        __start_node("test", "mctest", "")
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     else:
