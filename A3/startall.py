@@ -54,7 +54,7 @@ if __name__ == "__main__":
             pointIndex = modulename.find(".")
             print("_________________________________________")
             __test_module(modulename[:pointIndex])
-        __remove_all_unecessary_files([".beam"])
+        __remove_all_unecessary_files([".beam", ".dump"])
     elif user_input == "2":
         __make_all_modules()
         __remove_all_unecessary_files([".log"])

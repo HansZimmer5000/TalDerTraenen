@@ -10,7 +10,7 @@ mysend() ->
     mysend(<<"hello">>).
 
 mysend(Message) ->
-    {ok, Socket} = open(),
+    Socket = open(),
 
     ok = gen_udp:send(Socket, {225,0,10,1}, 6001, Message),
     
