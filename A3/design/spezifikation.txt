@@ -5,6 +5,7 @@ Fragen:
     - Ist es richtig, dass ein richtiger Slot/Frame mit richtiger Uhr zwar errechnet aber nie vorgegeben wird? Also man kann den Zeitpunkt von Slot X in Frame Y errechnen, aber es gibt niemanden der die Slot/Frame Objekte "vergibt"/"vorgibt".
     - Wie zur hölle mache ich den blöden Broadcast in Erlang? (Bisheriger Versuch klappt nur für; n Sender zu 1 receiver).
     - Und wie schaffe ich dass dann alle Receiver alle Nachrichten bekommen?
+    - Vessel3 als Java version haben, und dann wie Zeug bekommen?
 
 Antworten:
     - Nachrichten haben 21-22 Letters(depends on slotnumber), aber 34 Byte?
