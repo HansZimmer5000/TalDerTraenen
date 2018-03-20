@@ -4,6 +4,9 @@
 
 start() ->
     spawn(  fun() -> 
-                receiver:myreceive()
+                receiver:myreceive(15000)
+            end),
+    spawn(  fun() -> 
+                receiver:myreceive(15000)
             end),
     sender:mysend().
