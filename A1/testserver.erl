@@ -5,18 +5,47 @@
 
 
 getmessages_abfertigen_1_test() ->
-    %TODO Gib Server Nachricht 1, und frage dann nach Nachricht, ergebnis sollte Nachricht 1 sein! Erst richtig machbar wenn HBQ/DLQ voll implementiert.
-    ServerPid = starte_server(),
-    fahre_server_vorzeitig_herunter(ServerPid),
-    io:fwrite("Warten auf HBQ/DLQ Implementation"),
-    ?assert(false).
+    ThisPid = self(),
+    ErinnerungsZeit = 2000,
+    CMEM = [ErinnerungsZeit, [{ThisPid, 1, erlang:timestamp()}]],
+    ServerPid = spawn(fun() -> 
+                            NeueCMEM = server:getmessages_abfertigen(ThisPid, CMEM, ThisPid),
+                            ThisPid ! NeueCMEM 
+                        end),
+    receive
+        Any1 ->
+            {ServerPid, {request, deliverMSG, 2, ThisPid}} = Any1,
+            ServerPid ! {reply, 2}
+        after 2000 -> ?assert(false)
+    end,
+    receive
+        Any2 -> 
+            [ErinnerungsZeit, [{ThisPid, 2, _TS}]] = Any2
+        after 2000 -> ?assert(false)
+    end,
+    fahre_server_vorzeitig_herunter(ServerPid).
+
 
 dropmessage_abfertigen_1_test() ->
-    %TODO Wie genau testen? Irgendwie an HbQ rankommen -> da rein schauen?
-    ServerPid = starte_server(),
-    fahre_server_vorzeitig_herunter(ServerPid),
-    io:fwrite("Warten auf HBQ/DLQ Implementation"),
-    ?assert(false).
+    ThisPid = self(),
+    TS = vsutil:now2string(erlang:timestamp()),
+    Text =  io_lib:format("~p, ~p, ~p, ~s", [hostname, gruppe2, team6, TS]),
+    TestNachricht = [1, Text, TS],
+    ServerPid = spawn(fun() -> 
+                            Result = server:dropmessage_abfertigen(ThisPid, TestNachricht),
+                            ThisPid ! Result
+                        end),
+    receive
+        Any1 -> 
+            {ServerPid, {request, pushHBQ, TestNachricht}} = Any1,
+            ServerPid ! {reply, ok}
+        after 2000 -> ?assert(false)
+    end,
+    receive
+        Any2 -> ?assertEqual(ok, Any2)
+        after 2000 -> ?assert(false)
+    end,
+    fahre_server_vorzeitig_herunter(ServerPid).
 
 getmsgid_abfertigen_1_test() ->
     AktuelleNNR = server:getmsgid_abfertigen(self(), 0),
@@ -27,23 +56,6 @@ getmsgid_abfertigen_1_test() ->
     AktuelleNNR = 1,
     Temp_Ergebnis.
 
-getmsgid_abfertigen_2_test() ->
-    ServerPid = starte_server(),
-    ServerPid ! {self(), getmsgid},
-    receive
-        {nid, 1} -> fahre_server_vorzeitig_herunter(ServerPid)
-        after 3 ->  io:fwrite("Nichts bekommen."),
-                    fahre_server_vorzeitig_herunter(ServerPid)
-    end.
-
-
-
-
-starte_server() ->    
-    io:fwrite("initHBQ in server:start verhindert testserver:start_server"),
-    ?assert(false),
-    ServerPid = server:start(),
-    ServerPid.
 
 fahre_server_vorzeitig_herunter(ServerPid) ->
     exit(ServerPid, 'test vorbei').

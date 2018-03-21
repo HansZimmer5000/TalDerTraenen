@@ -4,12 +4,12 @@
 % API
 -export([start/0,
 
-        getmessages_abfertigen/2,
+        getmessages_abfertigen/3,
         hole_naechste_nnr_fur_leser/2,
         update_gesendete_nnr_fur_leser/3,
-        sendeNNr/2,
+        sendeNNr/3,
 
-        dropmessage_abfertigen/1,
+        dropmessage_abfertigen/2,
 
         getmsgid_abfertigen/2
         ]).
@@ -50,11 +50,11 @@ receive_loop(CMEM, NextNNR) ->
     receive
         {AbsenderPid, getmessages} ->   logge_status("Got getmessages"),
                                         timer:cancel(ServerTimer),
-                                        NeueCMEM = getmessages_abfertigen(CMEM, AbsenderPid),
+                                        NeueCMEM = getmessages_abfertigen(?HBQ, CMEM, AbsenderPid),
                                         receive_loop(NeueCMEM, NextNNR);
         {dropmessage, Nachricht} ->     logge_status("Got dropmessage"),
                                         timer:cancel(ServerTimer),
-                                        dropmessage_abfertigen(Nachricht),
+                                        dropmessage_abfertigen(?HBQ, Nachricht),
                                         receive_loop(CMEM, NextNNR);
         {AbsenderPid, getmsgid} ->  logge_status("Got getmsgid"),
                                     timer:cancel(ServerTimer),
@@ -67,22 +67,22 @@ receive_loop(CMEM, NextNNR) ->
 %------------------------------------------------------------------------------------------------------
 %																	>>EIGENTLICHE FUNKTIONEN<<
 %------------------------------------------------------------------------------------------------------
-getmessages_abfertigen(CMEM, LeserPid) -> 
+getmessages_abfertigen(HBQPid, CMEM, LeserPid) -> 
     ZuSendendeNNr = hole_naechste_nnr_fur_leser(CMEM, LeserPid),
-    GesendeteNNr = sendeNNr(ZuSendendeNNr, LeserPid),
-    NaechsteNNr = GesendeteNNr + 1,
-    NeueCMEM = update_gesendete_nnr_fur_leser(CMEM, LeserPid, NaechsteNNr),
+    io:fwrite("~p", [ZuSendendeNNr]),
+    GesendeteNNr = sendeNNr(HBQPid, ZuSendendeNNr, LeserPid),
+    NeueCMEM = update_gesendete_nnr_fur_leser(CMEM, LeserPid, GesendeteNNr),
     NeueCMEM.
 
 hole_naechste_nnr_fur_leser(CMEM, LeserPid) ->
-    cmem:getClientNNr(CMEM, LeserPid).
+    cmem:getClientNNr(CMEM, LeserPid) + 1.
     
 update_gesendete_nnr_fur_leser(CMEM, LeserPid, LetzteGesendeteNNr) ->
     NeueCMEM = cmem:updateClient(CMEM, LeserPid, LetzteGesendeteNNr, ?CMEM_LOG_DATEI_NAME),
     NeueCMEM.
 
-sendeNNr(ZuSendendeNNr, LeserPid) ->
-    ?HBQ ! {self(), {request, deliverMSG, ZuSendendeNNr, LeserPid}},
+sendeNNr(HBQPid, ZuSendendeNNr, LeserPid) ->
+    HBQPid ! {self(), {request, deliverMSG, ZuSendendeNNr, LeserPid}},
     receive
         {reply, GesendeteNNr} -> GesendeteNNr
     end.
@@ -92,8 +92,8 @@ sendeNNr(ZuSendendeNNr, LeserPid) ->
     %LeserPid ! {reply, Nachricht, TerminatedFlag}.
 
 
-dropmessage_abfertigen(Nachricht) ->
-    ?HBQ ! {self(), {request, pushHBQ, Nachricht}},
+dropmessage_abfertigen(HBQPid, Nachricht) ->
+    HBQPid ! {self(), {request, pushHBQ, Nachricht}},
     receive
         {reply, ok} -> ok
     end.

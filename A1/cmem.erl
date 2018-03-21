@@ -10,6 +10,8 @@
     tSIstAbglaufen/2
 ]).
 
+-define(DEFAULT_NNR, 0).
+
 
 initCMEM(ErinnerungsZeit, LogDatei) ->
     CMEM = [ErinnerungsZeit, []],
@@ -39,7 +41,7 @@ getClientNNr([Zeit, TupelListe], ClientPid) ->
     NNr = getClientNNr_(TupelListe, Zeit, ClientPid),
     NNr.
 
-getClientNNr_([], _Zeit, _ClientPid) -> 1;
+getClientNNr_([], _Zeit, _ClientPid) -> ?DEFAULT_NNR;
 getClientNNr_([KopfTupel | RestTupel], Zeit, ClientPid) ->
     case KopfTupel of
         {ClientPid, NNr, OldTS} -> pruefeTSUndGibNNrZuruck(OldTS, Zeit, NNr);

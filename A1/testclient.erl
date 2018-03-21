@@ -18,6 +18,8 @@
 %        nachricht_zu_text/1,
 %        neue_nnr_einfuegen/2
 
+-define(CONFIG_FILENAME, "client.cfg").
+
 frage_nach_neuer_nnr_1_test() ->
     TestNNR = 1,
     ServerPid = spawn(fun() -> 
@@ -30,7 +32,10 @@ frage_nach_neuer_nnr_1_test() ->
 erstelle_nachricht_1_test() ->
     NNR = 1,
     TS = vsutil:now2string(erlang:timestamp()),
-    Text =  io_lib:format("hostname1, gruppe1, team1, ~s", [TS]),
+    Hostname = hole_wert_aus_config_mit_key(hostname),
+    Praktikumsgruppe = hole_wert_aus_config_mit_key(praktikumsgruppe),
+    Teamnummer = hole_wert_aus_config_mit_key(teamnummer),
+    Text =  io_lib:format("~p, ~p, ~p, ~s", [Hostname, Praktikumsgruppe, Teamnummer, TS]),
     TestNachricht = [NNR, Text, TS],
     ResultNachricht = client:erstelle_nachricht(NNR, TS),
     io:fwrite("\n"),
@@ -205,3 +210,12 @@ nachricht_zu_text_2_test() ->
                 vsutil:now2string(TS)
                 ],
     "1, Test, 15.01 21:11:55,874|" = client:nachricht_zu_text(Nachricht).
+
+
+
+
+
+hole_wert_aus_config_mit_key(Key) ->
+    {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
+    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
+    Value.

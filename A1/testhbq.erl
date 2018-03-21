@@ -31,10 +31,6 @@ init_hbq_handler_1_test() ->
         after ?MAX_DELAY -> ?assert(false)
     end.
 
-receive_loop_1_test() ->
-    io:fwrite("Not implemented yet"),
-    ?assert(false).
-
 push_hbq_handler_1_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht1 = [1, "Text", TS, TS, TS],

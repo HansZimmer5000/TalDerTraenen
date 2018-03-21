@@ -110,9 +110,9 @@ erstelle_nachricht(NNR, ErstellungsTS) ->
     Nachricht.
 
 erstelle_nachrichten_text(ErstellungsTS) -> 
-    Hostname = hostname1,
-    Praktikumsgruppe = gruppe1,
-    Teamnummer = team1,
+    Hostname = hole_wert_aus_config_mit_key(hostname),
+    Praktikumsgruppe = hole_wert_aus_config_mit_key(praktikumsgruppe),
+    Teamnummer = hole_wert_aus_config_mit_key(teamnummer),
     Nachricht = io_lib:format("~p, ~p, ~p, ~s", [Hostname, Praktikumsgruppe, Teamnummer, vsutil:now2string(ErstellungsTS)]),
     lists:flatten(Nachricht).
 
