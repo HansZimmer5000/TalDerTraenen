@@ -63,11 +63,11 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
-        __start_node("server", "server")
         __start_node("hbq", "hbq")
-        time.sleep(2)
+        time.sleep(1)
+        __start_node("server", "server")
+        time.sleep(1)
         __start_node("client", "client")
-        __remove_all_unecessary_files([".beam"])
     elif user_input == "3":
         __remove_all_unecessary_files([".beam", ".dump", ".log"])
     else:

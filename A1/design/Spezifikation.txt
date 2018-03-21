@@ -129,7 +129,7 @@ Ist das Limit einmal erreicht und es kommt eine neue Nachricht wird die älteste
 
 CMEM API:
 (Kein extra Prozess! Deswegen Funktionsorientiert)
-CMEM merkt sich jede Server - Client Verbindung und welche Nachricht der client zuletzt bekam.
+CMEM merkt sich jede Server - Client Verbindung und welche Nachricht der client !zuletzt! bekam.
 Meldet sich ein Client nicht mehr wird er gelöscht und wird beim nächsten Mal wie ein neuer Client behandelt.
 
     Name: Initialiseren der CMEM

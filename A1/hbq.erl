@@ -40,12 +40,14 @@ start() ->
 wait_for_init() ->
   receive
     {PID, {request, initHBQ}} ->
+      io:fwrite("got init request"),
       DLQ = dlq:initDLQ(?DLQLIMIT, ?DLQ_LOG_DATEI),
       init_hbq_handler(PID), 
       receive_loop([], DLQ)
   end.
 
 receive_loop(HoldbackQueue, DeliveryQueue) ->
+  io:fwrite("receive_loop"),
   receive
     {PID, {request, pushHBQ, MessageAsList}} ->
       {NewHBQ, NewDLQ} = push_hbq_handler(PID, MessageAsList, HoldbackQueue, DeliveryQueue),
