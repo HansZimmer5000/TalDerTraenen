@@ -31,6 +31,9 @@ go({GGTProName, ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
     InstanceVariables = {GGTProName, empty, empty},
     GlobalVariables = {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid},
 
+    io:fwrite("~p, ~p", [NsPid, KoPid]),
+
+
     GGTProPid = spawn(fun() -> init(InstanceVariables, GlobalVariables) end),
     true = register(GGTProName, GGTProPid),
     logge_status(GGTProName, lists:flatten(

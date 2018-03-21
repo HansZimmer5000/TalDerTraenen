@@ -10,7 +10,8 @@
     create_ggtproname/2
 ]).
 
--define(KOPID, {koordinator,'ko@HansZimmer-PC'}).
+-define(CONFIG_DATEI_NAME, "ggtprozess.cfg").
+-define(KOPID, hole_wert_aus_config_mit_key(kopid)).
 -define(DEFAULT_LOG_DATEI_NAME, "starter").
 
 start([ParameterFromPython]) ->
@@ -59,3 +60,9 @@ logge_status(StarterNummer, Inhalt) ->
     LogNachricht = io_lib:format("Starter~p ~p ~s.\n", [StarterNummer, AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(LOG_DATEI_NAME, LogNachricht).
+
+
+hole_wert_aus_config_mit_key(Key) ->
+    {ok, ConfigListe} = file:consult(?CONFIG_DATEI_NAME),
+    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
+    Value.

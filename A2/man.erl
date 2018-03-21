@@ -4,7 +4,8 @@
     start/0
 ]).
 
--define(KOPID, {koordinator, 'ko@HansZimmer-PC'}).
+-define(CONFIG_FILENAME, "ggtprozess.cfg").
+-define(KOPID, hole_wert_aus_config_mit_key(kopid)).
 
 start() ->
     {ok, [CommandStr]} = io:fread("Kommando eingeben>", "~s"),
@@ -33,3 +34,9 @@ start() ->
         _Any ->   io:fwrite("Kommando unbekannt.\n"),
                     start()
     end.
+
+
+hole_wert_aus_config_mit_key(Key) ->
+    {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
+    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
+    Value.
