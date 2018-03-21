@@ -1,11 +1,31 @@
 Offene Fragen:
+
+Beantwortete Fragen:
     Wie sieht die CMEM aus?
+        Sie ist eine Liste:
+            Index 0     Erinnerungszeit in Sekunden
+            Index 1     Liste mit Tupeln
+                        Tupeln bestehen aus:
+                            ClientprozessID
+                            Die zu letzte gesendete Nachrichtennummer (NNr)
+                            Zeitstempel als dieses Tupel zum letzten Mal geupdated wurde (sprich, die oben genannte NNr gesendet wurde)
     Wie sieht die DLQ aus?
+        Sie ist eine Liste:
+            Index 0     DLQ Groesse
+            Index 1     Liste mit den Nachrichten im bekannten Format
+                        Diese Liste ist absteigend sortiert. Anders gesagt, steht die höchste NNr ganz vorn.
     Wie sieht die HBQ aus?
+        Sie ist eine Liste von Nachrichten im bekannten Format.
     Wie sieht der Server aus?
+        Der Server hat die CMEM als Variable, die HBQ kennt er als ProzessID.
+        Die Nachrichtennummern (NNr) ist initial bei 1 und steigt dann um 1 bis ins (theoretisch) unendliche.
     Wie sieht der Client aus?
-    Wie sieht der Redakteur aus?
-    Wie sieht der Leser aus?
+        Der Client nacheinander Redakteur und Leser.
+        Initial ist er Redakteur.
+            Was dort passiert kann der Aufgabenstellung entnommen werden.
+            Nach 5 erstellten Nachrichten wechselt er zum Leser
+        Leser.
+            Was dort passiert kann der Aufgabenstellung entnommen werden.
 
 Sonstige Anforderung:
     HBQ, DLQ, CMEM vollständig in eigenen Dateien.
