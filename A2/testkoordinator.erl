@@ -52,8 +52,8 @@ start_1_test() ->
 start_2_test() ->
     ArbeitsZeit = 1,
     TermZeit = 5,
-    SollQuota = 20,
     GGTProAnz = 5,
+    SollQuota = round((GGTProAnz * 4 * 80) / 100),
     ThisPid = self(),
     TestKoPid = spawn(fun() -> 
                     koordinator:start(ThisPid)
