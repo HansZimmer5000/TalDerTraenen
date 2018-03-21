@@ -50,6 +50,7 @@ if __name__ == "__main__":
     
     if user_input == "0":
         __make_all_modules()
+        __remove_all_unecessary_files([".beam"])
     elif user_input == "1":
         __make_all_modules()
         __test_module("testallgemein")
@@ -67,5 +68,7 @@ if __name__ == "__main__":
         time.sleep(2)
         __start_node("client", "client")
         __remove_all_unecessary_files([".beam"])
+    elif user_input == "3":
+        __remove_all_unecessary_files([".beam", ".dump", ".log"])
     else:
         print("Argument: '" + user_input + "' unkonwn.")
