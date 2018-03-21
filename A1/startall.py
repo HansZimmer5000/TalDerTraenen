@@ -32,6 +32,14 @@ def __clear_all_log_files_in_current_dir():
     for log_filename in log_filenames:
         __clear_file(log_filename)
 
+# Deletes all files of the defined types in the current folder
+def __remove_all_unecessary_files(unecessary_file_types):
+    unecessary_files = []
+    for unecessary_file_type in unecessary_file_types:
+        unecessary_files = unecessary_files + glob.glob("*" + unecessary_file_type)
+    for unecessary_file in unecessary_files:
+        os.remove(unecessary_file)
+
 # According to given Input, either all Testfiles gonna be executed or 
 # the client, server and hbq erlang node + server will be started.
 if __name__ == "__main__":
@@ -50,6 +58,7 @@ if __name__ == "__main__":
         __test_module("testcmem")
         __test_module("testhbq")
         __test_module("testdlq")
+        __remove_all_unecessary_files([".beam"])
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
@@ -57,5 +66,6 @@ if __name__ == "__main__":
         __start_node("hbq", "hbq")
         time.sleep(2)
         __start_node("client", "client")
+        __remove_all_unecessary_files([".beam"])
     else:
         print("Argument: '" + user_input + "' unkonwn.")
