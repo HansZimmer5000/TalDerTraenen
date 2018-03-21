@@ -1,11 +1,13 @@
 -module(util).
 -compile(export_all).
--export([list2set/1,shuffle/1,list2string/1,slist_tointlist/1,writelist/2,readlist/1,
-         sortliste/1,resortliste/1,randomliste/1,randomliste/3,
-		 attachStamp/2,attachStamp/1,to_String/1,float_to_int/1,floor/1,even/1,odd/1,type_is/1,
-		 counting1/1,counting/2,countread/1,countreset/1,countstop/1,
-		 globalvar/1,setglobalvar/2,getglobalvar/1,globalvarreset/1,globalvarstop/1,
-		 logging/2,logstop/0,timeMilliSecond/0]).
+
+% Above says, export all.
+%-export([list2set/1,shuffle/1,list2string/1,slist_tointlist/1,writelist/2,readlist/1,
+%         sortliste/1,resortliste/1,randomliste/1,randomliste/3,
+%		 attachStamp/2,attachStamp/1,to_String/1,float_to_int/1,floor/1,even/1,odd/1,type_is/1,
+%		 counting1/1,counting/2,countread/1,countreset/1,countstop/1,
+%		 globalvar/1,setglobalvar/2,getglobalvar/1,globalvarreset/1,globalvarstop/1,
+%		 logging/2,logstop/0,timeMilliSecond/0]).
 
 -define(MILL, 1000000).
 -define(ZERO, integer_to_list(0)).
