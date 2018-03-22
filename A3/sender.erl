@@ -25,7 +25,7 @@ open() ->
     MultiAddr = {225,0,10,1},
     {ok, Socket} = gen_udp:open(PORT_NUM_TX_MULTI,
                 [
-                    binary, 
+                    list, 
                     {active, false},
                     {ip, GwIP},
                     %inet, 
