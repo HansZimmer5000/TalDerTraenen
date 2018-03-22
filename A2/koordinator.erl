@@ -34,6 +34,7 @@
 -define(CONFIG_DATEI_NAME, "koordinator.cfg").
 -define(LOG_DATEI_NAME, "koordinator.log").
 -define(NSPID, hole_wert_aus_config_mit_key(nspid)).
+-define(NSNODE, hole_wert_aus_config_mit_key(nsnode)).
 -define(KONAME, hole_wert_aus_config_mit_key(koname)).
 -define(STARTER_COUNT, hole_wert_aus_config_mit_key(startercount)).
 -define(ARBEITSZEIT, hole_wert_aus_config_mit_key(arbeitszeit)).
@@ -48,6 +49,8 @@ start() ->
 
 start(NsPid) ->
     logge_status("koordinator startet"), 
+
+    net_adm:ping(?NSNODE),
 
     SollGGTCount = ?GGTPROANZ * ?STARTER_COUNT,
     case SollGGTCount >= 3 of
