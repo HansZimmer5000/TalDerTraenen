@@ -2,10 +2,10 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-%    prepareForSending/2,
+%    prepareIncompleteMessageForSending/2,
 %    addSendTime/2,
 
-prepareForSending_1_test() -> 
+prepareIncompleteMessageForSending_1_test() -> 
     io:fwrite("Not implemented yet"),
     ?assert(false).
     

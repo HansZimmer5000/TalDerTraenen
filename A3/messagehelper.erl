@@ -2,8 +2,14 @@
 
 
 -export([
-    prepareForSending/2,
-    addSendTime/2
+    prepareIncompleteMessageForSending/2,
+    addSendTime/2,
+
+    getStationType/1,
+
+    getStationName/1,
+
+    getSlotNumber/1
 ]).
 
 -define(SLOTNUMBERPOS, 25).
@@ -16,13 +22,23 @@
 %    - Byte 25       4           reservierte Slotnummer für den nächsten Frame!
 %    - Byte 26-33    77394825    Zeit (gesendet) in ms seit 01.01.1970, 8-Byte Integer, Big Endian
 
+prepareIncompleteMessageForSending(IncompleteMessage, SendTime) ->
+    CompleteMessage = addSendTime(IncompleteMessage, SendTime),
+    CompleteMessage.
 
+addSendTime(IncompleteMessage, SendTime) ->
+    CompleteMessage = lists:concat([IncompleteMessage, SendTime]),
+    CompleteMessage.
 
-prepareForSending(Message, SendTime) ->
-    CompleteMessage = addSendTime(Message, SendTime),
-    CompleteMessageAsByte = convertMessageToByte(CompleteMessage),
-    CompleteMessageAsByte.
+getStationType(Message) ->
+    [FirstLetter | _Rest] = Message,
+    FirstLetter.
 
-addSendTime(Message, SendTime) ->
-    NewMessage = lists:concat([Message, SendTime]),
-    NewMessage.
+getStationName(Message) ->
+    lists:substring(Message, 1, 12).
+
+getSlotNumber(Message) ->
+    SlotNumberLength = length(Message) - 33,
+    SlotNumberString = lists:substring(Message, ?SLOTNUMBERPOS, SlotNumberLength),
+    {SlotNumber, []} = string:to_integer(SlotNumberString),
+    SlotNumber.
