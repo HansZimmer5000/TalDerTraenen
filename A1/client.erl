@@ -35,6 +35,8 @@
 %																	>>START / INIT<<
 %------------------------------------------------------------------------------------------------------
 start() ->
+    net_adm:ping(?SERVERNODE),
+
     ets:new(?ETS_TABELLENNAME, [named_table, public, set]), 
     ets:insert(?ETS_TABELLENNAME, {self(), "client"}),
     logge_status(io_lib:format("client mit PID ~p gestartet", [self()])),

@@ -36,6 +36,7 @@ start() ->
     ServerPid.
 
 initHBQ() ->
+    net_adm:ping(?HBQNODE),
     ?HBQ ! {self(), {request, initHBQ}},
     receive
         {reply, ok} -> logge_status("HBQ initalisiert")
