@@ -2,13 +2,19 @@ Getestete Kombinationen:
     Unser:  Client
     Klauck: Server, CMEM, HBQ, DLQ
 
-    Unser: CMEM
-    Klauck: Client, Server, HBQ, DLQ
+    Unser: HBQ, DLQ, CMEM
+    Klauck: Server, Client
 
-    Unser: DLQ
-    Klauck: Client, Server, CMEM, HBQ
+    Unser: Server
+    Klauck: Client, HBQ, DLQ, CMEM 
+    Probleme: nokA Meldungen der HBQ/DLQ (Siehe Mail)
 
+Offene Fragen:
+  
 Beantwortete Fragen:
+    Was machen wir wenn Nachricht 46 als nächstes Gesendet werden sollte, die aber in DLQ nicht existiert, welche Nachricht wird als nächstes Gesendet, 1 oder 47?
+        CMEM Eintrag auf 0 setzen.
+        Zu einem späteren Zeitpunkt wird Lücke gefüllt sein.
     Wie sieht die CMEM aus?
         Sie ist eine Liste:
             Index 0     Erinnerungszeit in Sekunden

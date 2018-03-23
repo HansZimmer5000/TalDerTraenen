@@ -71,14 +71,14 @@ receive_loop(CMEM, NextNNR) ->
 %------------------------------------------------------------------------------------------------------
 getmessages_abfertigen(HBQPid, CMEM, LeserPid) -> 
     ZuSendendeNNr = hole_naechste_nnr_fur_leser(CMEM, LeserPid),
-    io:fwrite("~p", [ZuSendendeNNr]),
     GesendeteNNr = sendeNNr(HBQPid, ZuSendendeNNr, LeserPid),
+    logge_status(io_lib:format("Soll: ~p, Haben: ~p", [ZuSendendeNNr, GesendeteNNr])),
     NeueCMEM = update_gesendete_nnr_fur_leser(CMEM, LeserPid, GesendeteNNr),
     NeueCMEM.
 
 hole_naechste_nnr_fur_leser(CMEM, LeserPid) ->
     cmem:getClientNNr(CMEM, LeserPid) + 1.
-    
+
 update_gesendete_nnr_fur_leser(CMEM, LeserPid, LetzteGesendeteNNr) ->
     NeueCMEM = cmem:updateClient(CMEM, LeserPid, LetzteGesendeteNNr, ?CMEM_LOG_DATEI_NAME),
     NeueCMEM.
@@ -114,6 +114,7 @@ runterfahren() ->
         {reply, ok} -> logge_status("HBQ erfolgreich heruntergefahren")
         after timer:seconds(5) -> logge_status("HBQ nicht erfolgreich heruntergefahren")
     end,
+    true = unregister(?SERVERNAME),
     logge_status("-done").
 
 %------------------------------------------------------------------------------------------------------

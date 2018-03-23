@@ -7,7 +7,9 @@
     updateClient/4,
     getClientNNr/2,
     pruefeTSUndGibNNrZuruck/3,
-    tSIstAbglaufen/2
+    tSIstAbglaufen/2,
+
+    delCMEM/1
 ]).
 
 -define(DEFAULT_NNR, 0).
@@ -21,7 +23,7 @@ initCMEM(ErinnerungsZeitSek, LogDatei) ->
 
 updateClient([ErinnerungsZeitSek, TupelListe], ClientPid, NNr, LogDatei) ->
     NeueTupelListe = updateClient_(TupelListe, ClientPid, NNr),
-    logge_status(io_lib:format("~p bekommt als naechstes NNr ~p", [ClientPid, NNr]), LogDatei),
+    logge_status(io_lib:format("~p update zu NNR: ~p", [ClientPid, NNr]), LogDatei),
     CMEM = [ErinnerungsZeitSek, NeueTupelListe],
     CMEM.
 
@@ -58,6 +60,11 @@ tSIstAbglaufen(OldTS, ErinnerungsZeitSek) ->
     JetztTS = erlang:timestamp(),
     {_DiffMegaSec, DiffSec, _DiffMicroSec} = vsutil:diffTS(JetztTS, OldTS),
     DiffSec > ErinnerungsZeitSek.
+
+% Nicht in der Aufgabenstellung!
+% Dennoch vom Gegebenen Server verlangt.
+delCMEM(_CMEM) ->
+    ok.
 
 
 logge_status(Inhalt, LogDatei) ->

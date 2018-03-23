@@ -2,6 +2,8 @@
 
 % API
 -export([
+    startHBQ/0,
+
     start/0,
     wait_for_init/0,
     init_hbq_handler/1,
@@ -31,6 +33,9 @@
 %------------------------------------------------------------------------------------------------------
 %																	>>START / INIT<<
 %------------------------------------------------------------------------------------------------------
+startHBQ() ->
+  start().
+
 start() ->
   logge_status("HBQ wird gestartet"),
   HBQPID = spawn(fun() -> wait_for_init() end),
@@ -109,7 +114,7 @@ delete_hbq_handler(PID, DLQ) ->
       logge_status("ERR: DLQ wurde NICHT geloescht")
   end,
   PID ! {reply, ok},
-  exit(self(),kill).
+  true = unregister(?HBQNAME).
 
 %------------------------------------------------------------------------------------------------------
 %																					>>HILFSMETHODEN<<
