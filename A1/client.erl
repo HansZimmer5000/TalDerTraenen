@@ -184,6 +184,22 @@ empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NummernListe) ->
     [NNR | _Tail] = Nachricht,
     element_ist_in_liste(NNR, NummernListe).
 
+ts_ist_aus_der_zukunft(DLQoutTS, JetztTS) ->
+    vsutil:validTS(DLQoutTS),
+    vsutil:validTS(JetztTS),
+    NachrichtIstAusDerZukunft = vsutil:lessTS(JetztTS, DLQoutTS),
+    NachrichtIstAusDerZukunft.
+
+erstelle_diffts_string(TS1, TS2) ->
+    vsutil:validTS(TS1),
+    vsutil:validTS(TS2),
+    FullDiffTSString = vsutil:now2string(vsutil:diffTS(TS2, TS1)),
+    DiffTSString = lists:sublist(FullDiffTSString, 10, 9),
+    DiffTSString.
+
+
+
+
 
 element_ist_in_liste(_Elem, []) -> false;
 element_ist_in_liste(Elem, [Elem | _Rest]) -> true;
@@ -231,13 +247,13 @@ erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe) ->
     [_NNR, Textnachricht, _TSCOut, _TSHIn, _TSDIn, DLQoutTS] = Nachricht, 
     
     JetztTS = erlang:timestamp(),
-    vsutil:validTS(DLQoutTS),
-    vsutil:validTS(JetztTS),
-    NachrichtIstAusDerZukunft = vsutil:lessTS(JetztTS, DLQoutTS),
+    NachrichtIstAusDerZukunft = ts_ist_aus_der_zukunft(DLQoutTS, JetztTS),
     NachrichtIstVonMeinemRedakteur = empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NummernListe),
 
     case NachrichtIstAusDerZukunft of
-        true -> LogZusatz1 = "ist aus der Zukunft";
+        true -> 
+            DiffTSString = erstelle_diffts_string(DLQoutTS, JetztTS),
+            LogZusatz1 = io_lib:format("ist um ~p aus der Zukunft", [DiffTSString]);
         false -> LogZusatz1 = ""
     end,
 
