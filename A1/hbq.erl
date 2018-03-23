@@ -22,7 +22,7 @@
 ]).
 
 % KONSTANTEN
--define(CONFIG_FILENAME, "hbq.cfg").
+-define(CONFIG_FILENAME, "server.cfg").
 -define(LOG_DATEI_NAME, 'hbq.log').
 -define(DLQ_LOG_DATEI, 'dlq.log').
 -define(HBQNAME, extractValueFromConfig(hbqname)).

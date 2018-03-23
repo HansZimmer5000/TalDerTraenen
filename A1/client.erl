@@ -24,7 +24,7 @@
 % KONSTANTEN
 -define(CONFIG_FILENAME, "client.cfg").
 -define(MIN_INTERVALL_ZEIT_SEK, 2).
--define(CLIENT_ANZAHL, hole_wert_aus_config_mit_key(clientAnzahl)).
+-define(CLIENT_ANZAHL, hole_wert_aus_config_mit_key(clients)).
 -define(LIFETIME, hole_wert_aus_config_mit_key(lifetime)).
 -define(SERVERNAME, hole_wert_aus_config_mit_key(servername)).
 -define(SERVERNODE, hole_wert_aus_config_mit_key(servernode)).
