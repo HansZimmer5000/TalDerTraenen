@@ -193,11 +193,11 @@ element_ist_in_liste(Elem, [_Head | Rest]) ->
 
 kill_all_clients([]) -> 
     timer:sleep(timer:seconds(1)),
-	logge_status("Alle Clients wurden getötet");
+	logge_status("Alle Clients wurden getoetet");
 kill_all_clients([Client|RestClients]) ->
 	%exit(HeadClient,kill),
 	Client ! {kill},
-	logge_status(io_lib:format("Der Client ~p wurde zur Selbstzerstörung überredet", [Client])),
+	logge_status(io_lib:format("Der Client ~p wurde zur Selbstzerstoerung ueberredet", [Client])),
 	kill_all_clients(RestClients).
 
 %------------------------------------------------------------------------------------------------------

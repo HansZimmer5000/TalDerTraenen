@@ -21,7 +21,7 @@ initCMEM(ErinnerungsZeitSek, LogDatei) ->
 
 updateClient([ErinnerungsZeitSek, TupelListe], ClientPid, NNr, LogDatei) ->
     NeueTupelListe = updateClient_(TupelListe, ClientPid, NNr),
-    logge_status(io_lib:format("~p bekommt als nächstes NNr ~p", [ClientPid, NNr]), LogDatei),
+    logge_status(io_lib:format("~p bekommt als naechstes NNr ~p", [ClientPid, NNr]), LogDatei),
     CMEM = [ErinnerungsZeitSek, NeueTupelListe],
     CMEM.
 

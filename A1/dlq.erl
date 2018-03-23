@@ -1,5 +1,5 @@
 -module(dlq).
--author("Arne Thiele & Michael Müller").
+-author("Arne Thiele & Michael Mueller").
 
 % API
 -export([
@@ -22,7 +22,7 @@
 %////////////////////////////////
 %      DLQ
 % Beispiel mit einer Message: [Size,[NNR,["Message"],TSClientOut,TSHBQIn,TSDLQIn,TSDLQOut]]
-% DLQ ist so sortiert, dass aktuellste Nachricht (= Höchste Nachrichtennummer) ganz vorn steht, praktisch absteigend anhand der NNR sortiert.
+% DLQ ist so sortiert, dass aktuellste Nachricht (= Hoechste Nachrichtennummer) ganz vorn steht, praktisch absteigend anhand der NNR sortiert.
 %////////////////////////////////
 
 %------------------------------------------------------------------------------------------------------
@@ -38,16 +38,16 @@ initDLQ(Size,Datei) ->
 %										>>SCHNITTSTELLEN UND HANDLER<<
 %------------------------------------------------------------------------------------------------------
 
-% Löschen der DLQ
+% Loeschen der DLQ
 delDLQ(_DLQ) -> ok.
 
-% Gibt die Nachrichtennummer zurück die als nächstes erwartet wird. (Die letzte / größte Nachrichtennummer + 1)
+% Gibt die Nachrichtennummer zurueck die als naechstes erwartet wird. (Die letzte / groeßte Nachrichtennummer + 1)
 expectedNr([_Size, Messages]) ->
 	MaxNr = holeMaxNNr(Messages),
 	MaxNr + 1.
 
-% Gibt die höchste Nachrichtennummer heraus.
-% Wäre auch mit length(List) möglich
+% Gibt die hoechste Nachrichtennummer heraus.
+% Waere auch mit length(List) moeglich
 holeMaxNNr([]) ->
 	0;
 holeMaxNNr([AktuellsteNachricht | _RestlicheNachrichten]) ->
@@ -55,7 +55,7 @@ holeMaxNNr([AktuellsteNachricht | _RestlicheNachrichten]) ->
 	NNr.
 
 
-% Fügt eine neue Nachricht in die DLQ ein.
+% Fuegt eine neue Nachricht in die DLQ ein.
 % Da absteigend sortiert ist heißt das ganz vorne.
 % Vorausgesetzt die DLQ (Size) ist noch nicht voll! Wenn voll wird neue Nachricht einfach verworfen und Fehler gelogt.
 push2DLQ([NNr, Msg, TSClientOut, TSHBQin], [Size, Nachrichten], Datei) ->
@@ -63,18 +63,18 @@ push2DLQ([NNr, Msg, TSClientOut, TSHBQin], [Size, Nachrichten], Datei) ->
 	logge_status(io_lib:format("DLQIstVoll: ~p", [DLQIstVoll]), Datei),
 	if
 		DLQIstVoll ->
-			logge_status("DLQ ist voll, älteste Nachricht wird verworfen", Datei),
+			logge_status("DLQ ist voll, aelteste Nachricht wird verworfen", Datei),
 			TmpNeueNachrichten = entferneLetztesListenElement(Nachrichten);
 		true ->
 			TmpNeueNachrichten = Nachrichten
 	end,
 	TSDLQIn = erlang:timestamp(),
 	NeueNachrichten = [[NNr, Msg, TSClientOut, TSHBQin, TSDLQIn] | TmpNeueNachrichten],
-	logge_status("Neue Nachricht wurde vorne angefügt und mit Timestamp für DLQIn versehen", Datei),
+	logge_status("Neue Nachricht wurde vorne angefuegt und mit Timestamp fuer DLQIn versehen", Datei),
 	NeueDLQ = [Size, NeueNachrichten],
 	NeueDLQ.
 
-% Sendet eine Bestimmte Nachricht (anhand NNr) and bestimmten Client (ClientPID), gibt die gesendete Nummer zurück.
+% Sendet eine Bestimmte Nachricht (anhand NNr) and bestimmten Client (ClientPID), gibt die gesendete Nummer zurueck.
 deliverMSG(NNr, ClientPID,[_Size, Nachrichten], Datei) ->
   logge_status(io_lib:format("input: NNr: ~p ClientPID: ~p",[NNr, ClientPID]), Datei),
   % Nachricht holen & Existent -> Wenn nicht Fehler Nachricht erzeugen.
@@ -91,7 +91,7 @@ deliverMSG(NNr, ClientPID,[_Size, Nachrichten], Datei) ->
       Nachricht = GefundeneNachricht,
       TermiatedFlag = holeNachricht(Nachrichten, NNr + 1) == []
   end,
-  % Nachricht TSDLQOut anfügen.
+  % Nachricht TSDLQOut anfuegen.
   logge_nachricht_status(Nachricht, "zu verschicken", Datei),
   [ZuSendendeNNr, Text, TSClientOut, TSHBQin, TSDLQIn] = Nachricht,
   ZuSendendeNachricht = [ZuSendendeNNr, Text, TSClientOut, TSHBQin, TSDLQIn, erlang:timestamp()],
@@ -111,7 +111,7 @@ entferneLetztesListenElement(Nachrichten) ->
 	lists:droplast(Nachrichten).
 
 
-% Prüft ob die DLQ schon voll ist, also ob die Size schon erreicht wurde.
+% Prueft ob die DLQ schon voll ist, also ob die Size schon erreicht wurde.
 dLQIstVoll([Size, Nachrichten]) ->
 	if
 		Size == length(Nachrichten) ->
@@ -122,7 +122,7 @@ dLQIstVoll([Size, Nachrichten]) ->
 	DLQIstVoll.
 
 % Holt anhand der Nachrichtennummer eine Nachrichte aus eine Liste von Messages.
-% [] wird zurückgegeben wenn die Nachricht nicht gefunden werden konnte.
+% [] wird zurueckgegeben wenn die Nachricht nicht gefunden werden konnte.
 holeNachricht([], _NNr) -> [];
 holeNachricht([[NNr | NachrichtRest] | _RestlicheNachrichten], NNr) -> 
 	[NNr | NachrichtRest];
