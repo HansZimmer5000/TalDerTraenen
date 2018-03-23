@@ -50,7 +50,7 @@ getClientNNr_([KopfTupel | RestTupel], ErinnerungsZeitSek, ClientPid) ->
 
 pruefeTSUndGibNNrZuruck(OldTS, ErinnerungsZeitSek, SavedNNr) ->
     case tSIstAbglaufen(OldTS, ErinnerungsZeitSek) of
-        true ->  getClientNNr_([], ok, ok);
+        true ->  ?DEFAULT_NNR;
         false -> SavedNNr
     end.
 
