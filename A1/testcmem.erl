@@ -59,9 +59,9 @@ pruefeTSUndGibNNrZuruck_2_test() ->
 
 tSIstAbglaufen_1_test() ->
     AltTS = erlang:timestamp(),
-    false = cmem:tSIstAbglaufen(AltTS, ?ERINNERUNGS_ZEIT_SEK).
+    ?assertNot(cmem:tSIstAbglaufen(AltTS, ?ERINNERUNGS_ZEIT_SEK)).
 
 tSIstAbglaufen_2_test() ->
     AltTS = erlang:timestamp(),
     timer:sleep(timer:seconds(?ERINNERUNGS_ZEIT_SEK + 1)),
-    true = cmem:tSIstAbglaufen(AltTS, ?ERINNERUNGS_ZEIT_SEK).
+    ?assert(cmem:tSIstAbglaufen(AltTS, ?ERINNERUNGS_ZEIT_SEK)).
