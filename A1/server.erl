@@ -108,7 +108,13 @@ getmsgid_abfertigen(AbsenderPid, LetzteNNR) ->
 
 
 runterfahren() ->
-    logge_status("Server wird heruntergefahren").
+    logge_status("Server wird heruntergefahren"),
+    ?HBQ ! {self(), {request, dellHBQ}},
+    receive
+        {reply, ok} -> logge_status("HBQ erfolgreich heruntergefahren")
+        after timer:seconds(5) -> logge_status("HBQ nicht erfolgreich heruntergefahren")
+    end,
+    logge_status("-done").
 
 %------------------------------------------------------------------------------------------------------
 %																	>>GENERELLE FUNKTIONEN<<
