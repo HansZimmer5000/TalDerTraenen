@@ -4,15 +4,15 @@
 -export([
         start/0,
 
-        frage_nach_neuer_nnr/1,
+        frage_nach_neuer_nnr/2,
         erstelle_nachricht/2,
         erstelle_nachrichten_text/1,
-        pruefe_nnr_und_sende_nachricht/3,
+        pruefe_nnr_und_sende_nachricht/4,
         kalkuliere_neuen_intervall_sek/1,
 
-        frage_nach_neuer_nachricht/1,
+        frage_nach_neuer_nachricht/2,
         empfangene_nachricht_ist_von_meinem_redakteur/2,
-        logge_empfangene_nachricht/2,
+        logge_empfangene_nachricht/3,
         erstelle_empfangene_nachricht_logtext/2,
 
         zufalls_boolean/0,
@@ -29,7 +29,6 @@
 -define(SERVERNAME, hole_wert_aus_config_mit_key(servername)).
 -define(SERVERNODE, hole_wert_aus_config_mit_key(servernode)).
 -define(SERVER, {?SERVERNAME, ?SERVERNODE}).
--define(ETS_TABELLENNAME, hole_wert_aus_config_mit_key(etsTabellenname)).
 
 %------------------------------------------------------------------------------------------------------
 %																	>>START / INIT<<
@@ -37,12 +36,11 @@
 start() ->
     net_adm:ping(?SERVERNODE),
 
-    ets:new(?ETS_TABELLENNAME, [named_table, public, set]), 
-    ets:insert(?ETS_TABELLENNAME, {self(), "client"}),
-    logge_status(io_lib:format("client mit PID ~p gestartet", [self()])),
+    LogDatei = erstelle_log_datei_name(0),
+    logge_status(io_lib:format("client mit PID ~p gestartet", [self()]), LogDatei),
     ClientPidList = start_all_clients(?CLIENT_ANZAHL, []),
     timer:sleep(timer:seconds(?LIFETIME)),
-    kill_all_clients(ClientPidList).
+    kill_all_clients(ClientPidList, LogDatei).
 
 start_all_clients(0, AlteClientPidList) -> AlteClientPidList;
 start_all_clients(AktuelleClientnummer, AlteClientPidList) ->
@@ -52,43 +50,45 @@ start_all_clients(AktuelleClientnummer, AlteClientPidList) ->
 
 start_client_node(Clientnummer) ->
     Clientname = lists:concat(["client", Clientnummer]),
-    ClientPid = spawn(fun() -> redakteur_loop(?MIN_INTERVALL_ZEIT_SEK, []) end),
+    LogDatei = erstelle_log_datei_name(Clientnummer),
+
+    ClientPid = spawn(fun() -> redakteur_loop(?MIN_INTERVALL_ZEIT_SEK, [], LogDatei) end),
     register(list_to_atom(Clientname), ClientPid),
-    ets:insert(?ETS_TABELLENNAME, {ClientPid, Clientname}),
-    logge_status(lists:concat([Clientname, " mit PID ", io_lib:format("~p", [ClientPid]), " gestartet"])),
+
+    logge_status(lists:concat([Clientname, " mit PID ", io_lib:format("~p", [ClientPid]), " gestartet"]), LogDatei),
     ClientPid.
 
 %------------------------------------------------------------------------------------------------------
 %																	>>LOOPS<<
 %------------------------------------------------------------------------------------------------------
-redakteur_loop(Intervall, GeschriebeneNNRListe) -> 
-    logge_status("Beginne redakteur_loop"),
-    NNR = frage_nach_neuer_nnr(?SERVER),
+redakteur_loop(Intervall, GeschriebeneNNRListe, LogDatei) -> 
+    logge_status("Beginne redakteur_loop", LogDatei),
+    NNR = frage_nach_neuer_nnr(?SERVER, LogDatei),
     TS = erlang:timestamp(),
     Nachricht = erstelle_nachricht(NNR, TS),
-    logge_nachricht_status(Nachricht, "erstellt"),
+    logge_nachricht_status(Nachricht, "erstellt", LogDatei),
 
     timer:sleep(timer:seconds(Intervall)),
-    logge_status(io_lib:format("Intervall von ~p Sek. vorbei", [Intervall])),
+    logge_status(io_lib:format("Intervall von ~p Sek. vorbei", [Intervall]), LogDatei),
 
     NeueGeschriebeneNNRListe = lists:flatten([NNR, GeschriebeneNNRListe]),
-    pruefe_nnr_und_sende_nachricht(?SERVER, Nachricht, NeueGeschriebeneNNRListe),
+    pruefe_nnr_und_sende_nachricht(?SERVER, Nachricht, NeueGeschriebeneNNRListe, LogDatei),
     NeuerIntervall = kalkuliere_neuen_intervall_sek(Intervall),
-    logge_nachricht_status(Nachricht, "abgearbeitet"),
+    logge_nachricht_status(Nachricht, "abgearbeitet", LogDatei),
 
     case length(NeueGeschriebeneNNRListe) of
-        5 -> leser_loop(NeuerIntervall, NeueGeschriebeneNNRListe);
-        _Any -> redakteur_loop(NeuerIntervall, NeueGeschriebeneNNRListe)
+        5 -> leser_loop(NeuerIntervall, NeueGeschriebeneNNRListe, LogDatei);
+        _Any -> redakteur_loop(NeuerIntervall, NeueGeschriebeneNNRListe, LogDatei)
     end.
 
 
-leser_loop(Intervall, GeschriebeneNNRListe) ->
-    logge_status(io_lib:format("Beginne leser_loop mit NNRListe: ~w" , [GeschriebeneNNRListe])),
-    NeueNachricht = frage_nach_neuer_nachricht(?SERVER),
+leser_loop(Intervall, GeschriebeneNNRListe, LogDatei) ->
+    logge_status(io_lib:format("Beginne leser_loop mit NNRListe: ~w" , [GeschriebeneNNRListe]), LogDatei),
+    NeueNachricht = frage_nach_neuer_nachricht(?SERVER, LogDatei),
     case NeueNachricht of
-        [] -> redakteur_loop(Intervall, []);
-        _Any -> logge_empfangene_nachricht(NeueNachricht, GeschriebeneNNRListe),
-                leser_loop(Intervall, GeschriebeneNNRListe)
+        [] -> redakteur_loop(Intervall, [], LogDatei);
+        _Any -> logge_empfangene_nachricht(NeueNachricht, GeschriebeneNNRListe, LogDatei),
+                leser_loop(Intervall, GeschriebeneNNRListe, LogDatei)
     end.
 
 
@@ -96,12 +96,12 @@ leser_loop(Intervall, GeschriebeneNNRListe) ->
 %																	>>EIGENTLICHE FUNKTIONEN<<
 %------------------------------------------------------------------------------------------------------
 
-frage_nach_neuer_nnr(Server) ->
+frage_nach_neuer_nnr(Server, LogDatei) ->
     Server ! {self(), getmsgid},
-    logge_status("Warte auf NNR"),
+    logge_status("Warte auf NNR", LogDatei),
     receive
         {nid, NNR} -> 
-            logge_status(io_lib:format("NNR ~w bekommen", [NNR])),
+            logge_status(io_lib:format("NNR ~w bekommen", [NNR]), LogDatei),
             NNR;
         {kill} -> exit("Kill Befehl vom Main Client")
     end.
@@ -125,23 +125,23 @@ neue_nnr_einfuegen(NNR, NNRListe) ->
     NeueNNRListe.
 
 
-pruefe_nnr_und_sende_nachricht(Server, Nachricht, NNRListe) ->
+pruefe_nnr_und_sende_nachricht(Server, Nachricht, NNRListe, LogDatei) ->
     Anzahl_Erstellter_Nachrichten = length(NNRListe),
     case Anzahl_Erstellter_Nachrichten of
-        5 -> logge_nachricht_status(Nachricht, "vergessen zu senden");
+        5 -> logge_nachricht_status(Nachricht, "vergessen zu senden", LogDatei);
         _Any -> Server ! {dropmessage, Nachricht},
-                logge_nachricht_status(Nachricht, "gesendet")
+                logge_nachricht_status(Nachricht, "gesendet", LogDatei)
     end.
 
 
-frage_nach_neuer_nachricht(Server) -> 
+frage_nach_neuer_nachricht(Server, LogDatei) -> 
     Server ! {self(), getmessages},
-    logge_status("Warte auf Nachricht"),
+    logge_status("Warte auf Nachricht", LogDatei),
 
     receive
         {reply, Nachricht, TerminatedFlag} -> 
             ok,
-            logge_nachricht_status(Nachricht, io_lib:format("erhalten mit TerminatedFlag = ~p", [TerminatedFlag])),
+            logge_nachricht_status(Nachricht, io_lib:format("erhalten mit TerminatedFlag = ~p", [TerminatedFlag]), LogDatei),
             case TerminatedFlag of
                 true -> Ergebnis = [];
                 false -> Ergebnis = Nachricht
@@ -207,41 +207,41 @@ element_ist_in_liste(Elem, [_Head | Rest]) ->
     element_ist_in_liste(Elem, Rest).
 
 
-kill_all_clients([]) -> 
+kill_all_clients([], LogDatei) -> 
     timer:sleep(timer:seconds(1)),
-	logge_status("Alle Clients wurden getoetet");
-kill_all_clients([Client|RestClients]) ->
+	logge_status("Alle Clients wurden getoetet", LogDatei);
+kill_all_clients([Client|RestClients], LogDatei) ->
 	%exit(HeadClient,kill),
 	Client ! {kill},
-	logge_status(io_lib:format("Der Client ~p wurde zur Selbstzerstoerung ueberredet", [Client])),
-	kill_all_clients(RestClients).
+	logge_status(io_lib:format("Der Client ~p wurde zur Selbstzerstoerung ueberredet", [Client]), LogDatei),
+	kill_all_clients(RestClients, LogDatei).
 
 %------------------------------------------------------------------------------------------------------
 %																	>>GENERELLE FUNKTIONEN<<
 %------------------------------------------------------------------------------------------------------
+erstelle_log_datei_name(Clientnummer) ->
+    LogDatei = "client" ++ io_lib:format("~p",[Clientnummer]) ++ ".log",
+    LogDatei.
+
 hole_wert_aus_config_mit_key(Key) ->
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
     {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
     Value.
 
-logge_status(Inhalt) ->
+logge_status(Inhalt, LogDatei) ->
     AktuelleZeit = erlang:timestamp(),
     LogNachricht = io_lib:format("~p ~s.\n", [vsutil:now2string(AktuelleZeit), Inhalt]),
     io:fwrite(LogNachricht),
-    case element_ist_in_liste(?ETS_TABELLENNAME, ets:all()) of
-        true -> [{_Key, LogDateiName}] = ets:lookup(?ETS_TABELLENNAME, self()),
-                util:logging(lists:concat([LogDateiName,".log"]), LogNachricht);
-        false -> ok
-    end.
+    util:logging(LogDatei, LogNachricht).
 
-logge_nachricht_status(Nachricht, Status) ->
+logge_nachricht_status(Nachricht, Status, LogDatei) ->
     [NNR | _Rest] = Nachricht,
     LogNachricht = io_lib:format("NNR ~p ~s", [NNR, Status]),
-    logge_status(LogNachricht).
+    logge_status(LogNachricht, LogDatei).
 
-logge_empfangene_nachricht(Nachricht, NummernListe) ->
+logge_empfangene_nachricht(Nachricht, NummernListe, LogDatei) ->
     LogText = erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe),
-    logge_status(LogText).
+    logge_status(LogText, LogDatei).
 
 erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe) ->
     [_NNR, Textnachricht, _TSCOut, _TSHIn, _TSDIn, DLQoutTS] = Nachricht, 

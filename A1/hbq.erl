@@ -215,8 +215,3 @@ logge_status(Inhalt) ->
     LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(?LOG_DATEI_NAME, LogNachricht).
-
-logge_nachricht_status(Nachricht, Status) ->
-    [NNR | _Rest] = Nachricht,
-    LogNachricht = io_lib:format("NNR ~p ~s", [NNR, Status]),
-    logge_status(LogNachricht).

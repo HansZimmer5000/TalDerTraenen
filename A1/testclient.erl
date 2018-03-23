@@ -3,15 +3,18 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-%        frage_nach_neuer_nnr/0,
+%        start/0,
+%
+%        frage_nach_neuer_nnr/2,
 %        erstelle_nachricht/2,
 %        erstelle_nachrichten_text/1,
-%        pruefe_nnr_und_sende_nachricht/2,
+%        pruefe_nnr_und_sende_nachricht/4,
 %        kalkuliere_neuen_intervall_sek/1,
 
-%       frage_nach_neuer_nachricht/0,
-%       empfangene_nachricht_ist_von_meinem_redakteur/2,
-%TODO       logge_empfangene_nachricht/2,
+%        frage_nach_neuer_nachricht/2,
+%        empfangene_nachricht_ist_von_meinem_redakteur/2,
+%        logge_empfangene_nachricht/3,
+%        erstelle_empfangene_nachricht_logtext/2,
 
 %        zufalls_boolean/0,
 %        element_ist_in_liste/2,
@@ -19,6 +22,7 @@
 %        neue_nnr_einfuegen/2
 
 -define(CONFIG_FILENAME, "client.cfg").
+-define(TEST_LOG_FILE, "testclient.log").
 
 frage_nach_neuer_nnr_1_test() ->
     TestNNR = 1,
@@ -27,7 +31,7 @@ frage_nach_neuer_nnr_1_test() ->
                                     {AbsenderPID, getmsgid} -> AbsenderPID ! {nid, TestNNR}
                             end
                         end),
-    TestNNR = client:frage_nach_neuer_nnr(ServerPid).
+    TestNNR = client:frage_nach_neuer_nnr(ServerPid, ?TEST_LOG_FILE).
 
 erstelle_nachricht_1_test() ->
     NNR = 1,
@@ -65,7 +69,7 @@ pruefe_nnr_und_sende_nachricht_1_test() ->
                                     {dropmessage, _EmpfangeneNachricht} -> ThisPid ! ok
                             end
                         end),
-    client:pruefe_nnr_und_sende_nachricht(ServerPid, Nachricht, NNRListe),
+    client:pruefe_nnr_und_sende_nachricht(ServerPid, Nachricht, NNRListe, ?TEST_LOG_FILE),
     receive
         ok -> ok
     end.
@@ -80,7 +84,7 @@ pruefe_nnr_und_sende_nachricht_2_test() ->
                                     after 0 -> ThisPid ! ok
                             end
                         end),
-    client:pruefe_nnr_und_sende_nachricht(ServerPid, Nachricht, NNRListe),
+    client:pruefe_nnr_und_sende_nachricht(ServerPid, Nachricht, NNRListe, ?TEST_LOG_FILE),
     receive
         ok -> ok
     end.
@@ -99,7 +103,7 @@ frage_nach_neuer_nachricht_1_test() ->
                                 {AbsenderPID, getmessages} -> AbsenderPID ! {reply, Nachricht, TerminatedFlag}
                         end
                     end),
-    Nachricht = client:frage_nach_neuer_nachricht(ServerPid).
+    Nachricht = client:frage_nach_neuer_nachricht(ServerPid, ?TEST_LOG_FILE).
 
 frage_nach_neuer_nachricht_2_test() ->
     Nachricht = [3, "Text", vsutil:now2string(erlang:timestamp()), vsutil:now2string(erlang:timestamp()), vsutil:now2string(erlang:timestamp()), vsutil:now2string(erlang:timestamp())],
@@ -110,7 +114,7 @@ frage_nach_neuer_nachricht_2_test() ->
                                 {AbsenderPID, getmessages} -> AbsenderPID ! {reply, Nachricht, TerminatedFlag}
                         end
                     end),
-    Ergebnis = client:frage_nach_neuer_nachricht(ServerPid).
+    Ergebnis = client:frage_nach_neuer_nachricht(ServerPid, ?TEST_LOG_FILE).
 
 
 empfangene_nachricht_ist_von_meinem_redakteur_1_test() ->
