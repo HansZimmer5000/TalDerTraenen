@@ -1,4 +1,12 @@
-Offene Fragen:
+Getestete Kombinationen:
+    Unser:  Client
+    Klauck: Server, CMEM, HBQ, DLQ
+
+    Unser: CMEM
+    Klauck: Client, Server, HBQ, DLQ
+
+    Unser: DLQ
+    Klauck: Client, Server, CMEM, HBQ
 
 Beantwortete Fragen:
     Wie sieht die CMEM aus?
