@@ -61,7 +61,8 @@ receive_loop(CMEM, NextNNR) ->
                                     timer:cancel(ServerTimer),
                                     NeueNextNNR = getmsgid_abfertigen(AbsenderPid, NextNNR),
                                     receive_loop(CMEM, NeueNextNNR);
-        {request, killAll} -> runterfahren()
+        {request, killAll} ->   runterfahren()
+        after timer:seconds(?LATENZ_SEK) -> runterfahren()
     end.
 
 
