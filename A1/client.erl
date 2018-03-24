@@ -57,7 +57,6 @@ start_client_node(Clientnummer) ->
     LogDatei = erstelle_log_datei_name(Clientnummer),
 
     ClientPid = spawn(fun() -> redakteur_loop(?MIN_INTERVALL_ZEIT_SEK, [], LogDatei) end),
-    register(list_to_atom(Clientname), ClientPid),
 
     logge_status(lists:concat([Clientname, " mit PID ", io_lib:format("~p", [ClientPid]), " gestartet"]), LogDatei),
     ClientPid.
@@ -67,6 +66,7 @@ start_client_node(Clientnummer) ->
 %------------------------------------------------------------------------------------------------------
 redakteur_loop(Intervall, GeschriebeneNNRListe, LogDatei) -> 
     logge_status("Beginne redakteur_loop", LogDatei),
+
     NNR = frage_nach_neuer_nnr(?SERVER, LogDatei),
     TS = erlang:timestamp(),
     Nachricht = erstelle_nachricht(NNR, TS),
@@ -75,7 +75,7 @@ redakteur_loop(Intervall, GeschriebeneNNRListe, LogDatei) ->
     timer:sleep(timer:seconds(Intervall)),
     logge_status(io_lib:format("Intervall von ~p Sek. vorbei", [Intervall]), LogDatei),
 
-    NeueGeschriebeneNNRListe = lists:flatten([NNR, GeschriebeneNNRListe]),
+    NeueGeschriebeneNNRListe = [NNR] ++ GeschriebeneNNRListe,
     pruefe_nnr_und_sende_nachricht(?SERVER, Nachricht, NeueGeschriebeneNNRListe, LogDatei),
     NeuerIntervall = kalkuliere_neuen_intervall_sek(Intervall),
     logge_nachricht_status(Nachricht, "abgearbeitet", LogDatei),

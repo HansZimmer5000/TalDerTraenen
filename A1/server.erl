@@ -107,7 +107,7 @@ getmsgid_abfertigen(AbsenderPid, LetzteNNR) ->
 
 
 
-runterfahren() ->
+runterfahren(CMEM) ->
     logge_status("Server wird heruntergefahren"),
     ?HBQ ! {self(), {request, dellHBQ}},
     receive

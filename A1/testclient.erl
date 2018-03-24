@@ -24,6 +24,10 @@
 -define(CONFIG_FILENAME, "client.cfg").
 -define(TEST_LOG_FILE, "testclient.log").
 
+-define(HOSTNAME, hostname1).
+-define(PRAKTIKUMSGRUPPE, gruppe2).
+-define(TEAMNUMMER, team6).
+
 frage_nach_neuer_nnr_1_test() ->
     TestNNR = 1,
     ServerPid = spawn(fun() -> 
@@ -36,9 +40,9 @@ frage_nach_neuer_nnr_1_test() ->
 erstelle_nachricht_1_test() ->
     NNR = 1,
     TS = vsutil:now2string(erlang:timestamp()),
-    Hostname = hole_wert_aus_config_mit_key(hostname),
-    Praktikumsgruppe = hole_wert_aus_config_mit_key(praktikumsgruppe),
-    Teamnummer = hole_wert_aus_config_mit_key(teamnummer),
+    Hostname = ?HOSTNAME,
+    Praktikumsgruppe = ?PRAKTIKUMSGRUPPE,
+    Teamnummer = ?TEAMNUMMER,
     Text =  io_lib:format("~p, ~p, ~p, ~s", [Hostname, Praktikumsgruppe, Teamnummer, TS]),
     TestNachricht = [NNR, Text, TS],
     ResultNachricht = client:erstelle_nachricht(NNR, TS),
@@ -215,11 +219,3 @@ nachricht_zu_text_2_test() ->
                 ],
     "1, Test, 15.01 21:11:55,874|" = client:nachricht_zu_text(Nachricht).
 
-
-
-
-
-hole_wert_aus_config_mit_key(Key) ->
-    {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
-    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
-    Value.

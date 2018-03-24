@@ -99,7 +99,8 @@ deliver_nachricht_handler_2_test() ->
 delete_hbq_handler_1_test() ->
     DLQ = [?DLQSIZE, []],
     ThisPid = self(),
-    _HBQPid = spawn(fun() -> hbq:delete_hbq_handler(ThisPid, DLQ) end),
+    HBQPid = spawn(fun() -> hbq:delete_hbq_handler(ThisPid, DLQ) end),
+    register(wk, HBQPid),
     receive
         Any -> ?assertEqual({reply, ok}, Any)
         after ?MAX_DELAY -> ?assert(false)
