@@ -6,8 +6,8 @@ import time
 
 # Opens a new Commandline window (cmd.exe) and starts a new erlang node with the given name and modulecode. 
 # The module must contain a "start" function without arguments.
-def __start_node(nodename, modulename):
-    os.system("start erl -noshell -sname " + nodename + " -s " + modulename + " start")
+def __start_node(nodename, modulename, startFunction):
+    os.system("start erl -noshell -sname " + nodename + " -s " + modulename + " " + startFunction)
 
 def __start_empty_shell_node(nodename):
     os.system("start erl -sname " + nodename)
@@ -30,11 +30,11 @@ if __name__ == "__main__":
     
     if user_input == "2":
         __remove_all_unecessary_files([".dump", ".log"])
-        __start_empty_shell_node("hbq")
+        __start_node("hbq", "hbq", "startHBQ")
         time.sleep(1)
-        __start_node("server", "server")
+        __start_node("server", "server", "start")
         time.sleep(1)
-        __start_node("client", "client_starter")
+        __start_node("client", "client_starter", "start")
     elif user_input == "3":
         __remove_all_unecessary_files([".beam", ".dump", ".log"])
     else:

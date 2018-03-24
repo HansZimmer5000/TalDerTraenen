@@ -7,8 +7,10 @@ Getestete Kombinationen:
     Kombination 2
     Unser: Server
     Klauck: Client, HBQ, DLQ, CMEM 
-    Probleme: nokA Meldungen der HBQ/DLQ (Siehe Mail)
-    Probleme: Deadlock?
+    Problem: nokA Meldungen der HBQ/DLQ (Siehe Mail)
+    Erklärung:
+    Problem: Deadlock?
+    Erklärung: Unser Server erwartet bereits gestarete HBQ, tut man dies, kein Problem.
 
     Kombination 3
     Unser: HBQ, DLQ, CMEM
