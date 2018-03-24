@@ -75,7 +75,7 @@ push2DLQ([NNr, Msg, TSClientOut, TSHBQin], [Size, Nachrichten], Datei) ->
 	NeueDLQ.
 
 % Sendet eine Bestimmte Nachricht (anhand NNr) and bestimmten Client (ClientPID), gibt die gesendete Nummer zurueck.
-deliverMSG(NNr, ClientPID,[_Size, Nachrichten], Datei) ->
+deliverMSG(NNr, ClientPID, [_Size, Nachrichten], Datei) ->
   logge_status(io_lib:format("input: NNr: ~p ClientPID: ~p",[NNr, ClientPID]), Datei),
   % Nachricht holen & Existent -> Wenn nicht Fehler Nachricht erzeugen.
   GefundeneNachricht = holeNachricht(Nachrichten, NNr),
