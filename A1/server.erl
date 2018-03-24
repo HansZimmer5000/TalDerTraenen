@@ -56,7 +56,7 @@ receive_loop(CMEM, NextNNR) ->
                                         receive_loop(CMEM, NextNNR);
         {AbsenderPid, getmsgid} ->  logge_status("Got getmsgid"),
                                     NeueNextNNR = getmsgid_abfertigen(AbsenderPid, NextNNR),
-                                    receive_loop(CMEM, NeueNextNNR);
+                                    receive_loop(CMEM, NeueNextNNR)
         after timer:seconds(?LATENZ_SEK) -> runterfahren(CMEM)
     end.
 
