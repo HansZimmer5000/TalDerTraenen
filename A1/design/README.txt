@@ -65,13 +65,10 @@ in der client.cfg:
     Registrierter Name des Servers.
 {servernode, 'server@Michael-X250'}.
     Node auf dem der Registrierte Server zu finden ist.
-{hostname, hostname1}.
-    Der zu verwendende Hostname für den Nachrichtentext
-{praktikumsgruppe, gruppe2}.
-    Die zu verwendende Praktikumsgruppe für den Nachrichtentext
-{teamnummer, team6}.
-    Die zu verwendende Teamnummer für den Nachrichtentext
 
+Zudem interessant:
+    Konstanten in der .erl Datei pruefen.
+    Dort wird hostname, praktikumsgruppe und teamnummer (fuer den Nachrichtentext) festgelegt.
 
 --------------------
 Starten des Servers:

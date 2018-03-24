@@ -30,6 +30,10 @@
 -define(SERVERNODE, hole_wert_aus_config_mit_key(servernode)).
 -define(SERVER, {?SERVERNAME, ?SERVERNODE}).
 
+-define(HOSTNAME, hostname1).
+-define(PRAKTIKUMSGRUPPE, gruppe2).
+-define(TEAMNUMMER, team6).
+
 %------------------------------------------------------------------------------------------------------
 %																	>>START / INIT<<
 %------------------------------------------------------------------------------------------------------
