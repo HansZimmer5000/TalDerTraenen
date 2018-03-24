@@ -47,21 +47,16 @@ initHBQ() ->
 %------------------------------------------------------------------------------------------------------
 receive_loop(CMEM, NextNNR) ->
     logge_status("receive_loop"),
-    {ok,ServerTimer} = timer:send_after(timer:seconds(?LATENZ_SEK), self(), {request,killAll}),
     receive
         {AbsenderPid, getmessages} ->   logge_status("Got getmessages"),
-                                        timer:cancel(ServerTimer),
                                         NeueCMEM = getmessages_abfertigen(?HBQ, CMEM, AbsenderPid),
                                         receive_loop(NeueCMEM, NextNNR);
         {dropmessage, Nachricht} ->     logge_status("Got dropmessage"),
-                                        timer:cancel(ServerTimer),
                                         dropmessage_abfertigen(?HBQ, Nachricht),
                                         receive_loop(CMEM, NextNNR);
         {AbsenderPid, getmsgid} ->  logge_status("Got getmsgid"),
-                                    timer:cancel(ServerTimer),
                                     NeueNextNNR = getmsgid_abfertigen(AbsenderPid, NextNNR),
                                     receive_loop(CMEM, NeueNextNNR);
-        {request, killAll} ->   runterfahren(CMEM)
         after timer:seconds(?LATENZ_SEK) -> runterfahren(CMEM)
     end.
 
