@@ -1,13 +1,21 @@
 Getestete Kombinationen:
+
+    Kombination 1
     Unser:  Client
     Klauck: Server, CMEM, HBQ, DLQ
 
-    Unser: HBQ, DLQ, CMEM
-    Klauck: Server, Client
-
+    Kombination 2
     Unser: Server
     Klauck: Client, HBQ, DLQ, CMEM 
     Probleme: nokA Meldungen der HBQ/DLQ (Siehe Mail)
+    Probleme: Deadlock?
+
+    Kombination 3
+    Unser: HBQ, DLQ, CMEM
+    Klauck: Server, Client
+    Problem: "24.03 15:57:37,242|" <7318.74.0> update zu NNR: 0
+    Erklärung: Weil Herrn Klaucks Code bei NNr 0 beginnt und unserer bei NNr 1!
+
 
 Offene Fragen:
   
