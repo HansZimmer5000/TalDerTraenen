@@ -61,8 +61,8 @@ receive_loop(CMEM, NextNNR) ->
                                     timer:cancel(ServerTimer),
                                     NeueNextNNR = getmsgid_abfertigen(AbsenderPid, NextNNR),
                                     receive_loop(CMEM, NeueNextNNR);
-        {request, killAll} ->   runterfahren()
-        after timer:seconds(?LATENZ_SEK) -> runterfahren()
+        {request, killAll} ->   runterfahren(CMEM)
+        after timer:seconds(?LATENZ_SEK) -> runterfahren(CMEM)
     end.
 
 
@@ -114,6 +114,7 @@ runterfahren() ->
         {reply, ok} -> logge_status("HBQ erfolgreich heruntergefahren")
         after timer:seconds(5) -> logge_status("HBQ nicht erfolgreich heruntergefahren")
     end,
+    ok = cmem:delCMEM(CMEM),
     true = unregister(?SERVERNAME),
     logge_status("-done").
 
