@@ -36,6 +36,7 @@ Getestete Kombinationen:
 Offene Fragen:
     - DLQ sendet Nachricht, sendet gesendete NNr, aber was zuerst? Ist das überhaupt so wichtig?
     - Darf man die lists library verwenden?
+    - wo baut man ein, dass wenn NNr 1 aus DLQ rausgeflogen ist, NNr 2 der neue anfang ist? Sonst gibts nur noch 0er NNR.
   
 Beantwortete Fragen:
     Was genau soll cmem:getClientNNr zurückgeben, NNr in der Liste oder NNr + 1?
