@@ -75,22 +75,18 @@ init_hbq_handler(PID) ->
   PID ! {reply, ok}.
 
 push_hbq_handler(PID, [NNr, MessageLST, TSClientout], HBQ, DLQ) ->
-  % 1) Pruefen ob die geschickte Nachrichtennummer bereits auslieferbar ist
   logge_status(io_lib:format("push_hbq_handler PID: ~p, MsgNr: ~p", [PID, NNr])),
   TShbqin = erlang:timestamp(),
   MessageWithAddedTS = [NNr, MessageLST, TSClientout, TShbqin],
   CanBeDelivered = is_in_order(MessageWithAddedTS, DLQ),
   logge_status(io_lib:format("Kann Nachricht gesendet werden? ~p", [CanBeDelivered])),
-  % 2) falls ja --> mittels push2DLQ ausliefern und Reihenfolge der bereits gespeicherten Nachrichten pruefen; ggf weitere Nachrichten an die DLQ schicken
   if 
     CanBeDelivered ->
       NewDLQ = dlq:push2DLQ(MessageWithAddedTS, DLQ, ?DLQ_LOG_DATEI), 
       {NewHBQ, ResultDLQ} = pruefe_naechste_nachricht_und_pushe(HBQ, NewDLQ),
       Result = {NewHBQ, ResultDLQ};
-  % 3) falls nein --> Nachricht in die HBQ einsortieren (den Nummern nach aufsteigend)
     true ->
       NewHBQ = in_hbq_einfuegen(MessageWithAddedTS, HBQ),
-      % Limit abpruefen (2/3el der DLQ) und ggf Luecke schließen
       NewDLQ = pruefe_limit_und_fuelle_spalte(NewHBQ, DLQ, ?DLQLIMIT),
       {ResultHBQ,ResultDLQ} = pruefe_naechste_nachricht_und_pushe(NewHBQ,NewDLQ),
       Result = {ResultHBQ,ResultDLQ}
@@ -129,7 +125,6 @@ is_in_order([NNr | _], DLQ) ->
 %Rekursive Hilfsmethode, welche nach und nach weitere Nachrichten an die DLQ schickt, falls moeglich
 pruefe_naechste_nachricht_und_pushe([], DLQ) -> {[], DLQ};
 pruefe_naechste_nachricht_und_pushe([HBQHead | HBQTail], DLQ) ->
- %logge_status(io_lib:format("Aktueller Head: ~p", [HBQHead])),
   CanBeDelivered = is_in_order(HBQHead, DLQ),
   logge_status(io_lib:format("Message CanBeDelivered? ~p", [CanBeDelivered])),
   case CanBeDelivered of
@@ -158,7 +153,6 @@ in_hbq_einfuegen_(Akku, Message, []) ->
 in_hbq_einfuegen_(Akku, [NNr | MessageRest], [[HBQHeadNNr | HBQHeadRest] | HBQTail]) ->
   IsSmaller = NNr < HBQHeadNNr,
   if (IsSmaller) ->
-    %Hier war der Fehler :)
     NewFirstPartOfHBQ = lists:append(Akku, [[NNr | MessageRest]]),
     RestOfHBQ = [[HBQHeadNNr | HBQHeadRest] | HBQTail],
     NewHBQ = lists:append(NewFirstPartOfHBQ, RestOfHBQ);
@@ -175,22 +169,17 @@ pruefe_limit_und_fuelle_spalte(HBQ, DLQ, DLQLimit) ->
   if
     (HBQSize > GapLimit) ->
       logge_status("2/3 Regel erfuellt"),
-      %Ist das Limit ueberschritten, so wird die erste Luecke geschlossen und an die DLQ weitergegeben
       NewDLQ = finde_und_fuelle_spalte(HBQ, DLQ),
       NewDLQ;
     true ->
-      %Ist das Limit nicht ueberschritten, bleiben die beiden Queues unveraendert
       logge_status("2/3 Regel nicht erfuellt"),
       DLQ
   end.
 
 % Hilfsmethode die herausfindet wo genau die Luecke ist und die Luecke schließt.
 finde_und_fuelle_spalte(HBQ, DLQ) ->
-  % Wo ist die Luecke?
   {SpaltStartNNr, SpaltEndeNNr} = finde_spalte(HBQ, DLQ),
-  % Erstelle Fehlernachricht und logge
   GapMessageList = erstelle_spalt_nachricht(SpaltStartNNr, SpaltEndeNNr),
-  % Schließe diese Luecke
   NewDLQ = dlq:push2DLQ(GapMessageList, DLQ, ?LOG_DATEI_NAME),
   NewDLQ.
 
