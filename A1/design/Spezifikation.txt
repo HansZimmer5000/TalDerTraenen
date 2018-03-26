@@ -38,10 +38,11 @@ Getestete Kombinationen:
 Offene Fragen:
     DLQ sendet Nachricht, sendet gesendete NNr, aber was zuerst? Ist das überhaupt so wichtig?
     Darf man die lists library verwenden?
-    Was passiert wenn DLQ NNr 1,2,5 hat und NNr 4 angefordert wird?
     Professor Clients erstellen nicht 5 sondern 10 Nachrichten?
 
 Beantwortete Fragen:
+    Was passiert wenn DLQ NNr 1,2,5 hat und NNr 4 angefordert wird?
+        DLQ sendet nächst größere Nachricht
     Wo wird TerminatedFlag gesetzt?
         Beim senden einer Nachricht (NNr N) wird geprüft ob die nächste Nachricht (N + 1) vorhanden ist.
         Oder in der Error Nachricht (wenn angefragte Nachricht nicht vorhanden) ist Flag standard auf false.
