@@ -25,11 +25,11 @@ updateClient_2_test() ->
     NeueCMEM2 = cmem:updateClient(NeueCMEM1, b, 3, ?LOG_DATEI),
     NeueCMEM3 = cmem:updateClient(NeueCMEM2, c, 4, ?LOG_DATEI),
     NeueCMEM4 = cmem:updateClient(NeueCMEM3, SelfPid, 5, ?LOG_DATEI),
-    [?ERINNERUNGS_ZEIT_SEK, [Tupel1, Tupel2, Tupel3, Tupel4]] = NeueCMEM4,
-    {SelfPid, 5, _OldTS} = Tupel4,
+    [?ERINNERUNGS_ZEIT_SEK, Nachrichten4] = NeueCMEM4,
+    {SelfPid, 5, _TS} = lists:keyfind(SelfPid, 1, Nachrichten4),
     NeueCMEM5 = cmem:updateClient(NeueCMEM4, SelfPid, 6, ?LOG_DATEI),
-    [?ERINNERUNGS_ZEIT_SEK, [Tupel1, Tupel2, Tupel3, Tupel5]] = NeueCMEM5,
-    {SelfPid, 6, _OldTS} = Tupel5.
+    [?ERINNERUNGS_ZEIT_SEK, Nachrichten5] = NeueCMEM5,
+    {SelfPid, 6, _TS} = lists:keyfind(SelfPid, 1, Nachrichten5).
 
 getClientNNr_1_test() ->    
     CMEM = cmem:initCMEM(?ERINNERUNGS_ZEIT_SEK, ?LOG_DATEI),

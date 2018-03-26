@@ -22,22 +22,15 @@ initCMEM(ErinnerungsZeitSek, LogDatei) ->
 
 
 updateClient([ErinnerungsZeitSek, TupelListe], ClientPid, NNr, LogDatei) ->
-    NeueTupelListe = updateClient_(TupelListe, ClientPid, NNr),
+    NeueTupelListe = setClientNNr(TupelListe, ClientPid, NNr),
     logge_status(io_lib:format("~p update zu NNR: ~p", [ClientPid, NNr]), LogDatei),
     CMEM = [ErinnerungsZeitSek, NeueTupelListe],
     CMEM.
 
-updateClient_([], ClientPid, NNr) ->
-    [{ClientPid, NNr, erlang:timestamp()}];
-updateClient_(TupelListe, ClientPid, NNr) ->
-    [KopfTupel | RestTupel] = TupelListe,
-    case KopfTupel of
-        {ClientPid, _AltNNr, _AltTS} -> NeuesTupel = {ClientPid, NNr, erlang:timestamp()},
-                                        NeueTupelListe = [NeuesTupel | RestTupel];
-        _Any -> NeueRestTupel = updateClient_(RestTupel, ClientPid, NNr),
-                NeueTupelListe = [KopfTupel | NeueRestTupel]
-    end,
-    NeueTupelListe.
+setClientNNr(TupelListe, ClientPid, NNr) ->
+    TmpTupelListe = lists:keydelete(ClientPid, 1, TupelListe),
+    [{ClientPid, NNr, erlang:timestamp()}] ++ TmpTupelListe.
+
 
 getClientNNr([ErinnerungsZeitSek, TupelListe], ClientPid) ->
     NNr = getClientNNr_(TupelListe, ErinnerungsZeitSek, ClientPid),

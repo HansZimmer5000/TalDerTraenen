@@ -1,4 +1,6 @@
 Getestete Kombinationen:
+    Generelle Problem:
+    Klaucks Server fängt bei NNr 0 an, unserer bei NNr 1. 
 
     Kombination 1
     Unser:  Client
@@ -7,16 +9,22 @@ Getestete Kombinationen:
     Kombination 2
     Unser: Server
     Klauck: Client, HBQ, DLQ, CMEM 
-    Problem: nokA Meldungen der HBQ/DLQ (Siehe Mail)
-    Erklärung:
-    Problem: Deadlock?
+    Problem: Deadlock? Nach invollständigen Server und vollständigen Client Init passiert nichts.
     Erklärung: Unser Server erwartet bereits gestarete HBQ, tut man dies, kein Problem.
 
     Kombination 3
     Unser: HBQ, DLQ, CMEM
     Klauck: Server, Client
-    Problem: "24.03 15:57:37,242|" <7318.74.0> update zu NNR: 0
-    Erklärung: Weil Herrn Klaucks Code bei NNr 0 beginnt und unserer bei NNr 1!
+
+    Kombination 4
+    Unser: Client, HBQ, DLQ, CMEM
+    Klauck: Server
+
+    Kombination 5
+    Unser: CMEM
+    Klauck: Server, Client, HBQ, DLQ,
+    Problem: Update zu NNr 1 für jeden, dann direkter Sprung zu NNr 4 für jeden und dann bis zum Runterfahren NNr 4 Nachrichten.
+    Erklärung: 
 
 
 Offene Fragen:
