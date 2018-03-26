@@ -13,7 +13,7 @@
 	dlq_ist_voll/1,
 
 	deliverMSG/4,
-	pruefe_nnr_und_hole_nachricht/2,
+	pruefe_nnr_und_hole_nachricht/3,
 	hole_nachricht/2,
 	erstelleErrNachricht/0
 	]).
@@ -77,7 +77,7 @@ entferne_letztes_listen_element(Nachrichten) ->
 
 % Sendet eine Bestimmte Nachricht (anhand NNr) and bestimmten Client (ClientPID), gibt die gesendete Nummer zurueck.
 deliverMSG(NNr, ClientPID, [_Size, DLQNachrichten], Datei) ->
-	case pruefe_nnr_und_hole_nachricht(DLQNachrichten, NNr) of
+	case pruefe_nnr_und_hole_nachricht(DLQNachrichten, NNr, Datei) of
 		[] ->
 			logge_status(io_lib:format("Nachricht mit Nummer ~p nicht existent",[NNr]), Datei),
 			ZuSendendeNachricht = erstelleErrNachricht(),
@@ -97,11 +97,11 @@ deliverMSG(NNr, ClientPID, [_Size, DLQNachrichten], Datei) ->
 
 % Holt anhand der Nachrichtennummer eine Nachrichte aus eine Liste von Messages.
 % [] wird zurueckgegeben wenn die Nachricht nicht gefunden werden konnte.
-pruefe_nnr_und_hole_nachricht(DLQNachrichten, GesuchteNNr) ->
+pruefe_nnr_und_hole_nachricht(DLQNachrichten, GesuchteNNr, Datei) ->
 	MinNNr = hole_min_nnr(DLQNachrichten),
 	case GesuchteNNr < MinNNr of
 		true ->
-			logge_status(io_lib:format("GesuchteNNr ~p unterhalb von MinNNr ~p", [GesuchteNNr, MinNNr])),
+			logge_status(io_lib:format("GesuchteNNr ~p unterhalb von MinNNr ~p", [GesuchteNNr, MinNNr]), Datei),
 			hole_nachricht(DLQNachrichten, MinNNr);
 		false ->
 			hole_nachricht(DLQNachrichten, GesuchteNNr)
