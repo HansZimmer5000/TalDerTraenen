@@ -29,6 +29,7 @@ Getestete Kombinationen:
 
 Offene Fragen:
     - DLQ sendet Nachricht, sendet gesendete NNr, aber was zuerst? Ist das überhaupt so wichtig?
+    - Darf man die lists library verwenden?
   
 Beantwortete Fragen:
     Was machen wir wenn Nachricht 46 als nächstes Gesendet werden sollte, die aber in DLQ nicht existiert, welche Nachricht wird als nächstes Gesendet, 1 oder 47?
