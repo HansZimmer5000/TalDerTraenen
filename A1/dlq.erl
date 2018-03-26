@@ -96,7 +96,6 @@ deliverMSG(NNr, ClientPID, [_Size, Nachrichten], Datei) ->
       	TermiatedFlag = (holeNachricht(Nachrichten, NNr + 1) == [])
   end,
 
-  logge_nachricht_status(Nachricht, "zu verschicken", Datei),
   [ZuSendendeNNr, Text, TSClientOut, TSHBQin, TSDLQIn] = Nachricht,
   ZuSendendeNachricht = [ZuSendendeNNr, Text, TSClientOut, TSHBQin, TSDLQIn, erlang:timestamp()],
 
