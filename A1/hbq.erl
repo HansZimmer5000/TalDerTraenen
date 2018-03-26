@@ -18,8 +18,8 @@
     is_in_order/2,
     pruefe_naechste_nachricht_und_pushe/2,
     pruefe_limit_und_fuelle_spalte/3,
-    suche_und_fuelle_spalte/2,
-    suche_spalte/2,
+    finde_und_fuelle_spalte/2,
+    finde_spalte/2,
     erstelle_spalt_nachricht/2
 ]).
 
@@ -176,7 +176,7 @@ pruefe_limit_und_fuelle_spalte(HBQ, DLQ, DLQLimit) ->
     (HBQSize > GapLimit) ->
       logge_status("2/3 Regel erfuellt"),
       %Ist das Limit ueberschritten, so wird die erste Luecke geschlossen und an die DLQ weitergegeben
-      NewDLQ = suche_und_fuelle_spalte(HBQ, DLQ),
+      NewDLQ = finde_und_fuelle_spalte(HBQ, DLQ),
       NewDLQ;
     true ->
       %Ist das Limit nicht ueberschritten, bleiben die beiden Queues unveraendert
@@ -185,9 +185,9 @@ pruefe_limit_und_fuelle_spalte(HBQ, DLQ, DLQLimit) ->
   end.
 
 % Hilfsmethode die herausfindet wo genau die Luecke ist und die Luecke schließt.
-suche_und_fuelle_spalte(HBQ, DLQ) ->
+finde_und_fuelle_spalte(HBQ, DLQ) ->
   % Wo ist die Luecke?
-  {SpaltStartNNr, SpaltEndeNNr} = suche_spalte(HBQ, DLQ),
+  {SpaltStartNNr, SpaltEndeNNr} = finde_spalte(HBQ, DLQ),
   % Erstelle Fehlernachricht und logge
   GapMessageList = erstelle_spalt_nachricht(SpaltStartNNr, SpaltEndeNNr),
   % Schließe diese Luecke
@@ -195,7 +195,7 @@ suche_und_fuelle_spalte(HBQ, DLQ) ->
   NewDLQ.
 
 % Hilfsmethode die herausfindet wo genau die Luecke ist.
-suche_spalte([[AktuelleNNr | _AktuelleNachrichtRest] | _HBQRest],DLQ) ->
+finde_spalte([[AktuelleNNr | _AktuelleNachrichtRest] | _HBQRest], DLQ) ->
   ErwarteteNNr = dlq:expectedNr(DLQ),
   logge_status(io_lib:format("Gaprange: ~p-~p",[ErwarteteNNr, AktuelleNNr - 1])),
   {ErwarteteNNr, AktuelleNNr - 1}.
@@ -209,8 +209,6 @@ erstelle_spalt_nachricht(SpaltStartNNr,SpaltEndeNNr) ->
 %																					>>LOGGING UND CONFIG<<
 %------------------------------------------------------------------------------------------------------
 
-% Holt aus der Configdatei (server.cfg) den benoetigten Wert fuer den eingegebenen Key.
-% Erwartet Configdatei mit "{key1,value1}. {key2,value2}. ....."
 extractValueFromConfig(Key) ->
   {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
   {ok, Value} = vsutil:get_config_value(Key, ConfigListe),

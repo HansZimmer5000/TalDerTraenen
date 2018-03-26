@@ -193,17 +193,17 @@ pruefe_limit_und_fuelle_spalte_2_test() ->
     [?DLQSIZE, [DLQNachricht1]] = hbq:pruefe_limit_und_fuelle_spalte(HBQ, DLQ, ?DLQSIZE),
     [1, "Text", TS, TS, TS] = DLQNachricht1.
 
-suche_und_fuelle_spalte_1_test() ->
+finde_und_fuelle_spalte_1_test() ->
     TS = erlang:timestamp(),
     Nachricht1 = [1, "Text", TS, TS, TS],
     Nachricht4 = [4, "Text", TS, TS],
     HBQ = [Nachricht4],
     DLQ = [?DLQSIZE, [Nachricht1]],
-    [?DLQSIZE, [DLQNachricht1, DLQNachricht2]] = hbq:suche_und_fuelle_spalte(HBQ, DLQ),
+    [?DLQSIZE, [DLQNachricht1, DLQNachricht2]] = hbq:finde_und_fuelle_spalte(HBQ, DLQ),
     [3, "Error Nachricht zum Luecke von 2 bis 3 zu fuellen", TS, TS, _TS] = DLQNachricht1,
     [1, "Text", TS, TS, TS] = DLQNachricht2.
 
-suche_spalte_1_test() ->
+finde_spalte_1_test() ->
     TS = erlang:timestamp(),
     Nachricht1 = [1, "Text", TS, TS, TS],
     Nachricht4 = [4, "Text", TS, TS],
@@ -211,7 +211,7 @@ suche_spalte_1_test() ->
     DLQ = [?DLQSIZE, [Nachricht1]],
     ?assertEqual(
         {2, 3},
-        hbq:suche_spalte(HBQ, DLQ)
+        hbq:finde_spalte(HBQ, DLQ)
     ).
 
 erstelle_spalt_nachricht_1_test() ->

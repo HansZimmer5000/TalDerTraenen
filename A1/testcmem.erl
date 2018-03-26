@@ -34,7 +34,7 @@ updateClient_2_test() ->
 getClientNNr_1_test() ->    
     CMEM = cmem:initCMEM(?ERINNERUNGS_ZEIT_SEK, ?LOG_DATEI),
     NeueCMEM = cmem:updateClient(CMEM, self(), 2, ?LOG_DATEI),
-    2 = cmem:getClientNNr(NeueCMEM, self()).
+    3 = cmem:getClientNNr(NeueCMEM, self()).
 
 getClientNNr_2_test() ->    
     CMEM = cmem:initCMEM(?ERINNERUNGS_ZEIT_SEK, ?LOG_DATEI),
@@ -49,7 +49,7 @@ getClientNNr_3_test() ->
 pruefeTSUndGibNNrZuruck_1_test() ->
     NNr = 2,
     AltTS = erlang:timestamp(),
-    NNr = cmem:pruefeTSUndGibNNrZuruck(AltTS, ?ERINNERUNGS_ZEIT_SEK, NNr).
+    3 = cmem:pruefeTSUndGibNNrZuruck(AltTS, ?ERINNERUNGS_ZEIT_SEK, NNr).
 
 pruefeTSUndGibNNrZuruck_2_test() ->
     NNr = 2,
