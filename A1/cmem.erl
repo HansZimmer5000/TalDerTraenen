@@ -42,7 +42,7 @@ getClientNNr([ErinnerungsZeitSek, TupelListe], ClientPid) ->
 pruefeTSUndGibNNrZuruck(OldTS, ErinnerungsZeitSek, SavedNNr) ->
     case tSIstAbglaufen(OldTS, ErinnerungsZeitSek) of
         true ->  ?DEFAULT_NNR;
-        false -> SavedNNr
+        false -> SavedNNr + 1
     end.
 
 tSIstAbglaufen(OldTS, ErinnerungsZeitSek) ->
