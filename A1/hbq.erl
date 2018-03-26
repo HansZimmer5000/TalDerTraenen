@@ -166,7 +166,6 @@ in_hbq_einfuegen_(Akku, [NNr | NachrichtRest], [[HBQKopfNNr | HBQKopfRest] | HBQ
 %Server zurueckgegeben
 deliver_nachricht(PID, NNr, ToClient, DLQ) ->
   GesendeteNNr = dlq:deliverMSG(NNr,ToClient,DLQ, ?DLQ_LOG_DATEI),
-  logge_status(io_lib:format("Number of sent Nachricht: ~p", [GesendeteNNr])),
   PID ! {reply, GesendeteNNr}.
 
 %Handler fuer den delete Befehl, loescht auch die DLQ
