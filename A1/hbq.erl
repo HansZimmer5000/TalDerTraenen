@@ -15,7 +15,7 @@
     deliver_nachricht/4,
     delete_hbq/2,
 
-    is_in_order/2,
+    wird_erwartet/2,
     pruefe_naechste_nachricht_und_pushe/2,
     pruefe_limit_und_fuelle_spalte/3,
     finde_und_fuelle_spalte/2,
@@ -55,8 +55,8 @@ wait_for_init() ->
 receive_loop(HoldbackQueue, DeliveryQueue) ->
   receive
     {PID, {request, pushHBQ, NachrichtAsList}} ->
-      {NewHBQ, NewDLQ} = push_hbq(PID, NachrichtAsList, HoldbackQueue, DeliveryQueue),
-      receive_loop(NewHBQ, NewDLQ);
+      {NeueHBQ, NeueDLQ} = push_hbq(PID, NachrichtAsList, HoldbackQueue, DeliveryQueue),
+      receive_loop(NeueHBQ, NeueDLQ);
 
     {PID, {request, deliverMSG, NNr, ToClient}} ->
       deliver_nachricht(PID, NNr, ToClient, DeliveryQueue),
@@ -88,34 +88,34 @@ fuege_hbqin_ts_hinzu([NNr, Text, TSClientout]) ->
 
 pruefe_und_sende_nachricht(Nachricht, HBQ, DLQ) ->
   [NNr | _Rest] = Nachricht,
-  CanBeDelivered = is_in_order(Nachricht, DLQ),
-  case CanBeDelivered of 
+  KannDirektAnDLQ = wird_erwartet(Nachricht, DLQ),
+  case KannDirektAnDLQ of 
     true ->
       logge_status(io_lib:format("Nachricht mit Nummer ~p an DLQ gesendet", [NNr])),
-      NewHBQ = HBQ,
-      NewDLQ = dlq:push2DLQ(Nachricht, DLQ, ?DLQ_LOG_DATEI);
+      NeueHBQ = HBQ,
+      NeueDLQ = dlq:push2DLQ(Nachricht, DLQ, ?DLQ_LOG_DATEI);
     false ->
       logge_status(io_lib:format("Nachricht mit Nummer ~p in HBQ sortiert", [NNr])),
-      NewHBQ = in_hbq_einfuegen(Nachricht, HBQ),
-      NewDLQ = pruefe_limit_und_fuelle_spalte(NewHBQ, DLQ, ?DLQLIMIT)
+      NeueHBQ = in_hbq_einfuegen(Nachricht, HBQ),
+      NeueDLQ = pruefe_limit_und_fuelle_spalte(NeueHBQ, DLQ, ?DLQLIMIT)
   end,
-  HBQDLQTupel = pruefe_naechste_nachricht_und_pushe(NewHBQ,NewDLQ),
+  HBQDLQTupel = pruefe_naechste_nachricht_und_pushe(NeueHBQ,NeueDLQ),
   HBQDLQTupel.
 
 %Hilfsmethode um zu pruefen, ob die DLQ diese Nachricht erwartet
-is_in_order([NNr | _Rest], DLQ) ->
+wird_erwartet([NNr | _Rest], DLQ) ->
   ExpectedNNr = dlq:expectedNr(DLQ),
   ExpectedNNr == NNr.
 
 %Rekursive Hilfsmethode, welche nach und nach weitere Nachrichten an die DLQ schickt, falls moeglich
 pruefe_naechste_nachricht_und_pushe([], DLQ) -> {[], DLQ};
 pruefe_naechste_nachricht_und_pushe([HBQHead | HBQRest], DLQ) ->
-  CanBeDelivered = is_in_order(HBQHead, DLQ),
+  CanBeDelivered = wird_erwartet(HBQHead, DLQ),
   logge_status(io_lib:format("Nachricht CanBeDelivered? ~p", [CanBeDelivered])),
   case CanBeDelivered of
     true ->
-      NewDLQ = dlq:push2DLQ(HBQHead, DLQ, ?DLQ_LOG_DATEI),
-      pruefe_naechste_nachricht_und_pushe(HBQRest, NewDLQ);
+      NeueDLQ = dlq:push2DLQ(HBQHead, DLQ, ?DLQ_LOG_DATEI),
+      pruefe_naechste_nachricht_und_pushe(HBQRest, NeueDLQ);
     false -> 
       {[HBQHead | HBQRest], DLQ}
   end.
@@ -127,8 +127,8 @@ pruefe_limit_und_fuelle_spalte(HBQ, DLQ, DLQLimit) ->
   if
     (HBQSize > GapLimit) ->
       logge_status("2/3 Regel erfuellt"),
-      NewDLQ = finde_und_fuelle_spalte(HBQ, DLQ),
-      NewDLQ;
+      NeueDLQ = finde_und_fuelle_spalte(HBQ, DLQ),
+      NeueDLQ;
     true ->
       logge_status("2/3 Regel nicht erfuellt"),
       DLQ
@@ -139,8 +139,8 @@ in_hbq_einfuegen(Nachricht, []) ->
   [Nachricht];
 in_hbq_einfuegen(Nachricht, HBQ) ->
   logge_status("HBQ ist nicht leer"),
-  NewHBQ = in_hbq_einfuegen_([], Nachricht, HBQ),
-  NewHBQ.
+  NeueHBQ = in_hbq_einfuegen_([], Nachricht, HBQ),
+  NeueHBQ.
 
 %Prueft pro Rekursionsschritt, ob das vorderste Element der HBQ eine kleinere NNR hat als das einzufuegende Element.
 %Wenn dem nicht so ist, wird das erste Element der HBQ in den Akku geschrieben und es erfolgt ein weiterer Rekursionsaufruf
@@ -148,50 +148,56 @@ in_hbq_einfuegen(Nachricht, HBQ) ->
 in_hbq_einfuegen_(Akku, Nachricht, []) ->
   [NNr | _Rest] = Nachricht,
   logge_status(io_lib:format("Nachricht mit Nummer ~p wurde ganz hinten an HBQ gehaengt", [NNr])),
-  NewHBQ = Akku ++ [Nachricht],
-  NewHBQ;
+  NeueHBQ = Akku ++ [Nachricht],
+  NeueHBQ;
 in_hbq_einfuegen_(Akku, [NNr | NachrichtRest], [[HBQKopfNNr | HBQKopfRest] | HBQRest]) ->
   case NNr < HBQKopfNNr of 
     true ->
       VordererHBQTeil = Akku ++ [[NNr | NachrichtRest]],
       NeuerHBQRest = [[HBQKopfNNr | HBQKopfRest] | HBQRest],
-      NewHBQ = VordererHBQTeil ++ NeuerHBQRest;
+      NeueHBQ = VordererHBQTeil ++ NeuerHBQRest;
     false ->
       NewAkku = Akku ++ [[HBQKopfNNr | HBQKopfRest]],
-      NewHBQ = in_hbq_einfuegen_(NewAkku, [NNr | NachrichtRest], HBQRest)
+      NeueHBQ = in_hbq_einfuegen_(NewAkku, [NNr | NachrichtRest], HBQRest)
   end,
-  NewHBQ.
+  NeueHBQ.
 
 %Handler fuer den deliverMSG Befehl. Dieser wird an die dlq delegiert, anschließend wird die Nummer der versendeten Nachricht an den
 %Server zurueckgegeben
 deliver_nachricht(PID, NNr, ToClient, DLQ) ->
-  SentMsgNum = dlq:deliverMSG(NNr,ToClient,DLQ, ?DLQ_LOG_DATEI),
-  logge_status(io_lib:format("Number of sent Nachricht: ~p", [SentMsgNum])),
-  PID ! {reply,SentMsgNum}.
+  GesendeteNNr = dlq:deliverMSG(NNr,ToClient,DLQ, ?DLQ_LOG_DATEI),
+  logge_status(io_lib:format("Number of sent Nachricht: ~p", [GesendeteNNr])),
+  PID ! {reply, GesendeteNNr}.
 
 %Handler fuer den delete Befehl, loescht auch die DLQ
 delete_hbq(PID, DLQ) ->
+  delete_dlq(DLQ),
+  unregisterHBQ(?HBQNAME),
+  PID ! {reply, ok}.
+
+delete_dlq(DLQ) ->
   case dlq:delDLQ(DLQ) of 
     ok ->
       logge_status("DLQ wurde erfolgreich geloescht");
     _ -> 
       logge_status("ERR: DLQ wurde NICHT geloescht")
-  end,
-  case unregister(?HBQNAME) of
+  end.
+
+unregisterHBQ(HBQName) ->
+  case unregister(HBQName) of
     true ->
       logge_status("HBQ wurde erfolgreich unregistered");
     _ ->
       logge_status("ERR: HBQ wurde NICHT unregistered")
-  end,
-  PID ! {reply, ok}.
+  end.
 
 
 % Hilfsmethode die herausfindet wo genau die Luecke ist und die Luecke schließt.
 finde_und_fuelle_spalte(HBQ, DLQ) ->
   {SpaltStartNNr, SpaltEndeNNr} = finde_spalte(HBQ, DLQ),
   GapNachrichtList = erstelle_spalt_nachricht(SpaltStartNNr, SpaltEndeNNr),
-  NewDLQ = dlq:push2DLQ(GapNachrichtList, DLQ, ?LOG_DATEI_NAME),
-  NewDLQ.
+  NeueDLQ = dlq:push2DLQ(GapNachrichtList, DLQ, ?LOG_DATEI_NAME),
+  NeueDLQ.
 
 % Hilfsmethode die herausfindet wo genau die Luecke ist.
 finde_spalte([[AktuelleNNr | _AktuelleNachrichtRest] | _HBQRest], DLQ) ->

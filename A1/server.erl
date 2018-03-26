@@ -63,7 +63,7 @@ receive_loop(CMEM, NextNNR) ->
 getmessages_abfertigen(HBQPid, CMEM, LeserPid) -> 
     ZuSendendeNNr = hole_naechste_nnr_fur_leser(CMEM, LeserPid),
     GesendeteNNr = sendeNNr(HBQPid, ZuSendendeNNr, LeserPid),
-    logge_status(io_lib:format("Nachricht mit Nummer ~p (Angefordert: ~p) an ~p gesendet", [ZuSendendeNNr, GesendeteNNr, LeserPid])),
+    logge_status(io_lib:format("Nachricht mit Nummer ~p (Angefordert: ~p) an ~p gesendet", [GesendeteNNr, ZuSendendeNNr, LeserPid])),
     NeueCMEM = update_gesendete_nnr_fur_leser(CMEM, LeserPid, GesendeteNNr),
     NeueCMEM.
 

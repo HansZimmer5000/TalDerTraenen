@@ -106,11 +106,11 @@ delete_hbq_1_test() ->
         after ?MAX_DELAY -> ?assert(false)
     end. 
 
-is_in_order_1_test() ->
+wird_erwartet_1_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     DLQ = [?DLQSIZE, [[1, "Text", TS, TS ,TS]]],
     Nachricht = [2, "Text2", TS, TS],
-    ?assert(hbq:is_in_order(Nachricht, DLQ)).
+    ?assert(hbq:wird_erwartet(Nachricht, DLQ)).
 
 pruefe_naechste_nachricht_und_pushe_1_test() ->
     HBQ = [],
