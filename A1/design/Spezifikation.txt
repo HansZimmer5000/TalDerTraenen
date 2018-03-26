@@ -34,11 +34,15 @@ Getestete Kombinationen:
 
 
 Offene Fragen:
-    - DLQ sendet Nachricht, sendet gesendete NNr, aber was zuerst? Ist das überhaupt so wichtig?
-    - Darf man die lists library verwenden?
-    - wo baut man ein, dass wenn NNr 1 aus DLQ rausgeflogen ist, NNr 2 der neue anfang ist? Sonst gibts nur noch 0er NNR.
-  
+    DLQ sendet Nachricht, sendet gesendete NNr, aber was zuerst? Ist das überhaupt so wichtig?
+    Darf man die lists library verwenden?
+
 Beantwortete Fragen:
+    Wo wird TerminatedFlag gesetzt?
+        Beim senden einer Nachricht (NNr N) wird geprüft ob die nächste Nachricht (N + 1) vorhanden ist.
+        Oder in der Error Nachricht (wenn angefragte Nachricht nicht vorhanden) ist Flag standard auf false.
+    Wo baut man ein, dass wenn NNr 1 aus DLQ rausgeflogen ist, NNr 2 der neue anfang ist? Sonst gibts nur noch 0er NNR.
+        Wird in DLQ gemacht, wenn NNr N angefordert wird aber aktuelles NNr Minimum unter N liegt. Gesendet wird dann Minimum NNr.
     Was genau soll cmem:getClientNNr zurückgeben, NNr in der Liste oder NNr + 1?
         Steht dran, "welche (..) er als nächstes erhalten darf".
     Was machen wir wenn Nachricht 46 als nächstes Gesendet werden sollte, die aber in DLQ nicht existiert, welche Nachricht wird als nächstes Gesendet, 1 oder 47?

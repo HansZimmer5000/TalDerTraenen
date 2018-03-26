@@ -6,14 +6,15 @@
 	delDLQ/1, 
 
 	expectedNr/1, 
-	holeMaxNNr/1,
+	hole_max_nnr/1,
 
 	push2DLQ/3, 
-	entferneLetztesListenElement/1,
-	dLQIstVoll/1,
+	entferne_letztes_listen_element/1,
+	dlq_ist_voll/1,
 
 	deliverMSG/4,
-	holeNachricht/2,
+	pruefe_nnr_und_hole_nachricht/2,
+	hole_nachricht/2,
 	erstelleErrNachricht/0
 	]).
 
@@ -38,12 +39,12 @@ delDLQ(_DLQ) -> ok.
 
 % Gibt die Nachrichtennummer zurueck die als naechstes erwartet wird. (Die letzte / groeßte Nachrichtennummer + 1)
 expectedNr([_Size, Messages]) ->
-	MaxNr = holeMaxNNr(Messages),
+	MaxNr = hole_max_nnr(Messages),
 	MaxNr + 1.
 
-holeMaxNNr([]) ->
+hole_max_nnr([]) ->
 	?DLQ_EMPTY_NNR;
-holeMaxNNr([AktuellsteNachricht | _RestlicheNachrichten]) ->
+hole_max_nnr([AktuellsteNachricht | _RestlicheNachrichten]) ->
 	[NNr, _Text, _TSCOut, _TSHIn ,_TSDIn] = AktuellsteNachricht,
 	NNr.
 
@@ -52,11 +53,11 @@ holeMaxNNr([AktuellsteNachricht | _RestlicheNachrichten]) ->
 % Da absteigend sortiert ist heißt das ganz vorne.
 % Vorausgesetzt die DLQ (Size) ist noch nicht voll! Wenn voll wird neue Nachricht einfach verworfen und Fehler gelogt.
 push2DLQ([NNr, Msg, TSClientOut, TSHBQin], [Size, Nachrichten], Datei) ->
-	DLQIstVoll = dLQIstVoll([Size, Nachrichten]),
+	DLQIstVoll = dlq_ist_voll([Size, Nachrichten]),
 	case DLQIstVoll of
 		true ->
 			logge_status("DLQ ist voll, letzte Nachricht wird verworfen", Datei),
-			TmpNeueNachrichten = entferneLetztesListenElement(Nachrichten);
+			TmpNeueNachrichten = entferne_letztes_listen_element(Nachrichten);
 		false ->
 			TmpNeueNachrichten = Nachrichten
 	end,
@@ -67,24 +68,25 @@ push2DLQ([NNr, Msg, TSClientOut, TSHBQin], [Size, Nachrichten], Datei) ->
 	NeueDLQ.
 
 % Prueft ob die DLQ schon voll ist, also ob die Size schon erreicht wurde.
-dLQIstVoll([Size, Nachrichten]) ->
+dlq_ist_voll([Size, Nachrichten]) ->
 	Size == length(Nachrichten).
 
-entferneLetztesListenElement([]) -> [];
-entferneLetztesListenElement(Nachrichten) ->
+entferne_letztes_listen_element([]) -> [];
+entferne_letztes_listen_element(Nachrichten) ->
 	lists:droplast(Nachrichten).
 
 % Sendet eine Bestimmte Nachricht (anhand NNr) and bestimmten Client (ClientPID), gibt die gesendete Nummer zurueck.
 deliverMSG(NNr, ClientPID, [_Size, DLQNachrichten], Datei) ->
-	case holeNachricht(DLQNachrichten, NNr) of
+	case pruefe_nnr_und_hole_nachricht(DLQNachrichten, NNr) of
 		[] ->
 			logge_status(io_lib:format("Nachricht mit Nummer ~p nicht existent",[NNr]), Datei),
 			ZuSendendeNachricht = erstelleErrNachricht(),
 			TermiatedFlag = true;
 		GefundeneNachricht ->	
-			logge_status(io_lib:format("Nachricht mit Nummer ~p existent", [NNr]), Datei),
+			[GefundeneNNr | _] = GefundeneNachricht,
+			logge_status(io_lib:format("Nachricht mit Nummer ~p existent", [GefundeneNNr]), Datei),
 			ZuSendendeNachricht = GefundeneNachricht,
-			TermiatedFlag = (holeNachricht(DLQNachrichten, NNr + 1) == [])
+			TermiatedFlag = (hole_nachricht(DLQNachrichten, GefundeneNNr + 1) == [])
 	end,
 
 	GesendeteNachrichtMitTS = fuege_dlqout_ts_hinzu(ZuSendendeNachricht),
@@ -95,11 +97,29 @@ deliverMSG(NNr, ClientPID, [_Size, DLQNachrichten], Datei) ->
 
 % Holt anhand der Nachrichtennummer eine Nachrichte aus eine Liste von Messages.
 % [] wird zurueckgegeben wenn die Nachricht nicht gefunden werden konnte.
-holeNachricht([], _NNr) -> [];
-holeNachricht([[NNr | NachrichtRest] | _RestlicheNachrichten], NNr) -> 
+pruefe_nnr_und_hole_nachricht(DLQNachrichten, GesuchteNNr) ->
+	MinNNr = hole_min_nnr(DLQNachrichten),
+	case GesuchteNNr < MinNNr of
+		true ->
+			logge_status(io_lib:format("GesuchteNNr ~p unterhalb von MinNNr ~p", [GesuchteNNr, MinNNr])),
+			hole_nachricht(DLQNachrichten, MinNNr);
+		false ->
+			hole_nachricht(DLQNachrichten, GesuchteNNr)
+	end.
+
+hole_nachricht([], _NNr) -> 
+	[];
+hole_nachricht([[NNr | NachrichtRest] | _RestlicheNachrichten], NNr) -> 
 	[NNr | NachrichtRest];
-holeNachricht([_AktuellsteNachricht | RestlicheNachrichten], NNr) -> 
-	holeNachricht(RestlicheNachrichten, NNr).
+hole_nachricht([_AktuellsteNachricht | RestlicheNachrichten], NNr) -> 
+	hole_nachricht(RestlicheNachrichten, NNr).
+
+hole_min_nnr([]) ->
+	?DLQ_EMPTY_NNR;
+hole_min_nnr(DLQNachrichten) ->
+	LetzteNachricht = lists:last(DLQNachrichten),
+	[MinNNr | _] = LetzteNachricht,
+	MinNNr.
 
 % Erstellt eine Error Nachricht aufgrund des nicht vorhanden seins der gesuchten Nachrichtennummer in der DLQ.
 erstelleErrNachricht() ->

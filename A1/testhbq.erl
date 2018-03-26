@@ -86,13 +86,16 @@ deliver_nachricht_2_test() ->
     ServerPid = self(),
     _HBQPid = spawn(fun() -> hbq:deliver_nachricht(ServerPid, 1, ClientPid, DLQ) end),
     receive
-        {reply, SentMsgNum} -> ?assertEqual(0, SentMsgNum)
+        Any2 -> 
+            {reply, EmpfangeneNachricht, TerminatedFlag} = Any2,
+            [2, "Text", TS, TS, TS, _] = EmpfangeneNachricht,
+            ?assert(TerminatedFlag)
         after ?MAX_DELAY -> ?assert(false)
     end,
     receive
-        {reply, ZuSendendeNachricht, TermiatedFlag} -> 
-            [0, "Angeforderte Nachricht nicht vorhanden.", _TS, _TS, _TS, _TS] = ZuSendendeNachricht,
-            ?assert(TermiatedFlag)
+        Any1 -> 
+            {reply, SentMsgNum} = Any1,
+            ?assertEqual(2, SentMsgNum)
         after ?MAX_DELAY -> ?assert(false)
     end.
 

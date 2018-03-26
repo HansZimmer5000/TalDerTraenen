@@ -21,14 +21,14 @@ expectedNr_2_test() ->
     Nachricht2 = [1, "Text", TS, TS, TS],
     3 = dlq:expectedNr([?SIZE, [Nachricht1, Nachricht2]]).
 
-holeMaxNNr_1_test() ->
+hole_max_nnr_1_test() ->
     TS = erlang:timestamp(),
     Nachricht1 = [2, "Text", TS, TS, TS],
     Nachricht2 = [1, "Text", TS, TS, TS],
-    2 = dlq:holeMaxNNr([Nachricht1, Nachricht2]).
+    2 = dlq:hole_max_nnr([Nachricht1, Nachricht2]).
 
-holeMaxNNr_2_test() ->
-    0 = dlq:holeMaxNNr([]).
+hole_max_nnr_2_test() ->
+    0 = dlq:hole_max_nnr([]).
 
 
 push2DLQ_1_test() ->
@@ -74,40 +74,40 @@ deliverMSG_2_test() ->
     end.
 
 
-entferneLetztesListenElement_1_test() ->
-    [] = dlq:entferneLetztesListenElement([1]).
+entferne_letztes_listen_element_1_test() ->
+    [] = dlq:entferne_letztes_listen_element([1]).
 
-entferneLetztesListenElement_2_test() ->
-    [] = dlq:entferneLetztesListenElement([]).
+entferne_letztes_listen_element_2_test() ->
+    [] = dlq:entferne_letztes_listen_element([]).
 
-entferneLetztesListenElement_3_test() ->
-    [1,3,4] = dlq:entferneLetztesListenElement([1,3,4,5]).
+entferne_letztes_listen_element_3_test() ->
+    [1,3,4] = dlq:entferne_letztes_listen_element([1,3,4,5]).
 
 
-dLQIstVoll_1_test() ->
+dlq_ist_voll_1_test() ->
     DLQ = dlq:initDLQ(0, ?LOG_DATEI),
-    true = dlq:dLQIstVoll(DLQ).
+    ?assert(dlq:dlq_ist_voll(DLQ)).
 
-dLQIstVoll_2_test() ->
+dlq_ist_voll_2_test() ->
     DLQ = dlq:initDLQ(1, ?LOG_DATEI),
-    false = dlq:dLQIstVoll(DLQ).
+    false = dlq:dlq_ist_voll(DLQ).
 
-dLQIstVoll_3_test() ->
+dlq_ist_voll_3_test() ->
     DLQ = dlq:initDLQ(1, ?LOG_DATEI),
     TS = erlang:timestamp(),
     NeueDLQ = dlq:push2DLQ([1, "Text", TS, TS], DLQ, ?LOG_DATEI),
-    true = dlq:dLQIstVoll(NeueDLQ).
+    ?assert(dlq:dlq_ist_voll(NeueDLQ)).
 
 
-holeNachricht_1_test() ->
+hole_nachricht_1_test() ->
     DLQ = dlq:initDLQ(?SIZE, ?LOG_DATEI),
     TS = erlang:timestamp(),
     [?SIZE, Nachrichten] = dlq:push2DLQ([1, "Text", TS, TS], DLQ, ?LOG_DATEI),
-    [1, "Text", TS, TS, _TS] = dlq:holeNachricht(Nachrichten, 1).
+    [1, "Text", TS, TS, _TS] = dlq:hole_nachricht(Nachrichten, 1).
 
-holeNachricht_2_test() ->
+hole_nachricht_2_test() ->
     DLQ = dlq:initDLQ(?SIZE, ?LOG_DATEI),
-    [] = dlq:holeNachricht(DLQ, 1).
+    ?assertEqual([], dlq:hole_nachricht(DLQ, 1)).
 
 
 erstelleErrNachricht_1_test() ->
