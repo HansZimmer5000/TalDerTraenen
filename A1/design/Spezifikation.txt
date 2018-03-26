@@ -21,10 +21,16 @@ Getestete Kombinationen:
     Klauck: Server
 
     Kombination 5
-    Unser: CMEM
+    Unser: CMEM - Edited!
     Klauck: Server, Client, HBQ, DLQ,
     Problem: Update zu NNr 1 für jeden, dann direkter Sprung zu NNr 4 für jeden und dann bis zum Runterfahren NNr 4 Nachrichten.
-    Erklärung: 
+    Erklärung: Wir machen im Server cmeme:getClientNNr + 1, Klauck wohl in der CMEM, was soll getClientNNr nun zurückgeben, gehaltene oder nächste Nummer?
+
+    Kombination 6
+    Unser: Server, CMEM - Edited!
+    Klauck: Client, HBQ, DLQ
+    Problem & Erklärung siehe Kombi5
+
 
 
 Offene Fragen:
