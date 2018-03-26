@@ -81,21 +81,19 @@ entferneLetztesListenElement(Nachrichten) ->
 	lists:droplast(Nachrichten).
 
 % Sendet eine Bestimmte Nachricht (anhand NNr) and bestimmten Client (ClientPID), gibt die gesendete Nummer zurueck.
-deliverMSG(NNr, ClientPID, [_Size, Nachrichten], Datei) ->
-	case holeNachricht(Nachrichten, NNr) of
+deliverMSG(NNr, ClientPID, [_Size, DLQNachrichten], Datei) ->
+	case holeNachricht(DLQNachrichten, NNr) of
 		[] ->
 			logge_status(io_lib:format("Nachricht mit Nummer ~p nicht existent",[NNr]), Datei),
-			[ErrNNr, ErrText | ErrRest] = erstelleErrNachricht(),
-			Nachricht = [ErrNNr, ErrText | ErrRest],
+			ZuSendendeNachricht = erstelleErrNachricht(),
 			TermiatedFlag = true;
-		GefundeneNachricht ->
-			[GefundeneNNr | _NachrichtRest] = GefundeneNachricht,	
-			logge_status(io_lib:format("Nachricht mit Nummer ~p existent", [GefundeneNNr]), Datei),
-			Nachricht = GefundeneNachricht,
-			TermiatedFlag = (holeNachricht(Nachrichten, NNr + 1) == [])
+		GefundeneNachricht ->	
+			logge_status(io_lib:format("Nachricht mit Nummer ~p existent", [NNr]), Datei),
+			ZuSendendeNachricht = GefundeneNachricht,
+			TermiatedFlag = (holeNachricht(DLQNachrichten, NNr + 1) == [])
 	end,
 
-	GesendeteNachrichtMitTS = fuege_dlqout_ts_hinzu(Nachricht),
+	GesendeteNachrichtMitTS = fuege_dlqout_ts_hinzu(ZuSendendeNachricht),
 	ClientPID ! {reply, GesendeteNachrichtMitTS, TermiatedFlag},
 
 	[GesendeteNNr | _] = GesendeteNachrichtMitTS,
@@ -127,8 +125,3 @@ logge_status(Inhalt, LogDatei) ->
     LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(LogDatei, LogNachricht).
-
-logge_nachricht_status(Nachricht, Status, LogDatei) ->
-    [NNR | _Rest] = Nachricht,
-    LogNachricht = io_lib:format("NNR ~p ~s", [NNR, Status]),
-    logge_status(LogNachricht, LogDatei).
