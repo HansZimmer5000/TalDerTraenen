@@ -6,14 +6,14 @@
 
     start/0,
     wait_for_init/0,
-    init_hbq_handler/1,
+    init_hbq/1,
 
     receive_loop/2,
 
-    push_hbq_handler/4,
+    push_hbq/4,
     in_hbq_einfuegen/2,
-    deliver_nachricht_handler/4,
-    delete_hbq_handler/2,
+    deliver_nachricht/4,
+    delete_hbq/2,
 
     is_in_order/2,
     pruefe_naechste_nachricht_und_pushe/2,
@@ -48,7 +48,7 @@ wait_for_init() ->
     {PID, {request, initHBQ}} ->
       io:fwrite("got init request"),
       DLQ = dlq:initDLQ(?DLQLIMIT, ?DLQ_LOG_DATEI),
-      init_hbq_handler(PID), 
+      init_hbq(PID), 
       receive_loop([], DLQ)
   end.
 
@@ -56,14 +56,14 @@ receive_loop(HoldbackQueue, DeliveryQueue) ->
   io:fwrite("receive_loop"),
   receive
     {PID, {request, pushHBQ, MessageAsList}} ->
-      {NewHBQ, NewDLQ} = push_hbq_handler(PID, MessageAsList, HoldbackQueue, DeliveryQueue),
+      {NewHBQ, NewDLQ} = push_hbq(PID, MessageAsList, HoldbackQueue, DeliveryQueue),
       receive_loop(NewHBQ, NewDLQ);
 
     {PID, {request, deliverMSG, NNr, ToClient}} ->
-      deliver_nachricht_handler(PID, NNr, ToClient, DeliveryQueue),
+      deliver_nachricht(PID, NNr, ToClient, DeliveryQueue),
       receive_loop(HoldbackQueue, DeliveryQueue);
 
-    {PID, {request, dellHBQ}} -> delete_hbq_handler(PID, DeliveryQueue)
+    {PID, {request, dellHBQ}} -> delete_hbq(PID, DeliveryQueue)
   end.
 
 %------------------------------------------------------------------------------------------------------
@@ -71,11 +71,11 @@ receive_loop(HoldbackQueue, DeliveryQueue) ->
 %------------------------------------------------------------------------------------------------------
 
 %Bestaetigt dem aufrufenden Prozess (in diesem Fall dem Server) die Initialisierung
-init_hbq_handler(PID) ->
+init_hbq(PID) ->
   PID ! {reply, ok}.
 
-push_hbq_handler(PID, [NNr, MessageLST, TSClientout], HBQ, DLQ) ->
-  logge_status(io_lib:format("push_hbq_handler PID: ~p, MsgNr: ~p", [PID, NNr])),
+push_hbq(PID, [NNr, MessageLST, TSClientout], HBQ, DLQ) ->
+  logge_status(io_lib:format("push_hbq PID: ~p, MsgNr: ~p", [PID, NNr])),
   TShbqin = erlang:timestamp(),
   MessageWithAddedTS = [NNr, MessageLST, TSClientout, TShbqin],
   CanBeDelivered = is_in_order(MessageWithAddedTS, DLQ),
@@ -96,13 +96,13 @@ push_hbq_handler(PID, [NNr, MessageLST, TSClientout], HBQ, DLQ) ->
 
 %Handler fuer den deliverMSG Befehl. Dieser wird an die dlq delegiert, anschließend wird die Nummer der versendeten Nachricht an den
 %Server zurueckgegeben
-deliver_nachricht_handler(PID, NNr, ToClient, DLQ) ->
+deliver_nachricht(PID, NNr, ToClient, DLQ) ->
   SentMsgNum = dlq:deliverMSG(NNr,ToClient,DLQ, ?DLQ_LOG_DATEI),
   logge_status(io_lib:format("Number of sent Message: ~p", [SentMsgNum])),
   PID ! {reply,SentMsgNum}.
 
 %Handler fuer den delete Befehl, loescht auch die DLQ
-delete_hbq_handler(PID, DLQ) ->
+delete_hbq(PID, DLQ) ->
   AtomAnswer = dlq:delDLQ(DLQ),
   if 
     (AtomAnswer == ok) ->

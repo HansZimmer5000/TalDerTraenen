@@ -24,14 +24,14 @@ wait_for_init_1_test() ->
     end,
     exit(HBQPid, kill).
 
-init_hbq_handler_1_test() ->
-    hbq:init_hbq_handler(self()),
+init_hbq_1_test() ->
+    hbq:init_hbq(self()),
     receive
         {reply, ok} -> ?assert(true)
         after ?MAX_DELAY -> ?assert(false)
     end.
 
-push_hbq_handler_1_test() ->
+push_hbq_1_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht1 = [1, "Text", TS, TS, TS],
     Nachricht2 = [2, "Text", TS],
@@ -40,7 +40,7 @@ push_hbq_handler_1_test() ->
     ServerPid = self(),
     ThisPid = self(),
     _HBQPid = spawn(fun() -> 
-                        Result = hbq:push_hbq_handler(ServerPid, Nachricht2, HBQ, DLQ),
+                        Result = hbq:push_hbq(ServerPid, Nachricht2, HBQ, DLQ),
                         ThisPid ! Result 
                     end),
     receive
@@ -60,13 +60,13 @@ push_hbq_handler_1_test() ->
     end.
     
 
-deliver_nachricht_handler_1_test() ->
+deliver_nachricht_1_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = [1, "Text", TS, TS, TS],
     DLQ = [?DLQSIZE, [Nachricht]],
     ClientPid = self(),
     ServerPid = self(),
-    _HBQPid = spawn(fun() -> hbq:deliver_nachricht_handler(ServerPid, 1, ClientPid, DLQ) end),
+    _HBQPid = spawn(fun() -> hbq:deliver_nachricht(ServerPid, 1, ClientPid, DLQ) end),
     receive
         {reply, SentMsgNum} -> ?assertEqual(1, SentMsgNum)
         after ?MAX_DELAY -> ?assert(false)
@@ -78,13 +78,13 @@ deliver_nachricht_handler_1_test() ->
         after ?MAX_DELAY -> ?assert(false)
     end.
 
-deliver_nachricht_handler_2_test() ->
+deliver_nachricht_2_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = [2, "Text", TS, TS, TS],
     DLQ = [?DLQSIZE, [Nachricht]],
     ClientPid = self(),
     ServerPid = self(),
-    _HBQPid = spawn(fun() -> hbq:deliver_nachricht_handler(ServerPid, 1, ClientPid, DLQ) end),
+    _HBQPid = spawn(fun() -> hbq:deliver_nachricht(ServerPid, 1, ClientPid, DLQ) end),
     receive
         {reply, SentMsgNum} -> ?assertEqual(0, SentMsgNum)
         after ?MAX_DELAY -> ?assert(false)
@@ -96,10 +96,10 @@ deliver_nachricht_handler_2_test() ->
         after ?MAX_DELAY -> ?assert(false)
     end.
 
-delete_hbq_handler_1_test() ->
+delete_hbq_1_test() ->
     DLQ = [?DLQSIZE, []],
     ThisPid = self(),
-    HBQPid = spawn(fun() -> hbq:delete_hbq_handler(ThisPid, DLQ) end),
+    HBQPid = spawn(fun() -> hbq:delete_hbq(ThisPid, DLQ) end),
     register(wk, HBQPid),
     receive
         Any -> ?assertEqual({reply, ok}, Any)
