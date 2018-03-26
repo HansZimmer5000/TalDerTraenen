@@ -98,6 +98,7 @@ deliverMSG(NNr, ClientPID, [_Size, DLQNachrichten], Datei) ->
 % Holt anhand der Nachrichtennummer eine Nachrichte aus eine Liste von Messages.
 % [] wird zurueckgegeben wenn die Nachricht nicht gefunden werden konnte.
 pruefe_nnr_und_hole_nachricht(DLQNachrichten, GesuchteNNr, Datei) ->
+	%Statt nach Min NNr zu suchen, Nach nächst größerer suchen (oder eben der geforderten NNr)
 	MinNNr = hole_min_nnr(DLQNachrichten),
 	case GesuchteNNr < MinNNr of
 		true ->
