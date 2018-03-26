@@ -33,7 +33,7 @@
 %------------------------------------------------------------------------------------------------------
 %																	>>START / INIT<<
 %------------------------------------------------------------------------------------------------------
-% Code vom Professor erwartet folgende Funktion
+% Funktion vom Professor Code erwartet folgende Funktion
 startHBQ() ->
   start().
 
