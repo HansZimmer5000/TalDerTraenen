@@ -120,6 +120,29 @@ deliver_nachricht_3_test() ->
         after ?MAX_DELAY -> ?assert(false)
     end.
 
+deliver_nachricht_4_test() ->
+    TS = vsutil:now2string(erlang:timestamp()),
+    Nachricht1 = [2, "Text", TS, TS, TS],
+    Nachricht2 = [4, "Fülle Lücke von 3 bis 4", TS, TS, TS],
+    Nachricht3 = [5, "Text", TS, TS, TS],
+    DLQ = [?DLQSIZE, [Nachricht3, Nachricht2, Nachricht1]],
+    ClientPid = self(),
+    ServerPid = self(),
+    _HBQPid = spawn(fun() -> hbq:deliver_nachricht(ServerPid, 3, ClientPid, DLQ) end),
+    receive
+        Any2 -> 
+            {reply, EmpfangeneNachricht, TerminatedFlag} = Any2,
+            [4, "Fülle Lücke von 3 bis 4", TS, TS, TS, _] = EmpfangeneNachricht,
+            ?assertNot(TerminatedFlag)
+        after ?MAX_DELAY -> ?assert(false)
+    end,
+    receive
+        Any1 -> 
+            {reply, SentMsgNum} = Any1,
+            ?assertEqual(4, SentMsgNum)
+        after ?MAX_DELAY -> ?assert(false)
+    end.
+
 delete_hbq_1_test() ->
     DLQ = [?DLQSIZE, []],
     ThisPid = self(),

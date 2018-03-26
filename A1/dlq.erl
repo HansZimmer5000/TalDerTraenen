@@ -14,6 +14,7 @@
 
 	deliverMSG/4,
 	pruefe_nnr_und_hole_nachricht/3,
+	hole_naechst_groessere_nnr/2,
 	hole_nachricht/2,
 	erstelleErrNachricht/0
 	]).
@@ -98,14 +99,18 @@ deliverMSG(NNr, ClientPID, [_Size, DLQNachrichten], Datei) ->
 % Holt anhand der Nachrichtennummer eine Nachrichte aus eine Liste von Messages.
 % [] wird zurueckgegeben wenn die Nachricht nicht gefunden werden konnte.
 pruefe_nnr_und_hole_nachricht(DLQNachrichten, GesuchteNNr, Datei) ->
-	%Statt nach Min NNr zu suchen, Nach nächst größerer suchen (oder eben der geforderten NNr)
-	MinNNr = hole_min_nnr(DLQNachrichten),
-	case GesuchteNNr < MinNNr of
-		true ->
-			logge_status(io_lib:format("GesuchteNNr ~p unterhalb von MinNNr ~p", [GesuchteNNr, MinNNr]), Datei),
-			hole_nachricht(DLQNachrichten, MinNNr);
-		false ->
-			hole_nachricht(DLQNachrichten, GesuchteNNr)
+	case hole_nachricht(DLQNachrichten, GesuchteNNr) of
+		[] ->
+			DLQNachrichtenReversed = lists:reverse(DLQNachrichten),
+			case hole_naechst_groessere_nnr(DLQNachrichtenReversed, GesuchteNNr) of
+				GesuchteNNr ->
+					[];
+				NaechstGroessereNNr ->
+					logge_status(io_lib:format("Naechst Groessere NNr = ~p", [NaechstGroessereNNr]), Datei),
+					hole_nachricht(DLQNachrichten, NaechstGroessereNNr)
+			end;
+		GefundeneNachricht ->
+			GefundeneNachricht
 	end.
 
 hole_nachricht([], _NNr) -> 
@@ -115,12 +120,18 @@ hole_nachricht([[NNr | NachrichtRest] | _RestlicheNachrichten], NNr) ->
 hole_nachricht([_AktuellsteNachricht | RestlicheNachrichten], NNr) -> 
 	hole_nachricht(RestlicheNachrichten, NNr).
 
-hole_min_nnr([]) ->
-	?DLQ_EMPTY_NNR;
-hole_min_nnr(DLQNachrichten) ->
-	LetzteNachricht = lists:last(DLQNachrichten),
-	[MinNNr | _] = LetzteNachricht,
-	MinNNr.
+% hole_naechst_groessere_nnr rechnet mit einer Aufsteigend sortierten Liste!
+% Theoretisch auch möglich in dem man nur letztes Element anschaut und bei nicht passen weg löscht.
+hole_naechst_groessere_nnr([], AusgangsNNr) ->
+	AusgangsNNr;
+hole_naechst_groessere_nnr([DLQKopfNachricht | DLQRestNachrichten], AusgangsNNr) ->
+	[DLQKopfNNr | _] = DLQKopfNachricht,
+	case DLQKopfNNr > AusgangsNNr of
+		true ->
+			DLQKopfNNr;
+		false ->
+			hole_naechst_groessere_nnr(DLQRestNachrichten, AusgangsNNr)
+	end.
 
 % Erstellt eine Error Nachricht aufgrund des nicht vorhanden seins der gesuchten Nachrichtennummer in der DLQ.
 erstelleErrNachricht() ->

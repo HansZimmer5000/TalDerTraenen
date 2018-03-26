@@ -98,6 +98,27 @@ dlq_ist_voll_3_test() ->
     NeueDLQ = dlq:push2DLQ([1, "Text", TS, TS], DLQ, ?LOG_DATEI),
     ?assert(dlq:dlq_ist_voll(NeueDLQ)).
 
+hole_naechst_groessere_nnr_1_test() ->
+    TS = erlang:timestamp(),
+    Nachricht1 = [2, "Text", TS, TS, TS],
+    Nachricht2 = [4, "Fülle Lücke von 3 bis 4", TS, TS, TS],
+    Nachricht3 = [5, "Text", TS, TS, TS],
+    ReverseDLQNachrichten = [Nachricht1, Nachricht2, Nachricht3],
+    AusgangsNNr = 3,
+    ?assertEqual(
+        4,
+        dlq:hole_naechst_groessere_nnr(ReverseDLQNachrichten, AusgangsNNr)
+    ).
+
+hole_naechst_groessere_nnr_2_test() ->
+    TS = erlang:timestamp(),
+    Nachricht1 = [2, "Text", TS, TS, TS],
+    ReverseDLQNachrichten = [Nachricht1],
+    AusgangsNNr = 1,
+    ?assertEqual(
+        2,
+        dlq:hole_naechst_groessere_nnr(ReverseDLQNachrichten, AusgangsNNr)
+    ).
 
 hole_nachricht_1_test() ->
     DLQ = dlq:initDLQ(?SIZE, ?LOG_DATEI),
