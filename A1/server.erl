@@ -46,16 +46,12 @@ initHBQ() ->
 %																	>>LOOP<<
 %------------------------------------------------------------------------------------------------------
 receive_loop(CMEM, NextNNR) ->
-    logge_status("receive_loop"),
     receive
-        {AbsenderPid, getmessages} ->   logge_status("Got getmessages"),
-                                        NeueCMEM = getmessages_abfertigen(?HBQ, CMEM, AbsenderPid),
+        {AbsenderPid, getmessages} ->   NeueCMEM = getmessages_abfertigen(?HBQ, CMEM, AbsenderPid),
                                         receive_loop(NeueCMEM, NextNNR);
-        {dropmessage, Nachricht} ->     logge_status("Got dropmessage"),
-                                        dropmessage_abfertigen(?HBQ, Nachricht),
+        {dropmessage, Nachricht} ->     dropmessage_abfertigen(?HBQ, Nachricht),
                                         receive_loop(CMEM, NextNNR);
-        {AbsenderPid, getmsgid} ->  logge_status("Got getmsgid"),
-                                    NeueNextNNR = getmsgid_abfertigen(AbsenderPid, NextNNR),
+        {AbsenderPid, getmsgid} ->  NeueNextNNR = getmsgid_abfertigen(AbsenderPid, NextNNR),
                                     receive_loop(CMEM, NeueNextNNR)
         after timer:seconds(?LATENZ_SEK) -> runterfahren(CMEM)
     end.
@@ -67,7 +63,7 @@ receive_loop(CMEM, NextNNR) ->
 getmessages_abfertigen(HBQPid, CMEM, LeserPid) -> 
     ZuSendendeNNr = hole_naechste_nnr_fur_leser(CMEM, LeserPid),
     GesendeteNNr = sendeNNr(HBQPid, ZuSendendeNNr, LeserPid),
-    logge_status(io_lib:format("NNr ~p (Soll: ~p) an ~p gesendet", [ZuSendendeNNr, GesendeteNNr, LeserPid])),
+    logge_status(io_lib:format("Nachricht mit Nummer ~p (Angefordert: ~p) an ~p gesendet", [ZuSendendeNNr, GesendeteNNr, LeserPid])),
     NeueCMEM = update_gesendete_nnr_fur_leser(CMEM, LeserPid, GesendeteNNr),
     NeueCMEM.
 
@@ -83,21 +79,22 @@ sendeNNr(HBQPid, ZuSendendeNNr, LeserPid) ->
     receive
         {reply, GesendeteNNr} -> GesendeteNNr
     end.
-    %TS = erlang:timestamp(),
-    %Nachricht = [ZuSendendeNNr, "Text", TS, TS, TS, TS],
-    %TerminatedFlag = rand:uniform() > 0.5,
-    %LeserPid ! {reply, Nachricht, TerminatedFlag}.
 
 
 dropmessage_abfertigen(HBQPid, Nachricht) ->
     HBQPid ! {self(), {request, pushHBQ, Nachricht}},
+    [NNr | _Rest] = Nachricht,
     receive
-        {reply, ok} -> ok
+        {reply, ok} ->
+            logge_status(io_lib:format("Nachricht mit Nummer ~p wurde an HBQ geschickt", [NNr]))
+        after timer:seconds(5) -> 
+            logge_status(io_lib:format("Nachricht mit Nummer ~p wurde NICHT erfolgreich an HBQ geschickt", [NNr]))
     end.
 
 
 getmsgid_abfertigen(AbsenderPid, LetzteNNR) -> 
     AbsenderPid ! {nid, LetzteNNR},
+    logge_status(io_lib:format("NNr ~p an ~p gesendet", [LetzteNNR, AbsenderPid])),
     LetzteNNR + 1.
 
 
