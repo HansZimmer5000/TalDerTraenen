@@ -110,5 +110,5 @@ holeNachricht_2_test() ->
     [] = dlq:holeNachricht(DLQ, 1).
 
 
-erstelleErrNachrichtFurFehlendeNNr_1_test() ->
-    [0, "Angeforderte Nachricht nicht vorhanden." | _Timestamps] = dlq:erstelleErrNachrichtFurFehlendeNNr().
+erstelleErrNachricht_1_test() ->
+    [0, "Angeforderte Nachricht nicht vorhanden." | _Timestamps] = dlq:erstelleErrNachricht().

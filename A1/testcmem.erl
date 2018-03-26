@@ -38,24 +38,27 @@ getClientNNr_1_test() ->
 
 getClientNNr_2_test() ->    
     CMEM = cmem:initCMEM(?ERINNERUNGS_ZEIT_SEK, ?LOG_DATEI),
-    ?DEFAULT_NNR = cmem:getClientNNr(CMEM, self()).
+    Result = ?DEFAULT_NNR + 1,
+    Result = cmem:getClientNNr(CMEM, self()).
 
 getClientNNr_3_test() ->    
     CMEM = cmem:initCMEM(?ERINNERUNGS_ZEIT_SEK, ?LOG_DATEI),
     NeueCMEM = cmem:updateClient(CMEM, self(), 2, ?LOG_DATEI),
+    Result = ?DEFAULT_NNR + 1,
     timer:sleep(timer:seconds(?ERINNERUNGS_ZEIT_SEK + 1)),
-    ?DEFAULT_NNR = cmem:getClientNNr(NeueCMEM, self()).
+    Result = cmem:getClientNNr(NeueCMEM, self()).
 
 pruefeTSUndGibNNrZuruck_1_test() ->
     NNr = 2,
     AltTS = erlang:timestamp(),
-    3 = cmem:pruefeTSUndGibNNrZuruck(AltTS, ?ERINNERUNGS_ZEIT_SEK, NNr).
+    2 = cmem:pruefeTSUndGibNNrZuruck(AltTS, ?ERINNERUNGS_ZEIT_SEK, NNr).
 
 pruefeTSUndGibNNrZuruck_2_test() ->
     NNr = 2,
     AltTS = erlang:timestamp(),
+    Result = ?DEFAULT_NNR,
     timer:sleep(timer:seconds(?ERINNERUNGS_ZEIT_SEK + 1)),
-    ?DEFAULT_NNR = cmem:pruefeTSUndGibNNrZuruck(AltTS, ?ERINNERUNGS_ZEIT_SEK, NNr).
+    Result = cmem:pruefeTSUndGibNNrZuruck(AltTS, ?ERINNERUNGS_ZEIT_SEK, NNr).
 
 tSIstAbglaufen_1_test() ->
     AltTS = erlang:timestamp(),

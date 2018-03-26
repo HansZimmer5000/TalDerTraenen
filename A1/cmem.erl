@@ -31,18 +31,20 @@ setClientNNr(TupelListe, ClientPid, NNr) ->
     TmpTupelListe = lists:keydelete(ClientPid, 1, TupelListe),
     [{ClientPid, NNr, erlang:timestamp()}] ++ TmpTupelListe.
 
-
 getClientNNr([ErinnerungsZeitSek, TupelListe], ClientPid) ->
     GefundenesTupel = lists:keyfind(ClientPid, 1, TupelListe),
     case GefundenesTupel of
-        {ClientPid, NNr, AlterTS} -> pruefeTSUndGibNNrZuruck(AlterTS, ErinnerungsZeitSek, NNr);
-        _Any -> ?DEFAULT_NNR
-    end.
+        {ClientPid, NNr, AlterTS} -> 
+            AktuelleNNr = pruefeTSUndGibNNrZuruck(AlterTS, ErinnerungsZeitSek, NNr);
+        _Any -> 
+            AktuelleNNr = ?DEFAULT_NNR
+    end,
+    AktuelleNNr + 1.
 
 pruefeTSUndGibNNrZuruck(OldTS, ErinnerungsZeitSek, SavedNNr) ->
     case tSIstAbglaufen(OldTS, ErinnerungsZeitSek) of
         true ->  ?DEFAULT_NNR;
-        false -> SavedNNr + 1
+        false -> SavedNNr
     end.
 
 tSIstAbglaufen(OldTS, ErinnerungsZeitSek) ->

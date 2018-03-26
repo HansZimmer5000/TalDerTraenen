@@ -53,114 +53,72 @@ wait_for_init() ->
   end.
 
 receive_loop(HoldbackQueue, DeliveryQueue) ->
-  io:fwrite("receive_loop"),
   receive
-    {PID, {request, pushHBQ, MessageAsList}} ->
-      {NewHBQ, NewDLQ} = push_hbq(PID, MessageAsList, HoldbackQueue, DeliveryQueue),
+    {PID, {request, pushHBQ, NachrichtAsList}} ->
+      {NewHBQ, NewDLQ} = push_hbq(PID, NachrichtAsList, HoldbackQueue, DeliveryQueue),
       receive_loop(NewHBQ, NewDLQ);
 
     {PID, {request, deliverMSG, NNr, ToClient}} ->
       deliver_nachricht(PID, NNr, ToClient, DeliveryQueue),
       receive_loop(HoldbackQueue, DeliveryQueue);
 
-    {PID, {request, dellHBQ}} -> delete_hbq(PID, DeliveryQueue)
+    {PID, {request, dellHBQ}} -> 
+      delete_hbq(PID, DeliveryQueue)
   end.
 
 %------------------------------------------------------------------------------------------------------
-%																	>>SCHNITTSTELLEN UND HANDLER<<
+%																	>>SCHNITTSTELLEN<<
 %------------------------------------------------------------------------------------------------------
 
 %Bestaetigt dem aufrufenden Prozess (in diesem Fall dem Server) die Initialisierung
 init_hbq(PID) ->
   PID ! {reply, ok}.
 
-push_hbq(PID, [NNr, MessageLST, TSClientout], HBQ, DLQ) ->
-  logge_status(io_lib:format("push_hbq PID: ~p, MsgNr: ~p", [PID, NNr])),
+push_hbq(PID, Nachricht, HBQ, DLQ) ->
+  NachrichtMitTs = fuege_hbqin_ts_hinzu(Nachricht),
+
+  HBQDLQTupel = pruefe_und_sende_nachricht(NachrichtMitTs, HBQ, DLQ),
+
+  PID ! {reply, ok},
+  HBQDLQTupel.
+
+fuege_hbqin_ts_hinzu([NNr, Text, TSClientout]) ->
   TShbqin = erlang:timestamp(),
-  MessageWithAddedTS = [NNr, MessageLST, TSClientout, TShbqin],
-  CanBeDelivered = is_in_order(MessageWithAddedTS, DLQ),
-  logge_status(io_lib:format("Kann Nachricht gesendet werden? ~p", [CanBeDelivered])),
-  if 
-    CanBeDelivered ->
-      NewDLQ = dlq:push2DLQ(MessageWithAddedTS, DLQ, ?DLQ_LOG_DATEI), 
-      {NewHBQ, ResultDLQ} = pruefe_naechste_nachricht_und_pushe(HBQ, NewDLQ),
-      Result = {NewHBQ, ResultDLQ};
+  [NNr, Text, TSClientout, TShbqin].
+
+pruefe_und_sende_nachricht(Nachricht, HBQ, DLQ) ->
+  [NNr | _Rest] = Nachricht,
+  CanBeDelivered = is_in_order(Nachricht, DLQ),
+  case CanBeDelivered of 
     true ->
-      NewHBQ = in_hbq_einfuegen(MessageWithAddedTS, HBQ),
-      NewDLQ = pruefe_limit_und_fuelle_spalte(NewHBQ, DLQ, ?DLQLIMIT),
-      {ResultHBQ,ResultDLQ} = pruefe_naechste_nachricht_und_pushe(NewHBQ,NewDLQ),
-      Result = {ResultHBQ,ResultDLQ}
+      logge_status(io_lib:format("Nachricht mit Nummer ~p an DLQ gesendet", [NNr])),
+      NewHBQ = HBQ,
+      NewDLQ = dlq:push2DLQ(Nachricht, DLQ, ?DLQ_LOG_DATEI);
+    false ->
+      logge_status(io_lib:format("Nachricht mit Nummer ~p in HBQ sortiert", [NNr])),
+      NewHBQ = in_hbq_einfuegen(Nachricht, HBQ),
+      NewDLQ = pruefe_limit_und_fuelle_spalte(NewHBQ, DLQ, ?DLQLIMIT)
   end,
-  PID ! {reply, ok},
-  Result.
-
-%Handler fuer den deliverMSG Befehl. Dieser wird an die dlq delegiert, anschließend wird die Nummer der versendeten Nachricht an den
-%Server zurueckgegeben
-deliver_nachricht(PID, NNr, ToClient, DLQ) ->
-  SentMsgNum = dlq:deliverMSG(NNr,ToClient,DLQ, ?DLQ_LOG_DATEI),
-  logge_status(io_lib:format("Number of sent Message: ~p", [SentMsgNum])),
-  PID ! {reply,SentMsgNum}.
-
-%Handler fuer den delete Befehl, loescht auch die DLQ
-delete_hbq(PID, DLQ) ->
-  AtomAnswer = dlq:delDLQ(DLQ),
-  if 
-    (AtomAnswer == ok) ->
-      logge_status("DLQ wurde erfolgreich geloescht");
-    true -> 
-      logge_status("ERR: DLQ wurde NICHT geloescht")
-  end,
-  PID ! {reply, ok},
-  true = unregister(?HBQNAME).
-
-%------------------------------------------------------------------------------------------------------
-%																					>>HILFSMETHODEN<<
-%------------------------------------------------------------------------------------------------------
+  HBQDLQTupel = pruefe_naechste_nachricht_und_pushe(NewHBQ,NewDLQ),
+  HBQDLQTupel.
 
 %Hilfsmethode um zu pruefen, ob die DLQ diese Nachricht erwartet
-is_in_order([NNr | _], DLQ) ->
+is_in_order([NNr | _Rest], DLQ) ->
   ExpectedNNr = dlq:expectedNr(DLQ),
   ExpectedNNr == NNr.
 
 %Rekursive Hilfsmethode, welche nach und nach weitere Nachrichten an die DLQ schickt, falls moeglich
 pruefe_naechste_nachricht_und_pushe([], DLQ) -> {[], DLQ};
-pruefe_naechste_nachricht_und_pushe([HBQHead | HBQTail], DLQ) ->
+pruefe_naechste_nachricht_und_pushe([HBQHead | HBQRest], DLQ) ->
   CanBeDelivered = is_in_order(HBQHead, DLQ),
-  logge_status(io_lib:format("Message CanBeDelivered? ~p", [CanBeDelivered])),
+  logge_status(io_lib:format("Nachricht CanBeDelivered? ~p", [CanBeDelivered])),
   case CanBeDelivered of
     true ->
       NewDLQ = dlq:push2DLQ(HBQHead, DLQ, ?DLQ_LOG_DATEI),
-      pruefe_naechste_nachricht_und_pushe(HBQTail, NewDLQ);
+      pruefe_naechste_nachricht_und_pushe(HBQRest, NewDLQ);
     false -> 
-      {[HBQHead | HBQTail], DLQ}
+      {[HBQHead | HBQRest], DLQ}
   end.
-
-in_hbq_einfuegen(Message, []) ->
-  logge_status("HBQ ist leer, Element wird einfach eingefuegt"),
-  [Message];
-in_hbq_einfuegen(Message, HBQ) ->
-  logge_status("HBQ ist nicht leer"),
-  NewHBQ = in_hbq_einfuegen_([], Message, HBQ),
-  NewHBQ.
-
-%Prueft pro Rekursionsschritt, ob das forderste Element der HBQ eine kleinere NNR hat als das einzufuegende Element.
-%Wenn dem nicht so ist, wird das erste Element der HBQ in den Akku geschrieben und es erfolgt ein weiterer Rekursionsaufruf
-%Wenn dem so ist, wird das Neue Element an den Akku gehaengt, dieser vor den Rest der HBQ gehaengt und das ganze zurueckgegeben ausgegeben.
-in_hbq_einfuegen_(Akku, Message, []) ->
-  logge_status("ist ganz durchgelaufen, element wird ganz hinten angehaengt"),
-  NewHBQ = lists:append(Akku, [Message]),
-  NewHBQ;
-in_hbq_einfuegen_(Akku, [NNr | MessageRest], [[HBQHeadNNr | HBQHeadRest] | HBQTail]) ->
-  IsSmaller = NNr < HBQHeadNNr,
-  if (IsSmaller) ->
-    NewFirstPartOfHBQ = lists:append(Akku, [[NNr | MessageRest]]),
-    RestOfHBQ = [[HBQHeadNNr | HBQHeadRest] | HBQTail],
-    NewHBQ = lists:append(NewFirstPartOfHBQ, RestOfHBQ);
-    true ->
-      NewAkku = lists:append(Akku, [[HBQHeadNNr | HBQHeadRest]]),
-      NewHBQ = in_hbq_einfuegen_(NewAkku, [NNr | MessageRest], HBQTail)
-  end,
-  NewHBQ.
 
 %Hilfsmethode zum ueberpruefen der Einhaltung des 2/3el Ansatzes
 pruefe_limit_und_fuelle_spalte(HBQ, DLQ, DLQLimit) ->
@@ -176,11 +134,63 @@ pruefe_limit_und_fuelle_spalte(HBQ, DLQ, DLQLimit) ->
       DLQ
   end.
 
+in_hbq_einfuegen(Nachricht, []) ->
+  logge_status("HBQ ist leer, Element wird einfach eingefuegt"),
+  [Nachricht];
+in_hbq_einfuegen(Nachricht, HBQ) ->
+  logge_status("HBQ ist nicht leer"),
+  NewHBQ = in_hbq_einfuegen_([], Nachricht, HBQ),
+  NewHBQ.
+
+%Prueft pro Rekursionsschritt, ob das vorderste Element der HBQ eine kleinere NNR hat als das einzufuegende Element.
+%Wenn dem nicht so ist, wird das erste Element der HBQ in den Akku geschrieben und es erfolgt ein weiterer Rekursionsaufruf
+%Wenn dem so ist, wird das Neue Element an den Akku gehaengt, dieser vor den Rest der HBQ gehaengt und das ganze zurueckgegeben ausgegeben.
+in_hbq_einfuegen_(Akku, Nachricht, []) ->
+  [NNr | _Rest] = Nachricht,
+  logge_status(io_lib:format("Nachricht mit Nummer ~p wurde ganz hinten an HBQ gehaengt", [NNr])),
+  NewHBQ = Akku ++ [Nachricht],
+  NewHBQ;
+in_hbq_einfuegen_(Akku, [NNr | NachrichtRest], [[HBQKopfNNr | HBQKopfRest] | HBQRest]) ->
+  case NNr < HBQKopfNNr of 
+    true ->
+      VordererHBQTeil = Akku ++ [[NNr | NachrichtRest]],
+      NeuerHBQRest = [[HBQKopfNNr | HBQKopfRest] | HBQRest],
+      NewHBQ = VordererHBQTeil ++ NeuerHBQRest;
+    false ->
+      NewAkku = Akku ++ [[HBQKopfNNr | HBQKopfRest]],
+      NewHBQ = in_hbq_einfuegen_(NewAkku, [NNr | NachrichtRest], HBQRest)
+  end,
+  NewHBQ.
+
+%Handler fuer den deliverMSG Befehl. Dieser wird an die dlq delegiert, anschließend wird die Nummer der versendeten Nachricht an den
+%Server zurueckgegeben
+deliver_nachricht(PID, NNr, ToClient, DLQ) ->
+  SentMsgNum = dlq:deliverMSG(NNr,ToClient,DLQ, ?DLQ_LOG_DATEI),
+  logge_status(io_lib:format("Number of sent Nachricht: ~p", [SentMsgNum])),
+  PID ! {reply,SentMsgNum}.
+
+%Handler fuer den delete Befehl, loescht auch die DLQ
+delete_hbq(PID, DLQ) ->
+  case dlq:delDLQ(DLQ) of 
+    ok ->
+      logge_status("DLQ wurde erfolgreich geloescht");
+    _ -> 
+      logge_status("ERR: DLQ wurde NICHT geloescht")
+  end,
+  case unregister(?HBQNAME) of
+    true ->
+      logge_status("HBQ wurde erfolgreich unregistered");
+    _ ->
+      logge_status("ERR: HBQ wurde NICHT unregistered")
+  end,
+  PID ! {reply, ok}.
+
+
 % Hilfsmethode die herausfindet wo genau die Luecke ist und die Luecke schließt.
 finde_und_fuelle_spalte(HBQ, DLQ) ->
   {SpaltStartNNr, SpaltEndeNNr} = finde_spalte(HBQ, DLQ),
-  GapMessageList = erstelle_spalt_nachricht(SpaltStartNNr, SpaltEndeNNr),
-  NewDLQ = dlq:push2DLQ(GapMessageList, DLQ, ?LOG_DATEI_NAME),
+  GapNachrichtList = erstelle_spalt_nachricht(SpaltStartNNr, SpaltEndeNNr),
+  NewDLQ = dlq:push2DLQ(GapNachrichtList, DLQ, ?LOG_DATEI_NAME),
   NewDLQ.
 
 % Hilfsmethode die herausfindet wo genau die Luecke ist.

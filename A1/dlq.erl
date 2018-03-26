@@ -15,13 +15,14 @@
 
 	deliverMSG/4,
 	holeNachricht/2,
-	erstelleErrNachrichtFurFehlendeNNr/0
+	erstelleErrNachricht/0
 	]).
 
+-define(DLQ_EMPTY_NNR, 0).
 
 %////////////////////////////////
 %      DLQ
-% Beispiel mit einer Message: [Size,[NNR,["Message"],TSClientOut,TSHBQIn,TSDLQIn,TSDLQOut]]
+% Beispiel mit einer Message: [Size,[NNR,["Irgend ein Text"],TSClientOut,TSHBQIn,TSDLQIn,TSDLQOut]]
 % DLQ ist so sortiert, dass aktuellste Nachricht (= Hoechste Nachrichtennummer) ganz vorn steht, praktisch absteigend anhand der NNR sortiert.
 %////////////////////////////////
 
@@ -31,11 +32,11 @@
 
 % Initialisiert die DLQ
 initDLQ(Size,Datei) ->
-  logge_status(io_lib:format("Size: ~p, Datei: ~p",[Size,Datei]), Datei),
+  logge_status(io_lib:format("Neue DLQ mit Size ~p",[Size]), Datei),
   [Size, []].
 
 %------------------------------------------------------------------------------------------------------
-%										>>SCHNITTSTELLEN UND HANDLER<<
+%										>>SCHNITTSTELLEN<<
 %------------------------------------------------------------------------------------------------------
 
 % Loeschen der DLQ
@@ -46,10 +47,8 @@ expectedNr([_Size, Messages]) ->
 	MaxNr = holeMaxNNr(Messages),
 	MaxNr + 1.
 
-% Gibt die hoechste Nachrichtennummer heraus.
-% Waere auch mit length(List) moeglich
 holeMaxNNr([]) ->
-	0;
+	?DLQ_EMPTY_NNR;
 holeMaxNNr([AktuellsteNachricht | _RestlicheNachrichten]) ->
 	[NNr, _Text, _TSCOut, _TSHIn ,_TSDIn] = AktuellsteNachricht,
 	NNr.
@@ -60,66 +59,49 @@ holeMaxNNr([AktuellsteNachricht | _RestlicheNachrichten]) ->
 % Vorausgesetzt die DLQ (Size) ist noch nicht voll! Wenn voll wird neue Nachricht einfach verworfen und Fehler gelogt.
 push2DLQ([NNr, Msg, TSClientOut, TSHBQin], [Size, Nachrichten], Datei) ->
 	DLQIstVoll = dLQIstVoll([Size, Nachrichten]),
-	logge_status(io_lib:format("DLQIstVoll: ~p", [DLQIstVoll]), Datei),
-	if
-		DLQIstVoll ->
-			logge_status("DLQ ist voll, aelteste Nachricht wird verworfen", Datei),
-			TmpNeueNachrichten = entferneLetztesListenElement(Nachrichten);
+	case DLQIstVoll of
 		true ->
+			logge_status("DLQ ist voll, letzte Nachricht wird verworfen", Datei),
+			TmpNeueNachrichten = entferneLetztesListenElement(Nachrichten);
+		false ->
 			TmpNeueNachrichten = Nachrichten
 	end,
 	TSDLQIn = erlang:timestamp(),
 	NeueNachrichten = [[NNr, Msg, TSClientOut, TSHBQin, TSDLQIn] | TmpNeueNachrichten],
-	logge_status("Neue Nachricht wurde vorne angefuegt und mit Timestamp fuer DLQIn versehen", Datei),
+	logge_status("Neue Nachricht wurde vorne angefuegt", Datei),
 	NeueDLQ = [Size, NeueNachrichten],
 	NeueDLQ.
 
+% Prueft ob die DLQ schon voll ist, also ob die Size schon erreicht wurde.
+dLQIstVoll([Size, Nachrichten]) ->
+	Size == length(Nachrichten).
+
+entferneLetztesListenElement([]) -> [];
+entferneLetztesListenElement(Nachrichten) ->
+	lists:droplast(Nachrichten).
+
 % Sendet eine Bestimmte Nachricht (anhand NNr) and bestimmten Client (ClientPID), gibt die gesendete Nummer zurueck.
 deliverMSG(NNr, ClientPID, [_Size, Nachrichten], Datei) ->
-  logge_status(io_lib:format("input: NNr: ~p ClientPID: ~p",[NNr, ClientPID]), Datei),
-  % Nachricht holen & Existent -> Wenn nicht Fehler Nachricht erzeugen.
   GefundeneNachricht = holeNachricht(Nachrichten, NNr),
-  if
-    GefundeneNachricht == [] ->
-      logge_status(io_lib:format("Nachrichtnr: ~p nicht existent, Fehlernachricht wird erzeugt",[NNr]), Datei),
-      [ErrNNr, ErrText | ErrRest] = erstelleErrNachrichtFurFehlendeNNr(),
-      Nachricht = [ErrNNr, ErrText | ErrRest],
-      TermiatedFlag = true;
-    true ->
-      [GefundeneNNr | _NachrichtRest] = GefundeneNachricht,	
-      logge_status(io_lib:format("Nachrichtnr: ~p existent", [GefundeneNNr]), Datei),
-      Nachricht = GefundeneNachricht,
-      TermiatedFlag = holeNachricht(Nachrichten, NNr + 1) == []
+  case GefundeneNachricht of
+	[] ->
+		logge_status(io_lib:format("Nachricht mit Nummer ~p nicht existent",[NNr]), Datei),
+      	[ErrNNr, ErrText | ErrRest] = erstelleErrNachricht(),
+      	Nachricht = [ErrNNr, ErrText | ErrRest],
+      	TermiatedFlag = true;
+    _ ->
+      	[GefundeneNNr | _NachrichtRest] = GefundeneNachricht,	
+      	logge_status(io_lib:format("Nachricht mit Nummer ~p existent", [GefundeneNNr]), Datei),
+      	Nachricht = GefundeneNachricht,
+      	TermiatedFlag = (holeNachricht(Nachrichten, NNr + 1) == [])
   end,
-  % Nachricht TSDLQOut anfuegen.
+
   logge_nachricht_status(Nachricht, "zu verschicken", Datei),
   [ZuSendendeNNr, Text, TSClientOut, TSHBQin, TSDLQIn] = Nachricht,
   ZuSendendeNachricht = [ZuSendendeNNr, Text, TSClientOut, TSHBQin, TSDLQIn, erlang:timestamp()],
-  % Nachricht versenden.
+
   ClientPID ! {reply, ZuSendendeNachricht, TermiatedFlag},
   ZuSendendeNNr.
-
-
-%------------------------------------------------------------------------------------------------------
-%											>>HILFSMETHODEN<<
-%------------------------------------------------------------------------------------------------------
-
-% Schmeisst das letzte (aelteste) Element raus
-entferneLetztesListenElement([]) -> [];
-entferneLetztesListenElement(Nachrichten) ->
-	%lists:reverse(tl(lists:reverse(Messages))).
-	lists:droplast(Nachrichten).
-
-
-% Prueft ob die DLQ schon voll ist, also ob die Size schon erreicht wurde.
-dLQIstVoll([Size, Nachrichten]) ->
-	if
-		Size == length(Nachrichten) ->
-			DLQIstVoll = true;
-		true ->
-			DLQIstVoll = false
-	end,
-	DLQIstVoll.
 
 % Holt anhand der Nachrichtennummer eine Nachrichte aus eine Liste von Messages.
 % [] wird zurueckgegeben wenn die Nachricht nicht gefunden werden konnte.
@@ -130,9 +112,9 @@ holeNachricht([_AktuellsteNachricht | RestlicheNachrichten], NNr) ->
 	holeNachricht(RestlicheNachrichten, NNr).
 
 % Erstellt eine Error Nachricht aufgrund des nicht vorhanden seins der gesuchten Nachrichtennummer in der DLQ.
-erstelleErrNachrichtFurFehlendeNNr() ->
+erstelleErrNachricht() ->
 	TS = erlang:timestamp(),
-	[0, "Angeforderte Nachricht nicht vorhanden.", TS, TS, TS].
+	[?DLQ_EMPTY_NNR, "Angeforderte Nachricht nicht vorhanden.", TS, TS, TS].
 
 
 %------------------------------------------------------------------------------------------------------
