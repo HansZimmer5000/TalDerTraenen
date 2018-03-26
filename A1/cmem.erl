@@ -33,14 +33,10 @@ setClientNNr(TupelListe, ClientPid, NNr) ->
 
 
 getClientNNr([ErinnerungsZeitSek, TupelListe], ClientPid) ->
-    NNr = getClientNNr_(TupelListe, ErinnerungsZeitSek, ClientPid),
-    NNr.
-
-getClientNNr_([], _ErinnerungsZeitSek, _ClientPid) -> ?DEFAULT_NNR;
-getClientNNr_([KopfTupel | RestTupel], ErinnerungsZeitSek, ClientPid) ->
-    case KopfTupel of
-        {ClientPid, NNr, OldTS} -> pruefeTSUndGibNNrZuruck(OldTS, ErinnerungsZeitSek, NNr);
-        _Any -> getClientNNr_(RestTupel, ErinnerungsZeitSek, ClientPid)
+    GefundenesTupel = lists:keyfind(ClientPid, 1, TupelListe),
+    case GefundenesTupel of
+        {ClientPid, NNr, AlterTS} -> pruefeTSUndGibNNrZuruck(AlterTS, ErinnerungsZeitSek, NNr);
+        _Any -> ?DEFAULT_NNR
     end.
 
 pruefeTSUndGibNNrZuruck(OldTS, ErinnerungsZeitSek, SavedNNr) ->
