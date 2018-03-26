@@ -82,25 +82,24 @@ entferneLetztesListenElement(Nachrichten) ->
 
 % Sendet eine Bestimmte Nachricht (anhand NNr) and bestimmten Client (ClientPID), gibt die gesendete Nummer zurueck.
 deliverMSG(NNr, ClientPID, [_Size, Nachrichten], Datei) ->
-  GefundeneNachricht = holeNachricht(Nachrichten, NNr),
-  case GefundeneNachricht of
-	[] ->
-		logge_status(io_lib:format("Nachricht mit Nummer ~p nicht existent",[NNr]), Datei),
-      	[ErrNNr, ErrText | ErrRest] = erstelleErrNachricht(),
-      	Nachricht = [ErrNNr, ErrText | ErrRest],
-      	TermiatedFlag = true;
-    _ ->
-      	[GefundeneNNr | _NachrichtRest] = GefundeneNachricht,	
-      	logge_status(io_lib:format("Nachricht mit Nummer ~p existent", [GefundeneNNr]), Datei),
-      	Nachricht = GefundeneNachricht,
-      	TermiatedFlag = (holeNachricht(Nachrichten, NNr + 1) == [])
-  end,
+	case holeNachricht(Nachrichten, NNr) of
+		[] ->
+			logge_status(io_lib:format("Nachricht mit Nummer ~p nicht existent",[NNr]), Datei),
+			[ErrNNr, ErrText | ErrRest] = erstelleErrNachricht(),
+			Nachricht = [ErrNNr, ErrText | ErrRest],
+			TermiatedFlag = true;
+		GefundeneNachricht ->
+			[GefundeneNNr | _NachrichtRest] = GefundeneNachricht,	
+			logge_status(io_lib:format("Nachricht mit Nummer ~p existent", [GefundeneNNr]), Datei),
+			Nachricht = GefundeneNachricht,
+			TermiatedFlag = (holeNachricht(Nachrichten, NNr + 1) == [])
+	end,
 
-  [ZuSendendeNNr, Text, TSClientOut, TSHBQin, TSDLQIn] = Nachricht,
-  ZuSendendeNachricht = [ZuSendendeNNr, Text, TSClientOut, TSHBQin, TSDLQIn, erlang:timestamp()],
+	GesendeteNachrichtMitTS = fuege_dlqout_ts_hinzu(Nachricht),
+	ClientPID ! {reply, GesendeteNachrichtMitTS, TermiatedFlag},
 
-  ClientPID ! {reply, ZuSendendeNachricht, TermiatedFlag},
-  ZuSendendeNNr.
+	[GesendeteNNr | _] = GesendeteNachrichtMitTS,
+	GesendeteNNr.
 
 % Holt anhand der Nachrichtennummer eine Nachrichte aus eine Liste von Messages.
 % [] wird zurueckgegeben wenn die Nachricht nicht gefunden werden konnte.
@@ -115,6 +114,9 @@ erstelleErrNachricht() ->
 	TS = erlang:timestamp(),
 	[?DLQ_EMPTY_NNR, "Angeforderte Nachricht nicht vorhanden.", TS, TS, TS].
 
+fuege_dlqout_ts_hinzu([NNr, Text, TSClientOut, TSHBQin, TSDLQIn]) ->
+	TSDLQOut = erlang:timestamp(),
+	[NNr, Text, TSClientOut, TSHBQin, TSDLQIn, TSDLQOut].
 
 %------------------------------------------------------------------------------------------------------
 %											>>LOGGING UND CONFIG<<
