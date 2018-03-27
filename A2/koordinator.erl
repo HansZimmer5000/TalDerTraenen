@@ -61,8 +61,7 @@ start(NsPid) ->
     GGTProNameList = init_loop(NsPid, SteeringValues, 0, []),
 
     receive
-        {calc, WggT} -> logge_status("got calc"),
-                        calc(WggT, GGTProNameList, NsPid),
+        {calc, WggT} -> calc(WggT, GGTProNameList, NsPid),
                         logge_status("calc init done"),
                         calculation_receive_loop(GGTProNameList, NsPid)
     end.
@@ -182,30 +181,23 @@ get_next_to_last_and_last_elem([_HeadElem | RestElems]) ->
 calculation_receive_loop(GGTProNameList, NsPid) ->
     receive
         {briefmi, {GGTProName, CMi, CZeit}} -> 
-            logge_status("got briefmi"),
             briefmi(GGTProName, CMi, CZeit),
             calculation_receive_loop(GGTProNameList, NsPid);
         {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> 
-            logge_status("got briefterm"),
             briefterm(AbsenderPid, GGTProName, CMi, CZeit),
             calculation_receive_loop(GGTProNameList, NsPid); 
         prompt ->   
-            logge_status("got prompt"),
             prompt(GGTProNameList, NsPid),
             calculation_receive_loop(GGTProNameList, NsPid);
         nudge ->    
-            logge_status("got nudge"),
             nudge(GGTProNameList, NsPid),
             calculation_receive_loop(GGTProNameList, NsPid);
         toggle ->   
-            logge_status("got toggle"),
             toggle(),
             calculation_receive_loop(GGTProNameList, NsPid);
         reset ->    
-            logge_status("got reset"),
             reset(GGTProNameList, NsPid);
         kill ->     
-            logge_status("got kill"),
             kill(GGTProNameList, NsPid)
     end.
 

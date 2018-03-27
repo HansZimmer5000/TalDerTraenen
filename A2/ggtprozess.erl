@@ -58,7 +58,6 @@ init({GGTProName, Mi, Neighbors}, {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) 
 init_receive_loop({GGTProName, Mi, Neighbors}, GlobalVariables) ->
     receive
         {setneighbors, LeftN, RightN} ->  
-            logge_status(GGTProName, "got setneighbors"),
             NewFirstInstanceVariables = {GGTProName, Mi, {LeftN, RightN}},
             case empty_instance_variables_exist(NewFirstInstanceVariables) of
                 false -> NewFirstInstanceVariables;
@@ -67,7 +66,6 @@ init_receive_loop({GGTProName, Mi, Neighbors}, GlobalVariables) ->
                     init_receive_loop(NewFirstInstanceVariables, GlobalVariables)
             end;
         {setpm, MiNeu} -> 
-            logge_status(GGTProName, "got setpm"),
             NewFirstInstanceVariables = {GGTProName, MiNeu, Neighbors},
             case empty_instance_variables_exist(NewFirstInstanceVariables) of
                 false -> NewFirstInstanceVariables;
@@ -97,24 +95,19 @@ receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
                                         NewMissingCountForQuota = voteYes(MissingCountForQuota),
                                         receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota},
                                                         {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
-        {sendy, Y} ->               logge_status(GGTProName, "got sendy"),
-                                    timer:sleep(timer:seconds(ArbeitsZeit)),
+        {sendy, Y} ->               timer:sleep(timer:seconds(ArbeitsZeit)),
                                     NewMi = calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid),
                                     receive_loop({GGTProName, NewMi, Neighbors, empty},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
-        {AbsenderPid, tellmi} ->    logge_status(GGTProName, "got tellmi"),
-                                    tellmi(AbsenderPid, Mi),
+        {AbsenderPid, tellmi} ->    tellmi(AbsenderPid, Mi),
                                     receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
-        {AbsenderPid, pingGGT} ->   logge_status(GGTProName, "got pingGGT"),
-                                    pongGGT(AbsenderPid, GGTProName),
+        {AbsenderPid, pingGGT} ->   pongGGT(AbsenderPid, GGTProName),
                                     receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
-        kill ->     logge_status(GGTProName, "got kill"),
-                    kill(GGTProName, NsPid)
+        kill ->     kill(GGTProName, NsPid)
 
-        after timer:seconds(TermZeit) ->    logge_status(GGTProName, "in receive-after"),
-                                            NewMissingCountForQuota = start_vote(GGTProName, Mi, NsPid, Quota),
+        after timer:seconds(TermZeit) ->    NewMissingCountForQuota = start_vote(GGTProName, Mi, NsPid, Quota),
                                             receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota},
                                                             {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid})
     end.
