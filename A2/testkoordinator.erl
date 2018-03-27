@@ -5,8 +5,7 @@
 
 %    start/0,
 
-%    wait_for_starters/2,
-%    wait_and_collect_ggtpro/2,
+%    init_loop/4
 %    create_circle/2,
 %    set_neighbors/4,
 %    get_next_to_last_and_last_elem/1
@@ -72,43 +71,64 @@ start_2_test() ->
     end,
     kill_pid_and_clear_this_mailbox(TestKoPid).
 
-wait_for_starters_1_test() ->
+init_loop_1_test() ->
     SteeringValues = {steeringval, 0, 0, 1, 5},
     ThisPid = self(),
     TestPid = spawn(fun() -> 
-                    StartersCount = koordinator:wait_for_starters(SteeringValues, 0), 
-                    ThisPid ! StartersCount
+                    GGTProNameList = koordinator:init_loop(
+                                        ThisPid, 
+                                        SteeringValues, 
+                                        0, 
+                                        []), 
+                    ThisPid ! GGTProNameList
                 end),
+
     TestPid ! {ThisPid, getsteeringval},
     receive
         Any1 ->
             ?assertEqual(SteeringValues, Any1)
     end,
+
     TestPid ! {ThisPid, getsteeringval},
     receive
         Any2 ->
             ?assertEqual(SteeringValues, Any2)
     end,
+
+    TestPid ! {hello, nameC},
+    TestPid ! {hello, nameB},
+    TestPid ! {hello, nameA},
+
+    TestPid ! step,
+
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameA),
+    TestPid ! {pin, ThisPid},
     receive
         Any3 ->
-            ?assertEqual(2, Any3)
+            {setneighbors, nameC, nameB} = Any3
     end,
-    kill_pid_and_clear_this_mailbox(TestPid).
-
-
-wait_and_collect_ggtpro_1_test() -> 
-    ?assertEqual([], koordinator:wait_and_collect_ggtpro([], 0)).
-
-wait_and_collect_ggtpro_2_test() -> 
-    ThisPid = self(),
-    TestPid = spawn(fun() -> 
-                    GGTProNameList = koordinator:wait_and_collect_ggtpro([], 2), 
-                    ThisPid ! GGTProNameList
-                end),
-    TestPid ! {hello, nameA},
-    TestPid ! {hello, nameB},
+    receive_lookup(nameC),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameC),
+    TestPid ! {pin, ThisPid},
     receive
-        Any -> ?assertEqual([nameB, nameA], Any)
+        Any4 ->
+            {setneighbors, nameB, nameA} = Any4
+    end,
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+    receive_lookup(nameB),
+    TestPid ! {pin, ThisPid},
+    receive
+        Any5 ->
+            {setneighbors, nameA, nameC} = Any5
+    end,
+
+    receive
+        Any6 ->
+            ?assertEqual([nameA, nameB, nameC], Any6)
     end,
     kill_pid_and_clear_this_mailbox(TestPid).
 

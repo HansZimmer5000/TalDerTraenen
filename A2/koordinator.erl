@@ -4,8 +4,7 @@
     start/0,
     start/1,
 
-    wait_for_starters/2,
-    wait_and_collect_ggtpro/2,
+    init_loop/4,
     create_circle/2,
     set_neighbors/4,
     get_next_to_last_and_last_elem/1,
@@ -41,7 +40,6 @@
 -define(TERMZEIT, hole_wert_aus_config_mit_key(termzeit)).
 -define(QUOTA, hole_wert_aus_config_mit_key(quota)).
 -define(GGTPROANZ, hole_wert_aus_config_mit_key(ggtproanz)).
--define(STARTER_STEERINGVAL_TIMEOUT, hole_wert_aus_config_mit_key(starter_steeringval_timeout)).
 
 
 start() ->
@@ -50,34 +48,18 @@ start() ->
 start(NsPid) ->
     logge_status("koordinator startet"), 
 
-    net_adm:ping(?NSNODE),
+    net_adm:ping(?NSNODE),    
 
-    SollGGTCount = ?GGTPROANZ * ?STARTER_COUNT,
-    case SollGGTCount >= 3 of
-        true -> continue;
-        false -> throw_error("GGTPROANZ ist ~p, sollte aber mindestens 3 sein (für Kreis wichtig)", [?GGTPROANZ])
-    end,
-    SollQuota = round((SollGGTCount * ?QUOTA) / 100),
+    registerAtNS(NsPid),
 
-    register(?KONAME, self()),
-    NsPid ! {self(), {bind, ?KONAME, node()}},
-    receive
-        ok -> logge_status("ist registriert und beim nameservice bekannt")
-    end,
     start_starters(?STARTER_COUNT),
-    StartersCount = wait_for_starters({steeringval, ?ARBEITSZEIT, ?TERMZEIT, SollQuota, ?GGTPROANZ}, 0),
-    logge_status(lists:flatten(io_lib:format("~p von ~p starter(s) haben steeringval angefragt", [StartersCount, ?STARTER_COUNT]))), 
 
-    GlobalGGTProAnz = StartersCount * ?GGTPROANZ,
-    logge_status(lists:flatten(io_lib:format("Es laufen ~p von ~p GGTProzessen", [GlobalGGTProAnz, SollGGTCount]))), 
+    SollGGTCount = ?STARTER_COUNT * ?GGTPROANZ,
+    SollQuota = round((SollGGTCount * ?QUOTA) / 100),
+    SteeringValues = {steeringval, ?ARBEITSZEIT, ?TERMZEIT, SollQuota, ?GGTPROANZ},
 
-    GGTProNameList = wait_and_collect_ggtpro([], GlobalGGTProAnz),
-    logge_status(lists:flatten(io_lib:format("~p ggT-Prozesse sind bekannt", [length(GGTProNameList)]))), 
+    GGTProNameList = init_loop(NsPid, SteeringValues, 0, []),
 
-    receive
-        step -> create_circle(GGTProNameList, NsPid)
-    end,
-    logge_status("kreis erstellt"),
     receive
         {calc, WggT} -> logge_status("got calc"),
                         calc(WggT, GGTProNameList, NsPid),
@@ -85,28 +67,34 @@ start(NsPid) ->
                         calculation_receive_loop(GGTProNameList, NsPid)
     end.
 
+registerAtNS(NsPid) ->
+    register(?KONAME, self()),
+    NsPid ! {self(), {bind, ?KONAME, node()}},
+    receive
+        ok -> logge_status("ist registriert und beim nameservice bekannt")
+    end.
+
 start_starters(0) -> ok;
 start_starters(RestCount) ->
     spawn(fun() -> starter:go(RestCount) end),
     start_starters(RestCount - 1).
 
-wait_for_starters(SteeringValues, CurrentStartersCount) ->
+init_loop(NsPid, SteeringValues, CurrentStartersCount, GGTProNameList) ->
     receive
         {AbsenderPid, getsteeringval} ->
             AbsenderPid ! SteeringValues,
             NextStartersCount = CurrentStartersCount + 1,
-            wait_for_starters(SteeringValues, NextStartersCount)
-        after ?STARTER_STEERINGVAL_TIMEOUT -> CurrentStartersCount
-    end.
-
-wait_and_collect_ggtpro(GGTProNameList, 0) -> 
-    GGTProNameList;
-wait_and_collect_ggtpro(GGTProNameList, RestGGTProCount) ->
-    receive
-        {hello, GGTProName} -> 
+            init_loop(NsPid, SteeringValues, NextStartersCount, GGTProNameList);
+        {hello, GGTProName} ->
             NewGGTProNameList = [GGTProName | GGTProNameList],
-            NewRestGGTProCount = RestGGTProCount - 1,
-            wait_and_collect_ggtpro(NewGGTProNameList, NewRestGGTProCount)
+            init_loop(NsPid, SteeringValues, CurrentStartersCount, NewGGTProNameList);
+        step ->
+            SollGGTCount = ?STARTER_COUNT * ?GGTPROANZ,
+            logge_status(lists:flatten(io_lib:format("~p von ~p starter(s) haben steeringval angefragt", [CurrentStartersCount, ?STARTER_COUNT]))), 
+            logge_status(lists:flatten(io_lib:format("Es laufen ~p von ~p GGTProzessen", [length(GGTProNameList), SollGGTCount]))),
+            
+            create_circle(GGTProNameList, NsPid),
+            GGTProNameList
     end.
 
 
@@ -166,17 +154,18 @@ create_circle(GGTProNameList, NsPid) ->
     set_neighbors(LastGGTProName, NextToLastGGTProName, FirstGGTProName, NsPid),
     create_circle_(GGTProNameList, NsPid).
 
-create_circle_([_NextToLastGGTProName, _LastGGTProName], _NsPid) -> ok;
+create_circle_([_NextToLastGGTProName, _LastGGTProName], _NsPid) -> 
+    logge_status("kreis erstellt");
 create_circle_([FirstGGTProName, SecondGGTProName, ThirdGGTProName | RestGGTProNames], NsPid) ->
     set_neighbors(SecondGGTProName, FirstGGTProName, ThirdGGTProName, NsPid),
     create_circle_([SecondGGTProName, ThirdGGTProName | RestGGTProNames], NsPid).
 
 set_neighbors(MiddleGGTProName, LeftGGTProName, RightGGTProName, NsPid) ->
     case ggtpropid_exists(MiddleGGTProName, NsPid) of
-        true ->     continue;
+        true ->     
+            continue;
         false ->  
             throw(ggtpronameUnkownForNs)  
-            %log_status("Circle kann nicht vervollständigt werden, ~p wurde beim nameservice nicht gefunden!", [MiddleGGTProName])
     end,
     MiddleGGTProPid = get_ggtpropid(MiddleGGTProName, NsPid),
     MiddleGGTProPid ! {setneighbors, LeftGGTProName, RightGGTProName}.
@@ -253,7 +242,6 @@ nudge([HeadGGTProName | RestGGTProNames], NsPid) ->
         true -> continue;
         false -> 
             throw(ggtpronameUnkownForNs)
-            %throw_error("GGTProName ~p beim nameservice unbekannt!", [HeadGGTProName])
     end,
     HeadGGTProPid = get_ggtpropid(HeadGGTProName, NsPid),
     HeadGGTProPid ! {self(),pingGGT},
@@ -313,16 +301,11 @@ ggtpropid_exists(GGTProName, NsPid) ->
 get_ggtpropid(GGTProName, NsPid) ->
     NsPid ! {self(), {lookup, GGTProName}},
     receive
-        {pin, GGTProPid} -> GGTProPid;
+        {pin, GGTProPid} -> 
+            GGTProPid;
         not_found -> 
             throw(ggtpronameUnkownForNs)
-            %throw_error("GGTProName ~p beim nameservice unbekannt! Nutze vor dieser Funktion ggtpropid_exists/2 um sicher zugehen!", [GGTProName])
     end.
-
-throw_error(Text, List) ->
-    throw_error(lists:flatten(io_lib:format(Text,List))).
-throw_error(Text) ->
-    throw(Text).
 
 hole_wert_aus_config_mit_key(Key) ->
     {ok, ConfigListe} = file:consult(?CONFIG_DATEI_NAME),
