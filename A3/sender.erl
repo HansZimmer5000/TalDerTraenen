@@ -25,11 +25,11 @@ open() ->
     MultiAddr = {225,0,10,1},
     {ok, Socket} = gen_udp:open(PORT_NUM_TX_MULTI,
                 [
-                    list, 
+                    list, % as string, which is also a list
+                    inet, % use ipv4
                     {active, false},
                     {ip, GwIP},
-                    %inet, 
-                    %{multicast_ttl, 255},
+                    {multicast_ttl, 1},
                     %{multicast_loop, false},
                     {multicast_if, GwIP},
                     {add_membership, {MultiAddr, GwIP}},

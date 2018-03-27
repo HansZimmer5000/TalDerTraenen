@@ -12,13 +12,12 @@
     getSlotNumber/1
 ]).
 
--define(SLOTNUMBERPOS, 25).
--define(SENDTIMELENGTH, 8).
+-define(SLOTNUMBERPOS, 26). %Because String as List starts at 1 instead of 0.
 
 %Nachrichtenaufbau:
 %    Gesamt 34 Byte // TTL = 1!
 %    - Byte 0        A oder B    Stationsklasse
-%    - Byte 1-24     -team-4711- Nutzdaten
+%    - Byte 1-24     -team-0000- Nutzdaten
 %    - Byte 25       4           reservierte Slotnummer für den nächsten Frame!
 %    - Byte 26-33    77394825    Zeit (gesendet) in ms seit 01.01.1970, 8-Byte Integer, Big Endian
 
@@ -31,14 +30,15 @@ addSendTime(IncompleteMessage, SendTime) ->
     CompleteMessage.
 
 getStationType(Message) ->
-    [FirstLetter | _Rest] = Message,
-    FirstLetter.
+    [FirstLetterAsAscii | _] = Message,
+    [FirstLetterAsAscii]. %Converts Ascii to String
 
 getStationName(Message) ->
-    lists:substring(Message, 1, 12).
+    lists:sublist(Message, 2, 11).
 
 getSlotNumber(Message) ->
     SlotNumberLength = length(Message) - 33,
-    SlotNumberString = lists:substring(Message, ?SLOTNUMBERPOS, SlotNumberLength),
+    SlotNumberString = lists:sublist(Message, ?SLOTNUMBERPOS, SlotNumberLength),
+    io:fwrite("~p = length, ~p = string", [SlotNumberLength, SlotNumberString]),
     {SlotNumber, []} = string:to_integer(SlotNumberString),
     SlotNumber.
