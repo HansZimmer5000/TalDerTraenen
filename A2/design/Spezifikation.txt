@@ -1,6 +1,6 @@
 TODO:
     Toggle - Ist bei der Teminierung der errechnete ggT nicht der gewünschte ggT wird bei toggle = true ein sendy ins System gesendet.
-            Um dann doch noch auf den richtigen wggT zu kommen!
+            Um dann doch noch auf den richtigen wggT zu kommen! Aber wie macht man dann das?
     step - Erst nach "step" wird der Ring erstellt.
             Also haben alle ggT-Prozesse bis "step" zeit sich zurück zu melden!
 
