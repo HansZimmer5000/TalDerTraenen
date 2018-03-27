@@ -71,10 +71,7 @@ convertMessageToByte(Message) ->
     {SlotNumber, []} = string:to_integer(lists:sublist(Message, 26, SlotNumberLength)),
     SendTime = lists:sublist(Message, 26 + SlotNumberLength, 8),
 
-    StationTypeAndPayloadBinary = binary:list_to_bin(StationTypeAndPayload),
-    SendTimeBinary = binary:list_to_bin(SendTime),
-    io:fwrite("~p, ~p", [StationTypeAndPayload, StationTypeAndPayloadBinary]),
-    <<StationTypeAndPayloadBinary, SlotNumber, SendTimeBinary>>.
+    binary:list_to_bin(lists:append([StationTypeAndPayload, [SlotNumber], SendTime])).
 
 getStationType(Message) ->
     [FirstLetterAsAscii | _] = Message,
