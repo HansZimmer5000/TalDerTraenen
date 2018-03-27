@@ -2,6 +2,8 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
+%    createIncompleteMessage/3,
+
 %    prepareIncompleteMessageForSending/2,
 %    addSendTime/2,
 
@@ -10,6 +12,17 @@
 %    getStationName/1,
 
 %    getSlotNumber/1
+
+createIncompleteMessage_1_test() ->
+    StationType = "A",
+    StationName = "-team-0000-",
+    SlotNumber = 4,
+    IncompleteMessage = messagehelper:createIncompleteMessage(StationType, StationName, SlotNumber),
+    ?assertEqual("A-team-0000-4", IncompleteMessage).
+
+createIncompleteMessage_2_test() ->
+    io:fwrite("Fehlende Vessel3 Anbindung noch nicht implementiert & getestet!!"),
+    ?assert(false).
 
 prepareIncompleteMessageForSending_1_test() -> 
     IncompleteMessage = "A-team-0000-123456789012-4",

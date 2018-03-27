@@ -2,6 +2,8 @@
 
 
 -export([
+    createIncompleteMessage/3,
+
     prepareIncompleteMessageForSending/2,
     addSendTime/2,
 
@@ -20,6 +22,11 @@
 %    - Byte 1-24     -team-0000- Nutzdaten
 %    - Byte 25       4           reservierte Slotnummer für den nächsten Frame!
 %    - Byte 26-33    77394825    Zeit (gesendet) in ms seit 01.01.1970, 8-Byte Integer, Big Endian
+
+createIncompleteMessage(StationType, StationName, SlotNumber) ->
+    Payload = StationName, % ++ AdditionalText, -> Vessel3 Connection needed!
+    [SlotNumberString] = io_lib:format("~w", [SlotNumber]),
+    (StationType ++ Payload) ++ SlotNumberString.
 
 prepareIncompleteMessageForSending(IncompleteMessage, SendTime) ->
     CompleteMessage = addSendTime(IncompleteMessage, SendTime),
