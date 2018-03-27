@@ -26,6 +26,9 @@ convertMessagesFromByte_1_test() ->
     ?assert(string:equal("A-team-0000-123456789012-477394825", Message1AsString)),
     ?assert(string:equal("A-team-0000-123456789012-2577394825", Message2AsString)).
 
+convertMessagesFromByte_2_test() ->
+    ?assertEqual([], messagehelper:convertMessagesFromByte([])).
+
 convertMessageFromByte_1_test() ->
     StationType = <<"A">>,
     Payload = <<"-team-0000-123456789012-">>,
@@ -36,6 +39,17 @@ convertMessageFromByte_1_test() ->
 
     ?assertEqual(34, binary:referenced_byte_size(MessageAsByte)),
     ?assert(string:equal("A-team-0000-123456789012-477394825", ConvertedMessage)).
+
+convertMessageFromByte_2_test() ->
+    StationType = <<"A">>,
+    Payload = <<"-team-0000-123456789012-">>,
+    SlotNumber = 25,
+    SendTime = <<"77394825">>,
+    MessageAsByte = <<StationType/binary, Payload/binary, SlotNumber, SendTime/binary>>,
+    ConvertedMessage = messagehelper:convertMessageFromByte(MessageAsByte),
+
+    ?assertEqual(34, binary:referenced_byte_size(MessageAsByte)),
+    ?assert(string:equal("A-team-0000-123456789012-2577394825", ConvertedMessage)).
 
 createIncompleteMessage_1_test() ->
     StationType = "A",
@@ -54,6 +68,11 @@ prepareIncompleteMessageForSending_1_test() ->
     Message = messagehelper:prepareIncompleteMessageForSending(IncompleteMessage, SendTime),
     ?assertEqual("A-team-0000-123456789012-477394825", Message).
 
+prepareIncompleteMessageForSending_2_test() -> 
+    IncompleteMessage = "A-team-0000-123456789012-4",
+    SendTime = "77394825",
+    Message = messagehelper:prepareIncompleteMessageForSending(IncompleteMessage, SendTime),
+    ?assertEqual("A-team-0000-123456789012-477394825", Message).
     
 addSendTime_1_test() -> 
     ShouldResult = "A-team-0000-123456789012-477394825",
@@ -75,6 +94,14 @@ convertMessageToByte_1_test() ->
     ?assertEqual(34, binary:referenced_byte_size(ConvertedMessage)),
     ?assertEqual(
         <<"A-team-0000-123456789012-", 4, "77394825">>,
+        ConvertedMessage).
+
+convertMessageToByte_2_test() ->
+    Message = "A-team-0000-123456789012-2577394825",
+    ConvertedMessage = messagehelper:convertMessageToByte(Message),
+    ?assertEqual(34, binary:referenced_byte_size(ConvertedMessage)),
+    ?assertEqual(
+        <<"A-team-0000-123456789012-", 25, "77394825">>,
         ConvertedMessage).
 
 getStationType_1_test() -> 
