@@ -2,16 +2,36 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
+%    convertMessagesFromByte/1,
+%    convertMessageFromByte/1,
+
 %    createIncompleteMessage/3,
 
 %    prepareIncompleteMessageForSending/2,
 %    addSendTime/2,
+%    convertMessageToByte/1,
 
 %    getStationType/1,
 
 %    getStationName/1,
 
 %    getSlotNumber/1
+
+convertMessagesFromByte_1_test() ->
+    Message1AsByte = <<"A-team-0000-123456789012-", 4, "77394825">>,
+    Message2AsByte = <<"A-team-0000-123456789012-", 25, "77394825">>,
+    [Message2AsString, Message1AsString] = messagehelper:convertMessagesFromByte([Message1AsByte, Message2AsByte]),
+    ?assert(string:equal("A-team-0000-123456789012-477394825", Message1AsString)),
+    ?assert(string:equal("A-team-0000-123456789012-2577394825", Message2AsString)).
+
+convertMessageFromByte_1_test() ->
+    StationType = <<"A">>,
+    Payload = <<"-team-0000-123456789012-">>,
+    SlotNumber = 4,
+    SendTime = <<"77394825">>,
+    MessageAsByte = <<StationType/binary, Payload/binary, SlotNumber, SendTime/binary>>,
+    ConvertedMessage = messagehelper:convertMessageFromByte(MessageAsByte),
+    ?assert(string:equal("A-team-0000-123456789012-477394825", ConvertedMessage)).
 
 createIncompleteMessage_1_test() ->
     StationType = "A",
@@ -44,6 +64,13 @@ addSendTime_2_test() ->
     SendTime = 77394825,
     IsResult = messagehelper:addSendTime(TestMessage, SendTime),
     ?assertEqual(ShouldResult, IsResult).
+
+convertMessageToByte_1_test() ->
+    Message = "A-team-0000-123456789012-477394825",
+    ConvertedMessage = messagehelper:convertMessageToByte(Message),
+    ?assertEqual(
+        <<"A-team-0000-123456789012-", 4, "77394825">>,
+        ConvertedMessage).
 
 getStationType_1_test() -> 
     Message = "A-team-0000-123456789012-477394825",

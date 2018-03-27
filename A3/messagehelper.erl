@@ -2,10 +2,14 @@
 
 
 -export([
+    convertMessagesFromByte/1,
+    convertMessageFromByte/1,
+
     createIncompleteMessage/3,
 
     prepareIncompleteMessageForSending/2,
     addSendTime/2,
+    convertMessageToByte/1,
 
     getStationType/1,
 
@@ -23,6 +27,31 @@
 %    - Byte 25       4           reservierte Slotnummer für den nächsten Frame!
 %    - Byte 26-33    77394825    Zeit (gesendet) in ms seit 01.01.1970, 8-Byte Integer, Big Endian
 
+convertMessagesFromByte(MessagesInByte) ->
+    convertMessagesFromByte(MessagesInByte, []).
+
+convertMessagesFromByte([], ConvertedMessages) ->
+    ConvertedMessages;
+convertMessagesFromByte(MessagesInByte, ConvertedMessages) ->
+    [FirstMessageInByte | RestMessagesInByte] = MessagesInByte,
+    ConvertedMessage = convertMessageFromByte(FirstMessageInByte),
+    NewConvertedMessages = [ConvertedMessage | ConvertedMessages],
+    convertMessagesFromByte(RestMessagesInByte, NewConvertedMessages).
+
+
+convertMessageFromByte(MessageInByte) ->
+    MessageInByteList = binary:bin_to_list(MessageInByte),
+    SlotNumberLength = length(MessageInByteList) - 33,
+
+    StationType = lists:sublist(MessageInByteList, 1, 1),
+    Payload = lists:sublist(MessageInByteList, 2, 24),
+    [SlotNumberString] = lists:sublist(MessageInByteList, ?SLOTNUMBERPOS, SlotNumberLength),
+    SlotNumber = io_lib:format("~p", [SlotNumberString]),
+    SendTime = lists:sublist(MessageInByteList, ?SLOTNUMBERPOS + SlotNumberLength, 8),
+
+    ConvertedMessage = lists:append([StationType, Payload, SlotNumber, SendTime]),
+    ConvertedMessage.
+
 createIncompleteMessage(StationType, StationName, SlotNumber) ->
     Payload = StationName, % ++ AdditionalText, -> Vessel3 Connection needed!
     [SlotNumberString] = io_lib:format("~w", [SlotNumber]),
@@ -35,6 +64,17 @@ prepareIncompleteMessageForSending(IncompleteMessage, SendTime) ->
 addSendTime(IncompleteMessage, SendTime) ->
     CompleteMessage = lists:concat([IncompleteMessage, SendTime]),
     CompleteMessage.
+
+convertMessageToByte(Message) ->
+    SlotNumberLength = length(Message) - 33,
+    StationTypeAndPayload = lists:sublist(Message, 1, 25),
+    {SlotNumber, []} = string:to_integer(lists:sublist(Message, 26, SlotNumberLength)),
+    SendTime = lists:sublist(Message, 26 + SlotNumberLength, 8),
+
+    StationTypeAndPayloadBinary = binary:list_to_bin(StationTypeAndPayload),
+    SendTimeBinary = binary:list_to_bin(SendTime),
+    io:fwrite("~p, ~p", [StationTypeAndPayload, StationTypeAndPayloadBinary]),
+    <<StationTypeAndPayloadBinary, SlotNumber, SendTimeBinary>>.
 
 getStationType(Message) ->
     [FirstLetterAsAscii | _] = Message,
