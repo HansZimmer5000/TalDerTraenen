@@ -37,7 +37,6 @@ go({GGTProName, ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
     net_adm:ping(?NSNODE),
     net_adm:ping(?KONODE),
 
-
     GGTProPid = spawn(fun() -> init(InstanceVariables, GlobalVariables) end),
     true = register(GGTProName, GGTProPid),
     logge_status(GGTProName, lists:flatten(
@@ -159,7 +158,6 @@ tellmi(ReceiverPid, Mi) ->
 
 pongGGT(ReceiverPid, GGTProName) ->
     ReceiverPid ! {pongGGT, GGTProName}.
-
 
 kill(GGTProName, NsPid) ->
     NsPid ! {self(), {unbind, GGTProName}},
