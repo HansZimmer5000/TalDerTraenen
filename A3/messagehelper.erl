@@ -66,7 +66,7 @@ convertMessageFromByte(MessageInByte, ReceivedTime) ->
 
 createIncompleteMessage(StationType, StationName, SlotNumber) ->
     Payload = empty, % -> Vessel3 Connection needed!
-    {{StationType, StationName, Payload, SlotNumber}, empty}.
+    {{StationType, StationName, Payload, SlotNumber, empty}, empty}.
 
 prepareIncompleteMessageForSending(IncompleteMessage, SendTime) ->
     CompleteMessage = setSendTime(IncompleteMessage, SendTime),
