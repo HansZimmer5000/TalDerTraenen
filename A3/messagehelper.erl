@@ -77,12 +77,13 @@ setSendTime(IncompleteMessage, NewSendTime) ->
     {{StationType, StationName, Payload, SlotNumber, NewSendTime}, ReceivedTime}.
 
 convertMessageToByte(Message) ->
-    SlotNumberLength = length(Message) - 33,
-    StationTypeAndPayload = lists:sublist(Message, 1, 25),
-    {SlotNumber, []} = string:to_integer(lists:sublist(Message, 26, SlotNumberLength)),
-    SendTime = lists:sublist(Message, 26 + SlotNumberLength, 8),
+    {{StationType, StationName, Payload, SlotNumber, SendTime}, _} = Message,
+    StationTypeAndPayloadBinary = binary:list_to_bin((StationType ++ StationName) ++ Payload),
+    TempSendTimeBinary = binary:encode_unsigned(SendTime, big),
+    SendTimeBinary = <<0,0, TempSendTimeBinary/binary>>,
 
-    binary:list_to_bin(lists:append([StationTypeAndPayload, [SlotNumber], SendTime])).
+    <<StationTypeAndPayloadBinary/binary, SlotNumber, SendTimeBinary/binary>>.
+    %binary:list_to_bin(lists:append([StationTypeAndPayload, [SlotNumber], SendTime])).
 
 getStationType(Message) ->
     {{StationType, _, _, _, _}, _} = Message,

@@ -30,8 +30,8 @@ convertReceivedMessagesFromByte_1_test() ->
     Message2AsByte = <<"A-team-0000-123456789012-", 25, SendTimeBinary/binary>>,
     ReceivedTimes = [1522240433451, 1522240433451],
     [Message2, Message1] = messagehelper:convertReceivedMessagesFromByte([Message1AsByte, Message2AsByte], ReceivedTimes),
-    ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, binary:referenced_byte_size(Message1AsByte)),
-    ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, binary:referenced_byte_size(Message2AsByte)),
+    ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, byte_size(Message1AsByte)),
+    ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, byte_size(Message2AsByte)),
     ?assertEqual(?DEFAULT_FULL_RECEIVED_MESSAGE_4, Message1),
     ?assertEqual(?DEFAULT_FULL_RECEIVED_MESSAGE_25, Message2).
 
@@ -47,7 +47,7 @@ convertMessageFromByte_1_test() ->
     ReceivedTime = 1522240433451,
     ConvertedMessage = messagehelper:convertMessageFromByte(MessageAsByte, ReceivedTime),
 
-    ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, binary:referenced_byte_size(MessageAsByte)),
+    ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, byte_size(MessageAsByte)),
     ?assertEqual(?DEFAULT_FULL_RECEIVED_MESSAGE_4, ConvertedMessage).
 
 convertMessageFromByte_2_test() ->
@@ -59,7 +59,7 @@ convertMessageFromByte_2_test() ->
     ReceivedTime = 1522240433451,
     ConvertedMessage = messagehelper:convertMessageFromByte(MessageAsByte, ReceivedTime),
 
-    ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, binary:referenced_byte_size(MessageAsByte)),
+    ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, byte_size(MessageAsByte)),
     ?assertEqual(?DEFAULT_FULL_RECEIVED_MESSAGE_25, ConvertedMessage).
 
 createIncompleteMessage_1_test() ->
@@ -98,7 +98,7 @@ convertMessageToByte_1_test() ->
     SendTime = <<0,0,1,98,108,153,173,43>>,
     Message = {{"A","-team-0000-", "123456789012-", 4, 1522240433451}, empty},
     ConvertedMessage = messagehelper:convertMessageToByte(Message),
-    ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, binary:referenced_byte_size(ConvertedMessage)),
+    ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, byte_size(ConvertedMessage)),
     ?assertEqual(
         <<"A-team-0000-123456789012-", 4, SendTime/binary>>,
         ConvertedMessage).
@@ -107,7 +107,7 @@ convertMessageToByte_2_test() ->
     SendTime = <<0,0,1,98,108,153,173,43>>,
     Message = {{"A","-team-0000-", "123456789012-", 25, 1522240433451}, 1522240433451},
     ConvertedMessage = messagehelper:convertMessageToByte(Message),
-    ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, binary:referenced_byte_size(ConvertedMessage)),
+    ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, byte_size(ConvertedMessage)),
     ?assertEqual(
         <<"A-team-0000-123456789012-", 25, SendTime/binary>>,
         ConvertedMessage).
