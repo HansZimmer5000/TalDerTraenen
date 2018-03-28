@@ -21,12 +21,21 @@
 -define(SLOTNUMBERPOS, 26). %Because String as List starts at 1 instead of 0.
 -define(MESSAGE_AS_STRING_LENGTH, 39).
 
-%Nachrichtenaufbau:
+%Nachrichtenaufbau Binary:
 %    Gesamt 34 Byte // TTL = 1!
 %    - Byte 0        A oder B    Stationsklasse
 %    - Byte 1-24     -team-0000- Nutzdaten
 %    - Byte 25       4           reservierte Slotnummer für den nächsten Frame!
 %    - Byte 26-33    77394825    Zeit (gesendet) in ms seit 01.01.1970, 8-Byte Integer, Big Endian
+
+%Nachrichtenaufbau Intern:
+% {{StationType, StationName, Payload, Slotnumber, SendTime}, ReceivedTime}
+%   (Always) StationType = String with "A" or "B"
+%   (Always) StationName = String with "-team-0000-"
+%   (Always) Payload = String with some letters of 13 letters length
+%   (Always) Slotnumber = Number with 1 or 2 numbers (e.g. 4 or 25)
+%   (When Added) SendTime = Number with 13 numbers (UTC with e.g. vsutil:getUTC())
+%   (When Message was Received) RecievedTime = Same format as SendTime
 
 convertReceivedMessagesFromByte(MessagesInByte) ->
     convertReceivedMessagesFromByte(MessagesInByte, []).
