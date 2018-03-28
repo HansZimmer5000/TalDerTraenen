@@ -19,6 +19,7 @@
 ]).
 
 -define(SLOTNUMBERPOS, 26). %Because String as List starts at 1 instead of 0.
+-define(MESSAGE_AS_STRING_LENGTH, 39).
 
 %Nachrichtenaufbau:
 %    Gesamt 34 Byte // TTL = 1!
@@ -59,7 +60,7 @@ createIncompleteMessage(StationType, StationName, SlotNumber) ->
 
 prepareIncompleteMessageForSending(IncompleteMessage, SendTime) ->
     CompleteMessage = addSendTime(IncompleteMessage, SendTime),
-    CompleteMessage.
+    convertMessageToByte(CompleteMessage).
 
 addSendTime(IncompleteMessage, SendTime) ->
     CompleteMessage = lists:concat([IncompleteMessage, SendTime]),
