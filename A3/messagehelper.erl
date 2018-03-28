@@ -2,7 +2,7 @@
 
 
 -export([
-    convertMessagesFromByte/1,
+    convertReceivedMessagesFromByte/1,
     convertMessageFromByte/1,
 
     createIncompleteMessage/3,
@@ -27,16 +27,16 @@
 %    - Byte 25       4           reservierte Slotnummer für den nächsten Frame!
 %    - Byte 26-33    77394825    Zeit (gesendet) in ms seit 01.01.1970, 8-Byte Integer, Big Endian
 
-convertMessagesFromByte(MessagesInByte) ->
-    convertMessagesFromByte(MessagesInByte, []).
+convertReceivedMessagesFromByte(MessagesInByte) ->
+    convertReceivedMessagesFromByte(MessagesInByte, []).
 
-convertMessagesFromByte([], ConvertedMessages) ->
+convertReceivedMessagesFromByte([], ConvertedMessages) ->
     ConvertedMessages;
-convertMessagesFromByte(MessagesInByte, ConvertedMessages) ->
+convertReceivedMessagesFromByte(MessagesInByte, ConvertedMessages) ->
     [FirstMessageInByte | RestMessagesInByte] = MessagesInByte,
     ConvertedMessage = convertMessageFromByte(FirstMessageInByte),
     NewConvertedMessages = [ConvertedMessage | ConvertedMessages],
-    convertMessagesFromByte(RestMessagesInByte, NewConvertedMessages).
+    convertReceivedMessagesFromByte(RestMessagesInByte, NewConvertedMessages).
 
 
 convertMessageFromByte(MessageInByte) ->

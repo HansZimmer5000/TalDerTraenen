@@ -2,7 +2,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-%    convertMessagesFromByte/1,
+%    convertReceivedMessagesFromByte/1,
 %    convertMessageFromByte/1,
 
 %    createIncompleteMessage/3,
@@ -17,17 +17,17 @@
 
 %    getSlotNumber/1
 
-convertMessagesFromByte_1_test() ->
+convertReceivedMessagesFromByte_1_test() ->
     Message1AsByte = <<"A-team-0000-123456789012-", 4, "77394825">>,
     Message2AsByte = <<"A-team-0000-123456789012-", 25, "77394825">>,
-    [Message2AsString, Message1AsString] = messagehelper:convertMessagesFromByte([Message1AsByte, Message2AsByte]),
+    [Message2AsString, Message1AsString] = messagehelper:convertReceivedMessagesFromByte([Message1AsByte, Message2AsByte]),
     ?assertEqual(34, binary:referenced_byte_size(Message1AsByte)),
     ?assertEqual(34, binary:referenced_byte_size(Message2AsByte)),
     ?assert(string:equal("A-team-0000-123456789012-477394825", Message1AsString)),
     ?assert(string:equal("A-team-0000-123456789012-2577394825", Message2AsString)).
 
-convertMessagesFromByte_2_test() ->
-    ?assertEqual([], messagehelper:convertMessagesFromByte([])).
+convertReceivedMessagesFromByte_2_test() ->
+    ?assertEqual([], messagehelper:convertReceivedMessagesFromByte([])).
 
 convertMessageFromByte_1_test() ->
     StationType = <<"A">>,
