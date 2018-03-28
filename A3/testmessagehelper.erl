@@ -8,7 +8,7 @@
 %    createIncompleteMessage/3,
 
 %    prepareIncompleteMessageForSending/2,
-%    addSendTime/2,
+%    setSendTime/2,
 %    convertMessageToByte/1,
 
 %    getStationType/1,
@@ -32,8 +32,8 @@ convertReceivedMessagesFromByte_1_test() ->
     [Message2, Message1] = messagehelper:convertReceivedMessagesFromByte([Message1AsByte, Message2AsByte], ReceivedTimes),
     ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, binary:referenced_byte_size(Message1AsByte)),
     ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, binary:referenced_byte_size(Message2AsByte)),
-    ?assert(string:equal(?DEFAULT_FULL_MESSAGE_4, Message1)),
-    ?assert(string:equal(?DEFAULT_FULL_MESSAGE_25, Message2)).
+    ?assertEqual(?DEFAULT_FULL_RECEIVED_MESSAGE_4, Message1),
+    ?assertEqual(?DEFAULT_FULL_RECEIVED_MESSAGE_25, Message2).
 
 convertReceivedMessagesFromByte_2_test() ->
     ?assertEqual([], messagehelper:convertReceivedMessagesFromByte([], [])).
@@ -48,7 +48,7 @@ convertMessageFromByte_1_test() ->
     ConvertedMessage = messagehelper:convertMessageFromByte(MessageAsByte, ReceivedTime),
 
     ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, binary:referenced_byte_size(MessageAsByte)),
-    ?assert(messagehelper:equal(?DEFAULT_FULL_MESSAGE_4, ConvertedMessage)).
+    ?assertEqual(?DEFAULT_FULL_RECEIVED_MESSAGE_4, ConvertedMessage).
 
 convertMessageFromByte_2_test() ->
     StationType = <<"A">>,
@@ -60,7 +60,7 @@ convertMessageFromByte_2_test() ->
     ConvertedMessage = messagehelper:convertMessageFromByte(MessageAsByte, ReceivedTime),
 
     ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, binary:referenced_byte_size(MessageAsByte)),
-    ?assert(messagehelper:equal(?DEFAULT_FULL_MESSAGE_25, ConvertedMessage)).
+    ?assertEqual(?DEFAULT_FULL_RECEIVED_MESSAGE_25, ConvertedMessage).
 
 createIncompleteMessage_1_test() ->
     StationType = "A",
@@ -87,11 +87,11 @@ prepareIncompleteMessageForSending_2_test() ->
     Message = messagehelper:prepareIncompleteMessageForSending(IncompleteMessage, SendTime),
     ?assertEqual(<<"A-team-0000-123456789012-", 25, SendTime8ByteBinary/binary>>, Message).
     
-addSendTime_1_test() -> 
+setSendTime_1_test() -> 
     ShouldResult = {{"A","-team-0000-", "123456789012-", 25, 1522240433451}, empty},
     TestMessage = {{"A","-team-0000-", "123456789012-", 25, empty}, empty},
     SendTime = 1522240433451,
-    IsResult = messagehelper:addSendTime(TestMessage, SendTime),
+    IsResult = messagehelper:setSendTime(TestMessage, SendTime),
     ?assertEqual(ShouldResult, IsResult).
 
 convertMessageToByte_1_test() ->

@@ -2,13 +2,13 @@
 
 
 -export([
-    convertReceivedMessagesFromByte/1,
-    convertMessageFromByte/1,
+    convertReceivedMessagesFromByte/2,
+    convertMessageFromByte/2,
 
     createIncompleteMessage/3,
 
     prepareIncompleteMessageForSending/2,
-    addSendTime/2,
+    setSendTime/2,
     convertMessageToByte/1,
 
     getStationType/1,
@@ -29,51 +29,52 @@
 %    - Byte 26-33    77394825    Zeit (gesendet) in ms seit 01.01.1970, 8-Byte Integer, Big Endian
 
 %Nachrichtenaufbau Intern:
-% {{StationType, StationName, Payload, Slotnumber, SendTime}, ReceivedTime}
+% {{StationType, StationName, Payload, SlotNumber, SendTime}, ReceivedTime}
 %   (Always) StationType = String with "A" or "B"
 %   (Always) StationName = String with "-team-0000-"
 %   (Always) Payload = String with some letters of 13 letters length
-%   (Always) Slotnumber = Number with 1 or 2 numbers (e.g. 4 or 25)
+%   (Always) SlotNumber = Number with 1 or 2 numbers (e.g. 4 or 25)
 %   (When Added) SendTime = Number with 13 numbers (UTC with e.g. vsutil:getUTC())
 %   (When Message was Received) RecievedTime = Same format as SendTime
 
-convertReceivedMessagesFromByte(MessagesInByte) ->
-    convertReceivedMessagesFromByte(MessagesInByte, []).
+convertReceivedMessagesFromByte(MessagesInByte, ReceivedTimes) ->
+    convertReceivedMessagesFromByte(MessagesInByte, ReceivedTimes, []).
 
-convertReceivedMessagesFromByte([], ConvertedMessages) ->
+convertReceivedMessagesFromByte([], [], ConvertedMessages) ->
     ConvertedMessages;
-convertReceivedMessagesFromByte(MessagesInByte, ConvertedMessages) ->
+convertReceivedMessagesFromByte(MessagesInByte, ReceivedTimes, ConvertedMessages) ->
     [FirstMessageInByte | RestMessagesInByte] = MessagesInByte,
-    ConvertedMessage = convertMessageFromByte(FirstMessageInByte),
+    [FirstReceivedTime | RestReceivedTimes] = ReceivedTimes,
+    ConvertedMessage = convertMessageFromByte(FirstMessageInByte, FirstReceivedTime),
     NewConvertedMessages = [ConvertedMessage | ConvertedMessages],
-    convertReceivedMessagesFromByte(RestMessagesInByte, NewConvertedMessages).
+    convertReceivedMessagesFromByte(RestMessagesInByte, RestReceivedTimes, NewConvertedMessages).
 
 
-convertMessageFromByte(MessageInByte) ->
+convertMessageFromByte(MessageInByte, ReceivedTime) ->
     MessageInByteList = binary:bin_to_list(MessageInByte),
     SlotNumberLength = length(MessageInByteList) - 33,
 
     StationType = lists:sublist(MessageInByteList, 1, 1),
-    Payload = lists:sublist(MessageInByteList, 2, 24),
-    [SlotNumberString] = lists:sublist(MessageInByteList, ?SLOTNUMBERPOS, SlotNumberLength),
-    SlotNumber = io_lib:format("~p", [SlotNumberString]),
-    SendTime = lists:sublist(MessageInByteList, ?SLOTNUMBERPOS + SlotNumberLength, 8),
+    StationName = lists:sublist(MessageInByteList, 2, 11),
+    Payload = lists:sublist(MessageInByteList, 13, 13),
+    [SlotNumber] = lists:sublist(MessageInByteList, ?SLOTNUMBERPOS, SlotNumberLength),
+    SendTimeList = lists:sublist(MessageInByteList, ?SLOTNUMBERPOS + SlotNumberLength, 8),
+    SendTimeBinary = binary:list_to_bin(SendTimeList),
+    SendTime = binary:decode_unsigned(SendTimeBinary, big),
 
-    ConvertedMessage = lists:append([StationType, Payload, SlotNumber, SendTime]),
-    ConvertedMessage.
+    {{StationType, StationName, Payload, SlotNumber, SendTime}, ReceivedTime}.
 
 createIncompleteMessage(StationType, StationName, SlotNumber) ->
-    Payload = StationName, % ++ AdditionalText, -> Vessel3 Connection needed!
-    [SlotNumberString] = io_lib:format("~w", [SlotNumber]),
-    (StationType ++ Payload) ++ SlotNumberString.
+    Payload = empty, % -> Vessel3 Connection needed!
+    {{StationType, StationName, Payload, SlotNumber}, empty}.
 
 prepareIncompleteMessageForSending(IncompleteMessage, SendTime) ->
-    CompleteMessage = addSendTime(IncompleteMessage, SendTime),
+    CompleteMessage = setSendTime(IncompleteMessage, SendTime),
     convertMessageToByte(CompleteMessage).
 
-addSendTime(IncompleteMessage, SendTime) ->
-    CompleteMessage = lists:concat([IncompleteMessage, SendTime]),
-    CompleteMessage.
+setSendTime(IncompleteMessage, NewSendTime) ->
+    {{StationType, StationName, Payload, SlotNumber, _SendTime}, ReceivedTime} = IncompleteMessage,
+    {{StationType, StationName, Payload, SlotNumber, NewSendTime}, ReceivedTime}.
 
 convertMessageToByte(Message) ->
     SlotNumberLength = length(Message) - 33,
@@ -84,15 +85,13 @@ convertMessageToByte(Message) ->
     binary:list_to_bin(lists:append([StationTypeAndPayload, [SlotNumber], SendTime])).
 
 getStationType(Message) ->
-    [FirstLetterAsAscii | _] = Message,
-    [FirstLetterAsAscii]. %Converts Ascii to String
+    {{StationType, _, _, _, _}, _} = Message,
+    StationType.
 
 getStationName(Message) ->
-    lists:sublist(Message, 2, 11).
+    {{_, StationName, _, _, _}, _} = Message,
+    StationName.
 
 getSlotNumber(Message) ->
-    SlotNumberLength = length(Message) - 33,
-    SlotNumberString = lists:sublist(Message, ?SLOTNUMBERPOS, SlotNumberLength),
-    io:fwrite("~p = length, ~p = string", [SlotNumberLength, SlotNumberString]),
-    {SlotNumber, []} = string:to_integer(SlotNumberString),
+    {{_, _, _, SlotNumber, _}, _} = Message,
     SlotNumber.
