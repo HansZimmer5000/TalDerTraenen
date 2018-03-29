@@ -81,7 +81,7 @@ in der server.cfg:
 {latency, 5}.
     Latenz in Sekunden.
     Wird verwendet um nach der letzten empfangenen Nachricht und nach der Latenz herunterzufahren.
-{clientlifetime, 4}.
+{clients, 4}.
     Erinnerungszeit in Sekunden für die CMEM.
     Gibt an wie lang an einen beliebigen aber bestimmten Client in der CMEM gedacht wird.
 {hbqname, 'wk'}.
@@ -94,12 +94,6 @@ in der server.cfg:
 Starten der HBQ:
 --------------------
 1> hbq:start().
-
-in der hbq.cfg:
-{dlqlimit, 100}.
-    Die Groesse der DLQ.
-{hbqname, 'wk'}.
-    Der Registrierte Name der HBQ.
 
 -------------
 Runterfahren:
