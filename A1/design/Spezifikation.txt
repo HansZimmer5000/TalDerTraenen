@@ -37,10 +37,12 @@ Getestete Kombinationen:
 
 Offene Fragen:
     DLQ sendet Nachricht, sendet gesendete NNr, aber was zuerst? Ist das überhaupt so wichtig?
-    Darf man die lists library verwenden?
-    Professor Clients erstellen nicht 5 sondern 10 Nachrichten?
 
 Beantwortete Fragen:
+    Wie oft und wo muss der TS (Ist aus Zukunft) ausgewertet werden?
+        Nur Client
+    Darf man die lists library verwenden?
+        Nein.
     Was passiert wenn DLQ NNr 1,2,5 hat und NNr 4 angefordert wird?
         DLQ sendet nächst größere Nachricht
     Wo wird TerminatedFlag gesetzt?
