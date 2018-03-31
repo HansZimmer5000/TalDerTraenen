@@ -53,8 +53,7 @@ Beantwortete Fragen:
     Was genau soll cmem:getClientNNr zurückgeben, NNr in der Liste oder NNr + 1?
         Steht dran, "welche (..) er als nächstes erhalten darf".
     Was machen wir wenn Nachricht 46 als nächstes Gesendet werden sollte, die aber in DLQ nicht existiert, welche Nachricht wird als nächstes Gesendet, 1 oder 47?
-        CMEM Eintrag auf 0 setzen.
-        Zu einem späteren Zeitpunkt wird Lücke gefüllt sein.
+        Nachricht 47 wird gesendet.
     Wie sieht die CMEM aus?
         Sie ist eine Liste:
             Index 0     Erinnerungszeit in Sekunden

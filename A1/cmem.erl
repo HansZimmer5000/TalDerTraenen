@@ -28,6 +28,7 @@ updateClient([ErinnerungsZeitSek, TupelListe], ClientPid, NNr, LogDatei) ->
     CMEM.
 
 setClientNNr(TupelListe, ClientPid, NNr) ->
+    %Ohne lists machen, und ggf. hinten anhängen.
     TmpTupelListe = lists:keydelete(ClientPid, 1, TupelListe),
     [{ClientPid, NNr, erlang:timestamp()}] ++ TmpTupelListe.
 

@@ -82,16 +82,16 @@ deliverMSG(NNr, ClientPID, [_Size, DLQNachrichten], Datei) ->
 		[] ->
 			logge_status(io_lib:format("Nachricht mit Nummer ~p nicht existent",[NNr]), Datei),
 			ZuSendendeNachricht = erstelleErrNachricht(),
-			TermiatedFlag = true;
+			TerminatedFlag = true;
 		GefundeneNachricht ->	
 			[GefundeneNNr | _] = GefundeneNachricht,
 			logge_status(io_lib:format("Nachricht mit Nummer ~p existent", [GefundeneNNr]), Datei),
 			ZuSendendeNachricht = GefundeneNachricht,
-			TermiatedFlag = (hole_nachricht(DLQNachrichten, GefundeneNNr + 1) == [])
+			TerminatedFlag = (pruefe_nnr_und_hole_nachricht(DLQNachrichten, GefundeneNNr + 1, Datei) == [])
 	end,
 
 	GesendeteNachrichtMitTS = fuege_dlqout_ts_hinzu(ZuSendendeNachricht),
-	ClientPID ! {reply, GesendeteNachrichtMitTS, TermiatedFlag},
+	ClientPID ! {reply, GesendeteNachrichtMitTS, TerminatedFlag},
 
 	[GesendeteNNr | _] = GesendeteNachrichtMitTS,
 	GesendeteNNr.
