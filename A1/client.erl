@@ -106,8 +106,7 @@ frage_nach_neuer_nnr(Server, LogDatei) ->
     receive
         {nid, NNR} -> 
             logge_status(io_lib:format("NNR ~w bekommen", [NNR]), LogDatei),
-            NNR;
-        {kill} -> exit("Kill Befehl vom Main Client")
+            NNR
     end.
 
 erstelle_nachricht(NNR, ErstellungsTS) ->
@@ -150,8 +149,7 @@ frage_nach_neuer_nachricht(Server, LogDatei) ->
                 true -> Ergebnis = [];
                 false -> Ergebnis = Nachricht
             end,
-            Ergebnis;
-        {kill} -> exit("Kill Befehl vom Main Client")
+            Ergebnis
     end.
 
 
@@ -212,11 +210,9 @@ element_ist_in_liste(Elem, [_Head | Rest]) ->
 
 
 kill_all_clients([], LogDatei) -> 
-    timer:sleep(timer:seconds(1)),
 	logge_status("Alle Clients wurden getoetet", LogDatei);
 kill_all_clients([Client|RestClients], LogDatei) ->
-	%exit(HeadClient,kill),
-	Client ! {kill},
+	exit(Client, kill),
 	logge_status(io_lib:format("Der Client ~p wurde zur Selbstzerstoerung ueberredet", [Client]), LogDatei),
 	kill_all_clients(RestClients, LogDatei).
 
