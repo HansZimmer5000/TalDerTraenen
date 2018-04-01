@@ -9,10 +9,10 @@ Getestete Kombinationen:
     Kombination 2
     Unser: Server
     Klauck: Client, HBQ, DLQ, CMEM 
-    Problem: Deadlock? Nach invollständigen Server und vollständigen Client Init passiert nichts.
-    Erklärung: Unser Server erwartet bereits gestarete HBQ, tut man dies, kein Problem.
-    Problem: Er liefert 25 noch aus, bei Anfrage nach 26 schickt er auf ein Mal 98. Lückennachricht geht aber nur von 46-98.
-    Erklärung: ???
+        AltProblem: Deadlock? Nach invollständigen Server und vollständigen Client Init passiert nichts.
+        AltErklärung: Unser Server erwartet bereits gestarete HBQ, tut man dies, kein Problem.
+        AltProblem: Er liefert 25 noch aus, bei Anfrage nach 26 schickt er auf ein Mal 98. Lückennachricht geht aber nur von 46-98.
+        AltErklärung: ???
 
     Kombination 3
     Unser: HBQ, DLQ, CMEM
@@ -25,13 +25,13 @@ Getestete Kombinationen:
     Kombination 5
     Unser: CMEM
     Klauck: Server, Client, HBQ, DLQ,
-    Problem: Update zu NNr 1 für jeden, dann direkter Sprung zu NNr 4 für jeden und dann bis zum Runterfahren NNr 4 Nachrichten.
-    Erklärung: Wir machen im Server cmeme:getClientNNr + 1, Klauck wohl in der CMEM, was soll getClientNNr nun zurückgeben, gehaltene oder nächste Nummer?
+        AltProblem: Update zu NNr 1 für jeden, dann direkter Sprung zu NNr 4 für jeden und dann bis zum Runterfahren NNr 4 Nachrichten.
+        AltErklärung: Wir machen im Server cmeme:getClientNNr + 1, Klauck wohl in der CMEM, was soll getClientNNr nun zurückgeben, gehaltene oder nächste Nummer?
 
     Kombination 6
     Unser: Server, CMEM
     Klauck: Client, HBQ, DLQ
-    Problem & Erklärung siehe Kombi5
+        AltProblem & Erklärung siehe Kombi5
 
 
 
