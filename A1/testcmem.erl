@@ -9,7 +9,7 @@
 -define(DEFAULT_NNR, 0).
 
 initCMEM_1_test() ->
-    [?ERINNERUNGS_ZEIT_SEK, []] = cmem:initCMEM(?ERINNERUNGS_ZEIT_SEK, ?LOG_DATEI).
+    {?ERINNERUNGS_ZEIT_SEK, []} = cmem:initCMEM(?ERINNERUNGS_ZEIT_SEK, ?LOG_DATEI).
 
 updateClient_1_test() ->
     CMEM = cmem:initCMEM(?ERINNERUNGS_ZEIT_SEK, ?LOG_DATEI),

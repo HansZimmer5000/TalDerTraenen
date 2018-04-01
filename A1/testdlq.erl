@@ -8,18 +8,18 @@
 -define(KLEINERE_SIZE, 2).
 
 initDLQ_1_test() ->
-    [?SIZE, []] = dlq:initDLQ(?SIZE, ?LOG_DATEI).
+    {?SIZE, []} = dlq:initDLQ(?SIZE, ?LOG_DATEI).
 
 expectedNr_1_test() ->
     TS = erlang:timestamp(),
     Nachricht = [1, "Text", TS, TS, TS],
-    2 = dlq:expectedNr([?SIZE, [Nachricht]]).
+    2 = dlq:expectedNr({?SIZE, [Nachricht]}).
 
 expectedNr_2_test() ->
     TS = erlang:timestamp(),
     Nachricht1 = [2, "Text", TS, TS, TS],
     Nachricht2 = [1, "Text", TS, TS, TS],
-    3 = dlq:expectedNr([?SIZE, [Nachricht1, Nachricht2]]).
+    3 = dlq:expectedNr({?SIZE, [Nachricht1, Nachricht2]}).
 
 hole_max_nnr_1_test() ->
     TS = erlang:timestamp(),
@@ -36,7 +36,7 @@ push2DLQ_1_test() ->
     TS = erlang:timestamp(),
     NachrichtOriginal = [1, "Text", TS, TS],
     NeueDLQ = dlq:push2DLQ(NachrichtOriginal, DLQ, ?LOG_DATEI),
-    [?SIZE, [NachrichtMitTS]] = NeueDLQ,
+    {?SIZE, [NachrichtMitTS]} = NeueDLQ,
     [NNrOriginal, TextOriginal, TSOriginal, TSOriginal] = NachrichtOriginal,
     [NNrOriginal, TextOriginal, TSOriginal, TSOriginal, _TS] = NachrichtMitTS.
 
@@ -50,7 +50,7 @@ push2DLQ_2_test() ->
     NeueDLQ2 = dlq:push2DLQ(Nachricht2, NeueDLQ1, ?LOG_DATEI),
     NeueDLQ3 = dlq:push2DLQ(Nachricht3, NeueDLQ2, ?LOG_DATEI),
     io:fwrite("~w", [NeueDLQ3]),
-    [?KLEINERE_SIZE, [[3, "Text", TS, TS, _TS], [2, "Text", TS, TS, _TS]]] = NeueDLQ3.
+    {?KLEINERE_SIZE, [[3, "Text", TS, TS, _TS], [2, "Text", TS, TS, _TS]]} = NeueDLQ3.
 
 deliverMSG_1_test() ->
     DLQ = dlq:initDLQ(?SIZE, ?LOG_DATEI),
@@ -123,7 +123,7 @@ hole_naechst_groessere_nnr_2_test() ->
 hole_nachricht_1_test() ->
     DLQ = dlq:initDLQ(?SIZE, ?LOG_DATEI),
     TS = erlang:timestamp(),
-    [?SIZE, Nachrichten] = dlq:push2DLQ([1, "Text", TS, TS], DLQ, ?LOG_DATEI),
+    {?SIZE, Nachrichten} = dlq:push2DLQ([1, "Text", TS, TS], DLQ, ?LOG_DATEI),
     [1, "Text", TS, TS, _TS] = dlq:hole_nachricht(Nachrichten, 1).
 
 hole_nachricht_2_test() ->
