@@ -36,7 +36,7 @@ push_hbq_1_test() ->
     Nachricht1 = [1, "Text", TS, TS, TS],
     Nachricht2 = [2, "Text", TS],
     HBQ = [],
-    DLQ = [?DLQSIZE, [Nachricht1]],
+    DLQ = {?DLQSIZE, [Nachricht1]},
     ServerPid = self(),
     ThisPid = self(),
     _HBQPid = spawn(fun() -> 
@@ -50,7 +50,7 @@ push_hbq_1_test() ->
     receive
         Result -> 
             {NeueHBQ, NeueDLQ} = Result,
-            [?DLQSIZE, NeueDLQNachrichten] = NeueDLQ,
+            {?DLQSIZE, NeueDLQNachrichten} = NeueDLQ,
             [DLQNachricht1, DLQNachricht2] = NeueDLQNachrichten,
             
             [2, "Text", TS, _HBQInTS, _DLQInTS] = DLQNachricht1,
@@ -63,7 +63,7 @@ push_hbq_1_test() ->
 deliver_nachricht_1_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = [1, "Text", TS, TS, TS],
-    DLQ = [?DLQSIZE, [Nachricht]],
+    DLQ = {?DLQSIZE, [Nachricht]},
     ClientPid = self(),
     ServerPid = self(),
     _HBQPid = spawn(fun() -> hbq:deliver_nachricht(ServerPid, 1, ClientPid, DLQ) end),
@@ -81,7 +81,7 @@ deliver_nachricht_1_test() ->
 deliver_nachricht_2_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = [2, "Text", TS, TS, TS],
-    DLQ = [?DLQSIZE, [Nachricht]],
+    DLQ = {?DLQSIZE, [Nachricht]},
     ClientPid = self(),
     ServerPid = self(),
     _HBQPid = spawn(fun() -> hbq:deliver_nachricht(ServerPid, 1, ClientPid, DLQ) end),
@@ -102,7 +102,7 @@ deliver_nachricht_2_test() ->
 deliver_nachricht_3_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = [2, "Text", TS, TS, TS],
-    DLQ = [?DLQSIZE, [Nachricht]],
+    DLQ = {?DLQSIZE, [Nachricht]},
     ClientPid = self(),
     ServerPid = self(),
     _HBQPid = spawn(fun() -> hbq:deliver_nachricht(ServerPid, 3, ClientPid, DLQ) end),
@@ -125,7 +125,7 @@ deliver_nachricht_4_test() ->
     Nachricht1 = [2, "Text", TS, TS, TS],
     Nachricht2 = [4, "Fülle Lücke von 3 bis 4", TS, TS, TS],
     Nachricht3 = [5, "Text", TS, TS, TS],
-    DLQ = [?DLQSIZE, [Nachricht3, Nachricht2, Nachricht1]],
+    DLQ = {?DLQSIZE, [Nachricht3, Nachricht2, Nachricht1]},
     ClientPid = self(),
     ServerPid = self(),
     _HBQPid = spawn(fun() -> hbq:deliver_nachricht(ServerPid, 3, ClientPid, DLQ) end),
@@ -144,7 +144,7 @@ deliver_nachricht_4_test() ->
     end.
 
 delete_hbq_1_test() ->
-    DLQ = [?DLQSIZE, []],
+    DLQ = {?DLQSIZE, []},
     ThisPid = self(),
     HBQPid = spawn(fun() -> hbq:delete_hbq(ThisPid, DLQ) end),
     register(wk, HBQPid),
@@ -155,23 +155,23 @@ delete_hbq_1_test() ->
 
 wird_erwartet_1_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
-    DLQ = [?DLQSIZE, [[1, "Text", TS, TS ,TS]]],
+    DLQ = {?DLQSIZE, [[1, "Text", TS, TS ,TS]]},
     Nachricht = [2, "Text2", TS, TS],
     ?assert(hbq:wird_erwartet(Nachricht, DLQ)).
 
 pruefe_naechste_nachricht_und_pushe_1_test() ->
     HBQ = [],
-    DLQ = [?DLQSIZE, []],
+    DLQ = {?DLQSIZE, []},
     ?assertEqual({[], DLQ}, hbq:pruefe_naechste_nachricht_und_pushe(HBQ, DLQ)).
 
 pruefe_naechste_nachricht_und_pushe_2_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = [1, "Text", TS, TS],
     HBQ = [Nachricht],
-    DLQ = [?DLQSIZE, []],
+    DLQ = {?DLQSIZE, []},
     {NeueHBQ, NeueDLQ} = hbq:pruefe_naechste_nachricht_und_pushe(HBQ, DLQ),
 
-    [?DLQSIZE, NeueDLQNachrichten] = NeueDLQ,
+    {?DLQSIZE, NeueDLQNachrichten} = NeueDLQ,
     [ErsteDLQNachricht | _Rest] = NeueDLQNachrichten,
     [1, "Text", TS, TS, _DLQINTS] = ErsteDLQNachricht,
     ?assertEqual([], NeueHBQ).
@@ -180,9 +180,9 @@ pruefe_naechste_nachricht_und_pushe_3_test() ->
     TS = vsutil:now2string(erlang:timestamp()),
     Nachricht = [2, "Text", TS, TS],
     HBQ = [Nachricht],
-    DLQ = [?DLQSIZE, []],
+    DLQ = {?DLQSIZE, []},
     ?assertEqual(
-        {[Nachricht], [?DLQSIZE, []]}, 
+        {[Nachricht], {?DLQSIZE, []}}, 
         hbq:pruefe_naechste_nachricht_und_pushe(HBQ, DLQ)).
 
 in_hbq_einfuegen_1_test() ->
@@ -224,8 +224,8 @@ pruefe_limit_und_fuelle_spalte_1_test() ->
     Nachricht6 = [6, "Text", TS, TS],
     Nachricht7 = [7, "Text", TS, TS],
     HBQ = [Nachricht4, Nachricht5, Nachricht6, Nachricht7],
-    DLQ = [?DLQSIZE, [Nachricht1]],
-    [?DLQSIZE, [DLQNachricht1, DLQNachricht2]] = hbq:pruefe_limit_und_fuelle_spalte(HBQ, DLQ, ?DLQSIZE),
+    DLQ = {?DLQSIZE, [Nachricht1]},
+    {?DLQSIZE, [DLQNachricht1, DLQNachricht2]} = hbq:pruefe_limit_und_fuelle_spalte(HBQ, DLQ, ?DLQSIZE),
     [3, "Error Nachricht zum Luecke von 2 bis 3 zu fuellen", TS, TS, _TS] = DLQNachricht1,
     [1, "Text", TS, TS, TS] = DLQNachricht2.
 
@@ -236,8 +236,8 @@ pruefe_limit_und_fuelle_spalte_2_test() ->
     Nachricht5 = [5, "Text", TS, TS],
     Nachricht6 = [6, "Text", TS, TS],
     HBQ = [Nachricht4, Nachricht5, Nachricht6],
-    DLQ = [?DLQSIZE, [Nachricht1]],
-    [?DLQSIZE, [DLQNachricht1]] = hbq:pruefe_limit_und_fuelle_spalte(HBQ, DLQ, ?DLQSIZE),
+    DLQ = {?DLQSIZE, [Nachricht1]},
+    {?DLQSIZE, [DLQNachricht1]} = hbq:pruefe_limit_und_fuelle_spalte(HBQ, DLQ, ?DLQSIZE),
     [1, "Text", TS, TS, TS] = DLQNachricht1.
 
 finde_und_fuelle_spalte_1_test() ->
@@ -245,8 +245,8 @@ finde_und_fuelle_spalte_1_test() ->
     Nachricht1 = [1, "Text", TS, TS, TS],
     Nachricht4 = [4, "Text", TS, TS],
     HBQ = [Nachricht4],
-    DLQ = [?DLQSIZE, [Nachricht1]],
-    [?DLQSIZE, [DLQNachricht1, DLQNachricht2]] = hbq:finde_und_fuelle_spalte(HBQ, DLQ),
+    DLQ = {?DLQSIZE, [Nachricht1]},
+    {?DLQSIZE, [DLQNachricht1, DLQNachricht2]} = hbq:finde_und_fuelle_spalte(HBQ, DLQ),
     [3, "Error Nachricht zum Luecke von 2 bis 3 zu fuellen", TS, TS, _TS] = DLQNachricht1,
     [1, "Text", TS, TS, TS] = DLQNachricht2.
 
@@ -255,7 +255,7 @@ finde_spalte_1_test() ->
     Nachricht1 = [1, "Text", TS, TS, TS],
     Nachricht4 = [4, "Text", TS, TS],
     HBQ = [Nachricht4],
-    DLQ = [?DLQSIZE, [Nachricht1]],
+    DLQ = {?DLQSIZE, [Nachricht1]},
     ?assertEqual(
         {2, 3},
         hbq:finde_spalte(HBQ, DLQ)

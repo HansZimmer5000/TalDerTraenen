@@ -7,7 +7,7 @@
 getmessages_abfertigen_1_test() ->
     ThisPid = self(),
     ErinnerungsZeit = 2000,
-    CMEM = [ErinnerungsZeit, [{ThisPid, 1, erlang:timestamp()}]],
+    CMEM = {ErinnerungsZeit, [{ThisPid, 1, erlang:timestamp()}]},
     ServerPid = spawn(fun() -> 
                             NeueCMEM = server:getmessages_abfertigen(ThisPid, CMEM, ThisPid),
                             ThisPid ! NeueCMEM 
@@ -20,7 +20,7 @@ getmessages_abfertigen_1_test() ->
     end,
     receive
         Any2 -> 
-            [ErinnerungsZeit, [{ThisPid, 2, _TS}]] = Any2
+            {ErinnerungsZeit, [{ThisPid, 2, _TS}]} = Any2
         after 2000 -> ?assert(false)
     end,
     fahre_server_vorzeitig_herunter(ServerPid).

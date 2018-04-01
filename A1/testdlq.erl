@@ -127,8 +127,8 @@ hole_nachricht_1_test() ->
     [1, "Text", TS, TS, _TS] = dlq:hole_nachricht(Nachrichten, 1).
 
 hole_nachricht_2_test() ->
-    DLQ = dlq:initDLQ(?SIZE, ?LOG_DATEI),
-    ?assertEqual([], dlq:hole_nachricht(DLQ, 1)).
+    {?SIZE, Nachrichten} = dlq:initDLQ(?SIZE, ?LOG_DATEI),
+    ?assertEqual([], dlq:hole_nachricht(Nachrichten, 1)).
 
 
 erstelleErrNachricht_1_test() ->
