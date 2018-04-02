@@ -125,7 +125,7 @@ hole_nachricht([_AktuellsteNachricht | RestlicheNachrichten], NNr) ->
 hole_naechst_groessere_nnr([], AusgangsNNr) ->
 	AusgangsNNr;
 hole_naechst_groessere_nnr([DLQKopfNachricht | DLQRestNachrichten], AusgangsNNr) ->
-	[DLQKopfNNr | _] = DLQKopfNachricht,
+	[DLQKopfNNr | _Rest] = DLQKopfNachricht,
 	case DLQKopfNNr > AusgangsNNr of
 		true ->
 			DLQKopfNNr;

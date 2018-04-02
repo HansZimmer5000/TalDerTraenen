@@ -46,9 +46,8 @@ start() ->
 wait_for_init() ->
   receive
     {PID, {request, initHBQ}} ->
-      io:fwrite("got init request"),
-      DLQ = dlq:initDLQ(?DLQLIMIT, ?DLQ_LOG_DATEI),
-      init_hbq(PID), 
+      DLQ = init_hbq(PID), 
+      logge_status("HBQ initiiert und running"),
       receive_loop([], DLQ)
   end.
 
@@ -72,7 +71,9 @@ receive_loop(HoldbackQueue, DeliveryQueue) ->
 
 %Bestaetigt dem aufrufenden Prozess (in diesem Fall dem Server) die Initialisierung
 init_hbq(PID) ->
-  PID ! {reply, ok}.
+  DLQ = dlq:initDLQ(?DLQLIMIT, ?DLQ_LOG_DATEI),
+  PID ! {reply, ok},
+  DLQ.
 
 push_hbq(PID, Nachricht, HBQ, DLQ) ->
   NachrichtMitTs = fuege_hbqin_ts_hinzu(Nachricht),
@@ -110,10 +111,11 @@ wird_erwartet([NNr | _Rest], DLQ) ->
 %Rekursive Hilfsmethode, welche nach und nach weitere Nachrichten an die DLQ schickt, falls moeglich
 pruefe_naechste_nachricht_und_pushe([], DLQ) -> {[], DLQ};
 pruefe_naechste_nachricht_und_pushe([HBQHead | HBQRest], DLQ) ->
-  CanBeDelivered = wird_erwartet(HBQHead, DLQ),
-  logge_status(io_lib:format("Nachricht CanBeDelivered? ~p", [CanBeDelivered])),
-  case CanBeDelivered of
+  KannGesendetWerden = wird_erwartet(HBQHead, DLQ),
+  case KannGesendetWerden of
     true ->
+      [NNr | _Rest] = HBQHead,
+      logge_status(io_lib:format("Nachricht mit Nummer ~p in DLQ verschoben", [NNr])),
       NeueDLQ = dlq:push2DLQ(HBQHead, DLQ, ?DLQ_LOG_DATEI),
       pruefe_naechste_nachricht_und_pushe(HBQRest, NeueDLQ);
     false -> 
@@ -124,21 +126,19 @@ pruefe_naechste_nachricht_und_pushe([HBQHead | HBQRest], DLQ) ->
 pruefe_limit_und_fuelle_spalte(HBQ, DLQ, DLQLimit) ->
   GapLimit = DLQLimit / 3 * 2,
   HBQSize = length(HBQ),
-  if
-    (HBQSize > GapLimit) ->
+  case HBQSize > GapLimit of
+    true ->
       logge_status("2/3 Regel erfuellt"),
       NeueDLQ = finde_und_fuelle_spalte(HBQ, DLQ),
       NeueDLQ;
-    true ->
+    false ->
       logge_status("2/3 Regel nicht erfuellt"),
       DLQ
   end.
 
 in_hbq_einfuegen(Nachricht, []) ->
-  logge_status("HBQ ist leer, Element wird einfach eingefuegt"),
   [Nachricht];
 in_hbq_einfuegen(Nachricht, HBQ) ->
-  logge_status("HBQ ist nicht leer"),
   NeueHBQ = in_hbq_einfuegen_([], Nachricht, HBQ),
   NeueHBQ.
 
