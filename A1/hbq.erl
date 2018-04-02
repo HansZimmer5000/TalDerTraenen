@@ -88,15 +88,14 @@ fuege_hbqin_ts_hinzu([NNr, Text, TSClientout]) ->
   [NNr, Text, TSClientout, TShbqin].
 
 pruefe_und_sende_nachricht(Nachricht, HBQ, DLQ) ->
-  [NNr | _Rest] = Nachricht,
   KannDirektAnDLQ = wird_erwartet(Nachricht, DLQ),
   case KannDirektAnDLQ of 
     true ->
-      logge_status(io_lib:format("Nachricht mit Nummer ~p an DLQ gesendet", [NNr])),
+      logge_nachricht_status("an DLQ gesendet", Nachricht),
       NeueHBQ = HBQ,
       NeueDLQ = dlq:push2DLQ(Nachricht, DLQ, ?DLQ_LOG_DATEI);
     false ->
-      logge_status(io_lib:format("Nachricht mit Nummer ~p in HBQ sortiert", [NNr])),
+      logge_nachricht_status("in HBQ sortiert", Nachricht),
       NeueHBQ = in_hbq_einfuegen(Nachricht, HBQ),
       NeueDLQ = pruefe_limit_und_fuelle_spalte(NeueHBQ, DLQ, ?DLQLIMIT)
   end,
@@ -114,8 +113,7 @@ pruefe_naechste_nachricht_und_pushe([HBQHead | HBQRest], DLQ) ->
   KannGesendetWerden = wird_erwartet(HBQHead, DLQ),
   case KannGesendetWerden of
     true ->
-      [NNr | _Rest] = HBQHead,
-      logge_status(io_lib:format("Nachricht mit Nummer ~p in DLQ verschoben", [NNr])),
+      logge_nachricht_status("in DLQ verschoben", HBQHead),
       NeueDLQ = dlq:push2DLQ(HBQHead, DLQ, ?DLQ_LOG_DATEI),
       pruefe_naechste_nachricht_und_pushe(HBQRest, NeueDLQ);
     false -> 
@@ -136,8 +134,7 @@ pruefe_limit_und_fuelle_spalte(HBQ, DLQ, DLQLimit) ->
       DLQ
   end.
 
-in_hbq_einfuegen(Nachricht, []) ->
-  [Nachricht];
+% Fuegt eine Nachricht korrekt (Sortierung) in die HBQ ein.
 in_hbq_einfuegen(Nachricht, HBQ) ->
   NeueHBQ = in_hbq_einfuegen_([], Nachricht, HBQ),
   NeueHBQ.
@@ -146,8 +143,7 @@ in_hbq_einfuegen(Nachricht, HBQ) ->
 %Wenn dem nicht so ist, wird das erste Element der HBQ in den Akku geschrieben und es erfolgt ein weiterer Rekursionsaufruf
 %Wenn dem so ist, wird das Neue Element an den Akku gehaengt, dieser vor den Rest der HBQ gehaengt und das ganze zurueckgegeben ausgegeben.
 in_hbq_einfuegen_(Akku, Nachricht, []) ->
-  [NNr | _Rest] = Nachricht,
-  logge_status(io_lib:format("Nachricht mit Nummer ~p wurde ganz hinten an HBQ gehaengt", [NNr])),
+  logge_nachricht_status("wurde ganz hinten an HBQ gehaengt", Nachricht),
   NeueHBQ = Akku ++ [Nachricht],
   NeueHBQ;
 in_hbq_einfuegen_(Akku, [NNr | NachrichtRest], [[HBQKopfNNr | HBQKopfRest] | HBQRest]) ->
@@ -157,8 +153,8 @@ in_hbq_einfuegen_(Akku, [NNr | NachrichtRest], [[HBQKopfNNr | HBQKopfRest] | HBQ
       NeuerHBQRest = [[HBQKopfNNr | HBQKopfRest] | HBQRest],
       NeueHBQ = VordererHBQTeil ++ NeuerHBQRest;
     false ->
-      NewAkku = Akku ++ [[HBQKopfNNr | HBQKopfRest]],
-      NeueHBQ = in_hbq_einfuegen_(NewAkku, [NNr | NachrichtRest], HBQRest)
+      NeuerAkku = Akku ++ [[HBQKopfNNr | HBQKopfRest]],
+      NeueHBQ = in_hbq_einfuegen_(NeuerAkku, [NNr | NachrichtRest], HBQRest)
   end,
   NeueHBQ.
 
@@ -223,3 +219,8 @@ logge_status(Inhalt) ->
     LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(?LOG_DATEI_NAME, LogNachricht).
+
+logge_nachricht_status(Inhalt, Nachricht) ->
+    [NNr | _Rest] = Nachricht,
+    logge_status(io_lib:format("Nachricht mit NNr ~p: ~s", [NNr, Inhalt])).
+    
