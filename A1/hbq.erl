@@ -174,7 +174,7 @@ delete_dlq(DLQ) ->
   case dlq:delDLQ(DLQ) of 
     ok ->
       logge_status("DLQ wurde erfolgreich geloescht");
-    _ -> 
+    _Any -> 
       logge_status("ERR: DLQ wurde NICHT geloescht")
   end.
 
@@ -182,7 +182,7 @@ unregisterHBQ(HBQName) ->
   case unregister(HBQName) of
     true ->
       logge_status("HBQ wurde erfolgreich unregistered");
-    _ ->
+    _Any ->
       logge_status("ERR: HBQ wurde NICHT unregistered")
   end.
 
