@@ -33,7 +33,7 @@
 %------------------------------------------------------------------------------------------------------
 %																	>>START / INIT<<
 %------------------------------------------------------------------------------------------------------
-% Funktion vom Professor Code erwartet folgende Funktion
+% Alternative zu start/0
 startHBQ() ->
   start().
 
@@ -43,12 +43,15 @@ start() ->
   register(?HBQNAME, HBQPID),
   HBQPID.
 
+% Wartet auf Init vom Server
 wait_for_init() ->
   receive
     {PID, {request, initHBQ}} ->
       DLQ = init_hbq(PID), 
       logge_status("HBQ initiiert und running"),
-      receive_loop([], DLQ)
+      receive_loop([], DLQ);
+    {PID, {request, dellHBQ}} -> 
+      delete_hbq(PID)
   end.
 
 receive_loop(HBQ, DLQ) ->
@@ -169,6 +172,9 @@ deliver_nachricht(PID, NNr, ToClient, DLQ) ->
   PID ! {reply, GesendeteNNr}.
 
 %Handler fuer den delete Befehl, loescht auch die DLQ
+delete_hbq(PID) ->
+  unregisterHBQ(?HBQNAME),
+  PID ! {reply, ok}.
 delete_hbq(PID, DLQ) ->
   delete_dlq(DLQ),
   unregisterHBQ(?HBQNAME),

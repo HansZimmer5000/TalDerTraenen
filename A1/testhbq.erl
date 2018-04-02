@@ -24,6 +24,20 @@ wait_for_init_1_test() ->
     end,
     exit(HBQPid, kill).
 
+wait_for_init_2_test() ->
+    HBQName = 'wk',
+    HBQPid = spawn(fun() -> hbq:wait_for_init() end),
+    register(HBQName, HBQPid),
+    HBQPid ! {self(), {request, dellHBQ}},
+    receive
+        {reply, ok} -> ?assert(true)
+        after ?MAX_DELAY -> ?assert(false)
+    end,
+    ?assertEqual(
+        undefined, 
+        erlang:whereis(HBQName)),
+    exit(HBQPid, kill).
+
 init_hbq_1_test() ->
     hbq:init_hbq(self()),
     receive
