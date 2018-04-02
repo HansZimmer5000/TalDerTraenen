@@ -51,18 +51,22 @@ wait_for_init() ->
       receive_loop([], DLQ)
   end.
 
-receive_loop(HoldbackQueue, DeliveryQueue) ->
+receive_loop(HBQ, DLQ) ->
   receive
     {PID, {request, pushHBQ, NachrichtAsList}} ->
-      {NeueHBQ, NeueDLQ} = push_hbq(PID, NachrichtAsList, HoldbackQueue, DeliveryQueue),
+      {NeueHBQ, NeueDLQ} = push_hbq(PID, NachrichtAsList, HBQ, DLQ),
       receive_loop(NeueHBQ, NeueDLQ);
 
     {PID, {request, deliverMSG, NNr, ToClient}} ->
-      deliver_nachricht(PID, NNr, ToClient, DeliveryQueue),
-      receive_loop(HoldbackQueue, DeliveryQueue);
+      deliver_nachricht(PID, NNr, ToClient, DLQ),
+      receive_loop(HBQ, DLQ);
 
     {PID, {request, dellHBQ}} -> 
-      delete_hbq(PID, DeliveryQueue)
+      delete_hbq(PID, DLQ);
+
+    UnbekanntesKommando ->
+      logge_status(io_lib:format("Bekam unbekanntes Kommando ~p", [UnbekanntesKommando])),
+      receive_loop(HBQ, DLQ)
   end.
 
 %------------------------------------------------------------------------------------------------------

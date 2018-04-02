@@ -52,7 +52,10 @@ receive_loop(CMEM, NextNNR) ->
         {dropmessage, Nachricht} ->     dropmessage_abfertigen(?HBQ, Nachricht),
                                         receive_loop(CMEM, NextNNR);
         {AbsenderPid, getmsgid} ->  NeueNextNNR = getmsgid_abfertigen(AbsenderPid, NextNNR),
-                                    receive_loop(CMEM, NeueNextNNR)
+                                    receive_loop(CMEM, NeueNextNNR);
+        UnbekanntesKommando ->  logge_status(io_lib:format("Bekam unbekanntes Kommando ~p", [UnbekanntesKommando])),
+                                receive_loop(CMEM, NextNNR)
+        
         after timer:seconds(?LATENZ_SEK) -> runterfahren(CMEM)
     end.
 
