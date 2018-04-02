@@ -48,23 +48,23 @@ getClientNNr_3_test() ->
     timer:sleep(timer:seconds(?ERINNERUNGS_ZEIT_SEK + 1)),
     Result = cmem:getClientNNr(NeueCMEM, self()).
 
-pruefeTSUndGibNNrZuruck_1_test() ->
+pruefe_ts_und_gib_nnr_zurueck_1_test() ->
     NNr = 2,
     AltTS = erlang:timestamp(),
-    2 = cmem:pruefeTSUndGibNNrZuruck(AltTS, ?ERINNERUNGS_ZEIT_SEK, NNr).
+    2 = cmem:pruefe_ts_und_gib_nnr_zurueck(AltTS, ?ERINNERUNGS_ZEIT_SEK, NNr).
 
-pruefeTSUndGibNNrZuruck_2_test() ->
+pruefe_ts_und_gib_nnr_zurueck_2_test() ->
     NNr = 2,
     AltTS = erlang:timestamp(),
     Result = ?DEFAULT_NNR,
     timer:sleep(timer:seconds(?ERINNERUNGS_ZEIT_SEK + 1)),
-    Result = cmem:pruefeTSUndGibNNrZuruck(AltTS, ?ERINNERUNGS_ZEIT_SEK, NNr).
+    Result = cmem:pruefe_ts_und_gib_nnr_zurueck(AltTS, ?ERINNERUNGS_ZEIT_SEK, NNr).
 
-tSIstAbglaufen_1_test() ->
+ts_ist_abglaufen_1_test() ->
     AltTS = erlang:timestamp(),
-    ?assertNot(cmem:tSIstAbglaufen(AltTS, ?ERINNERUNGS_ZEIT_SEK)).
+    ?assertNot(cmem:ts_ist_abglaufen(AltTS, ?ERINNERUNGS_ZEIT_SEK)).
 
-tSIstAbglaufen_2_test() ->
+ts_ist_abglaufen_2_test() ->
     AltTS = erlang:timestamp(),
     timer:sleep(timer:seconds(?ERINNERUNGS_ZEIT_SEK + 1)),
-    ?assert(cmem:tSIstAbglaufen(AltTS, ?ERINNERUNGS_ZEIT_SEK)).
+    ?assert(cmem:ts_ist_abglaufen(AltTS, ?ERINNERUNGS_ZEIT_SEK)).

@@ -6,8 +6,8 @@
     initCMEM/2,
     updateClient/4,
     getClientNNr/2,
-    pruefeTSUndGibNNrZuruck/3,
-    tSIstAbglaufen/2,
+    pruefe_ts_und_gib_nnr_zurueck/3,
+    ts_ist_abglaufen/2,
 
     delCMEM/1
 ]).
@@ -27,30 +27,38 @@ updateClient({ErinnerungsZeitSek, TupelListe}, ClientPid, NNr, LogDatei) ->
     CMEM = {ErinnerungsZeitSek, NeueTupelListe},
     CMEM.
 
+
+setClientNNr([], ClientPid, NNr) ->
+    [{ClientPid, NNr, erlang:timestamp()}];
 setClientNNr(TupelListe, ClientPid, NNr) ->
-    %Ohne lists machen, und ggf. hinten anhängen.
-    TmpTupelListe = lists:keydelete(ClientPid, 1, TupelListe),
-    [{ClientPid, NNr, erlang:timestamp()}] ++ TmpTupelListe.
-
-getClientNNr({ErinnerungsZeitSek, TupelListe}, ClientPid) ->
-    GefundenesTupel = lists:keyfind(ClientPid, 1, TupelListe),
-    case GefundenesTupel of
-        {ClientPid, NNr, AlterTS} -> 
-            AktuelleNNr = pruefeTSUndGibNNrZuruck(AlterTS, ErinnerungsZeitSek, NNr);
-        _Any -> 
-            AktuelleNNr = ?DEFAULT_NNR
+    [KopfTupel | RestTupel] = TupelListe,
+    case KopfTupel of
+        {ClientPid, _AltNNr, _AltTS} -> NeuesTupel = {ClientPid, NNr, erlang:timestamp()},
+                                        NeueTupelListe = [NeuesTupel | RestTupel];
+        _Any -> NeueRestTupel = setClientNNr(RestTupel, ClientPid, NNr),
+                NeueTupelListe = [KopfTupel | NeueRestTupel]
     end,
-    AktuelleNNr + 1.
+    NeueTupelListe.
 
-pruefeTSUndGibNNrZuruck(OldTS, ErinnerungsZeitSek, SavedNNr) ->
-    case tSIstAbglaufen(OldTS, ErinnerungsZeitSek) of
-        true ->  ?DEFAULT_NNR;
-        false -> SavedNNr
+getClientNNr({_ErinnerungsZeitSek, []}, _ClientPid) -> 
+    ?DEFAULT_NNR + 1;
+getClientNNr({ErinnerungsZeitSek, [KopfTupel | RestTupel]}, ClientPid) ->
+    case KopfTupel of
+        {ClientPid, NNr, LetzterTS} -> 
+            pruefe_ts_und_gib_nnr_zurueck(LetzterTS, ErinnerungsZeitSek, NNr) + 1;
+        _Any -> 
+            getClientNNr({ErinnerungsZeitSek, RestTupel}, ClientPid)
     end.
 
-tSIstAbglaufen(OldTS, ErinnerungsZeitSek) ->
+pruefe_ts_und_gib_nnr_zurueck(LetzterTS, ErinnerungsZeitSek, LetzteNNr) ->
+    case ts_ist_abglaufen(LetzterTS, ErinnerungsZeitSek) of
+        true ->  ?DEFAULT_NNR;
+        false -> LetzteNNr
+    end.
+
+ts_ist_abglaufen(LetzterTS, ErinnerungsZeitSek) ->
     JetztTS = erlang:timestamp(),
-    {_DiffMegaSec, DiffSec, _DiffMicroSec} = vsutil:diffTS(JetztTS, OldTS),
+    {_DiffMegaSec, DiffSec, _DiffMicroSec} = vsutil:diffTS(JetztTS, LetzterTS),
     DiffSec > ErinnerungsZeitSek.
 
 % Nicht in der Aufgabenstellung!
