@@ -131,5 +131,5 @@ hole_nachricht_2_test() ->
     ?assertEqual([], dlq:hole_nachricht(Nachrichten, 1)).
 
 
-erstelleErrNachricht_1_test() ->
-    [0, "Angeforderte Nachricht nicht vorhanden." | _Timestamps] = dlq:erstelleErrNachricht().
+erstelle_err_nachricht_1_test() ->
+    [0, "Angeforderte Nachricht nicht vorhanden." | _Timestamps] = dlq:erstelle_err_nachricht().

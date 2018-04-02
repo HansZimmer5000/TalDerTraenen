@@ -16,16 +16,10 @@
 	pruefe_nnr_und_hole_nachricht/3,
 	hole_naechst_groessere_nnr/2,
 	hole_nachricht/2,
-	erstelleErrNachricht/0
+	erstelle_err_nachricht/0
 	]).
 
 -define(DLQ_EMPTY_NNR, 0).
-
-%////////////////////////////////
-%      DLQ
-% Beispiel mit einer Message: {Size,[NNR,["Irgend ein Text"],TSClientOut,TSHBQIn,TSDLQIn,TSDLQOut]]
-% DLQ ist so sortiert, dass aktuellste Nachricht (= Hoechste Nachrichtennummer) ganz vorn steht, praktisch absteigend anhand der NNR sortiert.
-%////////////////////////////////
 
 %------------------------------------------------------------------------------------------------------
 %										>>SCHNITTSTELLEN<<
@@ -68,7 +62,7 @@ push2DLQ([NNr, Msg, TSClientOut, TSHBQin], {Size, Nachrichten}, Datei) ->
 	NeueDLQ = {Size, NeueNachrichten},
 	NeueDLQ.
 
-% Prueft ob die DLQ schon voll ist, also ob die Size schon erreicht wurde.
+% Prueft ob die DLQ schon voll ist.
 dlq_ist_voll({Size, Nachrichten}) ->
 	Size == length(Nachrichten).
 
@@ -81,7 +75,7 @@ deliverMSG(NNr, ClientPID, {_Size, DLQNachrichten}, Datei) ->
 	case pruefe_nnr_und_hole_nachricht(DLQNachrichten, NNr, Datei) of
 		[] ->
 			logge_status(io_lib:format("Nachricht mit Nummer ~p nicht existent",[NNr]), Datei),
-			ZuSendendeNachricht = erstelleErrNachricht(),
+			ZuSendendeNachricht = erstelle_err_nachricht(),
 			TerminatedFlag = true;
 		GefundeneNachricht ->	
 			[GefundeneNNr | _] = GefundeneNachricht,
@@ -96,8 +90,8 @@ deliverMSG(NNr, ClientPID, {_Size, DLQNachrichten}, Datei) ->
 	[GesendeteNNr | _] = GesendeteNachrichtMitTS,
 	GesendeteNNr.
 
-% Holt anhand der Nachrichtennummer eine Nachrichte aus eine Liste von Messages.
-% [] wird zurueckgegeben wenn die Nachricht nicht gefunden werden konnte.
+% Holt anhand der Nachrichtennummer eine Nachricht (oder die naechst groessere) aus einer Liste von Messages.
+% [] wird zurueckgegeben wenn keine passende Nachricht gefunden werden konnte.
 pruefe_nnr_und_hole_nachricht(DLQNachrichten, GesuchteNNr, Datei) ->
 	case hole_nachricht(DLQNachrichten, GesuchteNNr) of
 		[] ->
@@ -121,7 +115,6 @@ hole_nachricht([_AktuellsteNachricht | RestlicheNachrichten], NNr) ->
 	hole_nachricht(RestlicheNachrichten, NNr).
 
 % hole_naechst_groessere_nnr rechnet mit einer Aufsteigend sortierten Liste!
-% Theoretisch auch möglich in dem man nur letztes Element anschaut und bei nicht passen weg löscht.
 hole_naechst_groessere_nnr([], AusgangsNNr) ->
 	AusgangsNNr;
 hole_naechst_groessere_nnr([DLQKopfNachricht | DLQRestNachrichten], AusgangsNNr) ->
@@ -134,7 +127,7 @@ hole_naechst_groessere_nnr([DLQKopfNachricht | DLQRestNachrichten], AusgangsNNr)
 	end.
 
 % Erstellt eine Error Nachricht aufgrund des nicht vorhanden seins der gesuchten Nachrichtennummer in der DLQ.
-erstelleErrNachricht() ->
+erstelle_err_nachricht() ->
 	TS = erlang:timestamp(),
 	[?DLQ_EMPTY_NNR, "Angeforderte Nachricht nicht vorhanden.", TS, TS, TS].
 
