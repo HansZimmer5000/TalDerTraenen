@@ -16,9 +16,7 @@
         erstelle_empfangene_nachricht_logtext/2,
 
         zufalls_boolean/0,
-        element_ist_in_liste/2,
-        nachricht_zu_text/1,
-        neue_nnr_einfuegen/2
+        element_ist_in_liste/2
         ]).
 
 % KONSTANTEN
@@ -125,12 +123,6 @@ erstelle_nachrichten_text(ErstellungsTS) ->
     Nachricht = io_lib:format("~p, ~p, ~p, ~s", [Hostname, Praktikumsgruppe, Teamnummer, vsutil:now2string(ErstellungsTS)]),
     lists:flatten(Nachricht).
 
-% 
-neue_nnr_einfuegen(NNR, []) -> [NNR];
-neue_nnr_einfuegen(NNR, NNRListe) ->
-    NeueNNRListe = lists:flatten([NNR, NNRListe]),
-    NeueNNRListe.
-
 % Diese Funktion prüft, ob es die 5te Nachricht ist, falls ja vergisst er die Nachricht zu senden.
 % Falls nicht, wird die Nachricht an den Server versendet.
 pruefe_nnr_und_sende_nachricht(Server, Nachricht, NNRListe, LogDatei) ->
@@ -153,14 +145,13 @@ frage_nach_neuer_nachricht(Server, LogDatei) ->
             ok,
             logge_nachricht_status(Nachricht, io_lib:format("erhalten mit TerminatedFlag = ~p", [TerminatedFlag]), LogDatei),
             case TerminatedFlag of
-                true -> [];
-                false -> Nachricht
-            end
+                true -> 	Ergebnis = [];
+                false -> 	Ergebnis = Nachricht
+            end,
+			Ergebnis
     end.
 
-
-
-
+% Hier wird die Intervallzeit nach der Aufgabenbeschreibung neu kalkuliert.
 kalkuliere_neuen_intervall_sek(Intervall) ->
     case zufalls_boolean() of
                 true -> Faktor = 1.5;
@@ -172,32 +163,24 @@ kalkuliere_neuen_intervall_sek(Intervall) ->
             NeuerIntervall when NeuerIntervall >= ?MIN_INTERVALL_ZEIT_SEK -> round(NeuerIntervall)
     end.
 
-
+% Diese Funktion generiert ein zufalls Boolean
 zufalls_boolean() ->
     rand:uniform() > 0.5.
 
-
-nachricht_zu_text(Nachricht) ->
-    [NNR | Rest] = Nachricht,
-    Akku = io_lib:format("~w", [NNR]),
-    nachricht_zu_text_(Rest, Akku).
-
-nachricht_zu_text_([], Akku) -> Akku;
-nachricht_zu_text_([NachrichtHead | NachrichtRest], Akku) ->
-    NeuerAkku = lists:flatten(io_lib:format("~s, ~s", [Akku, NachrichtHead])),
-    nachricht_zu_text_(NachrichtRest, NeuerAkku).
-
-
+% Prüft, ob die Nachricht vom eigenen Redakteur ist.
 empfangene_nachricht_ist_von_meinem_redakteur(Nachricht, NummernListe) ->
     [NNR | _Tail] = Nachricht,
     element_ist_in_liste(NNR, NummernListe).
 
+% Prüft, ob die empfangene Nachricht aus der Zukunft kommt.
+% Dabei wird auf das Ausgangszeitstempel der Nachricht geschaut. 
 ts_ist_aus_der_zukunft(DLQoutTS, JetztTS) ->
     vsutil:validTS(DLQoutTS),
     vsutil:validTS(JetztTS),
     NachrichtIstAusDerZukunft = vsutil:lessTS(JetztTS, DLQoutTS),
     NachrichtIstAusDerZukunft.
 
+% Gibt den Zeitunterschid zurück. Die Methoden sind aus vsutil, die uns gestellt wurden.
 erstelle_diffts_string(TS1, TS2) ->
     vsutil:validTS(TS1),
     vsutil:validTS(TS2),
@@ -205,16 +188,13 @@ erstelle_diffts_string(TS1, TS2) ->
     DiffTSString = lists:sublist(FullDiffTSString, 10, 9),
     DiffTSString.
 
-
-
-
-
+% Sucht rekursiv, ob ein Element in der mitgegebenen Liste vorhanden ist. 
 element_ist_in_liste(_Elem, []) -> false;
 element_ist_in_liste(Elem, [Elem | _Rest]) -> true;
 element_ist_in_liste(Elem, [_Head | Rest]) ->
     element_ist_in_liste(Elem, Rest).
 
-
+% Beendet rekursiv alle aktiven Clients.
 kill_all_clients([], LogDatei) -> 
 	logge_status("Alle Clients wurden getoetet", LogDatei);
 kill_all_clients([Client|RestClients], LogDatei) ->
