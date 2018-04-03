@@ -91,9 +91,8 @@ sendeNNr(HBQPid, ZuSendendeNNr, LeserPid) ->
         {reply, GesendeteNNr} -> 
 			GesendeteNNr
 		after timer:seconds(?TIMEOUT) -> 
-            logge_status(io_lib:format("Die HBQ konnte nicht beauftragt werden, die Nachricht mit der der Nummer ~p an den Client zu schicken.", [ZuSendendeNNr])),
-			ZuSendendeNNr - 1 
-    end.
+            logge_status(io_lib:format("Die HBQ konnte nicht beauftragt werden, die Nachricht mit der der Nummer ~p an den Client zu schicken.", [ZuSendendeNNr]))
+	end.
 
 % Verschickt die Nachricht vom Client an die HBQ, das Ergebnis wird geloggt.
 dropmessage_abfertigen(HBQPid, Nachricht) ->
