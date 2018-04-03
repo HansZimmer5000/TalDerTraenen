@@ -17,9 +17,7 @@
 %        erstelle_empfangene_nachricht_logtext/2,
 
 %        zufalls_boolean/0,
-%        element_ist_in_liste/2,
-%        nachricht_zu_text/1,
-%        neue_nnr_einfuegen/2
+%        element_ist_in_liste/2
 
 -define(CONFIG_FILENAME, "client.cfg").
 -define(TEST_LOG_FILE, "testclient.log").
@@ -61,8 +59,6 @@ erstelle_nachrichten_text_1_test() ->
     io:fwrite("\n"),
     io:fwrite(Text),
     Text == Result.
-
-
 
 pruefe_nnr_und_sende_nachricht_1_test() ->
     ThisPid = self(),
@@ -199,23 +195,3 @@ neue_nnr_einfuegen_1_test() ->
 
 neue_nnr_einfuegen_2_test() ->
     [1,2,3] = client:neue_nnr_einfuegen(1,[2,3]).
-
-nachricht_zu_text_1_test() ->
-    TS = {1516, 47115, 874000},
-    Nachricht = [1, 
-                "Test", 
-                vsutil:now2string(TS),
-                vsutil:now2string(TS),
-                vsutil:now2string(TS),
-                vsutil:now2string(TS)
-                ],
-    "1, Test, 15.01 21:11:55,874|, 15.01 21:11:55,874|, 15.01 21:11:55,874|, 15.01 21:11:55,874|" = client:nachricht_zu_text(Nachricht).
-
-nachricht_zu_text_2_test() ->
-    TS = {1516, 47115, 874000},
-    Nachricht = [1, 
-                "Test", 
-                vsutil:now2string(TS)
-                ],
-    "1, Test, 15.01 21:11:55,874|" = client:nachricht_zu_text(Nachricht).
-
