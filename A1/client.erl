@@ -44,7 +44,8 @@ start() ->
     timer:sleep(timer:seconds(?LIFETIME)),
     kill_all_clients(ClientPidList, LogDatei).
 
-start_all_clients(0, AlteClientPidList) -> AlteClientPidList;
+start_all_clients(0, AlteClientPidList) -> 
+    AlteClientPidList;
 start_all_clients(AktuelleClientnummer, AlteClientPidList) ->
     ClientPid = start_client_node(AktuelleClientnummer),
     NeueClientPidList = [ClientPid | AlteClientPidList],

@@ -1,0 +1,24 @@
+Getestete Kombinationen:
+    Kombination 1
+    Unser:  Client
+    Klauck: Server, CMEM, HBQ, DLQ
+
+    Kombination 2
+    Unser: Server
+    Klauck: Client, HBQ, DLQ, CMEM 
+
+    Kombination 3
+    Unser: HBQ, DLQ, CMEM
+    Klauck: Server, Client
+
+    Kombination 4
+    Unser: Client, HBQ, DLQ, CMEM
+    Klauck: Server
+
+    Kombination 5
+    Unser: CMEM
+    Klauck: Server, Client, HBQ, DLQ,
+
+    Kombination 6
+    Unser: Server, CMEM
+    Klauck: Client, HBQ, DLQ
