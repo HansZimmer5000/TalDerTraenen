@@ -100,7 +100,7 @@ leser_loop(Intervall, GeschriebeneNNRListe, LogDatei) ->
 %------------------------------------------------------------------------------------------------------
 %								>>EIGENTLICHE FUNKTIONEN<<
 %------------------------------------------------------------------------------------------------------
-
+% Fragt den Server nach der naechsten NNR
 frage_nach_neuer_nnr(Server, LogDatei) ->
     Server ! {self(), getmsgid},
     logge_status("Warte auf NNR", LogDatei),
@@ -110,11 +110,15 @@ frage_nach_neuer_nnr(Server, LogDatei) ->
             NNR
     end.
 
+% Diese Funktion erstellt die zu sendende Nachricht.
+% Die Nachricht beinhaltet [NNR, Textnachricht, ts]
 erstelle_nachricht(NNR, ErstellungsTS) ->
     Textnachricht = erstelle_nachrichten_text(ErstellungsTS),
     Nachricht = [NNR, Textnachricht, ErstellungsTS],
     Nachricht.
 
+% Diese Funktion erstellt die Textnachricht in der Nachricht.
+% Die Nachricht beinhaltet "Hostname, Praktikumsgruppe, TEAMNUMMER, ts"
 erstelle_nachrichten_text(ErstellungsTS) -> 
     Hostname = ?HOSTNAME,
     Praktikumsgruppe = ?PRAKTIKUMSGRUPPE,
@@ -122,13 +126,14 @@ erstelle_nachrichten_text(ErstellungsTS) ->
     Nachricht = io_lib:format("~p, ~p, ~p, ~s", [Hostname, Praktikumsgruppe, Teamnummer, vsutil:now2string(ErstellungsTS)]),
     lists:flatten(Nachricht).
 
-
+% 
 neue_nnr_einfuegen(NNR, []) -> [NNR];
 neue_nnr_einfuegen(NNR, NNRListe) ->
     NeueNNRListe = lists:flatten([NNR, NNRListe]),
     NeueNNRListe.
 
-
+% Diese Funktion prüft, ob es die 5te Nachricht ist, falls ja vergisst er die Nachricht zu senden.
+% Falls nicht, wird die Nachricht an den Server versendet.
 pruefe_nnr_und_sende_nachricht(Server, Nachricht, NNRListe, LogDatei) ->
     Anzahl_Erstellter_Nachrichten = length(NNRListe),
     case Anzahl_Erstellter_Nachrichten of
@@ -137,20 +142,21 @@ pruefe_nnr_und_sende_nachricht(Server, Nachricht, NNRListe, LogDatei) ->
                 logge_nachricht_status(Nachricht, "gesendet", LogDatei)
     end.
 
-
+% Diese Funktion fragt den Server, ob es noch Nachrichten zum lesen gibt.
+% Die Antwort vom Server beinhaltet einen Flag, ist dieser true gibt es keine Nachrichten mehr zu lesen.
+% Es wird eine leere Liste oder die Nachricht zurückgegeben.
 frage_nach_neuer_nachricht(Server, LogDatei) -> 
     Server ! {self(), getmessages},
     logge_status("Warte auf Nachricht", LogDatei),
-
+	
     receive
         {reply, Nachricht, TerminatedFlag} -> 
             ok,
             logge_nachricht_status(Nachricht, io_lib:format("erhalten mit TerminatedFlag = ~p", [TerminatedFlag]), LogDatei),
             case TerminatedFlag of
-                true -> Ergebnis = [];
-                false -> Ergebnis = Nachricht
-            end,
-            Ergebnis
+                true -> [];
+                false -> Nachricht
+            end
     end.
 
 
@@ -218,7 +224,7 @@ kill_all_clients([Client|RestClients], LogDatei) ->
 	kill_all_clients(RestClients, LogDatei).
 
 %------------------------------------------------------------------------------------------------------
-%																	>>GENERELLE FUNKTIONEN<<
+%										>>GENERELLE FUNKTIONEN<<
 %------------------------------------------------------------------------------------------------------
 erstelle_log_datei_name(Clientnummer) ->
     LogDatei = "client" ++ io_lib:format("~p",[Clientnummer]) ++ ".log",
