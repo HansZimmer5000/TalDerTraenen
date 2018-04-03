@@ -29,6 +29,7 @@
 %------------------------------------------------------------------------------------------------------
 %											>>START / INIT<<
 %------------------------------------------------------------------------------------------------------
+% Hierueber wird der Server gestartet und die HBQ und CMEM initialisiert.
 start() -> 
     CMEM = cmem:initCMEM(?ERINNERUNGS_ZEIT_SEK, ?CMEM_LOG_DATEI_NAME),
     initHBQ(),
@@ -36,6 +37,7 @@ start() ->
     register(?SERVERNAME, ServerPid),
     ServerPid.
 
+% Initalisiert die HBQ und wartet bis diese Antwortet.
 initHBQ() ->
     net_adm:ping(?HBQNODE),
     ?HBQ ! {self(), {request, initHBQ}},
@@ -46,6 +48,7 @@ initHBQ() ->
 %------------------------------------------------------------------------------------------------------
 %												>>LOOP<<
 %------------------------------------------------------------------------------------------------------
+% Hierrueber werden die im Entwurf beschriebenen Schnittstellen angeboten.
 receive_loop(CMEM, NextNNR) ->
     receive
         {AbsenderPid, getmessages} ->   NeueCMEM = getmessages_abfertigen(?HBQ, CMEM, AbsenderPid),
@@ -65,7 +68,7 @@ receive_loop(CMEM, NextNNR) ->
 %                           >>EIGENTLICHE FUNKTIONEN<<
 %------------------------------------------------------------------------------------------------------
 % Diese Funktion wickelt die Leseanfrage des Clients ab.
-% Es wird die aktualisierte CMEM zurückgegeben.
+%  Wir im Entwurd beschrieben wird die naechste NNR aus der CMEM gelesen, diese an die HBQ gesendet und hirnach die CMEM aktualisiert.
 getmessages_abfertigen(HBQPid, CMEM, LeserPid) -> 
     ZuSendendeNNr = hole_naechste_nnr_fur_leser(CMEM, LeserPid),
     GesendeteNNr = sendeNNr(HBQPid, ZuSendendeNNr, LeserPid),
@@ -77,14 +80,12 @@ getmessages_abfertigen(HBQPid, CMEM, LeserPid) ->
 hole_naechste_nnr_fur_leser(CMEM, LeserPid) ->
     cmem:getClientNNr(CMEM, LeserPid).
 
-% Diese Funktionen übergibt der CMEM die letzte gesendete NNR zum jeweiigen Client
-% um diese zu updaten.
+% Diese Funktionen übergibt der CMEM die letzte gesendete NNR zum jeweiigen Client um diese zu updaten.
 update_gesendete_nnr_fur_leser(CMEM, LeserPid, LetzteGesendeteNNr) ->
     NeueCMEM = cmem:updateClient(CMEM, LeserPid, LetzteGesendeteNNr, ?CMEM_LOG_DATEI_NAME),
     NeueCMEM.
 
-% Diese Funktion beauftragt die HBQ die NNR an den jeweiligen Client zu senden und gibt bei erfolg die gesendeteNNR zurück.
-% Falls keine Antwort vom HBQ erhalten wurde, wird die letze NNR zurückgegeben.
+% Wir im Entwurf beschrieben beauftragt der Server die HBQ, die NNR an den jeweiligen Client zu senden und gibt bei erfolg die gesendeteNNR zurück.
 sendeNNr(HBQPid, ZuSendendeNNr, LeserPid) ->
     HBQPid ! {self(), {request, deliverMSG, ZuSendendeNNr, LeserPid}},
     receive
@@ -94,7 +95,7 @@ sendeNNr(HBQPid, ZuSendendeNNr, LeserPid) ->
             logge_status(io_lib:format("Die HBQ konnte nicht beauftragt werden, die Nachricht mit der der Nummer ~p an den Client zu schicken.", [ZuSendendeNNr]))
 	end.
 
-% Verschickt die Nachricht vom Client an die HBQ, das Ergebnis wird geloggt.
+% Wie im Entwurd beschrieben wird die Nachricht vom Client an die HBQ uebergeben, das Ergebnis wird geloggt.
 dropmessage_abfertigen(HBQPid, Nachricht) ->
     HBQPid ! {self(), {request, pushHBQ, Nachricht}},
     [NNr | _Rest] = Nachricht,

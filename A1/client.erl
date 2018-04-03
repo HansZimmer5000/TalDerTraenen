@@ -63,6 +63,10 @@ start_client_node(Clientnummer) ->
 %------------------------------------------------------------------------------------------------------
 %								>>LOOPS<<
 %------------------------------------------------------------------------------------------------------
+% Der redakteur_loop ist dafür da, dass der Client Nachrichten an den Server schreibt.
+% Wie im Entwurf beschrieben versendet der Client 5 Nachrichten an den Server, 
+% die letzte Nachricht vergisst der Client zu senden und wechelt zum leser_loop.
+% Die geschriebenen NNRn werden in einer Liste hinterlegt.
 redakteur_loop(Intervall, GeschriebeneNNRListe, LogDatei) -> 
     logge_status("Beginne redakteur_loop", LogDatei),
 
@@ -84,7 +88,8 @@ redakteur_loop(Intervall, GeschriebeneNNRListe, LogDatei) ->
         _Any -> redakteur_loop(NeuerIntervall, NeueGeschriebeneNNRListe, LogDatei)
     end.
 
-
+% Der leser_loop fragt den Server nach neuen Nachrichten und loggt diese, bis keine mehr vorhanden sind.
+% Sind keine Nachrichten mehr vorhanden, wechselt dieser zum redakteur_loop.
 leser_loop(Intervall, GeschriebeneNNRListe, LogDatei) ->
     logge_status(io_lib:format("Beginne leser_loop mit NNRListe: ~w" , [GeschriebeneNNRListe]), LogDatei),
     NeueNachricht = frage_nach_neuer_nachricht(?SERVER, LogDatei),
@@ -98,7 +103,7 @@ leser_loop(Intervall, GeschriebeneNNRListe, LogDatei) ->
 %------------------------------------------------------------------------------------------------------
 %								>>EIGENTLICHE FUNKTIONEN<<
 %------------------------------------------------------------------------------------------------------
-% Fragt den Server nach der naechsten NNR
+% Wie im Entwurf beschrieben, fragt der Client den Server nach der naechsten NNR.
 frage_nach_neuer_nnr(Server, LogDatei) ->
     Server ! {self(), getmsgid},
     logge_status("Warte auf NNR", LogDatei),
@@ -134,7 +139,7 @@ pruefe_nnr_und_sende_nachricht(Server, Nachricht, NNRListe, LogDatei) ->
                 logge_nachricht_status(Nachricht, "gesendet", LogDatei)
     end.
 
-% Diese Funktion fragt den Server, ob es noch Nachrichten zum lesen gibt.
+% Wie im Entwurf beschrieben fragt der Client den Server, ob es noch Nachrichten zum lesen gibt.
 % Die Antwort vom Server beinhaltet einen Flag, ist dieser true gibt es keine Nachrichten mehr zu lesen.
 % Es wird eine leere Liste oder die Nachricht zurückgegeben.
 frage_nach_neuer_nachricht(Server, LogDatei) -> 
@@ -206,30 +211,40 @@ kill_all_clients([Client|RestClients], LogDatei) ->
 %------------------------------------------------------------------------------------------------------
 %										>>GENERELLE FUNKTIONEN<<
 %------------------------------------------------------------------------------------------------------
-erstelle_log_datei_name(Clientnummer) ->
-    LogDatei = "client" ++ io_lib:format("~p",[Clientnummer]) ++ ".log",
-    LogDatei.
-
 hole_wert_aus_config_mit_key(Key) ->
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
     {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
     Value.
 
+%------------------------------------------------------------------------------------------------------	
+%										>>LOGGING FUNKTIONEN<<
+%------------------------------------------------------------------------------------------------------
+
+erstelle_log_datei_name(Clientnummer) ->
+    LogDatei = "client" ++ io_lib:format("~p",[Clientnummer]) ++ ".log",
+    LogDatei.
+
+% Loggt uebergebene Nachrichten
 logge_status(Inhalt, LogDatei) ->
     AktuelleZeit = erlang:timestamp(),
     LogNachricht = io_lib:format("~p ~s.\n", [vsutil:now2string(AktuelleZeit), Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(LogDatei, LogNachricht).
 
+% Loggt den mitgegebenen Status zu einer Nachricht.
+% Dabei ist der Status frei wählbar.	
 logge_nachricht_status(Nachricht, Status, LogDatei) ->
     [NNR | _Rest] = Nachricht,
     LogNachricht = io_lib:format("NNR ~p ~s", [NNR, Status]),
     logge_status(LogNachricht, LogDatei).
 
+% loggt empfangene Nachrichten
 logge_empfangene_nachricht(Nachricht, NummernListe, LogDatei) ->
     LogText = erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe),
     logge_status(LogText, LogDatei).
 
+% Wie im Entwurf beschrieben wird Geprüft, ob die Nachricht aus der Zukunft kommt und ob die Nachricht
+% vom eigenen Redakteur ist, ist dies der Fall, wird diese zusätzlich geloggt.
 erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe) ->
     [_NNR, Textnachricht, _TSCOut, _TSHIn, _TSDIn, DLQoutTS] = Nachricht, 
     
