@@ -17,21 +17,21 @@
 %------------------------------------------------------------------------------------------------------
 %										>>SCHNITTSTELLEN<<
 %------------------------------------------------------------------------------------------------------
-% Initialisiert eine CMEM ohne Tupel (leere Liste)
+% Initialisiert eine CMEM ohne Tupel (leere Liste wie beschrieben)
 initCMEM(ErinnerungsZeitSek, LogDatei) ->
     CMEM = {ErinnerungsZeitSek, []},
     logge_status("CMEM initalisiert", LogDatei),
     CMEM.
 
-% Setzt die neue NNr fuer einen bestimmten Client in dementsprechenden Tupel (setClientNNr)
-% loggt dies und gibt die neue CMEM zurueck.
+% Wie beschrieben soll die neue NNr für den Client in der CMEM gesavet werden.
+% Hierfür muss man ggf. durch die ganze CMEM Liste laufen.
+% Wird der Client nicht gefunden wird ein kommplett neues Tupel erstellt und hinten angefügt.
 updateClient({ErinnerungsZeitSek, TupelListe}, ClientPid, NNr, LogDatei) ->
     NeueTupelListe = setClientNNr(TupelListe, ClientPid, NNr),
     logge_status(io_lib:format("~p update zu NNR: ~p", [ClientPid, NNr]), LogDatei),
     CMEM = {ErinnerungsZeitSek, NeueTupelListe},
     CMEM.
 
-% Setzt die neue NNr für einen bestimmten Client in dementsprechenden Tupel
 % Koennte man theoretisch noch zu Endrekursiv umschreiben.
 setClientNNr([], ClientPid, NNr) ->
     [{ClientPid, NNr, erlang:timestamp()}];
@@ -46,6 +46,8 @@ setClientNNr(TupelListe, ClientPid, NNr) ->
     NeueTupelListe.
 
 % Holt die gespeicherte NNr von einem bestimmten Client.
+% Wie beschrieben muss dafür ggf. die ganze CMEM Liste durch gegangen werden.
+% Wird der Client nicht gefunden, dann wird die Initial NNr (Default (=0) + 1) ausgegeben.
 getClientNNr({_ErinnerungsZeitSek, []}, _ClientPid) -> 
     ?DEFAULT_NNR + 1;
 getClientNNr({ErinnerungsZeitSek, [KopfTupel | RestTupel]}, ClientPid) ->
@@ -69,7 +71,7 @@ ts_ist_abglaufen(LetzterTS, ErinnerungsZeitSek) ->
     {_DiffMegaSec, DiffSec, _DiffMicroSec} = vsutil:diffTS(JetztTS, LetzterTS),
     DiffSec > ErinnerungsZeitSek.
 
-% Loescht die CMEM
+% Hier wird die CMEM "terminiert".
 delCMEM(_CMEM) ->
     ok.
 

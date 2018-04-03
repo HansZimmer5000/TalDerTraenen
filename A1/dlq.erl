@@ -24,10 +24,11 @@
 %------------------------------------------------------------------------------------------------------
 %										>>SCHNITTSTELLEN<<
 %------------------------------------------------------------------------------------------------------
-% Initialisiert die DLQ
+% Initialisiert die DLQ wie beschrieben.
 initDLQ(Size,Datei) ->
-  logge_status(io_lib:format("Neue DLQ mit Size ~p",[Size]), Datei),
-  {Size, []}.
+  	logge_status(io_lib:format("Neue DLQ mit Size ~p",[Size]), Datei),
+	DLQNachrichten = [],
+  	{Size, DLQNachrichten}.
 
 % Loeschen der DLQ
 delDLQ(_DLQ) -> ok.
@@ -44,9 +45,10 @@ hole_max_nnr([AktuellsteNachricht | _RestlicheNachrichten]) ->
 	NNr.
 
 
-% Fuegt eine neue Nachricht in die DLQ ein.
-% Da absteigend sortiert ist heißt das ganz vorne.
-% Vorausgesetzt die DLQ (Size) ist noch nicht voll! Wenn voll wird neue Nachricht einfach verworfen und Fehler gelogt.
+% Fuegt eine neue Nachricht in die DLQ ein, wie beschrieben, unter Berücksichtigung der Sortierung.
+% Ist die DLQ voll wird die Nachricht wie beschrieben eingefügt.
+%	Neue Nachricht wird eingefügt.
+%	Letzte (älteste und zudem Nachricht mit niedrigster NNr) wird aus DLQ gelöscht (dies wird geloggt).
 push2DLQ([NNr, Msg, TSClientOut, TSHBQin], {Size, Nachrichten}, Datei) ->
 	DLQIstVoll = dlq_ist_voll({Size, Nachrichten}),
 	case DLQIstVoll of
@@ -62,7 +64,7 @@ push2DLQ([NNr, Msg, TSClientOut, TSHBQin], {Size, Nachrichten}, Datei) ->
 	NeueDLQ = {Size, NeueNachrichten},
 	NeueDLQ.
 
-% Prueft ob die DLQ schon voll ist.
+% Prueft ob die DLQ schon voll ist (length von Nachrichten == DLQSize)
 dlq_ist_voll({Size, Nachrichten}) ->
 	Size == length(Nachrichten).
 
@@ -107,6 +109,7 @@ pruefe_nnr_und_hole_nachricht(DLQNachrichten, GesuchteNNr, Datei) ->
 			GefundeneNachricht
 	end.
 
+% Holt Nachricht aus Liste anhand von NNr.
 hole_nachricht([], _NNr) -> 
 	[];
 hole_nachricht([[NNr | NachrichtRest] | _RestlicheNachrichten], NNr) -> 
@@ -114,7 +117,8 @@ hole_nachricht([[NNr | NachrichtRest] | _RestlicheNachrichten], NNr) ->
 hole_nachricht([_AktuellsteNachricht | RestlicheNachrichten], NNr) -> 
 	hole_nachricht(RestlicheNachrichten, NNr).
 
-% hole_naechst_groessere_nnr rechnet mit einer Aufsteigend sortierten Liste!
+% Holt ausgehend von der AusgangsNNr die nächste größere NNr zurück.
+% Rechnet mit einer Aufsteigend sortierten Liste!
 hole_naechst_groessere_nnr([], AusgangsNNr) ->
 	AusgangsNNr;
 hole_naechst_groessere_nnr([DLQKopfNachricht | DLQRestNachrichten], AusgangsNNr) ->

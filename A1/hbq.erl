@@ -37,6 +37,7 @@
 startHBQ() ->
   start().
 
+% Wartet wie im Entwurf beschrieben nach start auf Init vom Server.
 start() ->
   logge_status("HBQ wird gestartet"),
   HBQPID = spawn(fun() -> wait_for_init() end),
@@ -47,9 +48,9 @@ start() ->
 wait_for_init() ->
   receive
     {PID, {request, initHBQ}} ->
-      DLQ = init_hbq(PID), 
+      {HBQ, DLQ} = init_hbq(PID), 
       logge_status("HBQ initiiert und running"),
-      receive_loop([], DLQ);
+      receive_loop(HBQ, DLQ); 
     {PID, {request, dellHBQ}} -> 
       delete_hbq(PID)
   end.
@@ -76,12 +77,18 @@ receive_loop(HBQ, DLQ) ->
 %																	>>SCHNITTSTELLEN<<
 %------------------------------------------------------------------------------------------------------
 
-%Bestaetigt dem aufrufenden Prozess (in diesem Fall dem Server) die Initialisierung
+% Bestaetigt dem aufrufenden Prozess (in diesem Fall dem Server) die Initialisierung
+% Wie beschrieben ist die HBQ initial leer.
 init_hbq(PID) ->
+  HBQ = [],
   DLQ = dlq:initDLQ(?DLQLIMIT, ?DLQ_LOG_DATEI),
   PID ! {reply, ok},
-  DLQ.
+  {HBQ, DLQ}.
 
+% Wie beschrieben wird hier eine neue Nachricht in die HBQ oder (XOR) DLQ einsortiert.
+%   Zuerst wird ein Zeitstempel angehaengt
+%   Dann wird in HBQ oder DLQ einsortiert
+%   Dann ein OK an die PID geschickt (in unserem Fall der Server)
 push_hbq(PID, Nachricht, HBQ, DLQ) ->
   NachrichtMitTs = fuege_hbqin_ts_hinzu(Nachricht),
 
@@ -94,6 +101,10 @@ fuege_hbqin_ts_hinzu([NNr, Text, TSClientout]) ->
   TShbqin = erlang:timestamp(),
   [NNr, Text, TSClientout, TShbqin].
 
+% Wie beschrieben wird die Nachricht zur einsortierung an die DLQ geschickt, sollte die NNr der Nachricht von der DLQ erwartet werden.
+% Sonst wird die Nachricht in die HBQ einsortiert.
+%   Danach wird die Größe der HBQ überprüft und ggf. eine Lücke geschlossen (mit Lücken-Füll-Nachricht an DLQ).
+%   Danach wird geprüft welche Nachrichten noch an die DLQ geschickt werden können (Alle in der HBQ bis zur nächsten Lücke)
 pruefe_und_sende_nachricht(Nachricht, HBQ, DLQ) ->
   KannDirektAnDLQ = wird_erwartet(Nachricht, DLQ),
   case KannDirektAnDLQ of 
@@ -142,6 +153,7 @@ pruefe_limit_und_fuelle_spalte(HBQ, DLQ, DLQLimit) ->
   end.
 
 % Fuegt eine Nachricht korrekt (Sortierung) in die HBQ ein.
+% Wie im Entwurf gesagt, ist die HBQ aufsteigend sortiert.
 in_hbq_einfuegen(Nachricht, HBQ) ->
   NeueHBQ = in_hbq_einfuegen_([], Nachricht, HBQ),
   NeueHBQ.
@@ -165,13 +177,15 @@ in_hbq_einfuegen_(Akku, [NNr | NachrichtRest], [[HBQKopfNNr | HBQKopfRest] | HBQ
   end,
   NeueHBQ.
 
-%Handler fuer den deliverMSG Befehl. Dieser wird an die dlq delegiert, anschließend wird die Nummer der versendeten Nachricht an den
-%Server zurueckgegeben
+% Leitet wie beschrieben die gewünschte NNr an die DLQ zu senden weiter.
+% Bekommt als Rückgabewert von der DLQ die gesendete NNr, die wird direkt an den Server zurück gesendet.
 deliver_nachricht(PID, NNr, ToClient, DLQ) ->
   GesendeteNNr = dlq:deliverMSG(NNr,ToClient,DLQ, ?DLQ_LOG_DATEI),
   PID ! {reply, GesendeteNNr}.
 
-%Handler fuer den delete Befehl, loescht auch die DLQ
+% Wie beschrieben wird die DLQ terminiert wenn die HBQ terminiert.
+% Der Befehl zur Löschung kann auch kommen wenn gerade auf die Initialisierung gewartet
+% wird, wobei es keine DLQ gibt, deswegen gibt sie es auch einstellig.
 delete_hbq(PID) ->
   unregisterHBQ(?HBQNAME),
   PID ! {reply, ok}.
@@ -180,6 +194,7 @@ delete_hbq(PID, DLQ) ->
   unregisterHBQ(?HBQNAME),
   PID ! {reply, ok}.
 
+% Terminiert die DLQ
 delete_dlq(DLQ) ->
   case dlq:delDLQ(DLQ) of 
     ok ->
@@ -188,6 +203,7 @@ delete_dlq(DLQ) ->
       logge_status("ERR: DLQ wurde NICHT geloescht")
   end.
 
+% Macht den registrierten Namen der HBQ wieder frei
 unregisterHBQ(HBQName) ->
   case unregister(HBQName) of
     true ->
@@ -205,6 +221,9 @@ finde_und_fuelle_spalte(HBQ, DLQ) ->
   NeueDLQ.
 
 % Hilfsmethode die herausfindet wo genau die Luecke ist.
+% Kleinste Nummer der Lücke ist die von der DLQ erwartete nächste Nummer
+% Größte Nummer der Lücke ist die kleinste NNr in der HBQ - 1.
+% Wie beschrieben hat die Füllernachricht als NNr die Größte Nummer der Lücke.
 finde_spalte([[AktuelleNNr | _AktuelleNachrichtRest] | _HBQRest], DLQ) ->
   ErwarteteNNr = dlq:expectedNr(DLQ),
   logge_status(io_lib:format("Gaprange: ~p-~p",[ErwarteteNNr, AktuelleNNr - 1])),
