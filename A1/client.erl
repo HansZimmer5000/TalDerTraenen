@@ -264,4 +264,5 @@ erstelle_empfangene_nachricht_logtext(Nachricht, NummernListe) ->
         false -> LogZusatz2 = ""
     end,
 
-    io_lib:format("Empfangene Nachricht '~s' ~s ~s", [Textnachricht, LogZusatz1, LogZusatz2]).
+    NeueTextNachricht = lists:concat([Textnachricht, "clientin:", vsutil:now2string(JetztTS)]),
+    io_lib:format("Empfangene Nachricht '~s' ~s ~s", [NeueTextNachricht, LogZusatz1, LogZusatz2]).

@@ -49,7 +49,7 @@ hole_max_nnr([AktuellsteNachricht | _RestlicheNachrichten]) ->
 % Ist die DLQ voll wird die Nachricht wie beschrieben eingefügt.
 %	Neue Nachricht wird eingefügt.
 %	Letzte (älteste und zudem Nachricht mit niedrigster NNr) wird aus DLQ gelöscht (dies wird geloggt).
-push2DLQ([NNr, Msg, TSClientOut, TSHBQin], {Size, Nachrichten}, Datei) ->
+push2DLQ([NNr, Text, TSClientOut, TSHBQin], {Size, Nachrichten}, Datei) ->
 	DLQIstVoll = dlq_ist_voll({Size, Nachrichten}),
 	case DLQIstVoll of
 		true ->
@@ -59,7 +59,8 @@ push2DLQ([NNr, Msg, TSClientOut, TSHBQin], {Size, Nachrichten}, Datei) ->
 			TmpNeueNachrichten = Nachrichten
 	end,
 	TSDLQIn = erlang:timestamp(),
-	NeueNachrichten = [[NNr, Msg, TSClientOut, TSHBQin, TSDLQIn] | TmpNeueNachrichten],
+	NeuerText = lists:concat([Text, "dlqin:", vsutil:now2string(TSDLQIn)]),
+	NeueNachrichten = [[NNr, NeuerText, TSClientOut, TSHBQin, TSDLQIn] | TmpNeueNachrichten],
 	logge_status("Neue Nachricht wurde vorne angefuegt", Datei),
 	NeueDLQ = {Size, NeueNachrichten},
 	NeueDLQ.
@@ -68,9 +69,12 @@ push2DLQ([NNr, Msg, TSClientOut, TSHBQin], {Size, Nachrichten}, Datei) ->
 dlq_ist_voll({Size, Nachrichten}) ->
 	Size == length(Nachrichten).
 
-entferne_letztes_listen_element([]) -> [];
-entferne_letztes_listen_element(Nachrichten) ->
-	lists:droplast(Nachrichten).
+entferne_letztes_listen_element([]) -> 
+	[];
+entferne_letztes_listen_element([_LetztesElem]) ->
+	[];
+entferne_letztes_listen_element([Head | Rest]) ->
+	[Head | entferne_letztes_listen_element(Rest)].
 
 % Sendet eine Bestimmte Nachricht (anhand NNr) and bestimmten Client (ClientPID), gibt die gesendete Nummer zurueck.
 deliverMSG(NNr, ClientPID, {_Size, DLQNachrichten}, Datei) ->
@@ -137,7 +141,8 @@ erstelle_err_nachricht() ->
 
 fuege_dlqout_ts_hinzu([NNr, Text, TSClientOut, TSHBQin, TSDLQIn]) ->
 	TSDLQOut = erlang:timestamp(),
-	[NNr, Text, TSClientOut, TSHBQin, TSDLQIn, TSDLQOut].
+	NeuerText = lists:concat([Text, "dlqout:",vsutil:now2string(erlang:timestamp())]),
+	[NNr, NeuerText, TSClientOut, TSHBQin, TSDLQIn, TSDLQOut].
 
 %------------------------------------------------------------------------------------------------------
 %											>>LOGGING UND CONFIG<<

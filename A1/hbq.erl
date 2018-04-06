@@ -99,7 +99,8 @@ push_hbq(PID, Nachricht, HBQ, DLQ) ->
 
 fuege_hbqin_ts_hinzu([NNr, Text, TSClientout]) ->
   TShbqin = erlang:timestamp(),
-  [NNr, Text, TSClientout, TShbqin].
+  NeuerText = lists:concat([Text, "hbqin:", vsutil:now2string(TShbqin)]),
+  [NNr, NeuerText, TSClientout, TShbqin].
 
 % Wie beschrieben wird die Nachricht zur einsortierung an die DLQ geschickt, sollte die NNr der Nachricht von der DLQ erwartet werden.
 % Sonst wird die Nachricht in die HBQ einsortiert.
