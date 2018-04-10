@@ -10,7 +10,7 @@
 %    set_neighbors/4,
 %    get_next_to_last_and_last_elem/1
 
-%    calculation_receive_loop/1,
+%    calculation_receive_loop/3,
 %    briefmi/3,
 %    briefterm/4,
 %    reset/2,
@@ -23,18 +23,17 @@
 %    send_message_to_processname/3,
 %    prompt/0,
 %    nudge/2,
-%    toggle/0,
+%    toggle/1,
 %    kill/2,
 %    kill_all_ggtprocesses/2,
 
 %    ggtpropid_exists/2,
 %    get_ggtpropid/2
-
-
-
+-export([start_2/0]).
 
 start_1_test() -> 
     ThisPid = self(),
+    register(nameservice, self()),
     TestKoPid = spawn(fun() -> 
                     koordinator:start(ThisPid)
                 end),
@@ -46,14 +45,17 @@ start_1_test() ->
                 {registered_name, koordinator},
                 process_info(TestKoPid, registered_name))
     end,
+    unregister(nameservice),
     kill_pid_and_clear_this_mailbox(TestKoPid).
 
-start_2_test() ->
+%Wirft errors in ggT-Prozessen, aber failt nicht.
+start_2() ->
     ArbeitsZeit = 1,
     TermZeit = 5,
     GGTProAnz = 5,
     SollQuota = round((GGTProAnz * 4 * 80) / 100),
     ThisPid = self(),
+    register(nameservice, self()),
     TestKoPid = spawn(fun() -> 
                     koordinator:start(ThisPid)
                 end),
@@ -69,11 +71,13 @@ start_2_test() ->
             io:fwrite("Wenn hier fail, speziell die gesetzten SteeringValues (hier und in koordinator.erl) pruefen!"),
             ?assertEqual({steeringval, ArbeitsZeit, TermZeit, SollQuota, GGTProAnz}, Any2)
     end,
+    unregister(nameservice),
     kill_pid_and_clear_this_mailbox(TestKoPid).
 
 init_loop_1_test() ->
     SteeringValues = {steeringval, 0, 0, 1, 5},
     ThisPid = self(),
+    register(nameservice, self()),
     TestPid = spawn(fun() -> 
                     GGTProNameList = koordinator:init_loop(
                                         ThisPid, 
@@ -130,6 +134,7 @@ init_loop_1_test() ->
         Any6 ->
             ?assertEqual([nameA, nameB, nameC], Any6)
     end,
+    unregister(nameservice),
     kill_pid_and_clear_this_mailbox(TestPid).
 
 create_circle_1_test() -> 
@@ -198,7 +203,7 @@ get_next_to_last_and_last_elem_2_test() ->
 calculation_receive_loop_1_test() -> 
     ThisPid = self(),
     TestPid = spawn(fun() ->
-            koordinator:calculation_receive_loop([nameA, nameB], ThisPid)
+            koordinator:calculation_receive_loop([nameA, nameB], ThisPid, false)
         end),
     TestPid ! prompt,
 
@@ -519,7 +524,10 @@ nudge_2_test() ->
     TestPid ! not_found.
 
 toggle_1_test() ->
-    throw("Not yet implemented").
+    ?assert(koordinator:toggle(false)).
+
+toggle_2_test() ->
+    ?assertNot(koordinator:toggle(true)).
 
 kill_1_test() ->
     ProList = [nameA, nameB],

@@ -20,7 +20,7 @@
     calc_new_mi/2
 ]).
 
--define(CONFIG_FILENAME, 'ggt.cfg').
+-define(CONFIG_FILENAME, "ggt.cfg").
 
 -define(NSNODE, hole_wert_aus_config_mit_key(nameservicenode)).
 -define(NSPID, whereis(nameservice)).

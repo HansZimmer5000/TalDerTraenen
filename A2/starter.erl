@@ -11,8 +11,10 @@
 ]).
 
 -define(CONFIG_DATEI_NAME, "ggt.cfg").
--define(KOPID, hole_wert_aus_config_mit_key(kopid)).
 -define(DEFAULT_LOG_DATEI_NAME, "starter").
+
+-define(KOORDINATORNAME, hole_wert_aus_config_mit_key(koordinatorname)).
+-define(KOPID, whereis(?KOORDINATORNAME)).
 
 -define(PRAKTIKUMSGRUPPE, hole_wert_aus_config_mit_key(praktikumsgruppe)).
 -define(TEAMNUMMER, hole_wert_aus_config_mit_key(teamnummer)).
