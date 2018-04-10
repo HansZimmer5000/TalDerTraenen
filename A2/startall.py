@@ -22,7 +22,7 @@ def __test_module(modulename):
 # Opens a new Commandline window (cmd.exe) and starts a new erlang node with the given name and modulecode. 
 # The module must contain a "start" function without arguments.
 def __start_node(nodename, modulename, parameter):
-    os.system("start erl -sname " + nodename + " -s " + modulename + " start" + " " + parameter)
+    os.system("start erl -noshell -sname " + nodename + " -s " + modulename + " start" + " " + parameter)
 
 def __start_normal_shell(nodename):
     os.system("start erl -sname " + nodename)
