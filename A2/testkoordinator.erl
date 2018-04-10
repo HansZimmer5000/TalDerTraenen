@@ -29,50 +29,6 @@
 
 %    ggtpropid_exists/2,
 %    get_ggtpropid/2
--export([start_2/0]).
-
-start_1_test() -> 
-    ThisPid = self(),
-    register(nameservice, self()),
-    TestKoPid = spawn(fun() -> 
-                    koordinator:start(ThisPid)
-                end),
-    timer:sleep(timer:seconds(1)),
-    receive
-        Any ->
-            {TestKoPid, {bind, koordinator, _Node}} = Any,
-            ?assertEqual(
-                {registered_name, koordinator},
-                process_info(TestKoPid, registered_name))
-    end,
-    unregister(nameservice),
-    kill_pid_and_clear_this_mailbox(TestKoPid).
-
-%Wirft errors in ggT-Prozessen, aber failt nicht.
-start_2() ->
-    ArbeitsZeit = 1,
-    TermZeit = 5,
-    GGTProAnz = 5,
-    SollQuota = round((GGTProAnz * 4 * 80) / 100),
-    ThisPid = self(),
-    register(nameservice, self()),
-    TestKoPid = spawn(fun() -> 
-                    koordinator:start(ThisPid)
-                end),
-    timer:sleep(timer:seconds(1)),
-    receive
-        Any1 ->
-            {TestKoPid, {bind, koordinator, _Node}} = Any1,
-            TestKoPid ! ok
-    end,
-    TestKoPid ! {ThisPid, getsteeringval},
-    receive
-        Any2 ->
-            io:fwrite("Wenn hier fail, speziell die gesetzten SteeringValues (hier und in koordinator.erl) pruefen!"),
-            ?assertEqual({steeringval, ArbeitsZeit, TermZeit, SollQuota, GGTProAnz}, Any2)
-    end,
-    unregister(nameservice),
-    kill_pid_and_clear_this_mailbox(TestKoPid).
 
 init_loop_1_test() ->
     SteeringValues = {steeringval, 0, 0, 1, 5},
@@ -296,7 +252,7 @@ reset_1_test() ->
 
     receive
         Any4 -> 
-            {TestPid, {bind, koordinator, _Node}} = Any4,
+            {TestPid, {rebind, koordinator, _Node}} = Any4,
             TestPid ! ok
     end,
     exit(TestPid, kill).
