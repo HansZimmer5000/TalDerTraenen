@@ -44,7 +44,7 @@ start_all_ggtprozesse(StarterNummer, {_ArbeitsZeit, _TermZeit, _Quota, 0}) ->
 start_all_ggtprozesse(StarterNummer, {ArbeitsZeit, TermZeit, Quota, GGTProAnz}) ->
     GGTProName = create_ggtproname(StarterNummer, GGTProAnz),
     ggtprozess:go({GGTProName, ArbeitsZeit, TermZeit, Quota}),
-    logge_status(StarterNummer, lists:flatten(io_lib:format("GGTPro~p gestartet", [GGTProAnz]))),
+    logge_status(StarterNummer, lists:flatten(io_lib:format("~p wurde gestartet", [GGTProName]))),
     
     NewGGTProAnz = GGTProAnz - 1,
     start_all_ggtprozesse(StarterNummer, {ArbeitsZeit, TermZeit, Quota, NewGGTProAnz}).
