@@ -53,15 +53,15 @@ if __name__ == "__main__":
             pointIndex = modulename.find(".")
             print("_________________________________________")
             __test_module(modulename[:pointIndex])
-        __remove_all_unecessary_files(["*.beam"], ["nameservice.beam"])
+        __remove_all_unecessary_files(["*.beam"], ["nameservice.beam", "vsutil.beam", "util.beam"])
     elif user_input == "2":
         __make_all_modules()
         __remove_all_unecessary_files(["*.log"], [])
         __start_node("ns", "nameservice", "")
         time.sleep(1)
         __start_node("ko", "koordinator", "")
-        __start_node("man", "man", "")
+        #__start_node("man", "man", "")
     elif user_input == "3":
-        __remove_all_unecessary_files(["*.log", "*.beam", "*.dump"], ["nameservice.beam"])
+        __remove_all_unecessary_files(["*.log", "*.beam", "*.dump"], ["nameservice.beam", "vsutil.beam", "util.beam"])
     else:
         print("Argument: '" + user_input + "' unkonwn.")

@@ -23,10 +23,10 @@
 -define(CONFIG_FILENAME, "ggt.cfg").
 
 -define(NSNODE, hole_wert_aus_config_mit_key(nameservicenode)).
--define(NSPID, whereis(nameservice)).
+-define(NSPID, global:whereis_name(nameservice)).
 
 -define(KOORDINATORNAME, hole_wert_aus_config_mit_key(koordinatorname)).
--define(KOPID, whereis(?KOORDINATORNAME)).
+-define(KOPID, global:whereis_name(?KOORDINATORNAME)).
 
 
 go({GGTProName, ArbeitsZeit, TermZeit, Quota}) ->
@@ -167,7 +167,7 @@ kill(GGTProName, NsPid) ->
         ok -> ok
     end,
 
-    case whereis(GGTProName) of
+    case global:whereis_name(GGTProName) of
         undefined -> ok; %Only for Test purposes! Because since its in the same process the name is always registered during normal run until unregistered here.
         _Any -> unregister(GGTProName)
     end,

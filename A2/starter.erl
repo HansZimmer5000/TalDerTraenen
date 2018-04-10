@@ -14,7 +14,7 @@
 -define(DEFAULT_LOG_DATEI_NAME, "starter").
 
 -define(KOORDINATORNAME, hole_wert_aus_config_mit_key(koordinatorname)).
--define(KOPID, whereis(?KOORDINATORNAME)).
+-define(KOPID, global:whereis_name(?KOORDINATORNAME)).
 
 -define(PRAKTIKUMSGRUPPE, hole_wert_aus_config_mit_key(praktikumsgruppe)).
 -define(TEAMNUMMER, hole_wert_aus_config_mit_key(teamnummer)).

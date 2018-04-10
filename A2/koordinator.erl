@@ -33,7 +33,7 @@
 -define(CONFIG_DATEI_NAME, "koordinator.cfg").
 -define(LOG_DATEI_NAME, "koordinator.log").
 
--define(NSPID, whereis(nameservice)).
+-define(NSPID, global:whereis_name(nameservice)).
 -define(NSNODE, hole_wert_aus_config_mit_key(nameservicenode)).
 -define(KONAME, hole_wert_aus_config_mit_key(koordinatorname)).
 
@@ -46,6 +46,7 @@
 
 
 start() ->
+    net_adm:ping(?NSNODE), 
     start(?NSPID).
 
 start(NsPid) ->
@@ -71,7 +72,7 @@ start(NsPid) ->
 
 registerAtNS(NsPid) ->
     register(?KONAME, self()),
-    NsPid ! {self(), {bind, ?KONAME, node()}},
+    NsPid ! {self(), {rebind, ?KONAME, node()}},
     receive
         ok -> logge_status("ist registriert und beim nameservice bekannt")
     end.
@@ -263,7 +264,7 @@ finalize(GGTProNameList, NsPid, Restart) ->
     receive
         ok -> continue
     end,
-    case whereis(?KONAME) of
+    case global:whereis_name(?KONAME) of
         undefined -> logge_status("finalize findet ?KONAME nicht, wenn Test -> ok"),
                      ok; %Only for Test purposes! Because since its in the same process the name is always registered during normal run until unregistered here.
         _Any -> unregister(?KONAME)
