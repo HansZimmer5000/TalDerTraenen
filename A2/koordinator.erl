@@ -47,6 +47,7 @@
 
 start() ->
     net_adm:ping(?NSNODE), 
+    timer:sleep(timer:seconds(2)),
     start(?NSPID).
 
 start(NsPid) ->
@@ -54,7 +55,7 @@ start(NsPid) ->
 
     net_adm:ping(?NSNODE),    
 
-    registerAtNS(NsPid),
+    register_at_ns(NsPid),
 
     start_starters(?STARTER_COUNT),
 
@@ -70,7 +71,9 @@ start(NsPid) ->
                         calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN)
     end.
 
-registerAtNS(NsPid) ->
+register_at_ns(undefined) ->
+    logge_status("NsPid unbekannt");
+register_at_ns(NsPid) ->
     register(?KONAME, self()),
     NsPid ! {self(), {rebind, ?KONAME, node()}},
     receive

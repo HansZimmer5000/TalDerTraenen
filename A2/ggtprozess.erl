@@ -26,10 +26,12 @@
 -define(NSPID, global:whereis_name(nameservice)).
 
 -define(KOORDINATORNAME, hole_wert_aus_config_mit_key(koordinatorname)).
--define(KOPID, global:whereis_name(?KOORDINATORNAME)).
+-define(KOPID, whereis(?KOORDINATORNAME)).
 
 
 go({GGTProName, ArbeitsZeit, TermZeit, Quota}) ->
+    net_adm:ping(?NSNODE),
+    timer:sleep(timer:seconds(2)),
     go({GGTProName, ArbeitsZeit, TermZeit, Quota, ?NSPID, ?KOPID});
 
 go({GGTProName, ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->

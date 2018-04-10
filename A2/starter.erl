@@ -14,16 +14,16 @@
 -define(DEFAULT_LOG_DATEI_NAME, "starter").
 
 -define(KOORDINATORNAME, hole_wert_aus_config_mit_key(koordinatorname)).
--define(KOPID, global:whereis_name(?KOORDINATORNAME)).
+-define(KOPID, whereis(?KOORDINATORNAME)).
 
 -define(PRAKTIKUMSGRUPPE, hole_wert_aus_config_mit_key(praktikumsgruppe)).
 -define(TEAMNUMMER, hole_wert_aus_config_mit_key(teamnummer)).
 
 start([ParameterFromPython]) ->
     {StarterNummer, []} = string:to_integer(atom_to_list(ParameterFromPython)),
-    go(StarterNummer, ?KOPID);
+    go(StarterNummer);
 start(StarterNummer) ->
-    go(StarterNummer, ?KOPID).
+    go(StarterNummer).
 
 go(StarterNummer) ->
     go(StarterNummer, ?KOPID).
