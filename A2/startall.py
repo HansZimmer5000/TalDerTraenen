@@ -60,7 +60,7 @@ if __name__ == "__main__":
         __start_node("ns", "nameservice", "")
         time.sleep(1)
         __start_node("ko", "koordinator", "")
-        #__start_node("man", "man", "")
+        __start_node("man", "man", "")
     elif user_input == "3":
         __remove_all_unecessary_files(["*.log", "*.beam", "*.dump"], ["nameservice.beam", "vsutil.beam", "util.beam"])
     else:

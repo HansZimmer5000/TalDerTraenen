@@ -4,8 +4,8 @@
     start/0
 ]).
 
--define(CONFIG_FILENAME, "ggtprozess.cfg").
--define(KOPID, hole_wert_aus_config_mit_key(kopid)).
+-define(CONFIG_FILENAME, "ggt.cfg").
+-define(KOPID, {koordinator, 'ko@Michael-X250'}).
 
 start() ->
     {ok, [CommandStr]} = io:fread("Kommando eingeben>", "~s"),
