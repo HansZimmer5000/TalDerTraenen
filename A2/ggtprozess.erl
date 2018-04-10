@@ -20,11 +20,14 @@
     calc_new_mi/2
 ]).
 
--define(CONFIG_FILENAME, 'ggtprozess.cfg').
--define(NSPID, hole_wert_aus_config_mit_key(nspid)).
--define(NSNODE, hole_wert_aus_config_mit_key(nsnode)).
--define(KOPID, hole_wert_aus_config_mit_key(kopid)).
--define(KONODE, hole_wert_aus_config_mit_key(konode)).
+-define(CONFIG_FILENAME, 'ggt.cfg').
+
+-define(NSNODE, hole_wert_aus_config_mit_key(nameservicenode)).
+-define(NSPID, whereis(nameservice)).
+
+-define(KOORDINATORNAME, hole_wert_aus_config_mit_key(koordinatorname)).
+-define(KOPID, whereis(?KOORDINATORNAME)).
+
 
 go({GGTProName, ArbeitsZeit, TermZeit, Quota}) ->
     go({GGTProName, ArbeitsZeit, TermZeit, Quota, ?NSPID, ?KOPID});
@@ -35,7 +38,6 @@ go({GGTProName, ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
 
     io:fwrite("~p, ~p", [NsPid, KoPid]),
     net_adm:ping(?NSNODE),
-    net_adm:ping(?KONODE),
 
     GGTProPid = spawn(fun() -> init(InstanceVariables, GlobalVariables) end),
     true = register(GGTProName, GGTProPid),

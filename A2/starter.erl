@@ -10,9 +10,12 @@
     create_ggtproname/2
 ]).
 
--define(CONFIG_DATEI_NAME, "ggtprozess.cfg").
+-define(CONFIG_DATEI_NAME, "ggt.cfg").
 -define(KOPID, hole_wert_aus_config_mit_key(kopid)).
 -define(DEFAULT_LOG_DATEI_NAME, "starter").
+
+-define(PRAKTIKUMSGRUPPE, hole_wert_aus_config_mit_key(praktikumsgruppe)).
+-define(TEAMNUMMER, hole_wert_aus_config_mit_key(teamnummer)).
 
 start([ParameterFromPython]) ->
     {StarterNummer, []} = string:to_integer(atom_to_list(ParameterFromPython)),
@@ -45,11 +48,9 @@ start_all_ggtprozesse(StarterNummer, {ArbeitsZeit, TermZeit, Quota, GGTProAnz}) 
     start_all_ggtprozesse(StarterNummer, {ArbeitsZeit, TermZeit, Quota, NewGGTProAnz}).
 
 create_ggtproname(StarterNummer, GGTProNummer) ->
-    Praktikumsgruppennummer = 1,
-    Teamnummer = 2,
     GGTProName = io_lib:format(
                     'ggt-~p~p~p~p', 
-                    [StarterNummer, Praktikumsgruppennummer, Teamnummer, GGTProNummer]
+                    [StarterNummer, ?PRAKTIKUMSGRUPPE, ?TEAMNUMMER, GGTProNummer]
                 ),
     list_to_atom(lists:flatten(GGTProName)).
 

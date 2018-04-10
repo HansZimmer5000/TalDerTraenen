@@ -9,7 +9,7 @@
     set_neighbors/4,
     get_next_to_last_and_last_elem/1,
 
-    calculation_receive_loop/2,
+    calculation_receive_loop/3,
     briefmi/3,
     briefterm/4,
     reset/2,
@@ -22,7 +22,7 @@
     send_message_to_processname/3,
     prompt/2,
     nudge/2,
-    toggle/0,
+    toggle/1,
     kill/2,
     kill_all_ggtprocesses/2,
 
@@ -32,14 +32,17 @@
 
 -define(CONFIG_DATEI_NAME, "koordinator.cfg").
 -define(LOG_DATEI_NAME, "koordinator.log").
--define(NSPID, hole_wert_aus_config_mit_key(nspid)).
--define(NSNODE, hole_wert_aus_config_mit_key(nsnode)).
--define(KONAME, hole_wert_aus_config_mit_key(koname)).
+
+-define(NSPID, whereis(nameservice)).
+-define(NSNODE, hole_wert_aus_config_mit_key(nameservicenode)).
+-define(KONAME, hole_wert_aus_config_mit_key(koordinatorname)).
+
 -define(STARTER_COUNT, hole_wert_aus_config_mit_key(startercount)).
 -define(ARBEITSZEIT, hole_wert_aus_config_mit_key(arbeitszeit)).
 -define(TERMZEIT, hole_wert_aus_config_mit_key(termzeit)).
 -define(QUOTA, hole_wert_aus_config_mit_key(quota)).
--define(GGTPROANZ, hole_wert_aus_config_mit_key(ggtproanz)).
+-define(GGTPROANZ, hole_wert_aus_config_mit_key(ggtprozessnummer)).
+-define(KORRIGIEREN, hole_wert_aus_config_mit_key(korrigieren)).
 
 
 start() ->
@@ -63,7 +66,7 @@ start(NsPid) ->
     receive
         {calc, WggT} -> calc(WggT, GGTProNameList, NsPid),
                         logge_status("calc init done"),
-                        calculation_receive_loop(GGTProNameList, NsPid)
+                        calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN)
     end.
 
 registerAtNS(NsPid) ->
@@ -178,23 +181,23 @@ get_next_to_last_and_last_elem([NextToLastElem, LastElem]) ->
 get_next_to_last_and_last_elem([_HeadElem | RestElems]) ->
     get_next_to_last_and_last_elem(RestElems).
 
-calculation_receive_loop(GGTProNameList, NsPid) ->
+calculation_receive_loop(GGTProNameList, NsPid, Korrigieren) ->
     receive
         {briefmi, {GGTProName, CMi, CZeit}} -> 
             briefmi(GGTProName, CMi, CZeit),
-            calculation_receive_loop(GGTProNameList, NsPid);
+            calculation_receive_loop(GGTProNameList, NsPid, Korrigieren);
         {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> 
             briefterm(AbsenderPid, GGTProName, CMi, CZeit),
-            calculation_receive_loop(GGTProNameList, NsPid); 
+            calculation_receive_loop(GGTProNameList, NsPid, Korrigieren); 
         prompt ->   
             prompt(GGTProNameList, NsPid),
-            calculation_receive_loop(GGTProNameList, NsPid);
+            calculation_receive_loop(GGTProNameList, NsPid, Korrigieren);
         nudge ->    
             nudge(GGTProNameList, NsPid),
-            calculation_receive_loop(GGTProNameList, NsPid);
+            calculation_receive_loop(GGTProNameList, NsPid, Korrigieren);
         toggle ->   
-            toggle(),
-            calculation_receive_loop(GGTProNameList, NsPid);
+            NeuesKorrigieren = toggle(Korrigieren),
+            calculation_receive_loop(GGTProNameList, NsPid, NeuesKorrigieren);
         reset ->    
             reset(GGTProNameList, NsPid);
         kill ->     
@@ -207,7 +210,7 @@ briefmi(GGTProName, CMi, CZeit) ->
 
 briefterm(_AbsenderPid, GGTProName, CMi, CZeit) ->
     logge_ggtpro_status(GGTProName, CMi, CZeit, true).
-    %{sendy, LCMi}, wirklich etwas zurück senden?
+    %{sendy, LCMi}, TODO: Rücksenden (globales minimales ggT) wenn Korrigieren = true
 
 prompt(GGTProNameList, NsPid) ->
     send_and_receive_mi(GGTProNameList, NsPid).
@@ -245,8 +248,8 @@ nudge([HeadGGTProName | RestGGTProNames], NsPid) ->
     end,
     nudge(RestGGTProNames, NsPid).
 
-toggle() ->
-    throw("Not yet implemented").
+toggle(Korrigieren) ->
+    not(Korrigieren).
 
 reset(GGTProNameList, NsPid) ->
     finalize(GGTProNameList, NsPid, true).

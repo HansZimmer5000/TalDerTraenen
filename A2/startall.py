@@ -28,12 +28,11 @@ def __start_normal_shell(nodename):
     os.system("start erl -sname " + nodename)
 
 # Deletes all files of the defined types in the current folder
-def __remove_all_unecessary_files(unecessary_file_types):
-    unecessary_files = []
-    for unecessary_file_type in unecessary_file_types:
-        unecessary_files = unecessary_files + glob.glob("*" + unecessary_file_type)
+def __remove_all_unecessary_files(unecessary_files, necessary_files):
     for unecessary_file in unecessary_files:
-        os.remove(unecessary_file)
+        for file in glob.glob(unecessary_file):
+            if not(file in necessary_files):
+                os.remove(file)
 
 
 # According to given Input, either all Testfiles gonna be executed or 
@@ -48,21 +47,21 @@ if __name__ == "__main__":
         __make_all_modules()
     elif user_input == "1":
         __make_all_modules()
-        __remove_all_unecessary_files([".log"])
+        __remove_all_unecessary_files(["*.log"], [])
         test_modulenames = __get_all_test_modulenames()
         for modulename in test_modulenames:
             pointIndex = modulename.find(".")
             print("_________________________________________")
             __test_module(modulename[:pointIndex])
-        __remove_all_unecessary_files([".beam"])
+        __remove_all_unecessary_files(["*.beam"], ["nameservice.beam"])
     elif user_input == "2":
         __make_all_modules()
-        __remove_all_unecessary_files([".log"])
+        __remove_all_unecessary_files(["*.log"], [])
         __start_node("ns", "nameservice", "")
         time.sleep(1)
         __start_node("ko", "koordinator", "")
         __start_node("man", "man", "")
     elif user_input == "3":
-        __remove_all_unecessary_files([".log", ".beam", ".dump"])
+        __remove_all_unecessary_files(["*.log", "*.beam", "*.dump"], ["nameservice.beam"])
     else:
         print("Argument: '" + user_input + "' unkonwn.")
