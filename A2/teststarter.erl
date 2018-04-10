@@ -23,8 +23,8 @@ go_1_test() ->
     timer:sleep(timer:seconds(1)),
     Result = whereis(GGTProName1),
     io:fwrite("Ergebnis: ~p, ggf. Sleepzeit anpassen bei langsameren PCs", [Result]),
-    ?assert(is_pid(Result)),
-    unregister(nameservice).
+    unregister(nameservice),
+    ?assert(is_pid(Result)).
 
 
 start_all_ggtprozesse_1_test() ->
@@ -32,8 +32,8 @@ start_all_ggtprozesse_1_test() ->
     register(nameservice, self()),
     starter:start_all_ggtprozesse(2, {empty, empty, empty, 1}),
     Result = whereis(GGTProName1),
-    ?assert(is_pid(Result)),
-    unregister(nameservice).
+    unregister(nameservice),
+    ?assert(is_pid(Result)).
 
 create_ggtproname_1_test() -> 
     ?assertEqual('ggt-1263', starter:create_ggtproname(1, 3)).
