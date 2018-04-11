@@ -73,7 +73,10 @@ init_receive_loop({GGTProName, Mi, Neighbors, CalcIsDone}, GlobalVariables) ->
                 true ->  
                     logge_status(GGTProName, "init done"),
                     init_receive_loop(NewFirstInstanceVariables, GlobalVariables)
-            end
+            end;
+        kill -> 
+            {_, _, _, NsPid, _} = GlobalVariables,
+            kill(GGTProName, NsPid)
     end.
 
 empty_instance_variables_exist(InstanceVariables) ->
