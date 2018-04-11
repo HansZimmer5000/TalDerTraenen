@@ -34,10 +34,9 @@ go({GGTProName, ArbeitsZeit, TermZeit, Quota}) ->
     go({GGTProName, ArbeitsZeit, TermZeit, Quota, ?NSPID, ?KOPID});
 
 go({GGTProName, ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
-    InstanceVariables = {GGTProName, empty, empty},
+    InstanceVariables = {GGTProName, empty, empty, false},
     GlobalVariables = {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid},
 
-    io:fwrite("~p, ~p", [NsPid, KoPid]),
     net_adm:ping(?NSNODE),
 
     GGTProPid = spawn(fun() -> init(InstanceVariables, GlobalVariables) end),
@@ -46,21 +45,21 @@ go({GGTProName, ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
                                 io_lib:format("gestartet mit PID ~p",[GGTProPid]))),
     GGTProPid.
 
-init({GGTProName, Mi, Neighbors}, {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
+init({GGTProName, Mi, Neighbors, CalcIsDone}, {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
     NsPid ! {self(), {rebind, GGTProName, node()}},
     receive
         ok -> logge_status(GGTProName, "registriert und bekannt beim nameservice")
     end,
     KoPid ! {hello, GGTProName},
     
-    {GGTProName, FilledMi, FilledNeighbors} = init_receive_loop({GGTProName, Mi, Neighbors}, {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}),
-    receive_loop({GGTProName, FilledMi, FilledNeighbors, empty}, 
+    {GGTProName, FilledMi, FilledNeighbors, CalcIsDone} = init_receive_loop({GGTProName, Mi, Neighbors, CalcIsDone}, {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}),
+    receive_loop({GGTProName, FilledMi, FilledNeighbors, empty, CalcIsDone}, 
                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}).
 
-init_receive_loop({GGTProName, Mi, Neighbors}, GlobalVariables) ->
+init_receive_loop({GGTProName, Mi, Neighbors, CalcIsDone}, GlobalVariables) ->
     receive
         {setneighbors, LeftN, RightN} ->  
-            NewFirstInstanceVariables = {GGTProName, Mi, {LeftN, RightN}},
+            NewFirstInstanceVariables = {GGTProName, Mi, {LeftN, RightN}, CalcIsDone},
             case empty_instance_variables_exist(NewFirstInstanceVariables) of
                 false -> NewFirstInstanceVariables;
                 true -> 
@@ -68,7 +67,7 @@ init_receive_loop({GGTProName, Mi, Neighbors}, GlobalVariables) ->
                     init_receive_loop(NewFirstInstanceVariables, GlobalVariables)
             end;
         {setpm, MiNeu} -> 
-            NewFirstInstanceVariables = {GGTProName, MiNeu, Neighbors},
+            NewFirstInstanceVariables = {GGTProName, MiNeu, Neighbors, CalcIsDone},
             case empty_instance_variables_exist(NewFirstInstanceVariables) of
                 false -> NewFirstInstanceVariables;
                 true ->  
@@ -78,58 +77,62 @@ init_receive_loop({GGTProName, Mi, Neighbors}, GlobalVariables) ->
     end.
 
 empty_instance_variables_exist(InstanceVariables) ->
-    {GGTProName, Mi, Neighbors} = InstanceVariables,
-    (GGTProName == empty) or (Mi == empty) or (Neighbors == empty).
+    {GGTProName, Mi, Neighbors, CalcIsDone} = InstanceVariables,
+    (GGTProName == empty) or (Mi == empty) or (Neighbors == empty) or (CalcIsDone == empty).
 
-receive_loop({GGTProName, Mi, Neighbors, 0}, 
+receive_loop({GGTProName, Mi, Neighbors, 0, OldCalcIsDone}, 
                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
-    %Following 2 lines should be done exactly one time after a successfull vote, not n times!
-    term(KoPid, GGTProName, Mi),
+    case OldCalcIsDone of
+        false -> 
+            term(KoPid, GGTProName, Mi);
+        _ -> donothing
+    end,
     MissingCountForQuota = 0,
+    CalcIsDone = true,
     receive
         {InitiatorPid, {vote, InitatorName}} -> logge_status_vote(GGTProName, InitatorName),
                                                 vote(InitiatorPid, GGTProName, MissingCountForQuota),
-                                                receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
+                                                receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota, CalcIsDone},
                                                                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {sendy, Y} ->               timer:sleep(timer:seconds(ArbeitsZeit)),
                                     NewMi = calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid),
-                                    receive_loop({GGTProName, NewMi, Neighbors, empty},
+                                    receive_loop({GGTProName, NewMi, Neighbors, empty, false},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
-        {setpm, MiNeu} ->           receive_loop({GGTProName, MiNeu, Neighbors, empty}, 
+        {setpm, MiNeu} ->           receive_loop({GGTProName, MiNeu, Neighbors, empty, false}, 
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {AbsenderPid, tellmi} ->    tellmi(AbsenderPid, Mi),
-                                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
+                                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota, CalcIsDone},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {AbsenderPid, pingGGT} ->   pongGGT(AbsenderPid, GGTProName),
-                                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
+                                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota, CalcIsDone},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         kill -> kill(GGTProName, NsPid)
     end;
-receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota}, 
+receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota, CalcIsDone}, 
                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
     receive
         {InitiatorPid, {vote, InitatorName}} -> logge_status_vote(GGTProName, InitatorName),
                                                 vote(InitiatorPid, GGTProName, MissingCountForQuota),
-                                                receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
+                                                receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota, CalcIsDone},
                                                                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
-        {vote_yes, OtherGGTProName} ->   logge_status_vote_yes(GGTProName, OtherGGTProName),
+        {vote_yes, OtherGGTProName} ->  logge_status_vote_yes(GGTProName, OtherGGTProName),
                                         NewMissingCountForQuota = vote_yes(MissingCountForQuota),
-                                        receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota},
+                                        receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota, CalcIsDone},
                                                         {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {sendy, Y} ->               timer:sleep(timer:seconds(ArbeitsZeit)),
                                     NewMi = calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid),
-                                    receive_loop({GGTProName, NewMi, Neighbors, empty},
+                                    receive_loop({GGTProName, NewMi, Neighbors, empty, CalcIsDone},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {AbsenderPid, tellmi} ->    tellmi(AbsenderPid, Mi),
-                                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
+                                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota, CalcIsDone},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {AbsenderPid, pingGGT} ->   pongGGT(AbsenderPid, GGTProName),
-                                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
+                                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota, CalcIsDone},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         kill -> kill(GGTProName, NsPid)
 
         after timer:seconds(TermZeit) ->    NewMissingCountForQuota = start_vote(GGTProName, Mi, NsPid, Quota),
-                                            receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota},
+                                            receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota, CalcIsDone},
                                                             {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid})
     end.
 
@@ -182,11 +185,11 @@ kill(GGTProName, NsPid) ->
         ok -> ok
     end,
 
-    case global:whereis_name(GGTProName) of
+    case whereis(GGTProName) of
         undefined -> ok; %Only for Test purposes! Because since its in the same process the name is always registered during normal run until unregistered here.
         _Any -> unregister(GGTProName)
     end,
-    ok.
+    logge_status(GGTProName, "ist heruntergefahren").
 
 start_vote(GGTProName, Mi, NsPid, Quota) ->
     logge_status(GGTProName, lists:flatten(io_lib:format("mit ~p (Mi) wird vote gestartet", [Mi]))),

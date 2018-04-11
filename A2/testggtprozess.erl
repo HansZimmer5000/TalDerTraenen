@@ -50,7 +50,7 @@ go_1_test() ->
 
 init_1_test() ->
     ThisPid = self(),
-    InstanceVariables = {nameA, empty, empty},
+    InstanceVariables = {nameA, empty, empty, false},
     GlobalVariables = {?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ThisPid, ThisPid},
     TestPid = spawn(fun() ->
                         ggtprozess:init(InstanceVariables, GlobalVariables)
@@ -78,7 +78,7 @@ init_1_test() ->
     end.
 
 init_receive_loop_1_test() ->
-    InstanceVariables = {nameA, empty, empty},
+    InstanceVariables = {nameA, empty, empty, false},
     ThisPid = self(),
     TestPid = spawn(fun() ->
                         NewInstanceVariables = ggtprozess:init_receive_loop(InstanceVariables, empty),
@@ -88,22 +88,25 @@ init_receive_loop_1_test() ->
     TestPid ! {setneighbors, ThisPid, ThisPid},
 
     receive
-        Any -> ?assertEqual({nameA, 3, {ThisPid, ThisPid}}, Any)
+        Any -> ?assertEqual({nameA, 3, {ThisPid, ThisPid}, false}, Any)
     end.
 
 empty_instance_variables_exist_1_test() ->
-    InstanceVariables = {nameA, empty, empty},
-    ?assertEqual(true, ggtprozess:empty_instance_variables_exist(InstanceVariables)).
+    InstanceVariables = {nameA, empty, empty, false},
+    ?assert(ggtprozess:empty_instance_variables_exist(InstanceVariables)).
 
 empty_instance_variables_exist_2_test() ->
-    InstanceVariables = {nameA, full, full},
-    ?assertEqual(false, ggtprozess:empty_instance_variables_exist(InstanceVariables)).
+    InstanceVariables = {nameA, full, full, false},
+    ?assertNot(ggtprozess:empty_instance_variables_exist(InstanceVariables)).
 
+empty_instance_variables_exist_3_test() ->
+    InstanceVariables = {nameA, full, full, empty},
+    ?assert(ggtprozess:empty_instance_variables_exist(InstanceVariables)).
 
 receive_loop_1_test() ->
     ThisPid = self(),
     MissingCountForQuota = empty,
-    InstanceVariables = {nameA, 3, {ThisPid, ThisPid}, MissingCountForQuota},
+    InstanceVariables = {nameA, 3, {ThisPid, ThisPid}, MissingCountForQuota, false},
     GlobalVariables = {?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ThisPid, ThisPid},
     TestPid = spawn(fun() ->
                         ggtprozess:receive_loop(InstanceVariables, GlobalVariables)
