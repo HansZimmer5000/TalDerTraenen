@@ -217,5 +217,5 @@ logge_status(GGTProName, Inhalt) ->
     LogDateiName = lists:flatten(io_lib:format("~p.log", [GGTProName])),
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
     LogNachricht = io_lib:format("~p ~p ~s.\n", [GGTProName, AktuelleZeit, Inhalt]),
-    io:fwrite(LogNachricht),
+    %io:fwrite(LogNachricht),
     util:logging(LogDateiName, LogNachricht).

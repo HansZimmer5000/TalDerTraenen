@@ -64,12 +64,7 @@ start(NsPid) ->
 
     GGTProNameList = init_loop(NsPid, SteeringValues, 0, []),
 
-    receive
-        {calc, WggT} -> calc(WggT, GGTProNameList, NsPid),
-                        logge_status("calc init done"),
-                        calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, WggT); % Set here 'empty' or WggT as global MinMi.
-        kill -> kill(GGTProNameList, NsPid)
-    end.
+    calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, empty).
 
 register_at_ns(undefined) ->
     logge_status("NsPid unbekannt");
