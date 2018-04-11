@@ -12,7 +12,7 @@
 %    kill/2,
 %    calc_and_send_new_mi/3,
 %    send_new_mi/2,
-%    voteYes/0,
+%    vote_yes/0,
 %    start_vote/4,
 %    tellmi/2,
 %    pongGGT/2,
@@ -194,8 +194,8 @@ send_new_mi_1_test() ->
         after 20 -> ok
     end.
 
-voteYes_1_test() ->
-    ?assertEqual(2, ggtprozess:voteYes(3)).
+vote_yes_1_test() ->
+    ?assertEqual(2, ggtprozess:vote_yes(3)).
 
 start_vote_1_test() ->
     GGTProName = nameA,

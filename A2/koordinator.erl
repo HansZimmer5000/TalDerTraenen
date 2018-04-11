@@ -220,7 +220,7 @@ briefmi(GGTProName, CMi, CZeit, empty) ->
     CMi;
 briefmi(GGTProName, CMi, CZeit, MinMi) ->
     logge_ggtpro_status(GGTProName, CMi, CZeit, false),
-    case CMi =< MinMi of
+    case CMi < MinMi of
         true -> 
             logge_status(io_lib:format("Neues Globales Mi: ~p (Alt: ~p)", [CMi, MinMi])), 
             CMi;
@@ -234,13 +234,13 @@ briefterm(_AbsenderPid, GGTProName, CMi, CZeit, empty, _Korrigieren) ->
     CMi;
 briefterm(AbsenderPid, GGTProName, CMi, CZeit, MinMi, Korrigieren) ->
     logge_ggtpro_status(GGTProName, CMi, CZeit, true),
-    case CMi =< MinMi of
+    case CMi < MinMi of
         true -> 
             logge_status(io_lib:format("Neues Globales Mi: ~p (Alt: ~p)", [CMi, MinMi])), 
             NewMinMi = CMi;
         false ->
             NewMinMi = MinMi,
-            case Korrigieren of
+            case (Korrigieren and (CMi > MinMi)) of %Abfrage noetig, da CMi = MinMi sein koennte.
                 true -> 
                     logge_status(io_lib:format("Korrektur an Client ~p gesendet", [GGTProName])),
                     AbsenderPid ! {sendy, MinMi};

@@ -8,12 +8,11 @@
 
     receive_loop/2,
 
-    vote_loop/2,
     vote/3,
     kill/2,
     calc_and_send_new_mi/5,
     send_new_mi/4,
-    voteYes/1,
+    vote_yes/1,
     start_vote/4,
     tellmi/2,
     pongGGT/2,
@@ -82,11 +81,11 @@ empty_instance_variables_exist(InstanceVariables) ->
     {GGTProName, Mi, Neighbors} = InstanceVariables,
     (GGTProName == empty) or (Mi == empty) or (Neighbors == empty).
 
-receive_loop({GGTProName, Mi, _Neighbors, 0}, 
-                {_ArbeitsZeit, _TermZeit, _Quota, NsPid, KoPid}) ->
-    KoPid ! {self(), briefterm, {GGTProName, Mi, vsutil:now2string(erlang:timestamp())}},
-    logge_status(GGTProName, "Genuegend Votes bekommen, briefterm gesendet, warte auf 'kill' im 'vote_loop'"),
-    vote_loop(GGTProName, NsPid);
+receive_loop({GGTProName, Mi, Neighbors, 0}, 
+                {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
+    term(KoPid, GGTProName, Mi),
+
+
 receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota}, 
                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
     receive
@@ -94,8 +93,8 @@ receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
                                                 vote(InitiatorPid, GGTProName, MissingCountForQuota),
                                                 receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
                                                                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
-        {voteYes, OtherGGTProName} ->   logge_status_voteyes(GGTProName, OtherGGTProName),
-                                        NewMissingCountForQuota = voteYes(MissingCountForQuota),
+        {vote_yes, OtherGGTProName} ->   logge_status_vote_yes(GGTProName, OtherGGTProName),
+                                        NewMissingCountForQuota = vote_yes(MissingCountForQuota),
                                         receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota},
                                                         {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {sendy, Y} ->               timer:sleep(timer:seconds(ArbeitsZeit)),
@@ -108,26 +107,28 @@ receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
         {AbsenderPid, pingGGT} ->   pongGGT(AbsenderPid, GGTProName),
                                     receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
-        kill ->     kill(GGTProName, NsPid)
+        kill -> kill(GGTProName, NsPid)
 
-        after timer:seconds(TermZeit) ->    NewMissingCountForQuota = start_vote(GGTProName, Mi, NsPid, Quota),
-                                            receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota},
-                                                            {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid})
+        after timer:seconds(TermZeit) ->   
+            case MissingCountForQuota of 
+                0 ->
+                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota}, 
+                                {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
+                _ ->
+                    NewMissingCountForQuota = start_vote(GGTProName, Mi, NsPid, Quota),
+                    receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota},
+                                {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid})
+            end
     end.
 
-vote_loop(GGTProName, NsPid) ->
-    receive
-        {InitiatorPid, {vote, InitatorName}} -> logge_status_vote(GGTProName, InitatorName),
-                                                vote(InitiatorPid, GGTProName, 0),
-                                                vote_loop(GGTProName, NsPid);
-        kill ->     logge_status(GGTProName, "got kill im vote_loop"),
-                    kill(GGTProName, NsPid)
-    end.
+term(KoPid, GGTProName, Mi) ->
+    KoPid ! {self(), briefterm, {GGTProName, Mi, vsutil:now2string(erlang:timestamp())}},
+    logge_status(GGTProName, "Genuegend Votes bekommen, briefterm gesendet").
 
 vote(InitiatorPid, GGTProName, MissingCountForQuota) ->
     case MissingCountForQuota of
         empty -> donothing;
-        _Any -> InitiatorPid ! {voteYes, GGTProName}
+        _Any -> InitiatorPid ! {vote_yes, GGTProName}
     end.
 
 calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid) ->
@@ -150,7 +151,7 @@ send_new_mi(NewMi, {LeftN, RightN}, GGTProName, KoPid) ->
     RightN ! {sendy, NewMi},
     KoPid ! {briefmi, {GGTProName, NewMi, vsutil:now2string(erlang:timestamp())}}.
 
-voteYes(MissingCountForQuota) ->
+vote_yes(MissingCountForQuota) ->
     case MissingCountForQuota of
         empty -> NewMissingCountForQuota = empty;
         _Any -> NewMissingCountForQuota = MissingCountForQuota - 1
@@ -178,7 +179,7 @@ kill(GGTProName, NsPid) ->
 start_vote(GGTProName, Mi, NsPid, Quota) ->
     logge_status(GGTProName, lists:flatten(io_lib:format("mit ~p (Mi) wird vote gestartet", [Mi]))),
     NsPid ! {self(), {multicast, vote, GGTProName}},
-    MissingCountForQuota = Quota - 1, % '-1' because, this GGT-Process said 'yes' by starting the vote
+    MissingCountForQuota = Quota,
     MissingCountForQuota.
 
 hole_wert_aus_config_mit_key(Key) ->
@@ -189,8 +190,8 @@ hole_wert_aus_config_mit_key(Key) ->
 logge_status_vote(GGTProName1, GGTProName2) ->
     logge_status(GGTProName1, lists:flatten(io_lib:format("got vote from ~p", [GGTProName2]))).
 
-logge_status_voteyes(GGTProName1, GGTProName2) ->
-    logge_status(GGTProName1, lists:flatten(io_lib:format("got voteYes from ~p", [GGTProName2]))).
+logge_status_vote_yes(GGTProName1, GGTProName2) ->
+    logge_status(GGTProName1, lists:flatten(io_lib:format("got vote_yes from ~p", [GGTProName2]))).
 
 logge_status(GGTProName, Inhalt) ->
     LogDateiName = lists:flatten(io_lib:format("~p.log", [GGTProName])),
