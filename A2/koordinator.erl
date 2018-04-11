@@ -55,15 +55,11 @@ start(NsPid) ->
     logge_status("koordinator startet"), 
 
     net_adm:ping(?NSNODE),    
-
     register_at_ns(NsPid),
 
     start_starters(?STARTER_COUNT),
-
     SteeringValues = {steeringval, ?ARBEITSZEIT, ?TERMZEIT, 0, ?GGTPROANZ},
-
     GGTProNameList = init_loop(NsPid, SteeringValues, 0, []),
-
     calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, empty).
 
 register_at_ns(undefined) ->
@@ -99,7 +95,11 @@ init_loop(NsPid, SteeringValues, CurrentStartersCount, GGTProNameList) ->
             logge_status(lists:flatten(io_lib:format("Es laufen ~p von ~p GGTProzessen", [length(GGTProNameList), SollGGTCount]))),
             
             create_circle(GGTProNameList, NsPid),
-            GGTProNameList
+            GGTProNameList;
+        reset ->    
+            reset(GGTProNameList, NsPid);
+        kill ->     
+            kill(GGTProNameList, NsPid)
     end.
 
 calc_quote(StartersCount, GGTProAnz) -> 
