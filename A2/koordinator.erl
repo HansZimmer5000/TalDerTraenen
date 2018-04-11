@@ -306,9 +306,9 @@ finalize(GGTProNameList, NsPid, Restart) ->
     receive
         ok -> continue
     end,
-    case global:whereis_name(?KONAME) of %TODO: problem, undefined in normal run.
-        undefined -> logge_status("finalize findet ?KONAME nicht, wenn Test -> ok"),
-                     ok; %Only for Test purposes! Because since its in the same process the name is always registered during normal run until unregistered here.
+    case whereis(?KONAME) of %TODO: problem, undefined in normal run.
+        undefined -> logge_status("finalize findet ?KONAME nicht, wenn Test -> ok");
+                     %Only for Test purposes! Because since its in the same process the name is always registered during normal run until unregistered here.
         _Any -> unregister(?KONAME)
     end,
     logge_status(lists:flatten(io_lib:format("Alle GGT-Prozesse herunter gefahren, selbst unregistered, Neustart = ~p", [Restart]))),
