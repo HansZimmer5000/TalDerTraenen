@@ -211,7 +211,7 @@ start_vote_1_test() ->
     end,
 
     receive
-        Any2 -> ?assertEqual(4, Any2)
+        Any2 -> ?assertEqual(5, Any2)
     end.
     
 

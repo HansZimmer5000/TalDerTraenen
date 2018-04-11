@@ -83,9 +83,28 @@ empty_instance_variables_exist(InstanceVariables) ->
 
 receive_loop({GGTProName, Mi, Neighbors, 0}, 
                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
+    %Following 2 lines should be done exactly one time after a successfull vote, not n times!
     term(KoPid, GGTProName, Mi),
-
-
+    MissingCountForQuota = 0,
+    receive
+        {InitiatorPid, {vote, InitatorName}} -> logge_status_vote(GGTProName, InitatorName),
+                                                vote(InitiatorPid, GGTProName, MissingCountForQuota),
+                                                receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
+                                                                {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
+        {sendy, Y} ->               timer:sleep(timer:seconds(ArbeitsZeit)),
+                                    NewMi = calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid),
+                                    receive_loop({GGTProName, NewMi, Neighbors, empty},
+                                                    {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
+        {setpm, MiNeu} ->           receive_loop({GGTProName, MiNeu, Neighbors, empty}, 
+                                                    {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
+        {AbsenderPid, tellmi} ->    tellmi(AbsenderPid, Mi),
+                                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
+                                                    {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
+        {AbsenderPid, pingGGT} ->   pongGGT(AbsenderPid, GGTProName),
+                                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
+                                                    {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
+        kill -> kill(GGTProName, NsPid)
+    end;
 receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota}, 
                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
     receive
@@ -109,16 +128,9 @@ receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         kill -> kill(GGTProName, NsPid)
 
-        after timer:seconds(TermZeit) ->   
-            case MissingCountForQuota of 
-                0 ->
-                    receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota}, 
-                                {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
-                _ ->
-                    NewMissingCountForQuota = start_vote(GGTProName, Mi, NsPid, Quota),
-                    receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota},
-                                {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid})
-            end
+        after timer:seconds(TermZeit) ->    NewMissingCountForQuota = start_vote(GGTProName, Mi, NsPid, Quota),
+                                            receive_loop({GGTProName, Mi, Neighbors, NewMissingCountForQuota},
+                                                            {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid})
     end.
 
 term(KoPid, GGTProName, Mi) ->
