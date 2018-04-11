@@ -97,11 +97,13 @@ receive_loop({GGTProName, Mi, Neighbors, 0, OldCalcIsDone},
                                                 vote(InitiatorPid, GGTProName, MissingCountForQuota),
                                                 receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota, CalcIsDone},
                                                                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
-        {sendy, Y} ->               timer:sleep(timer:seconds(ArbeitsZeit)),
+        {sendy, Y} ->               logge_status(GGTProName, io_lib:format("Korrektur Y = ~p erhalten", [Y])),
+                                    timer:sleep(timer:seconds(ArbeitsZeit)),
                                     NewMi = calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid),
                                     receive_loop({GGTProName, NewMi, Neighbors, empty, false},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
-        {setpm, MiNeu} ->           receive_loop({GGTProName, MiNeu, Neighbors, empty, false}, 
+        {setpm, MiNeu} ->           logge_status(GGTProName, io_lib:format("Starte neue Berechnung mit Mi = ~p", [MiNeu])),
+                                    receive_loop({GGTProName, MiNeu, Neighbors, empty, false}, 
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {AbsenderPid, tellmi} ->    tellmi(AbsenderPid, Mi),
                                     receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota, CalcIsDone},

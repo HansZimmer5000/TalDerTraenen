@@ -67,7 +67,7 @@ start(NsPid) ->
     receive
         {calc, WggT} -> calc(WggT, GGTProNameList, NsPid),
                         logge_status("calc init done"),
-                        calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, empty);
+                        calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, WggT); % Set here 'empty' or WggT as global MinMi.
         kill -> kill(GGTProNameList, NsPid)
     end.
 
@@ -196,7 +196,7 @@ calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, LastMinMi) ->
     receive
         {calc, WggT} -> 
             calc(WggT, GGTProNameList, NsPid),
-            calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, empty);
+            calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, WggT); % Set here 'empty' or WggT as global MinMi.
         {briefmi, {GGTProName, CMi, CZeit}} -> 
             NewMinMi = briefmi(GGTProName, CMi, CZeit, LastMinMi),
             calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, NewMinMi);
