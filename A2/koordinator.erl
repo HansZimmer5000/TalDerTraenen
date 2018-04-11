@@ -67,7 +67,8 @@ start(NsPid) ->
     receive
         {calc, WggT} -> calc(WggT, GGTProNameList, NsPid),
                         logge_status("calc init done"),
-                        calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, empty)
+                        calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, empty);
+        kill -> kill(GGTProNameList, NsPid)
     end.
 
 register_at_ns(undefined) ->
@@ -193,6 +194,9 @@ get_next_to_last_and_last_elem([_HeadElem | RestElems]) ->
 
 calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, LastMinMi) ->
     receive
+        {calc, WggT} -> 
+            calc(WggT, GGTProNameList, NsPid),
+            calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, empty);
         {briefmi, {GGTProName, CMi, CZeit}} -> 
             NewMinMi = briefmi(GGTProName, CMi, CZeit, LastMinMi),
             calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, NewMinMi);
@@ -302,7 +306,7 @@ finalize(GGTProNameList, NsPid, Restart) ->
     receive
         ok -> continue
     end,
-    case global:whereis_name(?KONAME) of
+    case global:whereis_name(?KONAME) of %TODO: problem, undefined in normal run.
         undefined -> logge_status("finalize findet ?KONAME nicht, wenn Test -> ok"),
                      ok; %Only for Test purposes! Because since its in the same process the name is always registered during normal run until unregistered here.
         _Any -> unregister(?KONAME)
