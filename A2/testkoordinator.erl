@@ -174,7 +174,7 @@ get_next_to_last_and_last_elem_2_test() ->
 calculation_receive_loop_1_test() -> 
     ThisPid = self(),
     TestPid = spawn(fun() ->
-            koordinator:calculation_receive_loop([nameA, nameB], ThisPid, false)
+            koordinator:calculation_receive_loop([nameA, nameB], ThisPid, false, 0)
         end),
     TestPid ! prompt,
 
@@ -229,13 +229,26 @@ calculation_receive_loop_1_test() ->
 
 
 briefmi_1_test() ->
-    LogNachricht = koordinator:briefmi(nameA, 3, empty),
-    ["nameA", "meldet", "3(CMi)", "false(TermFlag)" | _Rest] = string:tokens(LogNachricht, " ").
+    ?assertEqual(0, koordinator:briefmi(nameA, 3, empty, 0)).
 
+briefmi_2_test() ->
+    ?assertEqual(3, koordinator:briefmi(nameA, 3, empty, 3)).
+
+briefmi_3_test() ->
+    ?assertEqual(3, koordinator:briefmi(nameA, 3, empty, 4)).
 
 briefterm_1_test() ->
-    LogNachricht = koordinator:briefterm(self(), nameA, 3, empty),
-    ["nameA", "meldet", "3(CMi)", "true(TermFlag)" | _Rest] = string:tokens(LogNachricht, " ").
+    ?assertEqual(3, koordinator:briefterm(self(), nameA, 3, empty, 4, false)).
+
+briefterm_2_test() ->
+    ?assertEqual(3, koordinator:briefterm(self(), nameA, 4, empty, 3, true)),
+    receive 
+        Any -> ?assertEqual({sendy, 3}, Any)
+    end.
+
+briefterm_3_test() ->
+    ?assertEqual(3, koordinator:briefterm(self(), nameA, 4, empty, 3, false)).
+
 
 reset_1_test() ->
     ProList = [nameA, nameB],

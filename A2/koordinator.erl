@@ -10,9 +10,9 @@
     set_neighbors/4,
     get_next_to_last_and_last_elem/1,
 
-    calculation_receive_loop/3,
-    briefmi/3,
-    briefterm/4,
+    calculation_receive_loop/4,
+    briefmi/4,
+    briefterm/6,
     reset/2,
     calc/3,
     get_pms/2,
@@ -67,7 +67,7 @@ start(NsPid) ->
     receive
         {calc, WggT} -> calc(WggT, GGTProNameList, NsPid),
                         logge_status("calc init done"),
-                        calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN)
+                        calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, empty)
     end.
 
 register_at_ns(undefined) ->
@@ -191,36 +191,54 @@ get_next_to_last_and_last_elem([NextToLastElem, LastElem]) ->
 get_next_to_last_and_last_elem([_HeadElem | RestElems]) ->
     get_next_to_last_and_last_elem(RestElems).
 
-calculation_receive_loop(GGTProNameList, NsPid, Korrigieren) ->
+calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, LastMinMi) ->
     receive
         {briefmi, {GGTProName, CMi, CZeit}} -> 
-            briefmi(GGTProName, CMi, CZeit),
-            calculation_receive_loop(GGTProNameList, NsPid, Korrigieren);
+            NewMinMi = briefmi(GGTProName, CMi, CZeit, LastMinMi),
+            calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, NewMinMi);
         {AbsenderPid, briefterm, {GGTProName, CMi, CZeit}} -> 
-            briefterm(AbsenderPid, GGTProName, CMi, CZeit),
-            calculation_receive_loop(GGTProNameList, NsPid, Korrigieren); 
+            NewMinMi = briefterm(AbsenderPid, GGTProName, CMi, CZeit, LastMinMi, Korrigieren),
+            calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, NewMinMi); 
         prompt ->   
             prompt(GGTProNameList, NsPid),
-            calculation_receive_loop(GGTProNameList, NsPid, Korrigieren);
+            calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, LastMinMi);
         nudge ->    
             nudge(GGTProNameList, NsPid),
-            calculation_receive_loop(GGTProNameList, NsPid, Korrigieren);
+            calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, LastMinMi);
         toggle ->   
             NeuesKorrigieren = toggle(Korrigieren),
-            calculation_receive_loop(GGTProNameList, NsPid, NeuesKorrigieren);
+            calculation_receive_loop(GGTProNameList, NsPid, NeuesKorrigieren, LastMinMi);
         reset ->    
             reset(GGTProNameList, NsPid);
         kill ->     
             kill(GGTProNameList, NsPid)
     end.
 
+briefmi(GGTProName, CMi, CZeit, empty) ->
+    logge_ggtpro_status(GGTProName, CMi, CZeit, false),
+    CMi;
+briefmi(GGTProName, CMi, CZeit, MinMi) ->
+    logge_ggtpro_status(GGTProName, CMi, CZeit, false),
+    case CMi < MinMi of
+        true -> CMi;
+        false -> MinMi
+    end.
 
-briefmi(GGTProName, CMi, CZeit) ->
-    logge_ggtpro_status(GGTProName, CMi, CZeit, false).
-
-briefterm(_AbsenderPid, GGTProName, CMi, CZeit) ->
-    logge_ggtpro_status(GGTProName, CMi, CZeit, true).
-    %{sendy, LCMi}, TODO: Rücksenden (globales minimales ggT) wenn Korrigieren = true
+briefterm(_AbsenderPid, GGTProName, CMi, CZeit, empty, _Korrigieren) ->
+    logge_ggtpro_status(GGTProName, CMi, CZeit, true),
+    CMi;
+briefterm(AbsenderPid, GGTProName, CMi, CZeit, MinMi, Korrigieren) ->
+    logge_ggtpro_status(GGTProName, CMi, CZeit, true),
+    case CMi < MinMi of
+        true -> NewMinMi = CMi;
+        false ->
+            NewMinMi = MinMi,
+            case Korrigieren of
+                true -> AbsenderPid ! {sendy, MinMi};
+                false -> donothing
+            end
+    end,
+    NewMinMi.
 
 prompt(GGTProNameList, NsPid) ->
     send_and_receive_mi(GGTProNameList, NsPid).
