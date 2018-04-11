@@ -4,6 +4,10 @@ TODO:
     ggT selbstständig, ohne GoValues, machen, wofür bräuchte dann der Starter die Ahnung von den SteeringVals?
 
 Offene Fragen:
+
+Geschlossene Fragen:
+    - Was wenn schon in Calc-Phase aber es kommt nochmal calc?
+        Calc von vorn starten.
     - Was bedeuten die Variablen?
         ArbeitsZeit -> Delay zwischen Jetzt und der Zeit wenn der ggT-Prozess anfangen soll zu arbeiten
         TermZeit    -> Die TermZeit gilt für den ggT-Prozess, Mit jeder empfangenen Nachricht (außerhalb der Abstimmung) wird die Zeit resetet, läuft sie ab, initiert der betroffene ggT-Prozess eine Abstimmung.
@@ -11,16 +15,14 @@ Offene Fragen:
         GGTProName  -> Name des ggT-Prozesses
         CMi     -> Client Mi
         CZeit   -> Client Zeit des abschickens
-        LCMi    -> 
+        LCMi    -> Letztes Minimales Mi (ggT eines Prozesses) im ganzen System
         WggT    -> Wunsch ggT
         LeftN   -> Node links des aktuellen (Im Kreis, Uhrzeigersinn)
         RightN  -> Node rechts des aktuellen (Im Kreis, Gegen den Uhrzeigersinn)
         MiNeu   -> Neues Mi für gewissen ggT-Prozess
         Quota   -> Anzahl an ggT-Prozessen die (evtl. vorerst) am Ende der Berechnung angekommen sind und sich dem Abstimmungsinitiator zurückgemeldet haben
     - Warum hat Koordinator manchmal eine Response auf {briefterm, ...} vom Starter oder ggT-Prozess?
-    - Was wenn schon in Calc-Phase aber es kommt nochmal calc?
-
-Geschlossene Fragen:
+        Weil der Koordinator bei Korrekturflag = true eine Korrektur schickt und wenn False eben nicht.
     - Bis wann wird auf alle Starter und deren ggT-Prozesse gewartet?
         Bis 'step' beim Koordinator einget.
     - Reset -> Starter müssen dann auch unbinden und neu starten (neu steeringval anfragen)!
@@ -32,7 +34,7 @@ Geschlossene Fragen:
         step    -> Übergang von Sammeln der ggT-Prozess hellos zum errichten des Kreises
         prompt  -> ("Antreiben") ggT-Prozesse auffordern aktuellen Mi zurück zu schicken.
         nudge   -> ("Anstupsen") Anpingen, pong zurück erwarten
-        toggle  -> ("Umschalten")
+        toggle  -> ("Umschalten") Invertieren dass Korrekturflag
     - Wie sieht der GGTProName aus?
         "GGT-" + StarterNummer + Praktikumsgruppennummer + Teamnummer + ggT-Prozess Nummer (von 1 bis GGTProAnz).
     - Was ist das 2. Argument bei starter:go?
