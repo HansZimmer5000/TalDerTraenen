@@ -216,26 +216,36 @@ calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, LastMinMi) ->
 
 briefmi(GGTProName, CMi, CZeit, empty) ->
     logge_ggtpro_status(GGTProName, CMi, CZeit, false),
+    logge_status(io_lib:format("Neues Globales Mi: ~p (Alt: ~p)", [CMi, empty])),
     CMi;
 briefmi(GGTProName, CMi, CZeit, MinMi) ->
     logge_ggtpro_status(GGTProName, CMi, CZeit, false),
-    case CMi < MinMi of
-        true -> CMi;
-        false -> MinMi
+    case CMi =< MinMi of
+        true -> 
+            logge_status(io_lib:format("Neues Globales Mi: ~p (Alt: ~p)", [CMi, MinMi])), 
+            CMi;
+        false -> 
+            MinMi
     end.
 
 briefterm(_AbsenderPid, GGTProName, CMi, CZeit, empty, _Korrigieren) ->
     logge_ggtpro_status(GGTProName, CMi, CZeit, true),
+    logge_status(io_lib:format("Neues Globales Mi: ~p (Alt: ~p)", [CMi, empty])), 
     CMi;
 briefterm(AbsenderPid, GGTProName, CMi, CZeit, MinMi, Korrigieren) ->
     logge_ggtpro_status(GGTProName, CMi, CZeit, true),
-    case CMi < MinMi of
-        true -> NewMinMi = CMi;
+    case CMi =< MinMi of
+        true -> 
+            logge_status(io_lib:format("Neues Globales Mi: ~p (Alt: ~p)", [CMi, MinMi])), 
+            NewMinMi = CMi;
         false ->
             NewMinMi = MinMi,
             case Korrigieren of
-                true -> AbsenderPid ! {sendy, MinMi};
-                false -> donothing
+                true -> 
+                    logge_status(io_lib:format("Korrektur an Client ~p gesendet", [GGTProName])),
+                    AbsenderPid ! {sendy, MinMi};
+                false -> 
+                    donothing
             end
     end,
     NewMinMi.
@@ -277,6 +287,7 @@ nudge([HeadGGTProName | RestGGTProNames], NsPid) ->
     nudge(RestGGTProNames, NsPid).
 
 toggle(Korrigieren) ->
+    logge_status("Korrigieren flag invertiert"),
     not(Korrigieren).
 
 reset(GGTProNameList, NsPid) ->
