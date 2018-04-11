@@ -36,7 +36,7 @@ start() ->
     end.
 
 
-hole_wert_aus_config_mit_key(Key) ->
-    {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
-    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
-    Value.
+%hole_wert_aus_config_mit_key(Key) ->
+%    {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
+%    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
+%    Value.

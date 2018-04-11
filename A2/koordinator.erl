@@ -5,6 +5,7 @@
     start/1,
 
     init_loop/4,
+    calc_quote/2,
     create_circle/2,
     set_neighbors/4,
     get_next_to_last_and_last_elem/1,
@@ -59,9 +60,7 @@ start(NsPid) ->
 
     start_starters(?STARTER_COUNT),
 
-    SollGGTCount = ?STARTER_COUNT * ?GGTPROANZ,
-    SollQuota = round((SollGGTCount * ?QUOTA) / 100),
-    SteeringValues = {steeringval, ?ARBEITSZEIT, ?TERMZEIT, SollQuota, ?GGTPROANZ},
+    SteeringValues = {steeringval, ?ARBEITSZEIT, ?TERMZEIT, 0, ?GGTPROANZ},
 
     GGTProNameList = init_loop(NsPid, SteeringValues, 0, []),
 
@@ -88,9 +87,13 @@ start_starters(RestCount) ->
 init_loop(NsPid, SteeringValues, CurrentStartersCount, GGTProNameList) ->
     receive
         {AbsenderPid, getsteeringval} ->
-            AbsenderPid ! SteeringValues,
-            NextStartersCount = CurrentStartersCount + 1,
-            init_loop(NsPid, SteeringValues, NextStartersCount, GGTProNameList);
+            NewStartersCount = CurrentStartersCount + 1,
+            {steeringval, Arbeitszeit, Termzeit, _OldQuote, GGTProAnz} = SteeringValues,
+            NewQuote = calc_quote(NewStartersCount, GGTProAnz),
+            NewSteeringValues = {steeringval, Arbeitszeit, Termzeit, NewQuote, GGTProAnz},
+
+            AbsenderPid ! NewSteeringValues,
+            init_loop(NsPid, NewSteeringValues, NewStartersCount, GGTProNameList);
         {hello, GGTProName} ->
             NewGGTProNameList = [GGTProName | GGTProNameList],
             init_loop(NsPid, SteeringValues, CurrentStartersCount, NewGGTProNameList);
@@ -103,6 +106,21 @@ init_loop(NsPid, SteeringValues, CurrentStartersCount, GGTProNameList) ->
             GGTProNameList
     end.
 
+calc_quote(StartersCount, GGTProAnz) -> 
+    round(StartersCount * GGTProAnz * 80 / 100).
+
+create_circle(GGTProNameList, NsPid) ->
+    [FirstGGTProName, SecondGGTProName | _RestGGTProNames] = GGTProNameList,
+    [NextToLastGGTProName, LastGGTProName] = get_next_to_last_and_last_elem(GGTProNameList),
+    set_neighbors(FirstGGTProName, LastGGTProName, SecondGGTProName, NsPid),
+    set_neighbors(LastGGTProName, NextToLastGGTProName, FirstGGTProName, NsPid),
+    create_circle_(GGTProNameList, NsPid).
+
+create_circle_([_NextToLastGGTProName, _LastGGTProName], _NsPid) -> 
+    logge_status("kreis erstellt");
+create_circle_([FirstGGTProName, SecondGGTProName, ThirdGGTProName | RestGGTProNames], NsPid) ->
+    set_neighbors(SecondGGTProName, FirstGGTProName, ThirdGGTProName, NsPid),
+    create_circle_([SecondGGTProName, ThirdGGTProName | RestGGTProNames], NsPid).
 
 calc(WggT, GGTProNameList, NsPid) ->
     PMList = get_pms(WggT, GGTProNameList),
@@ -153,18 +171,6 @@ send_message_to_processname(Message, ProName, NsPid) ->
     ProPid = get_ggtpropid(ProName, NsPid),
     ProPid ! Message.
 
-create_circle(GGTProNameList, NsPid) ->
-    [FirstGGTProName, SecondGGTProName | _RestGGTProNames] = GGTProNameList,
-    [NextToLastGGTProName, LastGGTProName] = get_next_to_last_and_last_elem(GGTProNameList),
-    set_neighbors(FirstGGTProName, LastGGTProName, SecondGGTProName, NsPid),
-    set_neighbors(LastGGTProName, NextToLastGGTProName, FirstGGTProName, NsPid),
-    create_circle_(GGTProNameList, NsPid).
-
-create_circle_([_NextToLastGGTProName, _LastGGTProName], _NsPid) -> 
-    logge_status("kreis erstellt");
-create_circle_([FirstGGTProName, SecondGGTProName, ThirdGGTProName | RestGGTProNames], NsPid) ->
-    set_neighbors(SecondGGTProName, FirstGGTProName, ThirdGGTProName, NsPid),
-    create_circle_([SecondGGTProName, ThirdGGTProName | RestGGTProNames], NsPid).
 
 set_neighbors(MiddleGGTProName, LeftGGTProName, RightGGTProName, NsPid) ->
     case ggtpropid_exists(MiddleGGTProName, NsPid) of

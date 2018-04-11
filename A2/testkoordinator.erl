@@ -46,13 +46,13 @@ init_loop_1_test() ->
     TestPid ! {ThisPid, getsteeringval},
     receive
         Any1 ->
-            ?assertEqual(SteeringValues, Any1)
+            ?assertEqual({steeringval, 0, 0, 4, 5}, Any1)
     end,
 
     TestPid ! {ThisPid, getsteeringval},
     receive
         Any2 ->
-            ?assertEqual(SteeringValues, Any2)
+            ?assertEqual({steeringval, 0, 0, 8, 5}, Any2)
     end,
 
     TestPid ! {hello, nameC},
@@ -92,6 +92,21 @@ init_loop_1_test() ->
     end,
     unregister(nameservice),
     kill_pid_and_clear_this_mailbox(TestPid).
+
+calc_quote_1_test() ->
+    ?assertEqual(0, koordinator:calc_quote(0,0)).
+
+calc_quote_2_test() ->
+    ?assertEqual(0, koordinator:calc_quote(3,0)).
+
+calc_quote_3_test() ->
+    ?assertEqual(0, koordinator:calc_quote(0,3)).
+
+calc_quote_4_test() ->
+    ?assertEqual(20, koordinator:calc_quote(5,5)).
+
+calc_quote_5_test() ->
+    ?assertEqual(5, koordinator:calc_quote(3,2)).
 
 create_circle_1_test() -> 
     ?assertError({badmatch, []}, koordinator:create_circle([], self())).
