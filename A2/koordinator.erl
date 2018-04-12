@@ -57,7 +57,6 @@ start(NsPid) ->
     net_adm:ping(?NSNODE),    
     register_at_ns(NsPid),
 
-    start_starters(?STARTER_COUNT),
     SteeringValues = {steeringval, ?ARBEITSZEIT, ?TERMZEIT, 0, ?GGTPROANZ},
     GGTProNameList = init_loop(NsPid, SteeringValues, 0, []),
     calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, empty).
@@ -70,11 +69,6 @@ register_at_ns(NsPid) ->
     receive
         ok -> logge_status("ist registriert und beim nameservice bekannt")
     end.
-
-start_starters(0) -> ok;
-start_starters(RestCount) ->
-    spawn(fun() -> starter:go(RestCount) end),
-    start_starters(RestCount - 1).
 
 init_loop(NsPid, SteeringValues, CurrentStartersCount, GGTProNameList) ->
     receive

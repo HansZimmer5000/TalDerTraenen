@@ -22,22 +22,18 @@
 -define(CONFIG_FILENAME, "ggt.cfg").
 
 -define(NSNODE, hole_wert_aus_config_mit_key(nameservicenode)).
--define(NSPID, global:whereis_name(nameservice)).
+-define(NSNAME, nameservice).
 
 -define(KOORDINATORNAME, hole_wert_aus_config_mit_key(koordinatorname)).
--define(KOPID, whereis(?KOORDINATORNAME)).
 
 
 go({GGTProName, ArbeitsZeit, TermZeit, Quota}) ->
-    net_adm:ping(?NSNODE),
-    timer:sleep(timer:seconds(2)),
-    go({GGTProName, ArbeitsZeit, TermZeit, Quota, ?NSPID, ?KOPID});
+    {KoPid, NsPid} = get_ko_and_ns_pid(GGTProName),
+    go({GGTProName, ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
 
 go({GGTProName, ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
     InstanceVariables = {GGTProName, empty, empty, false},
     GlobalVariables = {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid},
-
-    net_adm:ping(?NSNODE),
 
     GGTProPid = spawn(fun() -> init(InstanceVariables, GlobalVariables) end),
     true = register(GGTProName, GGTProPid),
@@ -202,6 +198,27 @@ start_vote(GGTProName, Mi, NsPid, Quota) ->
     MissingCountForQuota = Quota,
     MissingCountForQuota.
 
+
+get_ko_and_ns_pid(GGTProName) -> 
+    net_adm:ping(?NSNODE),
+    timer:sleep(timer:seconds(2)),
+    case global:whereis_name(?NSNAME) of
+        undefined -> 
+            logge_status(GGTProName, "Nameservice global nicht gefunden, ggT faehrt runter"),
+            timer:sleep(timer:seconds(5)),
+            exit(kill);
+        NsPid -> 
+            NsPid ! {self(), {lookup, ?KOORDINATORNAME}},
+            receive
+                {pin, KoPid} -> 
+                    {KoPid, NsPid};
+                not_found -> 
+                    logge_status(GGTProName, "Koordinator nicht im Nameservice bekannt, ggT faehrt runter"),
+                    timer:sleep(timer:seconds(5)),
+                    exit(kill)
+            end
+    end.
+
 hole_wert_aus_config_mit_key(Key) ->
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
     {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
@@ -217,5 +234,5 @@ logge_status(GGTProName, Inhalt) ->
     LogDateiName = lists:flatten(io_lib:format("~p.log", [GGTProName])),
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
     LogNachricht = io_lib:format("~p ~p ~s.\n", [GGTProName, AktuelleZeit, Inhalt]),
-    %io:fwrite(LogNachricht),
+    io:fwrite(LogNachricht),
     util:logging(LogDateiName, LogNachricht).
