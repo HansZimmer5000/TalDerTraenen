@@ -3,9 +3,7 @@ Kombinationen
     Kombi1
     Unser: Koordinator
     Ihrer: Starter, ggT-Prozess
-    Problem: ** exception error: bad argument
-                in function  ggt_starter:start/1 (ggt_starter.erl, line 42)
-                in call from start_starter:goint/2 (start_starter.erl, line 9)
+    Problem: -
 
     Kombi2
     Unser: Starter
