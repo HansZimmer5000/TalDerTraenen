@@ -41,7 +41,7 @@
 -define(STARTER_COUNT, hole_wert_aus_config_mit_key(startercount)).
 -define(ARBEITSZEIT, hole_wert_aus_config_mit_key(arbeitszeit)).
 -define(TERMZEIT, hole_wert_aus_config_mit_key(termzeit)).
--define(QUOTA, hole_wert_aus_config_mit_key(quota)).
+-define(QUOTA, hole_wert_aus_config_mit_key(quote)).
 -define(GGTPROANZ, hole_wert_aus_config_mit_key(ggtprozessnummer)).
 -define(KORRIGIEREN, hole_wert_aus_config_mit_key(korrigieren)).
 

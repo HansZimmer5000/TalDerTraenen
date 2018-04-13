@@ -8,9 +8,9 @@ Kombinationen
                 in call from start_starter:goint/2 (start_starter.erl, line 9)
 
     Kombi2
-    Unser: ggT-Prozess
-    Ihrer: Starter, Koordinator
-    Problem: ... Modulenamen sind anders.
+    Unser: Starter
+    Ihrer: ggT-Prozess, Koordinator
+    Problem: ggt-Prozess:go ist anders oder gar nicht vorhanden.
 
 TODO:
     Toggle - Ist bei der Teminierung der errechnete ggT nicht der gewünschte ggT wird bei toggle = true ein sendy ins System gesendet.
