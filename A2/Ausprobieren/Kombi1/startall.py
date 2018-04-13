@@ -61,7 +61,7 @@ if __name__ == "__main__":
         __start_node("ko", "koordinator", "", "start")
         __start_node("man", "man", "", "start")
         time.sleep(2)
-        __start_node("starter", "start_starter", "3 1", "go")
+        __start_node("starter", "start_start_starter", "4 1", "start")
     elif user_input == "3":
         __remove_all_unecessary_files(["*.log", "*.dump"], [])
     else:
