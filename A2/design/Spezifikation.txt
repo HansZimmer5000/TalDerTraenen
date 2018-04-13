@@ -2,7 +2,15 @@ Kombinationen
 
     Kombi1
     Unser: Koordinator
-    Ihrer: Nameservice, Starter, ggT-Prozess
+    Ihrer: Starter, ggT-Prozess
+    Problem: ** exception error: bad argument
+                in function  ggt_starter:start/1 (ggt_starter.erl, line 42)
+                in call from start_starter:goint/2 (start_starter.erl, line 9)
+
+    Kombi2
+    Unser: ggT-Prozess
+    Ihrer: Starter, Koordinator
+    Problem: ... Modulenamen sind anders.
 
 TODO:
     Toggle - Ist bei der Teminierung der errechnete ggT nicht der gewünschte ggT wird bei toggle = true ein sendy ins System gesendet.
