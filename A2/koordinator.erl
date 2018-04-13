@@ -38,7 +38,6 @@
 -define(NSNODE, hole_wert_aus_config_mit_key(nameservicenode)).
 -define(KONAME, hole_wert_aus_config_mit_key(koordinatorname)).
 
--define(STARTER_COUNT, hole_wert_aus_config_mit_key(startercount)).
 -define(ARBEITSZEIT, hole_wert_aus_config_mit_key(arbeitszeit)).
 -define(TERMZEIT, hole_wert_aus_config_mit_key(termzeit)).
 -define(QUOTA, hole_wert_aus_config_mit_key(quote)).
@@ -84,10 +83,7 @@ init_loop(NsPid, SteeringValues, CurrentStartersCount, GGTProNameList) ->
             NewGGTProNameList = [GGTProName | GGTProNameList],
             init_loop(NsPid, SteeringValues, CurrentStartersCount, NewGGTProNameList);
         step ->
-            SollGGTCount = ?STARTER_COUNT * ?GGTPROANZ,
-            logge_status(lists:flatten(io_lib:format("~p von ~p starter(s) haben steeringval angefragt", [CurrentStartersCount, ?STARTER_COUNT]))), 
-            logge_status(lists:flatten(io_lib:format("Es laufen ~p von ~p GGTProzessen", [length(GGTProNameList), SollGGTCount]))),
-            
+            logge_status("Es werden keine weiteren ggT-Prozesse beachtet"),
             create_circle(GGTProNameList, NsPid),
             GGTProNameList;
         reset ->    
