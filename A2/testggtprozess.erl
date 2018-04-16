@@ -22,7 +22,7 @@
 -define(TERMZEIT, 5).
 -define(QUOTA, 5).
 
-go_1() ->
+go_1_test() ->
     ThisPid = self(),
     TestPid = ggtprozess:go({nameA, ?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ThisPid, ThisPid}),
 
@@ -35,7 +35,10 @@ go_1() ->
     end,
 
     TestPid ! {setpm, 3},
-    TestPid ! {setneighbors, ThisPid, ThisPid},
+    TestPid ! {setneighbors, nameB, nameC},
+
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameC, ThisPid),
 
     TestPid ! {ThisPid, tellmi},
     receive
@@ -48,9 +51,9 @@ go_1() ->
                 TestPid ! ok
     end.
 
-init_1() ->
+init_1_test() ->
     ThisPid = self(),
-    InstanceVariables = {nameA, empty, empty, false},
+    InstanceVariables = {nameA, empty, empty},
     GlobalVariables = {?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ThisPid, ThisPid},
     TestPid = spawn(fun() ->
                         ggtprozess:init(InstanceVariables, GlobalVariables)
@@ -64,7 +67,10 @@ init_1() ->
     end,
 
     TestPid ! {setpm, 3},
-    TestPid ! {setneighbors, ThisPid, ThisPid},
+    TestPid ! {setneighbors, nameB, nameC},
+
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameC, ThisPid),
 
     TestPid ! {ThisPid, tellmi},
     receive
@@ -77,39 +83,39 @@ init_1() ->
                 TestPid ! ok
     end.
 
-init_receive_loop_1() ->
-    InstanceVariables = {nameA, empty, empty, false},
-    ThisPid = self(),
+init_receive_loop_1_test() ->
+    ThisPid = self(),   
+    InstanceVariables = {nameA, empty, empty},
+    GlobalVariables = {empty, empty, empty, ThisPid, ThisPid},
     TestPid = spawn(fun() ->
-                        NewInstanceVariables = ggtprozess:init_receive_loop(InstanceVariables, empty),
+                        NewInstanceVariables = ggtprozess:init_receive_loop(InstanceVariables, GlobalVariables),
                         ThisPid ! NewInstanceVariables
                     end),
     TestPid ! {setpm, 3},
-    TestPid ! {setneighbors, ThisPid, ThisPid},
+    TestPid ! {setneighbors, nameB, nameC},
+
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameC, ThisPid),
 
     receive
-        Any -> ?assertEqual({nameA, 3, {ThisPid, ThisPid}, false}, Any)
+        Any -> ?assertEqual({nameA, 3, {ThisPid, ThisPid}}, Any)
     end.
 
 empty_instance_variables_exist_1_test() ->
-    InstanceVariables = {nameA, empty, empty, false},
+    InstanceVariables = {nameA, empty, empty},
     ?assert(ggtprozess:empty_instance_variables_exist(InstanceVariables)).
 
 empty_instance_variables_exist_2_test() ->
-    InstanceVariables = {nameA, full, full, false},
+    InstanceVariables = {nameA, full, full},
     ?assertNot(ggtprozess:empty_instance_variables_exist(InstanceVariables)).
 
-empty_instance_variables_exist_3_test() ->
-    InstanceVariables = {nameA, full, full, empty},
-    ?assert(ggtprozess:empty_instance_variables_exist(InstanceVariables)).
-
-receive_loop_1_test() ->
+calc_receive_loop_1_test() ->
     ThisPid = self(),
     MissingCountForQuota = empty,
-    InstanceVariables = {nameA, 3, {ThisPid, ThisPid}, MissingCountForQuota, false},
+    InstanceVariables = {nameA, 3, {ThisPid, ThisPid}, MissingCountForQuota},
     GlobalVariables = {?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ThisPid, ThisPid},
     TestPid = spawn(fun() ->
-                        ggtprozess:receive_loop(InstanceVariables, GlobalVariables)
+                        ggtprozess:calc_receive_loop(InstanceVariables, GlobalVariables)
                     end),
     TestPid ! {ThisPid, tellmi},
     receive
@@ -229,3 +235,11 @@ pongGGT_1_test() ->
     receive
         {pongGGT, nameA} -> ok
     end.
+
+
+answer_lookup(ToResolvedName, ToResolvedPid) ->
+    receive
+        {AbsenderPid, {lookup, ToResolvedName}} -> 
+            AbsenderPid ! {pin, ToResolvedPid}
+    end.
+    
