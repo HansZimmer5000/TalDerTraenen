@@ -286,7 +286,6 @@ kill(GGTProNameList, NsPid) ->
     finalize(GGTProNameList, NsPid, false).
 
 finalize(GGTProNameList, NsPid, Restart) ->
-    kill_all_ggtprocesses(GGTProNameList, NsPid),
     NsPid ! {self(), {unbind, ?KONAME}},
     receive
         ok -> continue
@@ -299,7 +298,7 @@ finalize(GGTProNameList, NsPid, Restart) ->
     logge_status(lists:flatten(io_lib:format("Alle GGT-Prozesse herunter gefahren, selbst unregistered, Neustart = ~p", [Restart]))),
     case Restart of
         true -> start(NsPid);
-        false -> finish
+        false -> kill_all_ggtprocesses(GGTProNameList, NsPid)
     end.
 
 
