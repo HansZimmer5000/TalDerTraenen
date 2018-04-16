@@ -53,10 +53,9 @@ go_1_test() ->
 
 init_1_test() ->
     ThisPid = self(),
-    InstanceVariables = {nameA, empty, empty},
     GlobalVariables = {?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ThisPid, ThisPid},
     TestPid = spawn(fun() ->
-                        ggtprozess:init(InstanceVariables, GlobalVariables)
+                        ggtprozess:init(nameA, GlobalVariables)
                     end),
     receive
         Any1 ->  ?assertEqual({TestPid, {rebind, nameA, node()}}, Any1),
@@ -82,32 +81,6 @@ init_1_test() ->
         Any4 -> ?assertEqual({TestPid, {unbind, nameA}}, Any4),
                 TestPid ! ok
     end.
-
-init_receive_loop_1_test() ->
-    ThisPid = self(),   
-    InstanceVariables = {nameA, empty, empty},
-    GlobalVariables = {empty, empty, empty, ThisPid, ThisPid},
-    TestPid = spawn(fun() ->
-                        NewInstanceVariables = ggtprozess:init_receive_loop(InstanceVariables, GlobalVariables),
-                        ThisPid ! NewInstanceVariables
-                    end),
-    TestPid ! {setpm, 3},
-    TestPid ! {setneighbors, nameB, nameC},
-
-    answer_lookup(nameB, ThisPid),
-    answer_lookup(nameC, ThisPid),
-
-    receive
-        Any -> ?assertEqual({nameA, 3, {ThisPid, ThisPid}}, Any)
-    end.
-
-empty_instance_variables_exist_1_test() ->
-    InstanceVariables = {nameA, empty, empty},
-    ?assert(ggtprozess:empty_instance_variables_exist(InstanceVariables)).
-
-empty_instance_variables_exist_2_test() ->
-    InstanceVariables = {nameA, full, full},
-    ?assertNot(ggtprozess:empty_instance_variables_exist(InstanceVariables)).
 
 calc_receive_loop_1_test() ->
     ThisPid = self(),

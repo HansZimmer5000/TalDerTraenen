@@ -3,8 +3,6 @@
 -export([
     go/1,
     init/2,
-    init_receive_loop/2,
-    empty_instance_variables_exist/1,
 
     calc_receive_loop/2,
 
@@ -32,76 +30,67 @@ go({GGTProName, ArbeitsZeit, TermZeit, Quota}) ->
     go({GGTProName, ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
 
 go({GGTProName, ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
-    InstanceVariables = {GGTProName, empty, empty},
     GlobalVariables = {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid},
 
-    GGTProPid = spawn(fun() -> init(InstanceVariables, GlobalVariables) end),
+    GGTProPid = spawn(fun() -> init(GGTProName, GlobalVariables) end),
     true = register(GGTProName, GGTProPid),
     logge_status(GGTProName, lists:flatten(
                                 io_lib:format("gestartet mit PID ~p",[GGTProPid]))),
     GGTProPid.
 
-init({GGTProName, Mi, Neighbors}, {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
+get_ko_and_ns_pid(GGTProName) -> 
+    net_adm:ping(?NSNODE),
+    timer:sleep(timer:seconds(2)),
+    case global:whereis_name(?NSNAME) of
+        undefined -> 
+            logge_status(GGTProName, "Nameservice global nicht gefunden, ggT faehrt runter"),
+            timer:sleep(timer:seconds(5)),
+            exit(kill);
+        NsPid -> 
+            KoPid = lookup_name_at_ns(?KOORDINATORNAME, NsPid),
+            case KoPid of
+                not_found -> 
+                    logge_status(GGTProName, "Koordinator nicht im Nameservice bekannt, ggT faehrt runter"),
+                    timer:sleep(timer:seconds(5)),
+                    exit(kill);
+                _ -> continue
+            end
+    end.
+
+init(GGTProName, {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
     NsPid ! {self(), {rebind, GGTProName, node()}},
     receive
         ok -> logge_status(GGTProName, "registriert und bekannt beim nameservice")
     end,
     KoPid ! {hello, GGTProName},
-    
-    {GGTProName, FilledMi, FilledNeighbors} = init_receive_loop({GGTProName, Mi, Neighbors}, {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}),
-    calc_receive_loop({GGTProName, FilledMi, FilledNeighbors, empty}, 
-                    {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}).
 
-init_receive_loop({GGTProName, Mi, Neighbors}, GlobalVariables) ->
-    {_,_,_,NsPid,_} = GlobalVariables,
     receive
         {setneighbors, LeftN, RightN} ->  
             logge_status(GGTProName, io_lib:format("Nachbarn bekommen: ~p (Left) ~p (Right)",[LeftN, RightN])),
 
-            NsPid ! {self(), {lookup, LeftN}},
-            receive
-                {pin, LeftPid} -> LeftPid;
-                not_found -> 
-                    LeftPid = empty,
-                    logge_status(GGTProName, "LeftN nicht im Nameservice bekannt, ggT faehrt runter"),
-                    timer:sleep(timer:seconds(5)),
-                    exit(kill)
-            end,
+            LeftPid = lookup_name_at_ns(LeftN, NsPid),
+            RightPid = lookup_name_at_ns(RightN, NsPid),
 
-            NsPid ! {self(), {lookup, RightN}},
-            receive
-                {pin, RightPid} -> RightPid;
-                not_found -> 
-                    RightPid = empty,
-                    logge_status(GGTProName, "RightN nicht im Nameservice bekannt, ggT faehrt runter"),
-                    timer:sleep(timer:seconds(5)),
-                    exit(kill)
+            case LeftPid of 
+                not_found -> logge_status(GGTProName, "LeftN Pid not_found in nameservice"), exit(kill);
+                _ -> continue
             end,
+            case RightPid of 
+                not_found -> logge_status(GGTProName, "RightN Pid not_found in nameservice"), exit(kill);
+                _ -> continue
+             end
+    end,
+    receive {setpm, NewMi} -> logge_status(GGTProName, io_lib:format("Pm bekommen: ~p",[NewMi])) end,
+    
+    calc_receive_loop({GGTProName, NewMi, {LeftPid, RightPid}, empty}, 
+                    {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}).
 
-            NewFirstInstanceVariables = {GGTProName, Mi, {LeftPid, RightPid}},
-            case empty_instance_variables_exist(NewFirstInstanceVariables) of
-                false -> NewFirstInstanceVariables;
-                true -> 
-                    logge_status(GGTProName, "init done"),
-                    init_receive_loop(NewFirstInstanceVariables, GlobalVariables)
-            end;
-        {setpm, MiNeu} -> 
-            logge_status(GGTProName, io_lib:format("Pm bekommen: ~p",[MiNeu])),
-            NewFirstInstanceVariables = {GGTProName, MiNeu, Neighbors},
-            case empty_instance_variables_exist(NewFirstInstanceVariables) of
-                false -> NewFirstInstanceVariables;
-                true ->  
-                    logge_status(GGTProName, "init done"),
-                    init_receive_loop(NewFirstInstanceVariables, GlobalVariables)
-            end;
-        kill -> 
-            {_, _, _, NsPid, _} = GlobalVariables,
-            kill(GGTProName, NsPid)
+lookup_name_at_ns(Name, NsPid) ->
+    NsPid ! {self(), {lookup, Name}},
+    receive
+        {pin, Pid} -> Pid;
+        not_found -> not_found
     end.
-
-empty_instance_variables_exist(InstanceVariables) ->
-    {GGTProName, Mi, Neighbors} = InstanceVariables,
-    (GGTProName == empty) or (Mi == empty) or (Neighbors == empty).
 
 term_receive_loop({GGTProName, Mi, Neighbors, OldMissingCountForQuota}, 
                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
@@ -124,8 +113,8 @@ term_receive_loop({GGTProName, Mi, Neighbors, OldMissingCountForQuota},
                                     NewMi = calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid),
                                     calc_receive_loop({GGTProName, NewMi, Neighbors, empty},
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
-        {setpm, MiNeu} ->           logge_status(GGTProName, io_lib:format("Starte neue Berechnung mit Mi = ~p", [MiNeu])),
-                                    calc_receive_loop({GGTProName, MiNeu, Neighbors, empty}, 
+        {setpm, NewMi} ->           logge_status(GGTProName, io_lib:format("Starte neue Berechnung mit Mi = ~p", [NewMi])),
+                                    calc_receive_loop({GGTProName, NewMi, Neighbors, empty}, 
                                                     {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid});
         {AbsenderPid, tellmi} ->    tellmi(AbsenderPid, Mi),
                                     term_receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota},
@@ -258,27 +247,6 @@ start_vote(GGTProName, Mi, NsPid, Quota) ->
     NsPid ! {self(), {multicast, vote, GGTProName}},
     MissingCountForQuota = Quota,
     MissingCountForQuota.
-
-
-get_ko_and_ns_pid(GGTProName) -> 
-    net_adm:ping(?NSNODE),
-    timer:sleep(timer:seconds(2)),
-    case global:whereis_name(?NSNAME) of
-        undefined -> 
-            logge_status(GGTProName, "Nameservice global nicht gefunden, ggT faehrt runter"),
-            timer:sleep(timer:seconds(5)),
-            exit(kill);
-        NsPid -> 
-            NsPid ! {self(), {lookup, ?KOORDINATORNAME}},
-            receive
-                {pin, KoPid} -> 
-                    {KoPid, NsPid};
-                not_found -> 
-                    logge_status(GGTProName, "Koordinator nicht im Nameservice bekannt, ggT faehrt runter"),
-                    timer:sleep(timer:seconds(5)),
-                    exit(kill)
-            end
-    end.
 
 hole_wert_aus_config_mit_key(Key) ->
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
