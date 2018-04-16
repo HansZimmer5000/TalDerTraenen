@@ -17,8 +17,6 @@ Kombinationen
 
 TODO:
     ggT selbstständig, ohne GoValues, machen, wofür bräuchte dann der Starter die Ahnung von den SteeringVals?
-    init_receive_loop in ggtprocess einfach sequenzell machen (Msg pattern matching von erlang nutzen)
-    Ganz vergessen: Antworten auf Vote schon nach der hälfte der Wartezeit!
 
 Offene Fragen:
 
