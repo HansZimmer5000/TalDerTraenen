@@ -8,10 +8,19 @@ Kombinationen
     Kombi2
     Unser: Starter, ggT-Prozess
     Ihrer: Koordinator
-    Problem: ggt-Prozess:go ist anders oder gar nicht vorhanden.
+    Problem: -
+
+    Kombi3
+    Unser: Koordinator, Starter, ggT-Prozess
+    Ihrer: Starter, ggT-Prozess
+    Problem: 
 
 TODO:
     ggT selbstständig, ohne GoValues, machen, wofür bräuchte dann der Starter die Ahnung von den SteeringVals?
+    init_receive_loop in ggtprocess einfach sequenzell machen (Msg pattern matching von erlang nutzen)
+    Ganz vergessen: Antworten auf Vote schon nach der hälfte der Wartezeit!
+    Unsere ggT-Prozesse warten nicht lange genug auf vote_yesses?
+    Reset und Kill nochmal checken.
 
 Offene Fragen:
 

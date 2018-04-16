@@ -22,7 +22,7 @@
 -define(TERMZEIT, 5).
 -define(QUOTA, 5).
 
-go_1_test() ->
+go_1() ->
     ThisPid = self(),
     TestPid = ggtprozess:go({nameA, ?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ThisPid, ThisPid}),
 
@@ -48,7 +48,7 @@ go_1_test() ->
                 TestPid ! ok
     end.
 
-init_1_test() ->
+init_1() ->
     ThisPid = self(),
     InstanceVariables = {nameA, empty, empty, false},
     GlobalVariables = {?ARBEITSZEIT, ?TERMZEIT, ?QUOTA, ThisPid, ThisPid},
@@ -77,7 +77,7 @@ init_1_test() ->
                 TestPid ! ok
     end.
 
-init_receive_loop_1_test() ->
+init_receive_loop_1() ->
     InstanceVariables = {nameA, empty, empty, false},
     ThisPid = self(),
     TestPid = spawn(fun() ->
