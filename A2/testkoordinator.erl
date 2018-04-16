@@ -61,26 +61,20 @@ init_loop_1_test() ->
 
     TestPid ! step,
 
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
     receive
         Any3 ->
             {setneighbors, nameC, nameB} = Any3
     end,
-    receive_lookup(nameC),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameC),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameC, ThisPid),
+    answer_lookup(nameC, ThisPid),
     receive
         Any4 ->
             {setneighbors, nameB, nameA} = Any4
     end,
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameB, ThisPid),
     receive
         Any5 ->
             {setneighbors, nameA, nameC} = Any5
@@ -120,26 +114,20 @@ create_circle_3_test() ->
             koordinator:create_circle([nameA, nameB, nameC], ThisPid)
         end),
 
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
     receive
         Any2 ->
             {setneighbors, nameC, nameB} = Any2
     end,
-    receive_lookup(nameC),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameC),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameC, ThisPid),
+    answer_lookup(nameC, ThisPid),
     receive
         Any4 ->
             {setneighbors, nameB, nameA} = Any4
     end,
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameB, ThisPid),
     receive
         Any6 ->
             {setneighbors, nameA, nameC} = Any6
@@ -151,10 +139,8 @@ set_neighbors_1_test() ->
     TestPid = spawn(fun() ->
             koordinator:set_neighbors(nameA, nameC, nameB, ThisPid)
         end),
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
     receive
         Any2 ->
             {setneighbors, nameC, nameB} = Any2
@@ -178,10 +164,8 @@ calculation_receive_loop_1_test() ->
         end),
     TestPid ! prompt,
 
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
 
     receive 
         Any1 -> 
@@ -189,10 +173,8 @@ calculation_receive_loop_1_test() ->
             TestPid ! {mi, 3}
     end,
 
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameB, ThisPid),
 
     receive 
         Any2 -> 
@@ -201,28 +183,25 @@ calculation_receive_loop_1_test() ->
     end,
 
     TestPid ! kill,
-
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive 
-        Any3 -> ?assertEqual(kill, Any3) 
-    end,
-
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive 
-        Any4 -> ?assertEqual(kill, Any4) 
-    end,
-
+    
     receive
         Any5 -> 
             {TestPid, {unbind, koordinator}} = Any5,
             TestPid ! ok
     end,
+
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
+    receive 
+        Any3 -> ?assertEqual(kill, Any3) 
+    end,
+
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameB, ThisPid),
+    receive 
+        Any4 -> ?assertEqual(kill, Any4) 
+    end,
+
     timer:sleep(500),
 
     ?assertEqual(undefined, process_info(TestPid, registered_name)).
@@ -256,28 +235,12 @@ reset_1_test() ->
     TestPid = spawn(fun() -> 
                         koordinator:reset(ProList, ThisPid)
                     end),
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive 
-        Any1 -> ?assertEqual(kill, Any1) 
-    end,
-
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive 
-        Any2 -> ?assertEqual(kill, Any2) 
-    end,
-
     receive
         Any3 -> 
             {TestPid, {unbind, koordinator}} = Any3,
             TestPid ! ok
     end,
-
+            
     receive
         Any4 -> 
             {TestPid, {rebind, koordinator, _Node}} = Any4,
@@ -293,28 +256,22 @@ calc_1_test() ->
                        koordinator:calc(WggT, GGTList, ThisPid)
                     end),
 
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
 
     receive
         Any1 -> {setpm, _Any1Pm} = Any1
     end,
 
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameB, ThisPid),
 
     receive
         Any2 -> {setpm, _Any2Pm} = Any2
     end,
 
-    receive_lookup(nameC),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameC),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameC, ThisPid),
+    answer_lookup(nameC, ThisPid),
 
     receive
         Any3 -> {setpm, _Any3Pm} = Any3
@@ -371,31 +328,25 @@ send_pms_to_ggtprocesses_1_test() ->
     ThisPid = self(),
     GGTList = [nameA, nameB, nameC],
     Pms = [3,2,1],
-    TestPid = spawn(fun() -> 
+    _TestPid = spawn(fun() -> 
                        koordinator:send_pms_to_ggtprocesses(Pms, GGTList, ThisPid)
                     end),
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
 
     receive
         Any1 -> ?assertEqual({setpm, 3}, Any1)
     end,
 
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameB, ThisPid),
 
     receive
         Any2 -> ?assertEqual({setpm, 2}, Any2)
     end,
 
-    receive_lookup(nameC),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameC),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameC, ThisPid),
+    answer_lookup(nameC, ThisPid),
 
     receive
         Any3 -> ?assertEqual({setpm, 1}, Any3)
@@ -405,22 +356,18 @@ send_ys_to_ggtprocesses_1_test() ->
     ThisPid = self(),
     GGTList = [nameA, nameB],
     Ys = [3,2,1],
-    TestPid = spawn(fun() -> 
+    _TestPid = spawn(fun() -> 
                        koordinator:send_ys_to_ggtprocesses(Ys, GGTList, ThisPid)
                     end),
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
 
     receive
         Any1 -> ?assertEqual({sendy, 3}, Any1)
     end,
 
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameB, ThisPid),
 
     receive
         Any2 -> ?assertEqual({sendy, 2}, Any2)
@@ -441,13 +388,11 @@ get_first_n_elems_of_list_2_test() ->
 send_message_to_processname_1_test() ->
     Message = hallo,
     ThisPid = self(),
-    TestPid = spawn(fun() -> 
+    _TestPid = spawn(fun() -> 
                        koordinator:send_message_to_processname(Message, nameA, ThisPid)
                     end),
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
 
     receive
         Any -> ?assertEqual(Message, Any)
@@ -459,10 +404,8 @@ prompt_1_test() ->
     TestPid = spawn(fun() -> 
                        koordinator:prompt(GGTProNameList, ThisPid)
                     end),
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
 
     receive 
         Any1 -> 
@@ -470,10 +413,8 @@ prompt_1_test() ->
             TestPid ! {mi, 3}
     end,
 
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameB, ThisPid),
 
     receive 
         Any2 -> 
@@ -487,10 +428,8 @@ nudge_1_test() ->
     TestPid = spawn(fun() -> 
                         ok = koordinator:nudge([nameA], ThisPid)
                     end),
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
     receive
         Any3 ->
             {TestPid, pingGGT} = Any3,
@@ -499,13 +438,12 @@ nudge_1_test() ->
 
 nudge_2_test() ->
     ThisPid = self(),
-    TestPid = spawn(fun() -> 
+    _TestPid = spawn(fun() -> 
                         ?assertThrow(
                             ggtpronameUnkownForNs, 
                             koordinator:nudge([nameA], ThisPid))
                     end),
-    receive_lookup(nameA),
-    TestPid ! not_found.
+    answer_lookup(nameA, not_found).
 
 toggle_1_test() ->
     ?assert(koordinator:toggle(false)).
@@ -519,27 +457,24 @@ kill_1_test() ->
     TestPid = spawn(fun() -> 
                         koordinator:kill(ProList, ThisPid)
                     end),
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive 
-        Any1 -> ?assertEqual(kill, Any1) 
-    end,
-
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive 
-        Any2 -> ?assertEqual(kill, Any2) 
-    end,
-
     receive
         Any3 -> 
             {TestPid, {unbind, koordinator}} = Any3,
             TestPid ! ok
     end,
+
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
+    receive 
+        Any1 -> ?assertEqual(kill, Any1) 
+    end,
+
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameB, ThisPid),
+    receive 
+        Any2 -> ?assertEqual(kill, Any2) 
+    end,
+
     timer:sleep(500),
 
     ?assertEqual(undefined, process_info(TestPid, registered_name)).
@@ -547,21 +482,17 @@ kill_1_test() ->
 kill_all_ggtprocesses_1_test() ->
     ProList = [nameA, nameB],
     ThisPid = self(),
-    TestPid = spawn(fun() -> 
+    _TestPid = spawn(fun() -> 
                         koordinator:kill_all_ggtprocesses(ProList, ThisPid)
                     end),
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
+    answer_lookup(nameA, ThisPid),
     receive 
         Any1 -> ?assertEqual(kill, Any1) 
     end,
 
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
-    receive_lookup(nameB),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameB, ThisPid),
+    answer_lookup(nameB, ThisPid),
     receive 
         Any2 -> ?assertEqual(kill, Any2) 
     end,
@@ -571,12 +502,11 @@ kill_all_ggtprocesses_1_test() ->
 
 ggtpropid_exists_1_test() ->
     ThisPid = self(),
-    TestPid = spawn(fun() -> 
+    _TestPid = spawn(fun() -> 
                         Result = koordinator:ggtpropid_exists(nameA, ThisPid),
                         ThisPid ! Result
                     end),
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
     receive
         Any ->
             ?assert(Any)
@@ -584,12 +514,11 @@ ggtpropid_exists_1_test() ->
 
 ggtpropid_exists_2_test() ->
     ThisPid = self(),
-    TestPid = spawn(fun() -> 
+    _TestPid = spawn(fun() -> 
                         Result = koordinator:ggtpropid_exists(nameA, ThisPid),
                         ThisPid ! Result
                     end),
-    receive_lookup(nameA),
-    TestPid ! not_found,
+    answer_lookup(nameA, not_found),
     receive
         Any ->
             ?assertEqual(false, Any)
@@ -597,12 +526,11 @@ ggtpropid_exists_2_test() ->
 
 get_ggtpropid_1_test() ->
     ThisPid = self(),
-    TestPid = spawn(fun() -> 
+    _TestPid = spawn(fun() -> 
                         Result = koordinator:get_ggtpropid(nameA, ThisPid),
                         ThisPid ! Result
                     end),
-    receive_lookup(nameA),
-    TestPid ! {pin, ThisPid},
+    answer_lookup(nameA, ThisPid),
     receive
         Any ->
             ?assertEqual(ThisPid, Any)
@@ -610,19 +538,26 @@ get_ggtpropid_1_test() ->
 
 get_ggtpropid_2_test() ->
     ThisPid = self(),
-    TestPid = spawn(fun() -> 
+    _TestPid = spawn(fun() -> 
                         ?assertThrow(
                             ggtpronameUnkownForNs,
                             koordinator:get_ggtpropid(nameA, ThisPid))
                     end),
-    receive_lookup(nameA),
-    TestPid ! not_found.
+    answer_lookup(nameA, not_found).
 %-----------------
 
-receive_lookup(Name) ->
+answer_lookup(ToResolvedName, ToResolvedPid) ->
     receive
-        Any -> 
-            {_Absender, {lookup, Name}} = Any
+        {AbsenderPid, {lookup, ToResolvedName}} ->
+            case ToResolvedPid of 
+                not_found ->
+                    AbsenderPid ! ToResolvedPid;
+                _ ->
+                    AbsenderPid ! {pin, ToResolvedPid}
+            end;
+        Any ->
+            io:fwrite("Unbekannte nachricht in answer_lookup(~p,~p): ~p", [ToResolvedName, ToResolvedPid, Any]),
+            ?assert(false)
     end.
 
 kill_pid_and_clear_this_mailbox(Pid) ->
