@@ -73,18 +73,18 @@ getPid(Node, LogDatei) ->
 %								>>LOOPS<<
 %------------------------------------------------------------------------------------------------------
 prozess_loop(VZ, TZ, NS, KO, Name, Mi, Nachbarn, Q, LogDatei) -> 
-	prozess_loop(VZ, TZ, NS, KO, Name, Mi, Nachbarn, Q, LogDatei, 0, {false, false}).
+	prozess_loop(VZ, TZ, NS, KO, Name, Mi, Nachbarn, Q, LogDatei, 0, {false, false, erlang:timestamp()}).
 
 prozess_loop(VZ, TZ, NS, KO, Name, Mi, Nachbarn, Q, LogDatei, VoteCount, VoteCfg) -> 
-	{TermFlag, VoteFlag} = VoteCfg,
+	{TermFlag, VoteFlag, LastContact} = VoteCfg,
 	receive
         {setpm, MiNeu} -> 				
 			logge_status(io_lib:format("Neues Mi: ~p erhalten.", [MiNeu]), LogDatei),
-			prozess_loop(VZ, TZ, NS, KO, Name, MiNeu, Nachbarn, Q, LogDatei, 0, {false, false});
+			prozess_loop(VZ, TZ, NS, KO, Name, MiNeu, Nachbarn, Q, LogDatei, 0, {false, false, erlang:timestamp()});
 		 
 		{sendy, Y} ->
 			MiNeu = calcGGT(Mi, Y, Nachbarn, KO, Name, LogDatei),
-			prozess_loop(VZ, TZ, NS, KO, Name, MiNeu, Nachbarn, Q, LogDatei, VoteCount, {TermFlag, false});
+			prozess_loop(VZ, TZ, NS, KO, Name, MiNeu, Nachbarn, Q, LogDatei, VoteCount, {TermFlag, false, erlang:timestamp()});
 			
 		{From, tellmi} ->
 			From ! {mi, Mi},			
@@ -103,13 +103,24 @@ prozess_loop(VZ, TZ, NS, KO, Name, Mi, Nachbarn, Q, LogDatei, VoteCount, VoteCfg
 				true ->
 					briefTerm(KO, Name, Mi, LogDatei)					
 			end,			
-			prozess_loop(VZ, TZ, NS, KO, Name, Mi, Nachbarn, Q, LogDatei, NewVoteCount, {NewTerm, VoteFlag});
+			prozess_loop(VZ, TZ, NS, KO, Name, Mi, Nachbarn, Q, LogDatei, NewVoteCount, {NewTerm, VoteFlag, LastContact});
 		
 		{From, {vote, Initiator}} ->   
-			case TermFlag of %TODO TZ / 2
+			case TermFlag of 
 				true -> 
 					From ! {voteYes, Name},
-					logge_status(io_lib:format("Vote Anfrage von ~p erhalten und mit Ja gestimmt.", [Initiator]), LogDatei)
+					logge_status(io_lib:format("Vote Anfrage von ~p erhalten und mit Ja gestimmt.", [Initiator]), LogDatei);
+				
+				false->
+					{_, LastSecs, _} = LastContact,
+					{_, NowSecs, _} = erlang:timestamp(),
+					case (NowSecs - LastSecs) >= (TZ/2) of
+						true -> 
+							From ! {voteYes, Name},
+							logge_status(io_lib:format("Vote Anfrage von ~p erhalten und mit Ja gestimmt.", [Initiator]), LogDatei);
+						false ->
+							logge_status(io_lib:format("Vote Anfrage von ~p erhalten und mit Nein nicht geantwortet.", [Initiator]), LogDatei)
+					end			
 			end,			
 			prozess_loop(VZ, TZ, NS, KO, Name, Mi, Nachbarn, Q, LogDatei, VoteCount, VoteCfg);
 			
@@ -122,7 +133,7 @@ prozess_loop(VZ, TZ, NS, KO, Name, Mi, Nachbarn, Q, LogDatei, VoteCount, VoteCfg
 					case TermFlag of
 						false ->
 							NS ! {self(), {multicast, vote, Name}},					
-							prozess_loop(VZ, TZ, NS, KO, Name, Mi, Nachbarn, Q, LogDatei, 0, {TermFlag, true})
+							prozess_loop(VZ, TZ, NS, KO, Name, Mi, Nachbarn, Q, LogDatei, 0, {TermFlag, true, LastContact})
 					end
 			end		
 			
