@@ -49,7 +49,7 @@ Komponenten:
     - Sendekanal                IP Multicast (UDP) mit Adresse 225.10.1.2 mit Port 15000 + Teamnummer
     - Station                   Besteht aus Sender- und Empfängereinheit, ist entweder Typ A oder B
                                 Jede Station sendet genau ein Mal pro Frame
-                                Jede Station hört (wenn in der richtigen Phase) alle Nachrichten ab
+                                Jede Station hört alle Nachrichten ab
         - Empfängereinheit          Bekommt Nachrichten, erkennt & behandelt Kollisionen
         - Sendeeinheit              holt sich einen Slot im nächsten Frame, prüft Slotzeit & eigene Zeit, wurde es verpasst im nächsten Slot wiedereinsteigen
         - Uhrensynchronisation      wertet Typ A Zeitstempel aus
