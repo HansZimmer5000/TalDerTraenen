@@ -72,11 +72,11 @@ init(GGTProName, {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
             RightPid = lookup_name_at_ns(RightN, NsPid),
 
             case LeftPid of 
-                not_found -> logge_status(GGTProName, "LeftN Pid not_found in nameservice"), exit(kill);
+                not_found -> logge_status(GGTProName, "LeftN Pid not_found in nameservice, Fahre runter"), exit(kill);
                 _ -> continue
             end,
             case RightPid of 
-                not_found -> logge_status(GGTProName, "RightN Pid not_found in nameservice"), exit(kill);
+                not_found -> logge_status(GGTProName, "RightN Pid not_found in nameservice, Fahre runter"), exit(kill);
                 _ -> continue
              end
     end,
@@ -95,9 +95,11 @@ lookup_name_at_ns(Name, NsPid) ->
 term_receive_loop({GGTProName, Mi, Neighbors, OldMissingCountForQuota}, 
                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
     case OldMissingCountForQuota of
-        0 -> term(KoPid, GGTProName, Mi),
-             MissingCountForQuota = empty;
-        _ -> MissingCountForQuota = OldMissingCountForQuota
+        0 -> 
+            term(KoPid, GGTProName, Mi),
+            MissingCountForQuota = empty;
+        _ -> 
+            MissingCountForQuota = OldMissingCountForQuota
     end,
     receive
         {InitiatorPid, {vote, InitiatorName}} -> vote(InitiatorPid, InitiatorName, GGTProName, true),
@@ -129,7 +131,7 @@ term_receive_loop({GGTProName, Mi, Neighbors, OldMissingCountForQuota},
 
 term(KoPid, GGTProName, Mi) ->
     KoPid ! {self(), briefterm, {GGTProName, Mi, vsutil:now2string(erlang:timestamp())}},
-    logge_status(GGTProName, "Genuegend Votes bekommen, briefterm gesendet").
+    logge_status(GGTProName, io_lib:format("Genuegend Votes erhalten, Terminiere mit ~p (Mi)", [Mi])).
 
 calc_receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota}, 
                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
@@ -200,8 +202,11 @@ vote(InitiatorPid, InitiatorName, GGTProName, WillRespond) ->
 calc_and_send_new_mi(Mi, Y, Neighbors, GGTProName, KoPid) ->
     NewMi = calc_new_mi(Mi, Y),
     case NewMi of
-        Mi ->   ok;
-        _Any -> send_new_mi(NewMi, Neighbors, GGTProName, KoPid)
+        Mi ->   
+            logge_status(GGTProName, io_lib:format("Neues Y (~p) ergab kein neues Mi", [Y]));
+        _Any -> 
+            logge_status(GGTProName, io_lib:format("Neues Y (~p) ergab neues Mi (~p), wird an Nachbarn und Koordinator gesendet", [Y, Mi])),
+            send_new_mi(NewMi, Neighbors, GGTProName, KoPid)
     end,
     NewMi.
 
@@ -254,10 +259,10 @@ hole_wert_aus_config_mit_key(Key) ->
     Value.
 
 logge_status_vote(GGTProName1, GGTProName2, WillRespond) ->
-    logge_status(GGTProName1, lists:flatten(io_lib:format("Vote from ~p, voteYes send: ~p", [GGTProName2, WillRespond]))).
+    logge_status(GGTProName1, lists:flatten(io_lib:format("Vote von ~p, voteYes gesendet: ~p", [GGTProName2, WillRespond]))).
 
 logge_status_vote_yes(GGTProName1, GGTProName2) ->
-    logge_status(GGTProName1, lists:flatten(io_lib:format("VoteYes from ~p", [GGTProName2]))).
+    logge_status(GGTProName1, lists:flatten(io_lib:format("VoteYes von ~p", [GGTProName2]))).
 
 logge_status(GGTProName, Inhalt) ->
     LogDateiName = lists:flatten(io_lib:format("~p.log", [GGTProName])),
