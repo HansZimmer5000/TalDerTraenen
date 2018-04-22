@@ -1,17 +1,10 @@
--module(starter).
+-module(starterMert).
 
 -export([
-    start/1,
-    start/2,
-    go/1,
-    go/2,
-
-    start_all_ggtprozesse/2,
-
-    create_ggtproname/2
+    start/1
 ]).
 
--define(CONFIG_DATEI_NAME, "ggt.cfg").
+-define(CONFIG_FILENAME, "c:/Users/Mert.S/eclipse-workspace/VSP2/src/ggt.cfg").
 -define(DEFAULT_LOG_DATEI_NAME, "starter").
 -define(KOORDINATORNAME, hole_wert_aus_config_mit_key(koordinatorname)).
 -define(NAMESERVICENODE, hole_wert_aus_config_mit_key(nameservicenode)).
@@ -25,7 +18,6 @@
 %------------------------------------------------------------------------------------------------------
 start(StarterNummer) ->
     logge_status(StarterNummer, "Startet"),	
-	LogDatei = erstelle_log_datei_name(StarterNummer),
 	KoPid = get_ko_pid(StarterNummer),
     KoPid ! {self(), getsteeringval},
     receive 
@@ -37,7 +29,6 @@ start(StarterNummer) ->
 %------------------------------------------------------------------------------------------------------
 %										>>LOOPS<<
 %------------------------------------------------------------------------------------------------------
-        
 start_all_ggtprozesse(StarterNummer, {_ArbeitsZeit, _TermZeit, _Quota, 0}) ->
     logge_status(StarterNummer, "Alle GGTProzesse gestartet");
 	
@@ -79,7 +70,6 @@ get_ko_pid(StarterNummer) ->
 %------------------------------------------------------------------------------------------------------
 %										>>GENERELLE FUNKTIONEN<<
 %------------------------------------------------------------------------------------------------------
-
 hole_wert_aus_config_mit_key(Key) ->
     {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
     {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
@@ -88,7 +78,6 @@ hole_wert_aus_config_mit_key(Key) ->
 %------------------------------------------------------------------------------------------------------	
 %										>>LOGGING FUNKTIONEN<<
 %------------------------------------------------------------------------------------------------------	
-		
 logge_status(StarterNummer, Inhalt) ->
     LOG_DATEI_NAME = lists:flatten(io_lib:format("~s~p.log", [?DEFAULT_LOG_DATEI_NAME, StarterNummer])),
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
