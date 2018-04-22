@@ -96,7 +96,7 @@ term_receive_loop({GGTProName, Mi, Neighbors, OldMissingCountForQuota},
                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
     case OldMissingCountForQuota of
         0 -> 
-            term(KoPid, GGTProName, Mi),
+            term(KoPid, GGTProName, Mi, Quota),
             MissingCountForQuota = empty;
         _ -> 
             MissingCountForQuota = OldMissingCountForQuota
@@ -129,9 +129,9 @@ term_receive_loop({GGTProName, Mi, Neighbors, OldMissingCountForQuota},
                                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid})
     end.
 
-term(KoPid, GGTProName, Mi) ->
+term(KoPid, GGTProName, Mi, Quota) ->
     KoPid ! {self(), briefterm, {GGTProName, Mi, vsutil:now2string(erlang:timestamp())}},
-    logge_status(GGTProName, io_lib:format("Genuegend Votes erhalten, Terminiere mit ~p (Mi)", [Mi])).
+    logge_status(GGTProName, io_lib:format("Genuegend Votes erhalten (~p), Terminiere mit ~p (Mi)", [Quota, Mi])).
 
 calc_receive_loop({GGTProName, Mi, Neighbors, MissingCountForQuota}, 
                 {ArbeitsZeit, TermZeit, Quota, NsPid, KoPid}) ->
