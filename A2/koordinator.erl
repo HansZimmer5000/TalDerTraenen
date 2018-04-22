@@ -84,7 +84,8 @@ init_loop(NsPid, SteeringValues, CurrentStartersCount, GGTProNameList) ->
             init_loop(NsPid, SteeringValues, CurrentStartersCount, NewGGTProNameList);
         step ->
             logge_status("Es werden keine weiteren ggT-Prozesse beachtet"),
-            create_circle(GGTProNameList, NsPid),
+            ShuffledGGTProNameList = util:shuffle(GGTProNameList),
+            create_circle(ShuffledGGTProNameList, NsPid),
             GGTProNameList;
         reset ->    
             reset(GGTProNameList, NsPid);
