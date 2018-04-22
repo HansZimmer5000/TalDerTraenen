@@ -84,6 +84,7 @@ prozess_loop(VZ, TZ, NS, KO, Name, Mi, Nachbarn, Q, LogDatei, VoteCount, VoteCfg
 		 
 		{sendy, Y} ->
 			MiNeu = calcGGT(Mi, Y, Nachbarn, KO, Name, LogDatei),
+			timer:sleep(timer:seconds(VZ)),
 			prozess_loop(VZ, TZ, NS, KO, Name, MiNeu, Nachbarn, Q, LogDatei, VoteCount, {TermFlag, false, erlang:timestamp()});
 			
 		{From, tellmi} ->
