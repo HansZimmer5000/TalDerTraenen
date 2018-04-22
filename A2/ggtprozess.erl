@@ -53,7 +53,7 @@ get_ko_and_ns_pid(GGTProName) ->
                     logge_status(GGTProName, "Koordinator nicht im Nameservice bekannt, ggT faehrt runter"),
                     timer:sleep(timer:seconds(5)),
                     exit(kill);
-                _ -> continue
+                _ -> {KoPid, NsPid}
             end
     end.
 
