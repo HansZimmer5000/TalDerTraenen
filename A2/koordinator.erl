@@ -44,6 +44,9 @@
 -define(GGTPROANZ, hole_wert_aus_config_mit_key(ggtprozessnummer)).
 -define(KORRIGIEREN, hole_wert_aus_config_mit_key(korrigieren)).
 
+%------------------------------------------------------------------------------------------------------
+%										>>START / INIT<<
+%------------------------------------------------------------------------------------------------------
 % Startet den Koordinator und findet die Nameservice PID heraus.
 start() ->
     net_adm:ping(?NSNODE), 
@@ -116,15 +119,6 @@ create_circle_([FirstGGTProName, SecondGGTProName, ThirdGGTProName | RestGGTProN
     set_neighbors(SecondGGTProName, FirstGGTProName, ThirdGGTProName, NsPid),
     create_circle_([SecondGGTProName, ThirdGGTProName | RestGGTProNames], NsPid).
 
-% Startet die Berechnung des WggT. 
-calc(WggT, GGTProNameList, NsPid) ->
-    PMList = get_pms(WggT, GGTProNameList),
-    send_pms_to_ggtprocesses(PMList, GGTProNameList, NsPid),
-    logge_status("pms zu ggT-Prozessen gesendet"),
-    SelectedGGTProcesses = select_random_some_ggtprocesses(GGTProNameList),
-    send_ys_to_ggtprocesses(PMList, SelectedGGTProcesses, NsPid),
-    logge_status(lists:flatten(io_lib:format("ys zu ~p ggT-Prozessen gesendet", [length(SelectedGGTProcesses)]))).
-
 % Erstellt mit Hilfe von vsutil:bestimme_mis/2 die PMs der ggT-Prozesse.
 get_pms(WggT, GGTProNameList) ->
     GGTProAnz = length(GGTProNameList),
@@ -193,6 +187,9 @@ get_next_to_last_and_last_elem([NextToLastElem, LastElem]) ->
 get_next_to_last_and_last_elem([_HeadElem | RestElems]) ->
     get_next_to_last_and_last_elem(RestElems).
 
+%------------------------------------------------------------------------------------------------------
+%										>>(WARTEN AUF) BERECHNUNG<<
+%------------------------------------------------------------------------------------------------------
 % Der Loop wenn auf eine Berechnung gewartet wird (2. Phase), bzw. eine gerade stattfindet (3. Phase). 
 calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, LastMinMi) ->
     receive
@@ -219,6 +216,15 @@ calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, LastMinMi) ->
         kill ->     
             kill(GGTProNameList, NsPid)
     end.
+
+% Startet die Berechnung des WggT. 
+calc(WggT, GGTProNameList, NsPid) ->
+    PMList = get_pms(WggT, GGTProNameList),
+    send_pms_to_ggtprocesses(PMList, GGTProNameList, NsPid),
+    logge_status("pms zu ggT-Prozessen gesendet"),
+    SelectedGGTProcesses = select_random_some_ggtprocesses(GGTProNameList),
+    send_ys_to_ggtprocesses(PMList, SelectedGGTProcesses, NsPid),
+    logge_status(lists:flatten(io_lib:format("ys zu ~p ggT-Prozessen gesendet", [length(SelectedGGTProcesses)]))).
 
 % Loggt das eingegangenge briefmi und gibt aktuelles globales minimales Mi zurück (Hier nur wenn MinMi initial = empty war).
 briefmi(GGTProName, CMi, CZeit, empty) ->
@@ -347,7 +353,9 @@ kill_all_ggtprocesses([HeadGGTProName | RestGGTProNames], NsPid) ->
             kill_all_ggtprocesses(RestGGTProNames, NsPid)
     end.
 
-%------------
+%------------------------------------------------------------------------------------------------------
+%										>>HILFSFUNKTIONEN<<
+%------------------------------------------------------------------------------------------------------
 % Hilfsmethode um zu checken ob ein ggT-Prozessname im Nameservice bekannt ist.
 ggtpropid_exists(GGTProName, NsPid) ->
     NsPid ! {self(), {lookup, GGTProName}},
