@@ -62,6 +62,7 @@ start(NsPid) ->
 
     SteeringValues = {steeringval, ?ARBEITSZEIT, ?TERMZEIT, 0, ?GGTPROANZ},
     GGTProNameList = init_loop(NsPid, SteeringValues, 0, []),
+    % Wie im Entwurf beschrieben, ist die Initphase zu Ende wird auf eine neue Berechnung gewartet.
     calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, empty).
 
 % Registriert den Koordinator beim Nameservie
@@ -75,7 +76,7 @@ register_at_ns(NsPid) ->
     end.
 
 % Loop fuer die erste Phase (Init) des Systems bei dem sich Starter und ggT-Prozesse beim Koordinator melden.
-% Bis 'step' empfangen, der Kreis erstellt und auf eine Berechnung gewartet wird.
+% Wie im Entwurf beschrieben.
 init_loop(NsPid, SteeringValues, CurrentStartersCount, GGTProNameList) ->
     receive
         {AbsenderPid, getsteeringval} ->
@@ -86,16 +87,26 @@ init_loop(NsPid, SteeringValues, CurrentStartersCount, GGTProNameList) ->
 
             AbsenderPid ! NewSteeringValues,
             init_loop(NsPid, NewSteeringValues, NewStartersCount, GGTProNameList);
+        
+        % Wie im Entwurf beschrieben macht sich so ein ggT-Prozess beim Koordinator bekannt.
         {hello, GGTProName} ->
             NewGGTProNameList = [GGTProName | GGTProNameList],
             init_loop(NsPid, SteeringValues, CurrentStartersCount, NewGGTProNameList);
+        
+        % Wie im Entwurf beschrieben endet hiermit die Initialisierung.
+        % Der Kreis wird erstellt, mit einer unsortierten und extra nochmal zusammengewürfelter Liste mit ggT-Prozessnamen
+        % Und die Liste aller bekannten ggT-Prozessnamen wird zurückgegeben.
         step ->
             logge_status("Es werden keine weiteren ggT-Prozesse beachtet"),
             ShuffledGGTProNameList = util:shuffle(GGTProNameList),
             create_circle(ShuffledGGTProNameList, NsPid),
             GGTProNameList;
+
+        % Siehe Kommentar bei Reset
         reset ->    
             reset(GGTProNameList, NsPid);
+
+        % Siehe Kommentar bei Kill
         kill ->     
             kill(GGTProNameList, NsPid)
     end.
@@ -104,7 +115,8 @@ init_loop(NsPid, SteeringValues, CurrentStartersCount, GGTProNameList) ->
 calc_quote(StartersCount, GGTProAnz) -> 
     round(StartersCount * GGTProAnz * 80 / 100).
 
-% Teilt den ggT-Prozessen ihre Nachbarn mit. Und erstellt somit den Kreis.
+% Teilt den ggT-Prozessen wie im Entwurf beschrieben ihre Nachbarn mit.
+% Und erstellt somit den Kreis.
 % Wobei jedoch der Erste und Letzte Eintrag besondert behandelt werden.
 create_circle(GGTProNameList, NsPid) ->
     [FirstGGTProName, SecondGGTProName | _RestGGTProNames] = GGTProNameList,
@@ -119,52 +131,15 @@ create_circle_([FirstGGTProName, SecondGGTProName, ThirdGGTProName | RestGGTProN
     set_neighbors(SecondGGTProName, FirstGGTProName, ThirdGGTProName, NsPid),
     create_circle_([SecondGGTProName, ThirdGGTProName | RestGGTProNames], NsPid).
 
-% Erstellt mit Hilfe von vsutil:bestimme_mis/2 die PMs der ggT-Prozesse.
-get_pms(WggT, GGTProNameList) ->
-    GGTProAnz = length(GGTProNameList),
-    PMList = vsutil:bestimme_mis(WggT, GGTProAnz),
-    PMList.
-
-% Wählt aus allen bekannten ggT-Prozessen zufällig ein Fünftel (mindestens 2) aus.
-select_random_some_ggtprocesses(GGTProNameList) ->
-    ShuffledGGTProNameList = util:shuffle(GGTProNameList),
-    SelectionCount = round(length(GGTProNameList) / 5),
-    case SelectionCount < 2 of
-        true ->  
-            Result = get_first_n_elems_of_list(2, ShuffledGGTProNameList, []);
-        false -> 
-            Result = get_first_n_elems_of_list(SelectionCount, ShuffledGGTProNameList, [])
-    end,
-    Result.
-
-% Sendet die PMs an die ggT-Prozesse
-send_pms_to_ggtprocesses([], [], _NsPid) -> ok;
-send_pms_to_ggtprocesses([HeadPM | RestPMs], [HeadGGTProName | RestGGTProNames], NsPid) ->
-    send_message_to_processname({setpm, HeadPM}, HeadGGTProName, NsPid),
-    send_pms_to_ggtprocesses(RestPMs, RestGGTProNames, NsPid).
-
-% Sendet die Ys an die vorhin zufällig ausgewählten ggT-Prozesse.
-send_ys_to_ggtprocesses(_Ys, [], _NsPid) -> done;
-send_ys_to_ggtprocesses([HeadY | RestYs], [HeadGGTProName | RestGGTProNames], NsPid) ->
-    send_message_to_processname({sendy, HeadY}, HeadGGTProName, NsPid),
-    send_ys_to_ggtprocesses(RestYs, RestGGTProNames, NsPid).
-
-% Holt die ersten N Elemente (in invertierter Reihenfolge) aus einer Liste.
-% Beispiel: get_first_n_elems_of_list(2, [1,2,3], []) -> [2,1]
-get_first_n_elems_of_list(0, _List, Akku) -> Akku;
-get_first_n_elems_of_list(N, [Head | Rest], Akku) ->
-    NewAkku = [Head | Akku],
-    NewN = N - 1,
-    get_first_n_elems_of_list(NewN, Rest, NewAkku).
-
-% Sendet die Nachricht and einen Prozessnamen (der wiederum über den Nameservice zu einer PID aufgelöst wird).
-send_message_to_processname(Message, ProName, NsPid) ->
-    case ggtpropid_exists(ProName, NsPid) of
-        true -> continue;
-        false -> throw(ggtpronameUnkownForNs)
-    end,
-    ProPid = get_ggtpropid(ProName, NsPid),
-    ProPid ! Message.
+% Holt aus einer Liste die vorletzten Elemente heraus.
+get_next_to_last_and_last_elem([]) ->
+    [];
+get_next_to_last_and_last_elem([_OneElem]) ->
+    get_next_to_last_and_last_elem([]);
+get_next_to_last_and_last_elem([NextToLastElem, LastElem]) -> 
+    [NextToLastElem, LastElem];
+get_next_to_last_and_last_elem([_HeadElem | RestElems]) ->
+    get_next_to_last_and_last_elem(RestElems).
 
 % Teilt dem ersten ggT-Prozess (Middle) mit, welcher Nachbar links und rechts von ihm ist.
 set_neighbors(MiddleGGTProName, LeftGGTProName, RightGGTProName, NsPid) ->
@@ -177,22 +152,13 @@ set_neighbors(MiddleGGTProName, LeftGGTProName, RightGGTProName, NsPid) ->
     MiddleGGTProPid = get_ggtpropid(MiddleGGTProName, NsPid),
     MiddleGGTProPid ! {setneighbors, LeftGGTProName, RightGGTProName}.
 
-% Holt aus einer Liste die vorletzten Elemente heraus.
-get_next_to_last_and_last_elem([]) ->
-    [];
-get_next_to_last_and_last_elem([_OneElem]) ->
-    get_next_to_last_and_last_elem([]);
-get_next_to_last_and_last_elem([NextToLastElem, LastElem]) -> 
-    [NextToLastElem, LastElem];
-get_next_to_last_and_last_elem([_HeadElem | RestElems]) ->
-    get_next_to_last_and_last_elem(RestElems).
-
 %------------------------------------------------------------------------------------------------------
 %										>>(WARTEN AUF) BERECHNUNG<<
 %------------------------------------------------------------------------------------------------------
 % Der Loop wenn auf eine Berechnung gewartet wird (2. Phase), bzw. eine gerade stattfindet (3. Phase). 
 calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, LastMinMi) ->
     receive
+        % Wie im Entwurf beschrieben wird eine neue Berechnung angestossen.
         {calc, WggT} -> 
             calc(WggT, GGTProNameList, NsPid),
             calculation_receive_loop(GGTProNameList, NsPid, ?KORRIGIEREN, WggT); % Hier 'empty' oder WggT als global MinMi setzen.
@@ -218,6 +184,8 @@ calculation_receive_loop(GGTProNameList, NsPid, Korrigieren, LastMinMi) ->
     end.
 
 % Startet die Berechnung des WggT. 
+% Wie beschrieben werdne hierzu erstmal die PMs ermittelt und den ggT-Prozessen mitgeteilt.
+% Danach werden 20% (Jedoch min. 2) der Prozesse eine Zahl aus dem System (Mi eines anderen ggT-Prozesses) gesendet.
 calc(WggT, GGTProNameList, NsPid) ->
     PMList = get_pms(WggT, GGTProNameList),
     send_pms_to_ggtprocesses(PMList, GGTProNameList, NsPid),
@@ -225,6 +193,53 @@ calc(WggT, GGTProNameList, NsPid) ->
     SelectedGGTProcesses = select_random_some_ggtprocesses(GGTProNameList),
     send_ys_to_ggtprocesses(PMList, SelectedGGTProcesses, NsPid),
     logge_status(lists:flatten(io_lib:format("ys zu ~p ggT-Prozessen gesendet", [length(SelectedGGTProcesses)]))).
+
+% Wie beschrieben, erstellt mit Hilfe von vsutil:bestimme_mis/2 die PMs der ggT-Prozesse.
+get_pms(WggT, GGTProNameList) ->
+    GGTProAnz = length(GGTProNameList),
+    PMList = vsutil:bestimme_mis(WggT, GGTProAnz),
+    PMList.
+
+% Wählt aus allen bekannten ggT-Prozessen zufällig ein Fünftel (mindestens 2) aus.
+select_random_some_ggtprocesses(GGTProNameList) ->
+    ShuffledGGTProNameList = util:shuffle(GGTProNameList),
+    SelectionCount = round(length(GGTProNameList) / 5),
+    case SelectionCount < 2 of
+        true ->  
+            Result = get_first_n_elems_of_list(2, ShuffledGGTProNameList, []);
+        false -> 
+            Result = get_first_n_elems_of_list(SelectionCount, ShuffledGGTProNameList, [])
+    end,
+    Result.
+
+% Holt die ersten N Elemente (in invertierter Reihenfolge) aus einer Liste.
+% Beispiel: get_first_n_elems_of_list(2, [1,2,3], []) -> [2,1]
+get_first_n_elems_of_list(0, _List, Akku) -> Akku;
+get_first_n_elems_of_list(N, [Head | Rest], Akku) ->
+    NewAkku = [Head | Akku],
+    NewN = N - 1,
+    get_first_n_elems_of_list(NewN, Rest, NewAkku).
+
+% Sendet die PMs an die ggT-Prozesse
+send_pms_to_ggtprocesses([], [], _NsPid) -> ok;
+send_pms_to_ggtprocesses([HeadPM | RestPMs], [HeadGGTProName | RestGGTProNames], NsPid) ->
+    send_message_to_processname({setpm, HeadPM}, HeadGGTProName, NsPid),
+    send_pms_to_ggtprocesses(RestPMs, RestGGTProNames, NsPid).
+
+% Sendet die Ys an die vorhin zufällig ausgewählten ggT-Prozesse.
+send_ys_to_ggtprocesses(_Ys, [], _NsPid) -> done;
+send_ys_to_ggtprocesses([HeadY | RestYs], [HeadGGTProName | RestGGTProNames], NsPid) ->
+    send_message_to_processname({sendy, HeadY}, HeadGGTProName, NsPid),
+    send_ys_to_ggtprocesses(RestYs, RestGGTProNames, NsPid).
+
+% Sendet die Nachricht and einen Prozessnamen (der wiederum über den Nameservice zu einer PID aufgelöst wird).
+send_message_to_processname(Message, ProName, NsPid) ->
+    case ggtpropid_exists(ProName, NsPid) of
+        true -> continue;
+        false -> throw(ggtpronameUnkownForNs)
+    end,
+    ProPid = get_ggtpropid(ProName, NsPid),
+    ProPid ! Message.
 
 % Loggt das eingegangenge briefmi und gibt aktuelles globales minimales Mi zurück (Hier nur wenn MinMi initial = empty war).
 briefmi(GGTProName, CMi, CZeit, empty) ->
@@ -308,22 +323,22 @@ nudge([HeadGGTProName | RestGGTProNames], NsPid) ->
     end,
     nudge(RestGGTProNames, NsPid).
 
-% Invertiert das Korrigieren Flag.
+% Invertiert wie beschrieben das Korrigieren Flag.
 toggle(Korrigieren) ->
     logge_status("Korrigieren flag invertiert"),
     not(Korrigieren).
 
-% Fährt sich selbst und die ggT-Prozesse herunter, startet sich dann jedoch Neu.
+% Fährt sich wie beschrieben selbst und die ggT-Prozesse herunter, startet sich dann jedoch Neu.
 reset(GGTProNameList, NsPid) ->
     finalize(GGTProNameList, NsPid, true).
 
-% Fährt sich selbst und die ggT-Prozesse herunter.
+% Fährt sich wie beschrieben selbst und die ggT-Prozesse herunter.
 kill(GGTProNameList, NsPid) ->
     finalize(GGTProNameList, NsPid, false).
 
 % Hier wird der Koordinator beim Nameservice 'unbind'ed und 'unregister'ed.
 % Zu dem werden alle ggT-Prozesse herunter gefahren.
-% Ist das Flag (3. Parameter) gesetzt so wird neu gestartet.
+% Ist das Flag (3. Parameter) gesetzt so wird neu gestartet, wie beschrieben.
 finalize(GGTProNameList, NsPid, Restart) ->
     NsPid ! {self(), {unbind, ?KONAME}},
     receive
@@ -341,7 +356,7 @@ finalize(GGTProNameList, NsPid, Restart) ->
         false -> killed
     end.
 
-% Fährt alle ggT-Prozesse herunter.
+% Fährt wie beschrieben alle ggT-Prozesse herunter.
 kill_all_ggtprocesses([], _NsPid) -> done;
 kill_all_ggtprocesses([HeadGGTProName | RestGGTProNames], NsPid) ->
     case ggtpropid_exists(HeadGGTProName, NsPid) of
