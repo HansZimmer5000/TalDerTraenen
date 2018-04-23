@@ -58,7 +58,7 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __remove_all_unecessary_files([".log"])
-        __start_node("test", "core", "")
+        os.system("start erl -noshell -sname payloadserver -s payloadserver start")
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     else:
