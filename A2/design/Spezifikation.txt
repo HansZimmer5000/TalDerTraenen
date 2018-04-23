@@ -15,8 +15,7 @@ Kombinationen
     Ihrer: Starter, ggT-Prozess
     Problem: -
 
-TODO:
-    ggT selbstständig, ohne GoValues, machen, wofür bräuchte dann der Starter die Ahnung von den SteeringVals?
+Todos:
 
 Offene Fragen:
 
