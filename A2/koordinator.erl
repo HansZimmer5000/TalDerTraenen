@@ -296,10 +296,11 @@ finalize(GGTProNameList, NsPid, Restart) ->
                      %Only for Test purposes! Because since its in the same process the name is always registered during normal run until unregistered here.
         _Any -> unregister(?KONAME)
     end,
+    kill_all_ggtprocesses(GGTProNameList, NsPid),
     logge_status(lists:flatten(io_lib:format("Alle GGT-Prozesse herunter gefahren, selbst unregistered, Neustart = ~p", [Restart]))),
     case Restart of
         true -> start(NsPid);
-        false -> kill_all_ggtprocesses(GGTProNameList, NsPid)
+        false -> killed
     end.
 
 
