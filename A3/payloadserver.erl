@@ -8,26 +8,25 @@ start() ->
 	register(payloadserver, ServerPid),
 	timer:sleep(timer:seconds(1)),
 	VesselPid = spawn(fun() ->
-			%os:cmd("erl -sname test -noshell -s payloadserver send")
-			%os:cmd("echo hello | erl -sname test -noshell -s payloadserver send")
 			os:cmd("java vessel3.Vessel 3 1 | erl -sname test -noshell -s payloadserver send")
 		 end),
-	io:fwrite("~p/~p", [self(), VesselPid]).
+	io:fwrite("PayloadserverPID: ~p // Vessel3 with Send Pipe PID: ~p\n", [self(), VesselPid]).
 
 send() ->
-	io:fwrite("~p\n", [net_adm:ping('payloadserver@Michael-X250')]),
-	timer:sleep(timer:seconds(1)),
-	?SERVERIP ! connected,
-	send_().
-send_() ->
-	case io:get_chars('', 24) of
-	    eof -> 
-			io:fwrite("eof");
-		Text ->
-			?SERVERIP ! Text,
-			io:fwrite("send: ~p", [Text])
-	end,
-	send_().
+	PingResult = net_adm:ping('payloadserver@Michael-X250'),
+	case PingResult of
+		pang ->
+			io:fwrite("Couldn't find Payloadserver!");
+		pong ->
+			timer:sleep(timer:seconds(1)),
+			io:fwrite("Could find Payloadserver!"),
+			send_(?SERVERIP)
+	end.
+
+send_(PayloadServerPid) ->
+	Text = io:get_chars('', 24),
+	PayloadServerPid ! Text,
+	send_(PayloadServerPid).
 
 % Bekommt alle Payloads, verwirft sie direkt ausser:
 % Wenn aktueller Payload angefragt bekommt der Absender den nächsten empfangenen Payload
@@ -36,6 +35,7 @@ loop() ->
 		{AbsenderPid, getNextPayload} ->
 			receive
 				Payload ->
+					io:fwrite("Got Request from ~p", [AbsenderPid]),
 					AbsenderPid ! Payload
 			end;
 		Any ->
