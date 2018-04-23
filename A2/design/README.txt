@@ -35,7 +35,7 @@ python startall.py 2
     Fuehrt die Applikation aus.
 python startall.py 3
     Loescht alle .beam (Ausnahmen siehe ohne Paramter), .dump, .log Dateien.
-    Raeumt quasi den Ordner auf, so dass nur noch .cfg und .erl Dateien übrig bleiben.
+    Raeumt quasi den Ordner auf, so dass nur noch bestimmte .beam Dateien, .cfg und .erl Dateien übrig bleiben.
 
 --------------------
 Starten der Nodes (In .cfg auf die gesetzten Nodenamen achten!):
