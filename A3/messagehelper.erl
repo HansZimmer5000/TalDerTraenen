@@ -29,10 +29,10 @@
 %    - Byte 26-33    77394825    Zeit (gesendet) in ms seit 01.01.1970, 8-Byte Integer, Big Endian
 
 %Nachrichtenaufbau Intern:
-% {{StationType, StationName, Payload, SlotNumber, SendTime}, ReceivedTime}
+% {{StationType, StationName, ExtraPayload, SlotNumber, SendTime}, ReceivedTime}
 %   (Always) StationType = String with "A" or "B"
 %   (Always) StationName = String with "-team-0000-"
-%   (Always) Payload = String with some letters of 13 letters length
+%   (Always) ExtraPayload = String with some letters of 13 letters length
 %   (Always) SlotNumber = Number with 1 or 2 numbers (e.g. 4 or 25)
 %   (When Added) SendTime = Number with 13 numbers (UTC with e.g. vsutil:getUTC())
 %   (When Message was Received) RecievedTime = Same format as SendTime
@@ -51,39 +51,34 @@ convertReceivedMessagesFromByte(MessagesInByte, ReceivedTimes, ConvertedMessages
 
 
 convertMessageFromByte(MessageInByte, ReceivedTime) ->
-    MessageInByteList = binary:bin_to_list(MessageInByte),
-    SlotNumberLength = length(MessageInByteList) - 33,
+    {StationType,Payload,SlotNumber,SendTime} = vsutil:message_to_string(MessageInByte),
 
-    StationType = lists:sublist(MessageInByteList, 1, 1),
-    StationName = lists:sublist(MessageInByteList, 2, 11),
-    Payload = lists:sublist(MessageInByteList, 13, 13),
-    [SlotNumber] = lists:sublist(MessageInByteList, ?SLOTNUMBERPOS, SlotNumberLength),
-    SendTimeList = lists:sublist(MessageInByteList, ?SLOTNUMBERPOS + SlotNumberLength, 8),
-    SendTimeBinary = binary:list_to_bin(SendTimeList),
-    SendTime = binary:decode_unsigned(SendTimeBinary, big),
+    StationName = lists:sublist(Payload, 1, 11),
+    ExtraPayload = lists:sublist(Payload, 12, 13),
 
-    {{StationType, StationName, Payload, SlotNumber, SendTime}, ReceivedTime}.
+    {{StationType, StationName, ExtraPayload, SlotNumber, SendTime}, ReceivedTime}.
 
 createIncompleteMessage(StationType, StationName, SlotNumber) ->
-    Payload = empty, % -> Vessel3 Connection needed!
-    {{StationType, StationName, Payload, SlotNumber, empty}, empty}.
+    ExtraPayload = empty, % -> Vessel3 Connection needed!
+    {{StationType, StationName, ExtraPayload, SlotNumber, empty}, empty}.
 
 prepareIncompleteMessageForSending(IncompleteMessage, SendTime) ->
     CompleteMessage = setSendTime(IncompleteMessage, SendTime),
     convertMessageToByte(CompleteMessage).
 
 setSendTime(IncompleteMessage, NewSendTime) ->
-    {{StationType, StationName, Payload, SlotNumber, _SendTime}, ReceivedTime} = IncompleteMessage,
-    {{StationType, StationName, Payload, SlotNumber, NewSendTime}, ReceivedTime}.
+    {{StationType, StationName, ExtraPayload, SlotNumber, _SendTime}, ReceivedTime} = IncompleteMessage,
+    {{StationType, StationName, ExtraPayload, SlotNumber, NewSendTime}, ReceivedTime}.
 
 convertMessageToByte(Message) ->
-    {{StationType, StationName, Payload, SlotNumber, SendTime}, _} = Message,
-    StationTypeAndPayloadBinary = binary:list_to_bin((StationType ++ StationName) ++ Payload),
-    TempSendTimeBinary = binary:encode_unsigned(SendTime, big),
-    SendTimeBinary = <<0,0, TempSendTimeBinary/binary>>,
+    {{StationType, StationName, ExtraPayload, SlotNumber, NewSendTime}, _} = Message,
 
-    <<StationTypeAndPayloadBinary/binary, SlotNumber, SendTimeBinary/binary>>.
-    %binary:list_to_bin(lists:append([StationTypeAndPayload, [SlotNumber], SendTime])).
+    BinStation = vsutil:createBinaryS(StationType),
+    BinData = vsutil:createBinaryD(StationName ++ ExtraPayload),
+    BinNextSlot = vsutil:createBinaryNS(SlotNumber),
+    BinTime = vsutil:createBinaryT(NewSendTime),
+
+    vsutil:concatBinary(BinStation,BinData,BinNextSlot,BinTime).
 
 getStationType(Message) ->
     {{StationType, _, _, _, _}, _} = Message,
