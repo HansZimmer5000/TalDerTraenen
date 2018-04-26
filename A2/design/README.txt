@@ -95,6 +95,9 @@ Starten der manuellen Eingabe:
 --------------------
 1> man:start().
 
+ACHTUNG! Pid des Koordinators ({KoordinatorName, KoordinatorNode}) ist als Konstante in man.erl geschrieben!
+Bei Wechsel des Namens, Nodenamens oder des Hosts muss ggf. dies angepasst werden!
+
 Nun koennen bestimmte Befehle eingegeben werden:
 kill
     Sendet 'kill' an den Koordinator.

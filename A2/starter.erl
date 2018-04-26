@@ -61,7 +61,7 @@ start_all_ggtprozesse(StarterNummer, {ArbeitsZeit, TermZeit, Quota, GGTProAnz}) 
 
 create_ggtproname(StarterNummer, GGTProNummer) ->
     GGTProName = io_lib:format(
-                    'ggt-~p~p~p~p', 
+                    '~p~p~p~p', 
                     [StarterNummer, ?PRAKTIKUMSGRUPPE, ?TEAMNUMMER, GGTProNummer]
                 ),
     list_to_atom(lists:flatten(GGTProName)).

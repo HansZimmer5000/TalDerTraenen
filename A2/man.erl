@@ -5,7 +5,7 @@
 ]).
 
 -define(CONFIG_FILENAME, "ggt.cfg").
--define(KOPID, {koordinator, 'ko@Michael-X250'}).
+-define(KOPID, {hole_wert_aus_config_mit_key(koordinatorname), 'ko@lab22.cpt.haw-hamburg.de'}).
 
 start() ->
     {ok, [CommandStr]} = io:fread("Kommando eingeben>", "~s"),
@@ -36,7 +36,7 @@ start() ->
     end.
 
 
-%hole_wert_aus_config_mit_key(Key) ->
-%    {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
-%    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
-%    Value.
+hole_wert_aus_config_mit_key(Key) ->
+    {ok, ConfigListe} = file:consult(?CONFIG_FILENAME),
+    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
+    Value.
