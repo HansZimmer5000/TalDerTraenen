@@ -13,7 +13,7 @@
 #
 # Example: stationCmd="java aufgabe4.MyStation"
 ########################################################################################################
-stationCmd="java -jar ./target/uberjar/exercise3-0.1.0-SNAPSHOT-standalone.jar"
+stationCmd=""
 
 ########################################################################################################
 # TODO: Enter data source programme with full path, but WITHOUT parameters 
@@ -21,7 +21,7 @@ stationCmd="java -jar ./target/uberjar/exercise3-0.1.0-SNAPSHOT-standalone.jar"
 # Example:    dataSource="~/somewhere/Vessel3"
 #         or  dataSource="java -cp . vessel3.Vessel"
 ########################################################################################################
-dataSource="./bin/Vessel3"
+dataSource="java -cp . vessel3.Vessel"
 
 
 if [ "$1" = "--help" ]; then

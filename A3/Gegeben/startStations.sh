@@ -41,7 +41,7 @@ UTCoffsetMs=$7
 #
 # Example: teamNo="2"
 ########################################################################################################
-teamNo="1"
+teamNo=""
 
 ########################################################################################################
 # TODO: Enter data source programme with full path, but WITHOUT parameters 
@@ -49,7 +49,7 @@ teamNo="1"
 # Example:    dataSource="~/somewhere/DataSource"
 #         or  dataSource="java -cp . datasource.DataSource"
 ########################################################################################################
-dataSource="./bin/Vessel3"
+dataSource=""
 
 ########################################################################################################
 # TODO: Enter your station's start command.
@@ -57,7 +57,7 @@ dataSource="./bin/Vessel3"
 #
 # Example: stationCmd="java aufgabe4.MyStation $interfaceName $mcastAddress $receivePort $stationClass"
 ########################################################################################################
-stationCmd="java -jar target/uberjar/exercise3-0.1.0-SNAPSHOT-standalone.jar $interfaceName $mcastAddress $receivePort $stationClass $UTCoffsetMs"
+stationCmd=""
 
 
 printUsage() {
