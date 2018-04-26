@@ -4,14 +4,15 @@ TODO:
 Fragen:
     - Wie genau ist der "nach Slot 2 oder nach Slot 24" Hinweis zu verstehen?
     - (Folie 38) was heißt "jeder ist Koordinator"?
-    - Ist der Unterschied zwischen Typ A und B Stationen nur der, dass man B-Uhren (da nie zur synchronisation verwendet) nie teilt?
+    - Ist der Unterschied zwischen Typ A und B Stationen nur der, dass man B-Uhren (da nie zur synchronisation verwendet) nie auswertet und zudem keinen initialen offset haben?
     - Ist es richtig, dass ein richtiger Slot/Frame mit richtiger Uhr zwar errechnet aber nie vorgegeben wird? Also man kann den Zeitpunkt von Slot X in Frame Y errechnen, aber es gibt niemanden der die Slot/Frame Objekte "vergibt"/"vorgibt".
-    - Wie zur hölle mache ich den blöden Broadcast in Erlang? (Bisheriger Versuch klappt nur für; n Sender zu 1 receiver).
-    - Und wie schaffe ich dass dann alle Receiver alle Nachrichten bekommen?
-    - Vessel3 als Java version haben, und dann wie Zeug bekommen?
     - Was ist die Referenzzeit (die um max 1/4 Slotlänge verschoben werden soll)?
 
 Antworten:
+    - Und wie schaffe ich dass dann alle Receiver alle Nachrichten bekommen?
+        Klaucks UCP Multicastfunktionen in vsutil
+    - Vessel3 als Java version haben, und dann wie Zeug bekommen?
+        Durch extra Payloadserver
     - Nachrichten haben 21-22 Letters(depends on slotnumber), aber 34 Byte?
         Habe 13 Byte Nutzlast vergessen, zudem slotnumber kann zu byte gecastet werden und dann einfach so in dem byte[] stehen.
     - Wenn es 2 Phasen gibt (man konnte Senden / man konnte nicht erfolgreich Senden), hört man in beiden Phasen alle Multicast Nachrichten ab?
