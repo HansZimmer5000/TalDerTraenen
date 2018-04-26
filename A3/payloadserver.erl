@@ -4,12 +4,15 @@
 -define(SERVERNODE, 'payloadserver@Michael-X250').
 -define(SERVERIP, {payloadserver, ?SERVERNODE}).
 
+-define(TEAMNUMBER, "3").
+-define(PRAKTIKUMSNUMBER, "2").
+
 start() ->
 	ServerPid = spawn(fun() -> loop() end),
 	register(payloadserver, ServerPid),
 	timer:sleep(timer:seconds(1)),
 	VesselPid = spawn(fun() ->
-			os:cmd("java vessel3.Vessel 3 1 | erl -sname test -noshell -s payloadserver send")
+			os:cmd("java vessel3.Vessel "++ ?TEAMNUMBER ++ " " ++ ?PRAKTIKUMSNUMBER ++ " | erl -sname test -noshell -s payloadserver send")
 		 end),
 	io:fwrite("PayloadserverPID: ~p // Vessel3 with Send Pipe PID: ~p\n", [self(), VesselPid]).
 

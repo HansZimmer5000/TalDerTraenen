@@ -58,7 +58,7 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __remove_all_unecessary_files([".log"])
-        os.system("start erl -noshell -sname payloadserver -s payloadserver start")
+        os.system("start erl -noshell -sname test -s tunnel test")
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     else:
