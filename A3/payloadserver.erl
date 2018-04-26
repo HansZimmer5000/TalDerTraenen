@@ -1,7 +1,8 @@
 -module(payloadserver).
 -export([start/0, send/0, loop/0]).
 
--define(SERVERIP, {payloadserver, 'payloadserver@Michael-X250'}).
+-define(SERVERNODE, 'payloadserver@Michael-X250').
+-define(SERVERIP, {payloadserver, ?SERVERNODE}).
 
 start() ->
 	ServerPid = spawn(fun() -> loop() end),
@@ -13,7 +14,7 @@ start() ->
 	io:fwrite("PayloadserverPID: ~p // Vessel3 with Send Pipe PID: ~p\n", [self(), VesselPid]).
 
 send() ->
-	PingResult = net_adm:ping('payloadserver@Michael-X250'),
+	PingResult = net_adm:ping(?SERVERNODE),
 	case PingResult of
 		pang ->
 			io:fwrite("Couldn't find Payloadserver!");
