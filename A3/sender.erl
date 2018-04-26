@@ -2,37 +2,18 @@
 
 -export(
     [
-        mysend/0, 
-        mysend/1
+        mysend/0
     ]).
 
+-define(LIFETIME, 10000).
+
 mysend() ->
-    mysend(<<"hello">>).
+    MultiCastAddr = {225,0,10,1},
+    Port = 15006,
 
-mysend(Message) ->
-    %SocketOld = open(),
-    {ok, Socket} = gen_udp:open(14999, [{broadcast, true}]),
-    io:format("sender opened socket=~p~n",[Socket]),
+    Socket = vsutil:openSe(MultiCastAddr, Port),
+    gen_udp:controlling_process(Socket, self()),
+    gen_udp:send(Socket, MultiCastAddr, Port, <<"TextNachricht">>),
 
-    ok = gen_udp:send(Socket, {225,0,10,1}, 15000, Message),
-    
-    gen_udp:close(Socket).
+    timer:apply_after(?LIFETIME, gen_udp, close, [Socket]).
 
-
-open() ->
-    PORT_NUM_TX_MULTI = 14999,
-    GwIP = {0,0,0,0},
-    MultiAddr = {225,0,10,1},
-    {ok, Socket} = gen_udp:open(PORT_NUM_TX_MULTI,
-                [
-                    binary,
-                    inet, % use ipv4
-                    {active, false},
-                    {ip, GwIP},
-                    {multicast_ttl, 1},
-                    %{multicast_loop, false},
-                    {multicast_if, GwIP},
-                    {add_membership, {MultiAddr, GwIP}},
-                    {broadcast, true}
-                ]),
-    Socket.

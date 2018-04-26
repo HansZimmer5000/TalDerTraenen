@@ -1,38 +1,20 @@
 -module(receiver).
 
--export([myreceive/1]).
+-export([
+    myreceive/0
+    ]).
+
+-define(LIFETIME, 1000).
 
 
-myreceive(PORT_NUM_RX_MULTI) ->
-    %Socket = open(PORT_NUM_RX_MULTI),
-    %io:fwrite("got Port ~p", [inet:port(Socket)]),
-    %inet:setopts(Socket, [{active, once}]),
-    {ok, Socket} = gen_udp:open(PORT_NUM_RX_MULTI),
-    io:fwrite("open"),
-    receive
-        {udp, Socket, Host, Port, Bin} ->
-            gen_udp:send(Socket, Host, Port, Bin),
-            io:fwrite("receiver~p received:~p~n",[PORT_NUM_RX_MULTI, Bin])
-    end,
+myreceive() ->
+    MultiCastAddr = {225,0,10,1},
+    Addr = {0,0,0,0}, 
+    Port = 15006,
 
-    gen_udp:close(Socket),
+    Socket = vsutil:openRec(MultiCastAddr, Addr, Port),
+    gen_udp:controlling_process(Socket, self()),
+    {ok, {Address, Port, Packet}} = gen_udp:recv(Socket, 0),
+    io:fwrite("Got: ~p, ~p, ~p", [Address, Port, Packet]),
 
-    myreceive(PORT_NUM_RX_MULTI).
-
-
-open(PORT_NUM_RX_MULTI) ->
-    GwIP = {0,0,0,0},
-    MultiAddr = {225,0,10,1},
-    {ok, Socket} = gen_udp:open(PORT_NUM_RX_MULTI,
-                [
-                    binary,
-                    inet, % use ipv4
-                    {active, false},
-                    {ip, GwIP},
-                    {multicast_if, GwIP},
-                    {multicast_ttl, 1},
-                    %{multicast_loop, false},
-                    {add_membership, {MultiAddr, GwIP}},
-                    {broadcast, true}
-                ]),
-    Socket.
+    timer:apply_after(?LIFETIME, gen_udp, close, [Socket]).
