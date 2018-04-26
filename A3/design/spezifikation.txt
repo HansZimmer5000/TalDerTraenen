@@ -1,3 +1,6 @@
+TODO:
+    - Stationen anderer Gruppen holen und testen
+
 Fragen:
     - Wie genau ist der "nach Slot 2 oder nach Slot 24" Hinweis zu verstehen?
     - (Folie 38) was heißt "jeder ist Koordinator"?
