@@ -5,7 +5,7 @@
     convertReceivedMessagesFromByte/2,
     convertMessageFromByte/2,
 
-    createIncompleteMessage/3,
+    createIncompleteMessage/2,
 
     prepareIncompleteMessageForSending/2,
     setSendTime/2,
@@ -58,8 +58,10 @@ convertMessageFromByte(MessageInByte, ReceivedTime) ->
 
     {{StationType, StationName, ExtraPayload, SlotNumber, SendTime}, ReceivedTime}.
 
-createIncompleteMessage(StationType, StationName, SlotNumber) ->
-    ExtraPayload = empty, % -> Vessel3 Connection needed!
+createIncompleteMessage(StationType, SlotNumber) ->
+    Payload = "-team-0602-" ++ [1,2,3,4,5,6,7,8,9,0,11,12,13], %-> Vessel3
+    StationName = lists:sublist(Payload, 1, 11),
+    ExtraPayload = lists:sublist(Payload, 12, 13),
     {{StationType, StationName, ExtraPayload, SlotNumber, empty}, empty}.
 
 prepareIncompleteMessageForSending(IncompleteMessage, SendTime) ->
