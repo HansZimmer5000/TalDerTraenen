@@ -8,7 +8,7 @@
 %    createIncompleteMessage/3,
 
 %    prepareIncompleteMessageForSending/2,
-%    setSendTime/2,
+%    setSendTimeAndPayload/2,
 %    convertMessageToByte/1,
 
 %    getStationType/1,
@@ -66,31 +66,31 @@ createIncompleteMessage_1_test() ->
     StationType = "A",
     SlotNumber = 4,
     IncompleteMessage = messagehelper:createIncompleteMessage(StationType, SlotNumber),
-    ?assertEqual({{"A","-team-0602-", [1,2,3,4,5,6,7,8,9,0,11,12,13], 4, empty}, empty}, IncompleteMessage).
-
-createIncompleteMessage_2_test() ->
-    io:fwrite("Fehlende Vessel3 Anbindung noch nicht implementiert & getestet!!"),
-    ?assert(false).
+    ?assertEqual({{"A",empty, empty, 4, empty}, empty}, IncompleteMessage).
 
 prepareIncompleteMessageForSending_1_test() -> 
-    IncompleteMessage = {{"A","-team-0602-", "123456789012-", 4, empty}, empty},
+    IncompleteMessage = {{"A",empty, empty, 4, empty}, empty},
     SendTime = 1522240433451,
     SendTime8ByteBinary = <<0,0,1,98,108,153,173,43>>,
     Message = messagehelper:prepareIncompleteMessageForSending(IncompleteMessage, SendTime),
     ?assertEqual(<<"A-team-0602-123456789012-", 4, SendTime8ByteBinary/binary>>, Message).
 
 prepareIncompleteMessageForSending_2_test() -> 
-    IncompleteMessage = {{"A","-team-0602-", "123456789012-", 25, empty}, empty},
+    IncompleteMessage = {{"A",empty, empty, 25, empty}, empty},
     SendTime = 1522240433451,
     SendTime8ByteBinary = <<0,0,1,98,108,153,173,43>>,
     Message = messagehelper:prepareIncompleteMessageForSending(IncompleteMessage, SendTime),
     ?assertEqual(<<"A-team-0602-123456789012-", 25, SendTime8ByteBinary/binary>>, Message).
     
-setSendTime_1_test() -> 
+prepareIncompleteMessageForSending_3_test() ->
+    io:fwrite("Fehlende Vessel3 Anbindung noch nicht implementiert & getestet!!"),
+    ?assert(false).
+
+setSendTimeAndPayload_1_test() -> 
     ShouldResult = {{"A","-team-0602-", "123456789012-", 25, 1522240433451}, empty},
-    TestMessage = {{"A","-team-0602-", "123456789012-", 25, empty}, empty},
+    TestMessage = {{"A",empty, empty, 25, empty}, empty},
     SendTime = 1522240433451,
-    IsResult = messagehelper:setSendTime(TestMessage, SendTime),
+    IsResult = messagehelper:setSendTimeAndPayload(TestMessage, SendTime),
     ?assertEqual(ShouldResult, IsResult).
 
 convertMessageToByte_1_test() ->

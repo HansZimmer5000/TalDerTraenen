@@ -8,7 +8,7 @@
     createIncompleteMessage/2,
 
     prepareIncompleteMessageForSending/2,
-    setSendTime/2,
+    setSendTimeAndPayload/2,
     convertMessageToByte/1,
 
     getStationType/1,
@@ -59,17 +59,19 @@ convertMessageFromByte(MessageInByte, ReceivedTime) ->
     {{StationType, StationName, ExtraPayload, SlotNumber, SendTime}, ReceivedTime}.
 
 createIncompleteMessage(StationType, SlotNumber) ->
-    Payload = "-team-0602-" ++ [1,2,3,4,5,6,7,8,9,0,11,12,13], %-> Vessel3
-    StationName = lists:sublist(Payload, 1, 11),
-    ExtraPayload = lists:sublist(Payload, 12, 13),
-    {{StationType, StationName, ExtraPayload, SlotNumber, empty}, empty}.
+    {{StationType, empty, empty, SlotNumber, empty}, empty}.
 
 prepareIncompleteMessageForSending(IncompleteMessage, SendTime) ->
-    CompleteMessage = setSendTime(IncompleteMessage, SendTime),
+    CompleteMessage = setSendTimeAndPayload(IncompleteMessage, SendTime),
     convertMessageToByte(CompleteMessage).
 
-setSendTime(IncompleteMessage, NewSendTime) ->
-    {{StationType, StationName, ExtraPayload, SlotNumber, _SendTime}, ReceivedTime} = IncompleteMessage,
+setSendTimeAndPayload(IncompleteMessage, NewSendTime) ->
+    {{StationType, empty, empty, SlotNumber, empty}, ReceivedTime} = IncompleteMessage,
+
+    Payload = "-team-0602-123456789012-", %Todo-> Vessel3 Anbindung
+    StationName = lists:sublist(Payload, 1, 11),
+    ExtraPayload = lists:sublist(Payload, 12, 13),
+
     {{StationType, StationName, ExtraPayload, SlotNumber, NewSendTime}, ReceivedTime}.
 
 convertMessageToByte(Message) ->
