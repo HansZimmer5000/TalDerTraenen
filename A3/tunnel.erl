@@ -14,9 +14,7 @@
 -define(HOMEPORT, 15006).
 
 test() ->
-    test1(), 
-    io:fwrite("\n\nTest2\n\n"),
-    test2().
+    test1(). %,io:fwrite("\n\nTest2\n\n"),test2().
 
 test1() ->
     spawn(fun() -> recv({0,0,0,0}) end),
