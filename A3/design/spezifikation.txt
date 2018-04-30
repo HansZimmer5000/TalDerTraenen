@@ -1,6 +1,18 @@
 TODO:
     - Stationen anderer Gruppen holen und testen
 
+Notiz:
+    - Core erkennt (Wie?) dass neuer Frame beginnt, ist in Sendephase
+        Core sendet nach (Sendezeit - 10ms - Jetzt) Sekunden (also 10 ms vor sendezeitpunkt) sich selbst eine Nachricht
+        Kommt die Nachricht wird Nachrichten Erstellung ausgelöst
+            MessageHelper erstellt Nachricht
+            Setzt Sendezeit ein 
+            Fragt aktuellste Payload ab
+            Gibt Nachricht in Byte zurueck
+        Core prüft Jetzt und Sendezeit
+        (ggf. Warten oder Nachricht verwerfen, Wieder mit extra nachricht an sich selbst wenn Nachricht rauskann?)
+        Nachricht senden
+
 Fragen:
     - Wie genau ist der "nach Slot 2 oder nach Slot 24" Hinweis zu verstehen?
     - (Folie 38) was heißt "jeder ist Koordinator"?
