@@ -17,13 +17,13 @@
 
 test() ->
     spawn(fun() -> receive0() end),
-    spawn(fun() -> receive0() end),
+    %spawn(fun() -> receive0() end),
     timer:sleep(timer:seconds(1)),
     %spawn(fun() -> send0() end),
     spawn(fun() -> send0() end).
 
 receive0() ->
-    {ok, Socket} = gen_udp:open(?PRAKTIKUMPORT, [
+    {ok, Socket} = gen_udp:open(5353, [
         {mode, binary},
         {reuseaddr, true},
         {ip, {224, 0, 0, 251}},
@@ -31,7 +31,7 @@ receive0() ->
         {multicast_loop, true},
         {broadcast, true},
         {add_membership, {{224, 0, 0, 251}, {0, 0, 0, 0}}},
-        {active, false}]), %once
+        {active, false}]), %once = dann mit receive Any -> ... end holen
 
     gen_udp:controlling_process(Socket, self()),
     io:fwrite("receiving"),
@@ -39,12 +39,13 @@ receive0() ->
     % Egal welche Abholung -> Die Nachrichten werden wohl nicht gehalten sondern nur neue werden gesichtet.
     % TODO: mal mit Socket erstellung und weitergebung machen.
     %receive {udp, _Socket0, _Ip0, _Port0, Message} -> io:fwrite("~p", [Message]) end,
+    %receive Message -> io:fwrite("~p", [Message]) end,
     io:fwrite("~p", [gen_udp:recv(Socket, 0)]),
     receive0().
 
 send0() ->
     {ok, Socket} = gen_udp:open(0, [binary]),
-    gen_udp:send(Socket, {224, 0, 0, 251}, ?PRAKTIKUMPORT, <<"hello world">>),
+    gen_udp:send(Socket, {224, 0, 0, 251}, 5353, <<"hello world">>),
     io:fwrite("sended").
             
 send() ->
