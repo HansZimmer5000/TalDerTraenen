@@ -24,6 +24,12 @@ def __test_module(modulename):
 def __start_node(nodename, modulename, parameter):
     os.system("start erl -noshell -sname " + nodename + " -s " + modulename + " start" + " " + parameter)
 
+def __start_node_mac(nodename, modulename, parameter):
+    erlcommand = "erl -noshell -sname " + nodename + " -s " + modulename + " start" + " " + parameter
+    erlcommand = "cd /Users/hapemac/Repo/TalDerTraenen/a3"
+    command = "osascript -e " + "'" + "tell application " + '"' + "Terminal" + '"'+ " to do script " + '"' + erlcommand + '"' + "'"
+    os.system(command)
+
 def __start_normal_shell(nodename):
     os.system("start erl -sname " + nodename)
 
@@ -58,7 +64,8 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __remove_all_unecessary_files([".log"])
-        os.system("erl -noshell -sname test -s tunnel test")
+        __start_node_mac("ns", "nameservice", "")
+        __start_node_mac("core", "core", "")
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     else:

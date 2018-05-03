@@ -1,20 +1,20 @@
 -module(receiver).
 
--export([start/0]).
+-export([start/1]).
 
 -define(NSNODE, hole_wert_aus_config_mit_key(node)).
 -define(NSNAME, nameservice).
 
-start() ->
-    Pid = spawn(fun() -> loop() end),
+start(CorePid) ->
+    Pid = spawn(fun() -> loop(CorePid) end),
     {?NSNAME, ?NSNODE} ! {enlist, Pid},
     Pid.
 
-loop() ->
+loop(CorePid) ->
     receive
-        {multicast, _Message} -> dosomething
+        {multicast, Message} -> CorePid ! Message
     end,
-    loop().
+    loop(CorePid).
 
 
 hole_wert_aus_config_mit_key(Key) ->

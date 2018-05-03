@@ -3,10 +3,11 @@
 -export([start/0]).
 
 start() ->
-    spawn(  fun() -> 
-                receiver:myreceive(15000)
-            end),
-    spawn(  fun() -> 
-                receiver:myreceive(15000)
-            end),
-    sender:mysend().
+    RecvPid = receiver:start(self()),
+    SendPid = sender:start(),
+
+    SendPid ! {send, "hallo welt"},
+    receive
+        Any -> io:fwrite("~p", [Any])
+    end.
+    
