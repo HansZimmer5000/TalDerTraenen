@@ -26,7 +26,7 @@ def __start_node(nodename, modulename, parameter):
 
 def __start_node_mac(nodename, modulename, parameter):
     erlcommand = "erl -noshell -sname " + nodename + " -s " + modulename + " start" + " " + parameter
-    erlcommand = "cd /Users/hapemac/Repo/TalDerTraenen/a3"
+    erlcommand = "cd /Users/hapemac/Repo/TalDerTraenen/a3 && " + erlcommand
     command = "osascript -e " + "'" + "tell application " + '"' + "Terminal" + '"'+ " to do script " + '"' + erlcommand + '"' + "'"
     os.system(command)
 
@@ -65,7 +65,8 @@ if __name__ == "__main__":
         __make_all_modules()
         __remove_all_unecessary_files([".log"])
         __start_node_mac("ns", "nameservice", "")
-        __start_node_mac("core", "core", "")
+        __start_node_mac("core1", "core", "")
+        __start_node_mac("core2", "core", "")
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     else:

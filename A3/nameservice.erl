@@ -19,7 +19,9 @@ receive_loop(StationPids) ->
                             receive_loop(NewStationPids);
         {multicast, Message} ->     logge_status("got multicast"),
                                     multicast(StationPids, Message),
-                                    receive_loop(StationPids)
+                                    receive_loop(StationPids);
+        Any ->  logge_status(io_lib:format("Got: ~p", [Any])),
+                receive_loop(StationPids)
     end.
 
 enlist(StationPids, NewPid) ->
@@ -29,7 +31,7 @@ enlist(StationPids, NewPid) ->
 multicast([], _Message) -> done;
 multicast(StationPids, Message) ->
     [CurrentStationPid | RestStationPids] = StationPids,
-    CurrentStationPid ! Message,
+    CurrentStationPid ! {multicast, Message},
     multicast(RestStationPids, Message).
 
 

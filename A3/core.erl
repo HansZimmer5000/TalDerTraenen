@@ -7,7 +7,12 @@ start() ->
     SendPid = sender:start(),
 
     SendPid ! {send, "hallo welt"},
+
+    receive_loop().
+
+receive_loop() ->
     receive
-        Any -> io:fwrite("~p", [Any])
-    end.
+        Any -> io:fwrite("Core Got: ~p", [Any])
+    end,
+    receive_loop().
     
