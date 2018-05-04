@@ -4,9 +4,12 @@
 
 start() ->
     io:fwrite("start"),
-    _RecvPid = receiver:start(self()),
+    RecvPid = receiver:start(self()),
     SendPid = sender:start(),
 
+
+
+    RecvPid ! listen_to_slot,
     SendPid ! {send, "hallo welt"},
 
     receive_loop().
