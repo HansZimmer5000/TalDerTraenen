@@ -1,27 +1,60 @@
 -module(utcclock).
 
 -export([
-    init/1,
+    start/1,
 
     adjust/2,
 
-    get8ByteUTCBinary/1
+    get_8_byte_utc_binary/1
 ]).
 
-%TODO: Problem!
-% SendTime should be 8 Byte, but vsutil:getUTC() return Number of length 13.
-% binary:encode_unsigned(vsutil:getUTC(), big) -> converts int to binary and is leaving us with 6 byte length.
+start(OffsetMS) ->
+    spawn(fun() -> loop(OffsetMS) end).
 
-init(_OffsetMS) ->
-    io:fwrite("not implemented yet"),
-    empty.
+loop(OffsetMS) ->
+    receive
+        {adjust, Messages} ->
+            NewOffsetMS = adjust(OffsetMS, Messages),
+            loop(NewOffsetMS);
+        {getcurrentoffsetms, Pid} ->
+            %TODO: For Testing only?
+            Pid ! OffsetMS,
+            loop(OffsetMS);
+        Any -> 
+            io:fwrite("Got: ~p", [Any]),
+            loop(OffsetMS)
+    end.
 
 
-adjust(_UTCClock, _Messages) ->
-    io:fwrite("not implemented yet"),
-    empty.
+adjust(OffsetMS, Messages) ->
+    AverageDiffMS = calc_average_diff_ms(Messages),
+    NewOffsetMS = OffsetMS + AverageDiffMS,
+    NewOffsetMS.
 
-get8ByteUTCBinary(ErlangTS) ->
+calc_average_diff_ms(Messages) ->
+    {TotalDiffMS, TotalCount} = calc_average_diff_ms(Messages, 0, 0),
+    case TotalCount of
+        0 ->
+            0;
+        TotalCountBigger0 ->
+            TotalDiffMS / TotalCountBigger0
+    end.
+
+
+calc_average_diff_ms([], TotalDiffMS, TotalCount) ->
+    {TotalDiffMS, TotalCount};
+calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount) ->
+    case messagehelper:getStationType(CurrentMessage) of
+        "A" ->
+            SendTime = messagehelper:getSendTime(CurrentMessage),
+            RecvTime = messagehelper:getReceivedTime(CurrentMessage),
+            NewTotalDiffMS = TotalDiffMS + RecvTime - SendTime,
+            calc_average_diff_ms(RestMessages, NewTotalDiffMS, TotalCount + 1);
+        _Any ->
+            calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount)
+    end.
+
+get_8_byte_utc_binary(ErlangTS) ->
     TSAsUTC = vsutil:now2UTC(ErlangTS),
     Tmp = binary:encode_unsigned(TSAsUTC, big),
     <<0,0, Tmp/binary>>.

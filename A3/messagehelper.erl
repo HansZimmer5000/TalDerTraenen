@@ -12,10 +12,10 @@
     convertMessageToByte/1,
 
     getStationType/1,
-
     getStationName/1,
-
-    getSlotNumber/1
+    getSlotNumber/1,
+    getSendTime/1,
+    getReceivedTime/1
 ]).
 
 -define(SLOTNUMBERPOS, 26). %Because String as List starts at 1 instead of 0.
@@ -95,3 +95,11 @@ getStationName(Message) ->
 getSlotNumber(Message) ->
     {{_, _, _, SlotNumber, _}, _} = Message,
     SlotNumber.
+
+getSendTime(Message) ->
+    {{_, _, _, _, SendTime}, _} = Message,
+    SendTime.
+
+getReceivedTime(Message) ->
+    {{_, _, _, _, _}, ReceivedTime} = Message,
+    ReceivedTime.
