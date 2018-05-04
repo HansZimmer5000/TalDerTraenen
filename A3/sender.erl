@@ -9,6 +9,8 @@ start() ->
     Pid = spawn(fun() -> loop({?NSNAME, ?NSNODE}) end),
     Pid.
 
+% --------------------------------------------------
+
 loop(Nameservice) ->
     receive
         {send, Message} -> send(Nameservice, Message)
@@ -18,7 +20,7 @@ loop(Nameservice) ->
 send(Nameservice, Message) ->
     Nameservice ! {multicast, Message}.
 
-
+%-------------------------------------------------
 
 hole_wert_aus_config_mit_key(Key) ->
         {ok, ConfigListe} = file:consult('nameservice.cfg'),

@@ -11,6 +11,8 @@
 start(OffsetMS) ->
     spawn(fun() -> loop(OffsetMS) end).
 
+% --------------------------------------------------
+
 loop(OffsetMS) ->
     receive
         {adjust, Messages} ->
@@ -24,7 +26,6 @@ loop(OffsetMS) ->
             io:fwrite("Got: ~p", [Any]),
             loop(OffsetMS)
     end.
-
 
 adjust(OffsetMS, Messages) ->
     AverageDiffMS = calc_average_diff_ms(Messages),
@@ -53,6 +54,8 @@ calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount) -
         _Any ->
             calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount)
     end.
+
+% --------------------------------------------------
 
 get_8_byte_utc_binary(ErlangTS) ->
     TSAsUTC = vsutil:now2UTC(ErlangTS),

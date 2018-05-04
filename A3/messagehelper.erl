@@ -84,6 +84,8 @@ convertMessageToByte(Message) ->
 
     vsutil:concatBinary(BinStation,BinData,BinNextSlot,BinTime).
 
+% --------------------------------------------------
+
 getStationType(Message) ->
     {{StationType, _, _, _, _}, _} = Message,
     StationType.

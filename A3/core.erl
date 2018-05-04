@@ -2,14 +2,16 @@
 
 -export([start/0]).
 
+-define(CLOCKOFFSETMS, 0).
+
 start() ->
     io:fwrite("start"),
     RecvPid = receiver:start(self()),
     SendPid = sender:start(),
+    ClockPid = utcclock:start(?CLOCKOFFSETMS),
 
 
-
-    RecvPid ! listen_to_slot,
+    RecvPid ! listentoslot,
     SendPid ! {send, "hallo welt"},
 
     receive_loop().

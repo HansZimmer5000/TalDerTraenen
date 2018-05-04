@@ -16,6 +16,8 @@
 start(CorePid) ->
     start(CorePid, {?NSNAME, ?NSNODE}).
 
+% --------------------------------------------------
+
 start(CorePid, NsPid) ->
     Pid = spawn(fun() -> loop(CorePid) end),
     NsPid ! {enlist, Pid},
