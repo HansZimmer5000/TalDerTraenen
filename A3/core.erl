@@ -5,11 +5,14 @@
 -define(CLOCKOFFSETMS, 0).
 
 start() ->
+    start(?CLOCKOFFSETMS).
+
+start(ClockOffsetMS) ->
     io:fwrite("start"),
     RecvPid = receiver:start(self()),
     SendPid = sender:start(),
-    ClockPid = utcclock:start(?CLOCKOFFSETMS),
-
+    _ClockPid = utcclock:start(ClockOffsetMS),
+    _PayloadServerPid = payloadserver:start(),
 
     RecvPid ! listentoslot,
     SendPid ! {send, "hallo welt"},
@@ -22,3 +25,4 @@ receive_loop() ->
     end,
     receive_loop().
     
+

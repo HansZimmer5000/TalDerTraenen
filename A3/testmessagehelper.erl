@@ -72,25 +72,21 @@ prepareIncompleteMessageForSending_1_test() ->
     IncompleteMessage = {{"A",empty, empty, 4, empty}, empty},
     SendTime = 1522240433451,
     SendTime8ByteBinary = <<0,0,1,98,108,153,173,43>>,
-    Message = messagehelper:prepareIncompleteMessageForSending(IncompleteMessage, SendTime),
+    Message = messagehelper:prepareIncompleteMessageForSending(IncompleteMessage, SendTime, "-team-0602-123456789012-"),
     ?assertEqual(<<"A-team-0602-123456789012-", 4, SendTime8ByteBinary/binary>>, Message).
 
 prepareIncompleteMessageForSending_2_test() -> 
     IncompleteMessage = {{"A",empty, empty, 25, empty}, empty},
     SendTime = 1522240433451,
     SendTime8ByteBinary = <<0,0,1,98,108,153,173,43>>,
-    Message = messagehelper:prepareIncompleteMessageForSending(IncompleteMessage, SendTime),
+    Message = messagehelper:prepareIncompleteMessageForSending(IncompleteMessage, SendTime, "-team-0602-123456789012-"),
     ?assertEqual(<<"A-team-0602-123456789012-", 25, SendTime8ByteBinary/binary>>, Message).
-    
-prepareIncompleteMessageForSending_3_test() ->
-    io:fwrite("Fehlende Vessel3 Anbindung noch nicht implementiert & getestet!!"),
-    ?assert(false).
 
 setSendTimeAndPayload_1_test() -> 
     ShouldResult = {{"A","-team-0602-", "123456789012-", 25, 1522240433451}, empty},
     TestMessage = {{"A",empty, empty, 25, empty}, empty},
     SendTime = 1522240433451,
-    IsResult = messagehelper:setSendTimeAndPayload(TestMessage, SendTime),
+    IsResult = messagehelper:setSendTimeAndPayload(TestMessage, SendTime, "-team-0602-123456789012-"),
     ?assertEqual(ShouldResult, IsResult).
 
 convertMessageToByte_1_test() ->

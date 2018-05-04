@@ -10,11 +10,11 @@
 start() ->
 	ServerPid = spawn(fun() -> loop() end),
 	register(payloadserver, ServerPid),
-	timer:sleep(timer:seconds(1)),
 	VesselPid = spawn(fun() ->
 			os:cmd("java vessel3.Vessel "++ ?TEAMNUMBER ++ " " ++ ?PRAKTIKUMSNUMBER ++ " | erl -sname test -noshell -s payloadserver send")
 		 end),
-	io:fwrite("PayloadserverPID: ~p // Vessel3 with Send Pipe PID: ~p\n", [self(), VesselPid]).
+	io:fwrite("PayloadserverPID: ~p // Vessel3 with Send Pipe PID: ~p\n", [self(), VesselPid]),
+	ServerPid.
 
 send() ->
 	PingResult = net_adm:ping(?SERVERNODE),
@@ -39,7 +39,7 @@ loop() ->
 		{AbsenderPid, getNextPayload} ->
 			receive
 				Payload ->
-					io:fwrite("Got Request from ~p", [AbsenderPid]),
+					%io:fwrite("Got Request from ~p", [AbsenderPid]),
 					AbsenderPid ! Payload
 			end;
 		Any ->
