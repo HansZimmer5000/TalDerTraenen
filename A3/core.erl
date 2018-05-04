@@ -3,7 +3,8 @@
 -export([start/0]).
 
 start() ->
-    RecvPid = receiver:start(self()),
+    io:fwrite("start"),
+    _RecvPid = receiver:start(self()),
     SendPid = sender:start(),
 
     SendPid ! {send, "hallo welt"},

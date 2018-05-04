@@ -64,9 +64,9 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __remove_all_unecessary_files([".log"])
-        __start_node_mac("ns", "nameservice", "")
-        __start_node_mac("core1", "core", "")
-        __start_node_mac("core2", "core", "")
+        __start_node("ns", "nameservice", "")
+        __start_node("core1", "core", "")
+        __start_node("core2", "core", "")
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     else:

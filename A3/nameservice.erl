@@ -31,7 +31,7 @@ enlist(StationPids, NewPid) ->
 multicast([], _Message) -> done;
 multicast(StationPids, Message) ->
     [CurrentStationPid | RestStationPids] = StationPids,
-    CurrentStationPid ! {multicast, Message},
+    CurrentStationPid !  {udp, empty, empty, empty, Message},
     multicast(RestStationPids, Message).
 
 

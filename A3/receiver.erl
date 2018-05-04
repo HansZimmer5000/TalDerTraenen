@@ -12,7 +12,7 @@ start(CorePid) ->
 
 loop(CorePid) ->
     receive
-        {multicast, Message} -> CorePid ! Message;
+         {udp, _Socket0, _Ip0, _Port0, Message} -> CorePid ! Message;
         Any -> io:fwrite(io_lib:format("Got: ~p", [Any]))
     end,
     loop(CorePid).
