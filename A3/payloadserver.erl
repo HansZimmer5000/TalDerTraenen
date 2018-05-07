@@ -40,7 +40,7 @@ loop() ->
 			receive
 				Payload ->
 					%io:fwrite("Got Request from ~p", [AbsenderPid]),
-					AbsenderPid ! Payload
+					AbsenderPid ! {payload, Payload}
 			end;
 		Any ->
 			io:fwrite("got: ~p\n", [Any])
