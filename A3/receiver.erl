@@ -1,57 +1,71 @@
 -module(receiver).
 
 -export([
-    start/1,
     start/2,
+    start/3,
     
-    loop/1,
-    listen_to_slot/1
+    loop/2,
+    listen_to_slot/2
     ]).
 
 -define(NSNODE, hole_wert_aus_config_mit_key(node)).
 -define(NSNAME, nameservice).
 
--define(SLOTLENGTHMS, 20).
-
-start(CorePid) ->
-    start(CorePid, {?NSNAME, ?NSNODE}).
+-define(SLOTLENGTHMS, 40).
 
 % --------------------------------------------------
 
-start(CorePid, NsPid) ->
-    Pid = spawn(fun() -> loop(CorePid) end),
+start(CorePid, StationName) ->
+    start(CorePid, StationName,{?NSNAME, ?NSNODE}).
+
+start(CorePid, StationName,NsPid) ->
+    Pid = spawn(fun() -> loop(CorePid, StationName) end),
     NsPid ! {enlist, Pid},
     Pid.
 
-loop(CorePid) ->
+loop(CorePid, StationName) ->
     receive
         {udp, _Socket0, _Ip0, _Port0, Message} ->
             io:fwrite(io_lib:format("Missed Message: ~p in loop", [Message]));
         listentoslot -> 
-            listen_to_slot(CorePid);
+            listen_to_slot(CorePid, StationName);
         Any -> 
             io:fwrite(io_lib:format("Got: ~p in loop", [Any]))
     end,
-    loop(CorePid).
+    loop(CorePid, StationName).
 
-listen_to_slot(CorePid) ->
+listen_to_slot(CorePid, StationName) ->
     timer:send_after(?SLOTLENGTHMS, self(), stop_listening),
-    listen(CorePid, [], []).
+    {SlotMessages, ReceivedTimes} = listen([], []),
+    ConvertedSlotMessages = messagehelper:convertReceivedMessagesFromByte(SlotMessages, ReceivedTimes),
+    StationWasInvolved = stationWasInvolved(ConvertedSlotMessages, StationName),
 
-listen(CorePid, SlotMessages, ReceivedTimes) ->
+    CorePid ! {slotmessages, ConvertedSlotMessages, StationWasInvolved}.
+
+listen(SlotMessages, ReceivedTimes) ->
     receive
         {udp, _Socket0, _Ip0, _Port0, Message} -> 
             NewSlotMessages = [Message | SlotMessages],
             NewReceivedTimes = [erlang:timestamp() | ReceivedTimes],
-            listen(CorePid, NewSlotMessages, NewReceivedTimes);
+            listen(NewSlotMessages, NewReceivedTimes);
         stop_listening ->
-            CorePid ! {slotmessages, SlotMessages, ReceivedTimes},
-            loop(CorePid);
+            {SlotMessages, ReceivedTimes};
         Any -> 
             io:fwrite(io_lib:format("Got: ~p in listen_to_slot", [Any])),
-            listen(CorePid, SlotMessages, ReceivedTimes)
+            listen(SlotMessages, ReceivedTimes)
     end.
 
+stationWasInvolved([], _StationName) ->
+    false;
+stationWasInvolved(ConvertedSlotMessages, StationName) ->
+    [FirstConvertedSlotMessage | RestConvertedSlotMessages] = ConvertedSlotMessages,
+    MessageStationName = messagehelper:getStationName(FirstConvertedSlotMessage),
+    case MessageStationName of
+        StationName ->
+            true;
+        _Any ->
+            stationWasInvolved(RestConvertedSlotMessages, StationName)
+    end.    
 
 %-------------------------------------------------------------------
 

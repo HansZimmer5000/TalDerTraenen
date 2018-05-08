@@ -3,8 +3,9 @@
 -include_lib("eunit/include/eunit.hrl").
 
 start_1_test() ->
+    StationName = "Station1",
     ThisPid = self(),
-    TestPid = receiver:start(ThisPid, ThisPid),
+    TestPid = receiver:start(ThisPid, StationName,ThisPid),
     receive
         Any ->
             {enlist, Pid} = Any,
@@ -14,34 +15,38 @@ start_1_test() ->
     end.
 
 listen_to_slot_1_test() ->
+    StationName = "Station1",
+    SendTimeBinary = <<0,0,1,98,108,153,173,43>>,
+    Message2AsByte = <<"A-team-0602-123456789012-", 25, SendTimeBinary/binary>>,
     ThisPid = self(),
     TestPid = spawn(fun() ->
-                        receiver:listen_to_slot(ThisPid)
+                        receiver:listen_to_slot(ThisPid, StationName)
                     end),
-    TestPid ! {udp, empty, empty, empty, <<"Hallo Welt">>},
+    TestPid ! {udp, empty, empty, empty, Message2AsByte},
 
     receive 
         Any -> 
-            {slotmessages, Messages, ReceivedTimes} = Any,
-            [Message] = Messages,
-            [RecvTime] = ReceivedTimes,
-            DiffRecvTime = vsutil:diffTS(erlang:timestamp(), RecvTime),
+            {slotmessages, ConvertedMessages, StationWasInvolved} = Any,
+            [ConvertedMessage] = ConvertedMessages,
+            false = StationWasInvolved,
+            DiffRecvTime = vsutil:diffTS(erlang:timestamp(), messagehelper:getReceivedTime(ConvertedMessage)),
             {0,0,_} = DiffRecvTime,
-            ?assertEqual(<<"Hallo Welt">>, Message)
+            ?assertEqual(Message2AsByte, messagehelper:convertMessageToByte(ConvertedMessage))
         after timer:seconds(1) -> 
             ?assert(false)
     end.
 
 listen_to_slot_2_test() ->
+    StationName = "Station1",
     ThisPid = self(),
     _TestPid = spawn(fun() ->
-                        receiver:listen_to_slot(ThisPid)
+                        receiver:listen_to_slot(ThisPid, StationName)
                     end),
     receive 
         Any -> 
-            {slotmessages, Messages, ReceivedTimes} = Any,
-            ?assertEqual([], Messages),
-            ?assertEqual([], ReceivedTimes)
+            {slotmessages, ConvertedMessages, StationWasInvolved} = Any,
+            ?assertEqual([], ConvertedMessages),
+            ?assertEqual(false, StationWasInvolved)
         after timer:seconds(1) -> 
             ?assert(false)
     end.
@@ -49,7 +54,7 @@ listen_to_slot_2_test() ->
 loop_1_test() ->
     ThisPid = self(),
     TestPid = spawn(fun() ->
-                        receiver:loop(ThisPid)
+                        receiver:loop(ThisPid, "Station1")
                     end),
 
     TestPid ! {udp, empty, empty, empty, <<"Hallo Welt">>},
@@ -62,22 +67,26 @@ loop_1_test() ->
     end.
 
 loop_2_test() ->
+    StationName = "Station1",
+    SendTimeBinary = <<0,0,1,98,108,153,173,43>>,
+    Message1AsByte = <<"A-team-0602-123456789012-", 4, SendTimeBinary/binary>>,
+    Message2AsByte = <<"A-team-0602-123456789012-", 25, SendTimeBinary/binary>>,
     ThisPid = self(),
     TestPid = spawn(fun() ->
-                        receiver:loop(ThisPid)
+                        receiver:loop(ThisPid, StationName)
                     end),
-    TestPid ! {udp, empty, empty, empty, <<"Hallo Welt">>},            
+    TestPid ! {udp, empty, empty, empty, Message1AsByte},            
     TestPid ! listentoslot,
-    TestPid ! {udp, empty, empty, empty, <<"Hallo Welt2">>},
+    TestPid ! {udp, empty, empty, empty, Message2AsByte},
 
     receive 
         Any -> 
-            {slotmessages, Messages, ReceivedTimes} = Any,
-            [Message] = Messages,
-            [RecvTime] = ReceivedTimes,
-            DiffRecvTime = vsutil:diffTS(erlang:timestamp(), RecvTime),
+            {slotmessages, ConvertedMessages, StationWasInvolved} = Any,
+            [ConvertedMessage] = ConvertedMessages,
+            false = StationWasInvolved,
+            DiffRecvTime = vsutil:diffTS(erlang:timestamp(), messagehelper:getReceivedTime(ConvertedMessage)),
             {0,0,_} = DiffRecvTime,
-            ?assertEqual(<<"Hallo Welt2">>, Message)
+            ?assertEqual(Message2AsByte, messagehelper:convertMessageToByte(ConvertedMessage))
         after timer:seconds(1) -> 
             ?assert(false)
     end.
