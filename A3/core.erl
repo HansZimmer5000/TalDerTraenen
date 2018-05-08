@@ -15,34 +15,23 @@ start(ClockOffsetMS) ->
     ClockPid = utcclock:start(ClockOffsetMS),
     _PayloadServerPid = payloadserver:start(),
 
-    RecvPid ! listentoslot,
-    SendPid ! {send, "hallo welt"},
+    receive_loop(RecvPid, ClockPid).
 
-    receive_loop().
-
-receive_loop() ->
+receive_loop(RecvPid, ClockPid) ->
     receive
-        Any -> io:fwrite("Core Got: ~p", [Any])
+        %Einstiegsphase
+        %Sendephase
+        Any -> 
+            io:fwrite("Core Got: ~p", [Any])
     end,
-    receive_loop().
-    
-listen_to_slot(RecvPid, ClockPid) ->
+    receive_loop(RecvPid, ClockPid).
+
+listen_to_slot(RecvPid) ->
     RecvPid ! listentoslot,
     receive
-        {slotmessages, SlotMessages, ReceivedTimes} ->
-            case collision_happend(SlotMessages) of
-                false ->
-                    ConvertedMessages = messagehelper:convertReceivedMessagesFromByte(SlotMessages, ReceivedTimes),
-                    ClockPid ! {adjust, ConvertedMessages};
-                true ->
-                    donothing
-            end
-    end.
-
-collision_happend(SlotMessages) ->
-    case length(SlotMessages) of
-        1 -> false;
-        Any -> true
+        {slotmessages, ConvertedSlotMessages, StationWasInvolved} ->
+            %todo: Switch to Einstiegsphase if in Sendephase and StationWasInvolved = true
+            {ConvertedSlotMessages, StationWasInvolved}
     end.
 
 
