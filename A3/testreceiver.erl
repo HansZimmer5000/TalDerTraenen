@@ -29,8 +29,8 @@ listen_to_slot_1_test() ->
             {slotmessages, ConvertedMessages, StationWasInvolved} = Any,
             [ConvertedMessage] = ConvertedMessages,
             false = StationWasInvolved,
-            DiffRecvTime = vsutil:diffTS(erlang:timestamp(), messagehelper:getReceivedTime(ConvertedMessage)),
-            {0,0,_} = DiffRecvTime,
+            DiffRecvTime = messagehelper:getReceivedTime(ConvertedMessage) - vsutil:getUTC(),
+            ?assert(DiffRecvTime < 20),
             ?assertEqual(Message2AsByte, messagehelper:convertMessageToByte(ConvertedMessage))
         after timer:seconds(1) -> 
             ?assert(false)
@@ -84,8 +84,8 @@ loop_2_test() ->
             {slotmessages, ConvertedMessages, StationWasInvolved} = Any,
             [ConvertedMessage] = ConvertedMessages,
             false = StationWasInvolved,
-            DiffRecvTime = vsutil:diffTS(erlang:timestamp(), messagehelper:getReceivedTime(ConvertedMessage)),
-            {0,0,_} = DiffRecvTime,
+            DiffRecvTime = messagehelper:getReceivedTime(ConvertedMessage) - vsutil:getUTC(),
+            ?assert(DiffRecvTime < 20),
             ?assertEqual(Message2AsByte, messagehelper:convertMessageToByte(ConvertedMessage))
         after timer:seconds(1) -> 
             ?assert(false)
@@ -102,16 +102,14 @@ loop_3_test() ->
                         end),
         TestPid ! {udp, empty, empty, empty, Message1AsByte},            
         TestPid ! listentoslot,
+        TestPid ! {udp, empty, empty, empty, Message1AsByte}, 
         TestPid ! {udp, empty, empty, empty, Message2AsByte},
     
         receive 
             Any -> 
                 {slotmessages, ConvertedMessages, StationWasInvolved} = Any,
-                [ConvertedMessage] = ConvertedMessages,
-                ?assert(StationWasInvolved),
-                DiffRecvTime = vsutil:diffTS(erlang:timestamp(), messagehelper:getReceivedTime(ConvertedMessage)),
-                {0,0,_} = DiffRecvTime,
-                ?assertEqual(Message2AsByte, messagehelper:convertMessageToByte(ConvertedMessage))
+                ?assertEqual(ConvertedMessages, []),
+                ?assert(StationWasInvolved)
             after timer:seconds(1) -> 
                 ?assert(false)
         end.

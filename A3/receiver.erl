@@ -51,7 +51,7 @@ listen(SlotMessages, ReceivedTimes) ->
     receive
         {udp, _Socket0, _Ip0, _Port0, Message} -> 
             NewSlotMessages = [Message | SlotMessages],
-            NewReceivedTimes = [erlang:timestamp() | ReceivedTimes],
+            NewReceivedTimes = [vsutil:getUTC() | ReceivedTimes],
             listen(NewSlotMessages, NewReceivedTimes);
         stop_listening ->
             {SlotMessages, ReceivedTimes};

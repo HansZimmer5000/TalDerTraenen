@@ -1,30 +1,36 @@
 -module(utcclock).
 
 -export([
-    start/1,
+    start/2,
 
     adjust/2,
 
     get_8_byte_utc_binary/1
 ]).
 
-start(OffsetMS) ->
-    spawn(fun() -> loop(OffsetMS) end).
+-define(FRAMECHECKCYCLEMS, 10).
+
+start(OffsetMS, CorePid) ->
+    spawn(fun() -> loop(OffsetMS, CorePid) end).
 
 % --------------------------------------------------
 
-loop(OffsetMS) ->
+loop(OffsetMS, CorePid) ->
+    timer:send_after(?FRAMECHECKCYCLEMS, self(), checkframe),
     receive
         {adjust, Messages} ->
             NewOffsetMS = adjust(OffsetMS, Messages),
-            loop(NewOffsetMS);
+            loop(NewOffsetMS, CorePid);
+        checkframe ->
+            check_frame(OffsetMS, CorePid),
+            loop(OffsetMS, CorePid);
         {getcurrentoffsetms, Pid} ->
             %TODO: For Testing only?
             Pid ! OffsetMS,
-            loop(OffsetMS);
+            loop(OffsetMS, CorePid);
         Any -> 
             io:fwrite("Got: ~p", [Any]),
-            loop(OffsetMS)
+            loop(OffsetMS, CorePid)
     end.
 
 adjust(OffsetMS, Messages) ->
@@ -55,6 +61,16 @@ calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount) -
             calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount)
     end.
 
+check_frame(OffsetMS, CorePid) ->
+    case new_frame_started(OffsetMS) of
+        true ->
+            CorePid ! newframe;
+        false ->
+            donothing
+    end.
+
+new_frame_started(OffsetMS) ->
+    false.
 
 get_8_byte_utc_binary(ErlangTS) ->
     TSAsUTC = vsutil:now2UTC(ErlangTS),

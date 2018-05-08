@@ -19,12 +19,14 @@ start(ClockOffsetMS) ->
 
 receive_loop(RecvPid, ClockPid) ->
     receive
-        %Einstiegsphase
-        %Sendephase
+        newframe ->
+            %Einstiegsphase
+            %Sendephase
+            receive_loop(RecvPid, ClockPid);
         Any -> 
-            io:fwrite("Core Got: ~p", [Any])
-    end,
-    receive_loop(RecvPid, ClockPid).
+            io:fwrite("Core Got: ~p", [Any]),
+            receive_loop(RecvPid, ClockPid)
+    end.
 
 listen_to_slot(RecvPid) ->
     RecvPid ! listentoslot,
