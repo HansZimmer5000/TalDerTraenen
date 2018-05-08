@@ -15,17 +15,17 @@ start(ClockOffsetMS) ->
     ClockPid = utcclock:start(ClockOffsetMS),
     _PayloadServerPid = payloadserver:start(),
 
-    receive_loop(RecvPid, ClockPid).
+    receive_loop(RecvPid, SendPid, ClockPid).
 
-receive_loop(RecvPid, ClockPid) ->
+receive_loop(RecvPid, SendPid, ClockPid) ->
     receive
         newframe ->
             %Einstiegsphase
             %Sendephase
-            receive_loop(RecvPid, ClockPid);
+            receive_loop(RecvPid, SendPid, ClockPid);
         Any -> 
             io:fwrite("Core Got: ~p", [Any]),
-            receive_loop(RecvPid, ClockPid)
+            receive_loop(RecvPid, SendPid, ClockPid)
     end.
 
 listen_to_slot(RecvPid) ->
