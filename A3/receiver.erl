@@ -13,7 +13,6 @@
 
 -define(SLOTLENGTHMS, 40).
 
-% --------------------------------------------------
 
 start(CorePid, StationName) ->
     start(CorePid, StationName,{?NSNAME, ?NSNODE}).
@@ -22,6 +21,8 @@ start(CorePid, StationName,NsPid) ->
     Pid = spawn(fun() -> loop(CorePid, StationName) end),
     NsPid ! {enlist, Pid},
     Pid.
+
+% --------------------------------------------------
 
 loop(CorePid, StationName) ->
     receive
