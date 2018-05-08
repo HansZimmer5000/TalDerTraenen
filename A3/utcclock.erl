@@ -55,9 +55,10 @@ calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount) -
             calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount)
     end.
 
-% --------------------------------------------------
 
 get_8_byte_utc_binary(ErlangTS) ->
     TSAsUTC = vsutil:now2UTC(ErlangTS),
     Tmp = binary:encode_unsigned(TSAsUTC, big),
     <<0,0, Tmp/binary>>.
+
+% --------------------------------------------------
