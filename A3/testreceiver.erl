@@ -90,3 +90,28 @@ loop_2_test() ->
         after timer:seconds(1) -> 
             ?assert(false)
     end.
+
+loop_3_test() ->
+        StationName = "-team-0602-",
+        SendTimeBinary = <<0,0,1,98,108,153,173,43>>,
+        Message1AsByte = <<"A-team-0602-123456789012-", 4, SendTimeBinary/binary>>,
+        Message2AsByte = <<"A-team-0602-123456789012-", 25, SendTimeBinary/binary>>,
+        ThisPid = self(),
+        TestPid = spawn(fun() ->
+                            receiver:loop(ThisPid, StationName)
+                        end),
+        TestPid ! {udp, empty, empty, empty, Message1AsByte},            
+        TestPid ! listentoslot,
+        TestPid ! {udp, empty, empty, empty, Message2AsByte},
+    
+        receive 
+            Any -> 
+                {slotmessages, ConvertedMessages, StationWasInvolved} = Any,
+                [ConvertedMessage] = ConvertedMessages,
+                ?assert(StationWasInvolved),
+                DiffRecvTime = vsutil:diffTS(erlang:timestamp(), messagehelper:getReceivedTime(ConvertedMessage)),
+                {0,0,_} = DiffRecvTime,
+                ?assertEqual(Message2AsByte, messagehelper:convertMessageToByte(ConvertedMessage))
+            after timer:seconds(1) -> 
+                ?assert(false)
+        end.
