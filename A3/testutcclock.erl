@@ -57,7 +57,8 @@ adjust_4_test() ->
 check_frame_1_test() ->
     ThisPid = self(),
     Starttime = vsutil:getUTC(),
-    utcclock:check_frame(Starttime, 0, Starttime, ThisPid),
+    FrameCount = 0,
+    utcclock:check_frame(Starttime, 0, FrameCount, ThisPid),
     receive
         _Any -> 
             ?assert(false)
@@ -68,8 +69,8 @@ check_frame_1_test() ->
 check_frame_2_test() ->
     ThisPid = self(),
     Starttime = vsutil:getUTC(),
-    BeginnLastFrame = -1000,
-    utcclock:check_frame(Starttime, 0, BeginnLastFrame, ThisPid),
+    FrameCount = -1,
+    utcclock:check_frame(Starttime, 0, FrameCount, ThisPid),
     receive
         Any -> 
             ?assertEqual(newframe, Any)
@@ -78,27 +79,27 @@ check_frame_2_test() ->
     end.
 
 new_frame_started_1_test() ->
-    CurrentTime = utcclock:get_current_time(vsutil:getUTC(), 0),
-    BeginnLastFrame = CurrentTime - 1010,
-    NewFrameStarted = utcclock:new_frame_started(CurrentTime, BeginnLastFrame),
+    CurrentTime = 0,
+    FrameCount = -1,
+    NewFrameStarted = utcclock:new_frame_started(CurrentTime, FrameCount),
     ?assert(NewFrameStarted).
 
 new_frame_started_2_test() ->
-    CurrentTime = utcclock:get_current_time(vsutil:getUTC(), 0),
-    BeginnLastFrame = CurrentTime,
-    NewFrameStarted = utcclock:new_frame_started(CurrentTime, BeginnLastFrame),
+    CurrentTime = 0,
+    FrameCount = 0,
+    NewFrameStarted = utcclock:new_frame_started(CurrentTime, FrameCount),
     ?assertNot(NewFrameStarted).
 
 new_frame_started_3_test() ->
-    CurrentTime = 0,
-    BeginnLastFrame = -900,
-    NewFrameStarted = utcclock:new_frame_started(CurrentTime, BeginnLastFrame),
+    CurrentTime = 900,
+    FrameCount = 0,
+    NewFrameStarted = utcclock:new_frame_started(CurrentTime, FrameCount),
     ?assertNot(NewFrameStarted).
 
 new_frame_started_4_test() ->
-    CurrentTime = 0,
-    BeginnLastFrame = -1100,
-    NewFrameStarted = utcclock:new_frame_started(CurrentTime, BeginnLastFrame),
+    CurrentTime = 1000,
+    FrameCount = 0,
+    NewFrameStarted = utcclock:new_frame_started(CurrentTime, FrameCount),
     ?assert(NewFrameStarted).
 
 get_8_byte_utc_binary_1_test() ->

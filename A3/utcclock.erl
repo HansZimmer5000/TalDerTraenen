@@ -18,31 +18,31 @@ start(OffsetMS, CorePid) ->
     Starttime = vsutil:getUTC(),
     logge_status(io_lib:format("Starttime: ~p\n", [Starttime])),
     FramecheckCycleMS = ?FRAMECHECKCYCLEMS,
-    BeginnCurrentFrame = Starttime,
-    spawn(fun() -> loop(Starttime, OffsetMS, FramecheckCycleMS, BeginnCurrentFrame, CorePid) end).
+    FrameCount = 0,
+    spawn(fun() -> loop(Starttime, OffsetMS, FramecheckCycleMS, FrameCount, CorePid) end).
 
 % --------------------------------------------------
 
-loop(Starttime, OffsetMS, FramecheckCycleMS, BeginnCurrentFrame, CorePid) ->
+loop(Starttime, OffsetMS, FramecheckCycleMS, FrameCount, CorePid) ->
     timer:send_after(FramecheckCycleMS, self(), checkframe),
     receive
         {adjust, Messages} ->
             NewOffsetMS = adjust(OffsetMS, Messages),
-            loop(Starttime, NewOffsetMS, FramecheckCycleMS, BeginnCurrentFrame, CorePid);
+            loop(Starttime, NewOffsetMS, FramecheckCycleMS, FrameCount, CorePid);
         checkframe ->
-            NewBeginnCurrentFrame = check_frame(Starttime, OffsetMS, BeginnCurrentFrame, CorePid),
-            loop(Starttime, OffsetMS, FramecheckCycleMS, NewBeginnCurrentFrame, CorePid);
+            NewFrameCount = check_frame(Starttime, OffsetMS, FrameCount, CorePid),
+            loop(Starttime, OffsetMS, FramecheckCycleMS, NewFrameCount, CorePid);
 
         {getcurrentoffsetms, SenderPid} ->
             %For Testing only
             SenderPid ! OffsetMS,
-            loop(Starttime, OffsetMS, FramecheckCycleMS, BeginnCurrentFrame, CorePid);
+            loop(Starttime, OffsetMS, FramecheckCycleMS, FrameCount, CorePid);
         {getcurrenttime, SenderPid} ->
             SenderPid ! get_current_time(Starttime, OffsetMS),
-            loop(Starttime, OffsetMS, FramecheckCycleMS, BeginnCurrentFrame, CorePid);
+            loop(Starttime, OffsetMS, FramecheckCycleMS, FrameCount, CorePid);
         Any -> 
             io:fwrite("Got: ~p", [Any]),
-            loop(Starttime, OffsetMS, FramecheckCycleMS, BeginnCurrentFrame, CorePid)
+            loop(Starttime, OffsetMS, FramecheckCycleMS, FrameCount, CorePid)
     end.
 
 adjust(OffsetMS, Messages) ->
@@ -73,21 +73,22 @@ calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount) -
             calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount)
     end.
 
-check_frame(Starttime, OffsetMS, BeginnCurrentFrame, CorePid) ->
+check_frame(Starttime, OffsetMS, FrameCount, CorePid) ->   
+    %TODO: Mit zunehmender laufzeit erkennt er immer später erst wann der neue Frame beginnt!
     CurrentTime = get_current_time(Starttime, OffsetMS),
-    case new_frame_started(CurrentTime, BeginnCurrentFrame) of
+    case new_frame_started(CurrentTime, FrameCount) of
         true ->
             CorePid ! newframe,
             logge_status(io_lib:format("New Frame at: ~p", [CurrentTime])),
-            CurrentTime;
+            FrameCount + 1;
         false ->
             logge_status(io_lib:format("No New Frame at: ~p", [CurrentTime])),
-            BeginnCurrentFrame
+            FrameCount
     end.
 
-new_frame_started(CurrentTime, BeginnCurrentFrame) ->
+new_frame_started(CurrentTime, FrameCount) ->
     %Ist die Aktuelle Zeit genau auf 0 Sekunden oder 0 Sekunden + FRAMECHECKCYCLE - 1?
-    TimeElapsedInCurrentFrame = CurrentTime - BeginnCurrentFrame,
+    TimeElapsedInCurrentFrame = CurrentTime - (FrameCount * 1000),
     TimeElapsedInCurrentFrame >= 1000.
 
 get_current_time(Starttime, OffsetMS) ->
