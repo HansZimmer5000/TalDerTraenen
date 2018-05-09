@@ -38,7 +38,7 @@ loop(CorePid, StationName) ->
 listen_to_slot(CorePid, StationName) ->
     timer:send_after(?SLOTLENGTHMS, self(), stop_listening),
     {SlotMessages, ReceivedTimes} = listen([], []),
-    ConvertedSlotMessages = messagehelper:convertReceivedMessagesFromByte(SlotMessages, ReceivedTimes),
+    ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
     {CollisionHappend, StationWasInvolved} = collision_happend(ConvertedSlotMessages, StationName),
     case CollisionHappend of
         true ->
@@ -71,7 +71,7 @@ station_was_involved([], _StationName) ->
     false;
 station_was_involved(ConvertedSlotMessages, StationName) ->
     [FirstConvertedSlotMessage | RestConvertedSlotMessages] = ConvertedSlotMessages,
-    MessageStationName = messagehelper:getStationName(FirstConvertedSlotMessage),
+    MessageStationName = messagehelper:get_station_name(FirstConvertedSlotMessage),
     case MessageStationName of
         StationName ->
             true;

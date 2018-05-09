@@ -2,20 +2,20 @@
 
 
 -export([
-    convertReceivedMessagesFromByte/2,
-    convertMessageFromByte/2,
+    convert_received_messages_from_byte/2,
+    convert_message_from_byte/2,
 
-    createIncompleteMessage/2,
+    create_incomplete_message/2,
 
-    prepareIncompleteMessageForSending/3,
-    setSendTimeAndPayload/3,
-    convertMessageToByte/1,
+    prepare_incomplete_message_for_sending/3,
+    set_sendtime_and_payload/3,
+    convert_message_to_byte/1,
 
-    getStationType/1,
-    getStationName/1,
-    getSlotNumber/1,
-    getSendTime/1,
-    getReceivedTime/1
+    get_station_type/1,
+    get_station_name/1,
+    get_slotnumber/1,
+    get_sendtime/1,
+    get_receivedtime/1
 ]).
 
 -define(SLOTNUMBERPOS, 26). %Because String as List starts at 1 instead of 0.
@@ -37,20 +37,20 @@
 %   (When Added) SendTime = Number with 13 numbers (UTC with e.g. vsutil:getUTC())
 %   (When Message was Received) RecievedTime = Same format as SendTime
 
-convertReceivedMessagesFromByte(MessagesInByte, ReceivedTimes) ->
-    convertReceivedMessagesFromByte(MessagesInByte, ReceivedTimes, []).
+convert_received_messages_from_byte(MessagesInByte, ReceivedTimes) ->
+    convert_received_messages_from_byte(MessagesInByte, ReceivedTimes, []).
 
-convertReceivedMessagesFromByte([], [], ConvertedMessages) ->
+convert_received_messages_from_byte([], [], ConvertedMessages) ->
     ConvertedMessages;
-convertReceivedMessagesFromByte(MessagesInByte, ReceivedTimes, ConvertedMessages) ->
+convert_received_messages_from_byte(MessagesInByte, ReceivedTimes, ConvertedMessages) ->
     [FirstMessageInByte | RestMessagesInByte] = MessagesInByte,
     [FirstReceivedTime | RestReceivedTimes] = ReceivedTimes,
-    ConvertedMessage = convertMessageFromByte(FirstMessageInByte, FirstReceivedTime),
+    ConvertedMessage = convert_message_from_byte(FirstMessageInByte, FirstReceivedTime),
     NewConvertedMessages = [ConvertedMessage | ConvertedMessages],
-    convertReceivedMessagesFromByte(RestMessagesInByte, RestReceivedTimes, NewConvertedMessages).
+    convert_received_messages_from_byte(RestMessagesInByte, RestReceivedTimes, NewConvertedMessages).
 
 
-convertMessageFromByte(MessageInByte, ReceivedTime) ->
+convert_message_from_byte(MessageInByte, ReceivedTime) ->
     {StationType,Payload,SlotNumber,SendTime} = vsutil:message_to_string(MessageInByte),
 
     StationName = lists:sublist(Payload, 1, 11),
@@ -58,14 +58,14 @@ convertMessageFromByte(MessageInByte, ReceivedTime) ->
 
     {{StationType, StationName, ExtraPayload, SlotNumber, SendTime}, ReceivedTime}.
 
-createIncompleteMessage(StationType, SlotNumber) ->
+create_incomplete_message(StationType, SlotNumber) ->
     {{StationType, empty, empty, SlotNumber, empty}, empty}.
 
-prepareIncompleteMessageForSending(IncompleteMessage, SendTime, Payload) ->
-    CompleteMessage = setSendTimeAndPayload(IncompleteMessage, SendTime, Payload),
-    convertMessageToByte(CompleteMessage).
+prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, Payload) ->
+    CompleteMessage = set_sendtime_and_payload(IncompleteMessage, SendTime, Payload),
+    convert_message_to_byte(CompleteMessage).
 
-setSendTimeAndPayload(IncompleteMessage, NewSendTime, Payload) ->
+set_sendtime_and_payload(IncompleteMessage, NewSendTime, Payload) ->
     {{StationType, empty, empty, SlotNumber, empty}, ReceivedTime} = IncompleteMessage,
 
     StationName = lists:sublist(Payload, 1, 11),
@@ -73,7 +73,7 @@ setSendTimeAndPayload(IncompleteMessage, NewSendTime, Payload) ->
 
     {{StationType, StationName, ExtraPayload, SlotNumber, NewSendTime}, ReceivedTime}.
 
-convertMessageToByte(Message) ->
+convert_message_to_byte(Message) ->
     {{StationType, StationName, ExtraPayload, SlotNumber, NewSendTime}, _} = Message,
 
     BinStation = vsutil:createBinaryS(StationType),
@@ -85,22 +85,22 @@ convertMessageToByte(Message) ->
 
 % --------------------------------------------------
 
-getStationType(Message) ->
+get_station_type(Message) ->
     {{StationType, _, _, _, _}, _} = Message,
     StationType.
 
-getStationName(Message) ->
+get_station_name(Message) ->
     {{_, StationName, _, _, _}, _} = Message,
     StationName.
 
-getSlotNumber(Message) ->
+get_slotnumber(Message) ->
     {{_, _, _, SlotNumber, _}, _} = Message,
     SlotNumber.
 
-getSendTime(Message) ->
+get_sendtime(Message) ->
     {{_, _, _, _, SendTime}, _} = Message,
     SendTime.
 
-getReceivedTime(Message) ->
+get_receivedtime(Message) ->
     {{_, _, _, _, _}, ReceivedTime} = Message,
     ReceivedTime.

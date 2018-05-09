@@ -80,10 +80,10 @@ calc_average_diff_ms(Messages) ->
 calc_average_diff_ms([], TotalDiffMS, TotalCount) ->
     {TotalDiffMS, TotalCount};
 calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount) ->
-    case messagehelper:getStationType(CurrentMessage) of
+    case messagehelper:get_station_type(CurrentMessage) of
         "A" ->
-            SendTime = messagehelper:getSendTime(CurrentMessage),
-            RecvTime = messagehelper:getReceivedTime(CurrentMessage),
+            SendTime = messagehelper:get_sendtime(CurrentMessage),
+            RecvTime = messagehelper:get_receivedtime(CurrentMessage),
             NewTotalDiffMS = TotalDiffMS + RecvTime - SendTime,
             calc_average_diff_ms(RestMessages, NewTotalDiffMS, TotalCount + 1);
         _Any ->

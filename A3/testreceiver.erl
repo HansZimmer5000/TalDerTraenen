@@ -29,9 +29,9 @@ listen_to_slot_1_test() ->
             {slotmessages, ConvertedMessages, StationWasInvolved} = Any,
             [ConvertedMessage] = ConvertedMessages,
             false = StationWasInvolved,
-            DiffRecvTime = messagehelper:getReceivedTime(ConvertedMessage) - vsutil:getUTC(),
+            DiffRecvTime = messagehelper:get_receivedtime(ConvertedMessage) - vsutil:getUTC(),
             ?assert(DiffRecvTime < 20),
-            ?assertEqual(Message2AsByte, messagehelper:convertMessageToByte(ConvertedMessage))
+            ?assertEqual(Message2AsByte, messagehelper:convert_message_to_byte(ConvertedMessage))
         after timer:seconds(1) -> 
             ?assert(false)
     end.
@@ -84,9 +84,9 @@ loop_2_test() ->
             {slotmessages, ConvertedMessages, StationWasInvolved} = Any,
             [ConvertedMessage] = ConvertedMessages,
             false = StationWasInvolved,
-            DiffRecvTime = messagehelper:getReceivedTime(ConvertedMessage) - vsutil:getUTC(),
+            DiffRecvTime = messagehelper:get_receivedtime(ConvertedMessage) - vsutil:getUTC(),
             ?assert(DiffRecvTime < 20),
-            ?assertEqual(Message2AsByte, messagehelper:convertMessageToByte(ConvertedMessage))
+            ?assertEqual(Message2AsByte, messagehelper:convert_message_to_byte(ConvertedMessage))
         after timer:seconds(1) -> 
             ?assert(false)
     end.

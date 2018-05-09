@@ -48,7 +48,7 @@ prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServ
     SendtimeMS = notify_when_preperation_and_send_due(ClockPid, SlotNumber),
     receive
         preperation ->
-            IncompleteMessage = messagehelper:createIncompleteMessage(StationType, SlotNumber),
+            IncompleteMessage = messagehelper:create_incomplete_message(StationType, SlotNumber),
             receive
                 send ->
                     ClockPid ! {calcdifftime, SendtimeMS, self()},
@@ -76,7 +76,7 @@ send_message(IncompleteMessage, PayloadServerPid, SendPid) ->
     PayloadServerPid ! {self(), getNextPayload},
     receive
         {payload, Payload} ->
-            Message = messagehelper:prepareIncompleteMessageForSending(IncompleteMessage, SendTime, Payload),
+            Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, Payload),
             SendPid ! {send, Message}
     end.
 
