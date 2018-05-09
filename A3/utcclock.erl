@@ -5,38 +5,42 @@
 
     adjust/2,
 
+    check_frame/4,
+    new_frame_started/3,
+
     get_8_byte_utc_binary/1
 ]).
 
 -define(FRAMECHECKCYCLEMS, 10).
 
 start(OffsetMS, CorePid) ->
-    spawn(fun() -> loop(OffsetMS, CorePid) end).
+    Starttime = vsutil:getUTC(),
+    FramecheckCycleMS = ?FRAMECHECKCYCLEMS,
+    spawn(fun() -> loop(Starttime, OffsetMS, FramecheckCycleMS, CorePid) end).
 
 % --------------------------------------------------
 
-loop(OffsetMS, CorePid) ->
-    timer:send_after(?FRAMECHECKCYCLEMS, self(), checkframe),
+loop(Starttime, OffsetMS, FramecheckCycleMS, CorePid) ->
+    timer:send_after(FramecheckCycleMS, self(), checkframe),
     receive
         {adjust, Messages} ->
             NewOffsetMS = adjust(OffsetMS, Messages),
-            loop(NewOffsetMS, CorePid);
+            loop(Starttime, NewOffsetMS, FramecheckCycleMS, CorePid);
         checkframe ->
-            check_frame(OffsetMS, CorePid),
-            loop(OffsetMS, CorePid);
-        {getcurrentoffsetms, Pid} ->
-            %TODO: For Testing only?
-            Pid ! OffsetMS,
-            loop(OffsetMS, CorePid);
+            check_frame(Starttime, OffsetMS, FramecheckCycleMS, CorePid),
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CorePid);
+        {getcurrentoffsetms, SenderPid} ->
+            SenderPid ! OffsetMS,
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CorePid);
         Any -> 
             io:fwrite("Got: ~p", [Any]),
-            loop(OffsetMS, CorePid)
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CorePid)
     end.
 
 adjust(OffsetMS, Messages) ->
     AverageDiffMS = calc_average_diff_ms(Messages),
     NewOffsetMS = OffsetMS + AverageDiffMS,
-    NewOffsetMS.
+    round(NewOffsetMS).
 
 calc_average_diff_ms(Messages) ->
     {TotalDiffMS, TotalCount} = calc_average_diff_ms(Messages, 0, 0),
@@ -61,16 +65,22 @@ calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount) -
             calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount)
     end.
 
-check_frame(OffsetMS, CorePid) ->
-    case new_frame_started(OffsetMS) of
+check_frame(Starttime, OffsetMS, FramecheckCycleMS, CorePid) ->
+    case new_frame_started(Starttime, OffsetMS, FramecheckCycleMS) of
         true ->
             CorePid ! newframe;
         false ->
             donothing
     end.
 
-new_frame_started(OffsetMS) ->
-    false.
+new_frame_started(Starttime, OffsetMS, FramecheckCycleMS) ->
+    %Ist die Aktuelle Zeit genau auf 0 Sekunden oder 0 Sekunden + FRAMECHECKCYCLE - 1?
+    TimeElapsedInCurrentFrame = get_current_time(Starttime, OffsetMS) rem 1000,
+    (TimeElapsedInCurrentFrame >= 0) and (TimeElapsedInCurrentFrame < (FramecheckCycleMS - 1)).
+
+get_current_time(Starttime, OffsetMS) ->
+    Result = vsutil:getUTC() - Starttime + OffsetMS,
+    round(Result).
 
 get_8_byte_utc_binary(ErlangTS) ->
     TSAsUTC = vsutil:now2UTC(ErlangTS),
