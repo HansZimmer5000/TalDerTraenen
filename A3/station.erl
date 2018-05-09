@@ -4,6 +4,8 @@
     start/1
 ]).
 
-start([StationTypeAtom]) ->
+start([StationTypeAtom, StationNameAtom]) ->
     StationType = atom_to_list(StationTypeAtom),
-    core:start(StationType).
+    StationName = atom_to_list(StationNameAtom),
+    LogFile = io_lib:format("~p.log", [StationName]),
+    core:start(StationType, StationName, LogFile).

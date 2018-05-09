@@ -5,7 +5,7 @@
 start_1_test() ->
     StationName = "Station1",
     ThisPid = self(),
-    TestPid = receiver:start(ThisPid, StationName,ThisPid),
+    TestPid = receiver:start(ThisPid, StationName, "testrecv.log", ThisPid),
     receive
         Any ->
             {enlist, Pid} = Any,
@@ -20,7 +20,7 @@ listen_to_slot_1_test() ->
     Message2AsByte = <<"Ateam 06-021234567890123-", 25, SendTimeBinary/binary>>,
     ThisPid = self(),
     TestPid = spawn(fun() ->
-                        receiver:listen_to_slot(ThisPid, StationName)
+                        receiver:listen_to_slot(ThisPid, StationName, "testrecv.log")
                     end),
     TestPid ! {udp, empty, empty, empty, Message2AsByte},
 
@@ -40,7 +40,7 @@ listen_to_slot_2_test() ->
     StationName = "Station1",
     ThisPid = self(),
     _TestPid = spawn(fun() ->
-                        receiver:listen_to_slot(ThisPid, StationName)
+                        receiver:listen_to_slot(ThisPid, StationName, "testrecv.log")
                     end),
     receive 
         Any -> 
@@ -54,7 +54,7 @@ listen_to_slot_2_test() ->
 loop_1_test() ->
     ThisPid = self(),
     TestPid = spawn(fun() ->
-                        receiver:loop(ThisPid, "Station1")
+                        receiver:loop(ThisPid, "Station1", "testrecv.log")
                     end),
 
     TestPid ! {udp, empty, empty, empty, <<"Hallo Welt">>},
@@ -73,7 +73,7 @@ loop_2_test() ->
     Message2AsByte = <<"Ateam 06-021234567890123-", 25, SendTimeBinary/binary>>,
     ThisPid = self(),
     TestPid = spawn(fun() ->
-                        receiver:loop(ThisPid, StationName)
+                        receiver:loop(ThisPid, StationName, "testrecv.log")
                     end),
     TestPid ! {udp, empty, empty, empty, Message1AsByte},            
     TestPid ! listentoslot,
@@ -98,7 +98,7 @@ loop_3_test() ->
         Message2AsByte = <<"Ateam 06-021234567890123-", 25, SendTimeBinary/binary>>,
         ThisPid = self(),
         TestPid = spawn(fun() ->
-                            receiver:loop(ThisPid, StationName)
+                            receiver:loop(ThisPid, StationName, "testrecv.log")
                         end),
         TestPid ! {udp, empty, empty, empty, Message1AsByte},            
         TestPid ! listentoslot,

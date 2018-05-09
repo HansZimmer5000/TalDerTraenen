@@ -1,7 +1,8 @@
 -module(core).
 
 -export([
-    start/1,
+    start/3,
+    start/4,
 
     listen_to_frame/1,
     listen_to_slot/1,
@@ -13,33 +14,33 @@
 -define(CLOCKOFFSETMS, 0).
 -define(MESSAGEPREPERATIONTIMEMS, 10).
 
-start(StationType) ->
-    start(StationType, ?CLOCKOFFSETMS).
+start(StationType, StationName, LogFile) ->
+    start(StationType, StationName, LogFile, ?CLOCKOFFSETMS).
 
-start(StationType, ClockOffsetMS) ->
-    io:fwrite("start"),
-    StationName = "team 06-02",
+start(StationType, StationName, LogFile, ClockOffsetMS) ->
+    logge_status("Startet", LogFile),
 
-    RecvPid = receiver:start(self(), StationName),
-    SendPid = sender:start(),
-    ClockPid = utcclock:start(ClockOffsetMS, self()),
-    PayloadServerPid = payloadserver:start(),
+    RecvPid = receiver:start(self(), StationName, LogFile),
+    SendPid = sender:start(LogFile),
+    ClockPid = utcclock:start(ClockOffsetMS, self(), LogFile),
+    PayloadServerPid = payloadserver:start(LogFile),
 
-    entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid).
+    entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid, LogFile).
 
-entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid) ->
+entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid, LogFile) ->
     receive
         newframe ->
+            logge_status("New Frame Started", LogFile),
             {Messages, _StationWasInvolved} = listen_to_frame(RecvPid),
             ClockPid ! {adjust, Messages},
             SlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName),
-            send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber);
+            send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile);
         Any -> 
-            io:fwrite("Core Got: ~p", [Any]),
-            entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid)
+            logge_status("Got: ~p", [Any], LogFile),
+            entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid, LogFile)
     end.
 
-send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber) ->
+send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile) ->
     receive
         newframe ->
             ThisPid = self(),
@@ -54,14 +55,14 @@ send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid
                 {messagewassend, MessageWasSend} -> 
                     case (StationWasInvolved or not(MessageWasSend)) of
                         true ->
-                            entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid);
+                            entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid, LogFile);
                         false ->
-                            send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber)
+                            send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile)
                     end
             end;
         Any -> 
-            io:fwrite("Core Got: ~p", [Any]),
-            send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber)
+            logge_status("Got: ~p", [Any], LogFile),
+            send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile)
     end.
 
 listen_to_frame(RecvPid) ->
@@ -131,3 +132,13 @@ notify_when_preperation_and_send_due(ClockPid, SlotNumber) ->
     end,
     SendtimeMS.
 
+%------------------------------------------
+logge_status(Text, Input, LogFile) ->
+    Inhalt = io_lib:format(Text,Input),
+    logge_status(Inhalt, LogFile).
+
+logge_status(Inhalt, LogFile) ->
+    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
+    LogNachricht = io_lib:format("~p Core ~s.\n", [AktuelleZeit, Inhalt]),
+    io:fwrite(LogNachricht),
+    util:logging(LogFile, LogNachricht).

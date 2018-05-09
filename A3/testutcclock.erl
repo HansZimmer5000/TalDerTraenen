@@ -8,7 +8,7 @@
 start_1_test() ->
     OffsetMS = ?DEFAULTOFFSETMS,
     ThisPid = self(),
-    TestPid = utcclock:start(OffsetMS,ThisPid),
+    TestPid = utcclock:start(OffsetMS,ThisPid, "testclock.log"),
     TestPid ! {adjust, []},
     TestPid ! {getcurrentoffsetms, self()},
     receive

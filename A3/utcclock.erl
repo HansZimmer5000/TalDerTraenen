@@ -1,7 +1,7 @@
 -module(utcclock).
 
 -export([
-    start/2,
+    start/3,
 
     adjust/2,
 
@@ -19,47 +19,49 @@
 -define(FRAMELENGTHMS, 1000).
 -define(SLOTLENGTHMS, 40).
 
-start(OffsetMS, CorePid) ->
+start(OffsetMS, CorePid, LogFile) ->
     Starttime = vsutil:getUTC(),
-    logge_status(io_lib:format("Starttime: ~p\n", [Starttime])),
+    logge_status("Starttime: ~p\n", [Starttime], LogFile),
     FramecheckCycleMS = ?FRAMECHECKCYCLEMS,
     CurrentFrameNumber = 0,
-    spawn(fun() -> loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid) end).
+    ClockPid = spawn(fun() -> loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile) end),
+    logge_status("started", LogFile),
+    ClockPid.
 
 % --------------------------------------------------
 
-loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid) ->
+loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile) ->
     timer:send_after(FramecheckCycleMS, self(), checkframe),
     receive
         {adjust, Messages} ->
             NewOffsetMS = adjust(OffsetMS, Messages),
-            loop(Starttime, NewOffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid);
+            loop(Starttime, NewOffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         checkframe ->
             NewCurrentFrameNumber = check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid),
-            loop(Starttime, OffsetMS, FramecheckCycleMS, NewCurrentFrameNumber, CorePid);
+            loop(Starttime, OffsetMS, FramecheckCycleMS, NewCurrentFrameNumber, CorePid, LogFile);
         {calcslotbeginn, SlotNumber, SenderPid} ->
             SendtimeMS = calc_slot_beginn_this_frame_time(CurrentFrameNumber, SlotNumber),
             SenderPid ! {resultslotbeginn, SendtimeMS};
         {alarm, AlarmMessage, TimeWhenItsDue, SenderPid} ->
             TimeTillItsDue = TimeWhenItsDue - get_current_time(Starttime, OffsetMS),
             set_alarm(AlarmMessage, TimeTillItsDue, SenderPid),
-            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid);
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         {calcdifftime, SlotBeginnInFrame, SenderPid} ->
             CurrentTime = get_current_time(Starttime, OffsetMS),
             DiffTime = calc_diff_time(CurrentTime, SlotBeginnInFrame),
             SenderPid ! {resultdifftime, DiffTime},
-            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid);
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
 
         {getcurrentoffsetms, SenderPid} ->
             %For Testing only
             SenderPid ! OffsetMS,
-            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid);
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         {getcurrenttime, SenderPid} ->
             SenderPid ! get_current_time(Starttime, OffsetMS),
-            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid);
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         Any -> 
-            io:fwrite("Got: ~p", [Any]),
-            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid)
+            logge_status("Got: ~p", [Any], LogFile),
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile)
     end.
 
 adjust(OffsetMS, Messages) ->
@@ -95,10 +97,10 @@ check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid) ->
     case new_frame_started(CurrentTime, CurrentFrameNumber) of
         true ->
             CorePid ! newframe,
-            logge_status(io_lib:format("New Frame at: ~p", [CurrentTime])),
+            %logge_status(io_lib:format("New Frame at: ~p", [CurrentTime])),
             CurrentFrameNumber + 1;
         false ->
-            logge_status(io_lib:format("No New Frame at: ~p", [CurrentTime])),
+            %logge_status(io_lib:format("No New Frame at: ~p", [CurrentTime])),
             CurrentFrameNumber
     end.
 
@@ -133,11 +135,13 @@ get_8_byte_utc_binary(ErlangTS) ->
     Tmp = binary:encode_unsigned(TSAsUTC, big),
     <<0,0, Tmp/binary>>.
 
-% --------------------------------------------------
+%------------------------------------------
+logge_status(Text, Input, LogFile) ->
+    Inhalt = io_lib:format(Text,Input),
+    logge_status(Inhalt, LogFile).
 
-logge_status(Inhalt) ->
-    LOG_DATEI_NAME = "clock.log",
+logge_status(Inhalt, LogFile) ->
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
-    LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
-    %io:fwrite(LogNachricht),
-    util:logging(LOG_DATEI_NAME, LogNachricht).
+    LogNachricht = io_lib:format("~p Clock ~s.\n", [AktuelleZeit, Inhalt]),
+    io:fwrite(LogNachricht),
+    util:logging(LogFile, LogNachricht).
