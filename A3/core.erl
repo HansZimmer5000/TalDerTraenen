@@ -13,15 +13,12 @@
 -define(CLOCKOFFSETMS, 0).
 -define(MESSAGEPREPERATIONTIMEMS, 10).
 
-start([StationTypeAtom]) ->
-    StationType = atom_to_list(StationTypeAtom),
-    start(StationType, ?CLOCKOFFSETMS);
 start(StationType) ->
     start(StationType, ?CLOCKOFFSETMS).
 
 start(StationType, ClockOffsetMS) ->
     io:fwrite("start"),
-    StationName = "-team-0602-",
+    StationName = "team 06-02",
 
     RecvPid = receiver:start(self(), StationName),
     SendPid = sender:start(),

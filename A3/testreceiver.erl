@@ -17,7 +17,7 @@ start_1_test() ->
 listen_to_slot_1_test() ->
     StationName = "Station1",
     SendTimeBinary = <<0,0,1,98,108,153,173,43>>,
-    Message2AsByte = <<"A-team-0602-123456789012-", 25, SendTimeBinary/binary>>,
+    Message2AsByte = <<"Ateam 06-021234567890123-", 25, SendTimeBinary/binary>>,
     ThisPid = self(),
     TestPid = spawn(fun() ->
                         receiver:listen_to_slot(ThisPid, StationName)
@@ -69,8 +69,8 @@ loop_1_test() ->
 loop_2_test() ->
     StationName = "Station1",
     SendTimeBinary = <<0,0,1,98,108,153,173,43>>,
-    Message1AsByte = <<"A-team-0602-123456789012-", 4, SendTimeBinary/binary>>,
-    Message2AsByte = <<"A-team-0602-123456789012-", 25, SendTimeBinary/binary>>,
+    Message1AsByte = <<"Ateam 06-021234567890123-", 4, SendTimeBinary/binary>>,
+    Message2AsByte = <<"Ateam 06-021234567890123-", 25, SendTimeBinary/binary>>,
     ThisPid = self(),
     TestPid = spawn(fun() ->
                         receiver:loop(ThisPid, StationName)
@@ -92,10 +92,10 @@ loop_2_test() ->
     end.
 
 loop_3_test() ->
-        StationName = "-team-0602-",
+        StationName = "team 06-02",
         SendTimeBinary = <<0,0,1,98,108,153,173,43>>,
-        Message1AsByte = <<"A-team-0602-123456789012-", 4, SendTimeBinary/binary>>,
-        Message2AsByte = <<"A-team-0602-123456789012-", 25, SendTimeBinary/binary>>,
+        Message1AsByte = <<"Ateam 06-021234567890123-", 4, SendTimeBinary/binary>>,
+        Message2AsByte = <<"Ateam 06-021234567890123-", 25, SendTimeBinary/binary>>,
         ThisPid = self(),
         TestPid = spawn(fun() ->
                             receiver:loop(ThisPid, StationName)

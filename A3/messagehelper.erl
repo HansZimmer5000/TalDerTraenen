@@ -53,8 +53,8 @@ convert_received_messages_from_byte(MessagesInByte, ReceivedTimes, ConvertedMess
 convert_message_from_byte(MessageInByte, ReceivedTime) ->
     {StationType,Payload,SlotNumber,SendTime} = vsutil:message_to_string(MessageInByte),
 
-    StationName = lists:sublist(Payload, 1, 11),
-    ExtraPayload = lists:sublist(Payload, 12, 13),
+    StationName = lists:sublist(Payload, 1, 10),
+    ExtraPayload = lists:sublist(Payload, 11, 14),
 
     {{StationType, StationName, ExtraPayload, SlotNumber, SendTime}, ReceivedTime}.
 
@@ -67,9 +67,9 @@ prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, Payload) ->
 
 set_sendtime_and_payload(IncompleteMessage, NewSendTime, Payload) ->
     {{StationType, empty, empty, SlotNumber, empty}, ReceivedTime} = IncompleteMessage,
-
-    StationName = lists:sublist(Payload, 1, 11),
-    ExtraPayload = lists:sublist(Payload, 12, 13),
+    
+    StationName = lists:sublist(Payload, 1, 10),
+    ExtraPayload = lists:sublist(Payload, 11, 14),
 
     {{StationType, StationName, ExtraPayload, SlotNumber, NewSendTime}, ReceivedTime}.
 

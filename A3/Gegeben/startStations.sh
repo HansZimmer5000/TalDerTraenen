@@ -41,7 +41,7 @@ UTCoffsetMs=$7
 #
 # Example: teamNo="2"
 ########################################################################################################
-teamNo=""
+teamNo="6"
 
 ########################################################################################################
 # TODO: Enter data source programme with full path, but WITHOUT parameters 
@@ -49,7 +49,7 @@ teamNo=""
 # Example:    dataSource="~/somewhere/DataSource"
 #         or  dataSource="java -cp . datasource.DataSource"
 ########################################################################################################
-dataSource=""
+dataSource="java -cp . vessel3.Vessel"
 
 ########################################################################################################
 # TODO: Enter your station's start command.
@@ -57,8 +57,8 @@ dataSource=""
 #
 # Example: stationCmd="java aufgabe4.MyStation $interfaceName $mcastAddress $receivePort $stationClass"
 ########################################################################################################
-stationCmd=""
-
+stationCmd="erl -noshell -sname station $interfaceName $mcastAddress $receivePort $stationClass"
+#erl -noshell -sname " + nodename + " -s " + modulename + " start" + " " + parameter
 
 printUsage() {
 	echo "Usage: $0 <interface> <multicast-address> <receive-port> <from-station-index> <to-station-index> <station-class> [ <UTC-offset-(ms)> ]"

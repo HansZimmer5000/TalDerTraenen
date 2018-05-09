@@ -18,16 +18,16 @@
 %    get_slotnumber/1
 
 % <<0,0,1,98,108,153,173,43>> == 1522240433451.
--define(DEFAULT_FULL_MESSAGE_4, {{"A", "-team-0602-", "123456789012-", 4, 1522240433451}, empty}).
--define(DEFAULT_FULL_MESSAGE_25, {{"A", "-team-0602-", "123456789012-", 25, 1522240433451}, empty}).
--define(DEFAULT_FULL_RECEIVED_MESSAGE_4, {{"A", "-team-0602-", "123456789012-", 4, 1522240433451}, 1522240433451}).
--define(DEFAULT_FULL_RECEIVED_MESSAGE_25, {{"A", "-team-0602-", "123456789012-", 25, 1522240433451}, 1522240433451}).
+-define(DEFAULT_FULL_MESSAGE_4, {{"A", "team 06-02", "1234567890123-", 4, 1522240433451}, empty}).
+-define(DEFAULT_FULL_MESSAGE_25, {{"A", "team 06-02", "1234567890123-", 25, 1522240433451}, empty}).
+-define(DEFAULT_FULL_RECEIVED_MESSAGE_4, {{"A", "team 06-02", "1234567890123-", 4, 1522240433451}, 1522240433451}).
+-define(DEFAULT_FULL_RECEIVED_MESSAGE_25, {{"A", "team 06-02", "1234567890123-", 25, 1522240433451}, 1522240433451}).
 -define(MESSAGE_AS_BINARY_LENGTH, 34).
 
 convert_received_messages_from_byte_1_test() ->
     SendTimeBinary = <<0,0,1,98,108,153,173,43>>,
-    Message1AsByte = <<"A-team-0602-123456789012-", 4, SendTimeBinary/binary>>,
-    Message2AsByte = <<"A-team-0602-123456789012-", 25, SendTimeBinary/binary>>,
+    Message1AsByte = <<"Ateam 06-021234567890123-", 4, SendTimeBinary/binary>>,
+    Message2AsByte = <<"Ateam 06-021234567890123-", 25, SendTimeBinary/binary>>,
     ReceivedTimes = [1522240433451, 1522240433451],
     [Message2, Message1] = messagehelper:convert_received_messages_from_byte([Message1AsByte, Message2AsByte], ReceivedTimes),
     ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, byte_size(Message1AsByte)),
@@ -40,7 +40,7 @@ convert_received_messages_from_byte_2_test() ->
 
 convert_message_from_byte_1_test() ->
     StationType = <<"A">>,
-    Payload = <<"-team-0602-123456789012-">>,
+    Payload = <<"team 06-021234567890123-">>,
     SlotNumber = 4,
     SendTime = <<0,0,1,98,108,153,173,43>>,
     MessageAsByte = <<StationType/binary, Payload/binary, SlotNumber, SendTime/binary>>,
@@ -52,7 +52,7 @@ convert_message_from_byte_1_test() ->
 
 convert_message_from_byte_2_test() ->
     StationType = <<"A">>,
-    Payload = <<"-team-0602-123456789012-">>,
+    Payload = <<"team 06-021234567890123-">>,
     SlotNumber = 25,
     SendTime = <<0,0,1,98,108,153,173,43>>,
     MessageAsByte = <<StationType/binary, Payload/binary, SlotNumber, SendTime/binary>>,
@@ -72,39 +72,39 @@ prepare_incomplete_message_for_sending_1_test() ->
     IncompleteMessage = {{"A",empty, empty, 4, empty}, empty},
     SendTime = 1522240433451,
     SendTime8ByteBinary = <<0,0,1,98,108,153,173,43>>,
-    Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, "-team-0602-123456789012-"),
-    ?assertEqual(<<"A-team-0602-123456789012-", 4, SendTime8ByteBinary/binary>>, Message).
+    Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, "team 06-021234567890123-"),
+    ?assertEqual(<<"Ateam 06-021234567890123-", 4, SendTime8ByteBinary/binary>>, Message).
 
 prepare_incomplete_message_for_sending_2_test() -> 
     IncompleteMessage = {{"A",empty, empty, 25, empty}, empty},
     SendTime = 1522240433451,
     SendTime8ByteBinary = <<0,0,1,98,108,153,173,43>>,
-    Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, "-team-0602-123456789012-"),
-    ?assertEqual(<<"A-team-0602-123456789012-", 25, SendTime8ByteBinary/binary>>, Message).
+    Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, "team 06-021234567890123-"),
+    ?assertEqual(<<"Ateam 06-021234567890123-", 25, SendTime8ByteBinary/binary>>, Message).
 
 set_sendtime_and_payload_1_test() -> 
-    ShouldResult = {{"A","-team-0602-", "123456789012-", 25, 1522240433451}, empty},
+    ShouldResult = {{"A","team 06-02", "1234567890123-", 25, 1522240433451}, empty},
     TestMessage = {{"A",empty, empty, 25, empty}, empty},
     SendTime = 1522240433451,
-    IsResult = messagehelper:set_sendtime_and_payload(TestMessage, SendTime, "-team-0602-123456789012-"),
+    IsResult = messagehelper:set_sendtime_and_payload(TestMessage, SendTime, "team 06-021234567890123-"),
     ?assertEqual(ShouldResult, IsResult).
 
 convert_message_to_byte_1_test() ->
     SendTime = <<0,0,1,98,108,153,173,43>>,
-    Message = {{"A","-team-0602-", "123456789012-", 4, 1522240433451}, empty},
+    Message = {{"A","team 06-02", "1234567890123-", 4, 1522240433451}, empty},
     ConvertedMessage = messagehelper:convert_message_to_byte(Message),
     ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, byte_size(ConvertedMessage)),
     ?assertEqual(
-        <<"A-team-0602-123456789012-", 4, SendTime/binary>>,
+        <<"Ateam 06-021234567890123-", 4, SendTime/binary>>,
         ConvertedMessage).
 
 convert_message_to_byte_2_test() ->
     SendTime = <<0,0,1,98,108,153,173,43>>,
-    Message = {{"A","-team-0602-", "123456789012-", 25, 1522240433451}, 1522240433451},
+    Message = {{"A","team 06-02", "1234567890123-", 25, 1522240433451}, 1522240433451},
     ConvertedMessage = messagehelper:convert_message_to_byte(Message),
     ?assertEqual(?MESSAGE_AS_BINARY_LENGTH, byte_size(ConvertedMessage)),
     ?assertEqual(
-        <<"A-team-0602-123456789012-", 25, SendTime/binary>>,
+        <<"Ateam 06-021234567890123-", 25, SendTime/binary>>,
         ConvertedMessage).
 
 get_station_type_1_test() -> 
@@ -115,7 +115,7 @@ get_station_type_1_test() ->
 get_station_name_1_test() ->
     Message = ?DEFAULT_FULL_RECEIVED_MESSAGE_25,
     StationType = messagehelper:get_station_name(Message),
-    ?assertEqual("-team-0602-", StationType).
+    ?assertEqual("team 06-02", StationType).
 
 get_slotnumber_1_test() ->
     Message = ?DEFAULT_FULL_RECEIVED_MESSAGE_4,
