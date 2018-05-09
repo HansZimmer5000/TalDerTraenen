@@ -22,7 +22,7 @@ start(ClockOffsetMS) ->
 receive_loop(RecvPid, SendPid, ClockPid) ->
     receive
         newframe ->
-            %Einstiegsphase ODER Sendephase
+            %Einstiegsphase UND Sendephase
             %io:fwrite("New Frame started: ~p--~p\n", [vsutil:now2string(erlang:timestamp()), vsutil:getUTC()]),
             receive_loop(RecvPid, SendPid, ClockPid);
         Any -> 
@@ -40,8 +40,8 @@ listen_to_slot(RecvPid) ->
 
 
 send_message(SendPid, SlotNumber, StationType,ClockPid, PayloadServerPid) ->
-    inform_preperation(ClockPid, SlotNumber),
-    inform_send(ClockPid, SlotNumber),
+    %TODO: See SendTime as the latest point in the slot.
+    notify_when_preperation_and_send_due(ClockPid, SlotNumber),
     receive
         preperation ->
             IncompleteMessage = messagehelper:createIncompleteMessage(StationType, SlotNumber),
@@ -58,17 +58,11 @@ send_message(SendPid, SlotNumber, StationType,ClockPid, PayloadServerPid) ->
             end
     end.
 
-inform_preperation(ClockPid, SlotNumber) ->
-    ClockPid ! {calcsendtime, SlotNumber},
+notify_when_preperation_and_send_due(ClockPid, SlotNumber) ->
+    ClockPid ! {calcsendtime, SlotNumber, self()},
     receive
         {sendtime, SendtimeMS} ->
-            ClockPid ! {alarm, preperation, SendtimeMS - ?MESSAGEPREPERATIONTIMEMS}
-    end.
-
-inform_send(ClockPid, SlotNumber) ->
-    ClockPid ! {calcsendtime, SlotNumber},
-    receive
-        {sendtime, SendtimeMS} ->
+            ClockPid ! {alarm, preperation, SendtimeMS - ?MESSAGEPREPERATIONTIMEMS},
             ClockPid ! {alarm, send, SendtimeMS}
     end.
 

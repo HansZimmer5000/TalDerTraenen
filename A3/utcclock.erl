@@ -13,6 +13,7 @@
 ]).
 
 -define(FRAMECHECKCYCLEMS, 10).
+-define(FRAMELENGTHMS, 1000).
 
 start(OffsetMS, CorePid) ->
     Starttime = vsutil:getUTC(),
@@ -32,6 +33,10 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, FrameCount, CorePid) ->
         checkframe ->
             NewFrameCount = check_frame(Starttime, OffsetMS, FrameCount, CorePid),
             loop(Starttime, OffsetMS, FramecheckCycleMS, NewFrameCount, CorePid);
+        {calcsendtime, _SlotNumber, SenderPid} ->
+            %TODO, calc send time with slotnumber
+            SendtimeMS = 0,
+            SenderPid ! {sendtime, SendtimeMS};
 
         {getcurrentoffsetms, SenderPid} ->
             %For Testing only
@@ -74,7 +79,6 @@ calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount) -
     end.
 
 check_frame(Starttime, OffsetMS, FrameCount, CorePid) ->   
-    %TODO: Mit zunehmender laufzeit erkennt er immer später erst wann der neue Frame beginnt!
     CurrentTime = get_current_time(Starttime, OffsetMS),
     case new_frame_started(CurrentTime, FrameCount) of
         true ->
@@ -87,9 +91,8 @@ check_frame(Starttime, OffsetMS, FrameCount, CorePid) ->
     end.
 
 new_frame_started(CurrentTime, FrameCount) ->
-    %Ist die Aktuelle Zeit genau auf 0 Sekunden oder 0 Sekunden + FRAMECHECKCYCLE - 1?
-    TimeElapsedInCurrentFrame = CurrentTime - (FrameCount * 1000),
-    TimeElapsedInCurrentFrame >= 1000.
+    TimeElapsedInCurrentFrame = CurrentTime - (FrameCount * ?FRAMELENGTHMS),
+    TimeElapsedInCurrentFrame >= ?FRAMELENGTHMS.
 
 get_current_time(Starttime, OffsetMS) ->
     Result = vsutil:getUTC() - Starttime + OffsetMS,
@@ -106,5 +109,5 @@ logge_status(Inhalt) ->
     LOG_DATEI_NAME = "clock.log",
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
     LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
-    io:fwrite(LogNachricht),
+    %io:fwrite(LogNachricht),
     util:logging(LOG_DATEI_NAME, LogNachricht).

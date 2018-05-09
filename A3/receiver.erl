@@ -64,7 +64,7 @@ collision_happend(ConvertedSlotMessages, StationName) ->
         case length(ConvertedSlotMessages) of
             0 -> {true, false};
             1 -> {false, false};
-            Any -> {true, station_was_involved(ConvertedSlotMessages, StationName)}
+            _Any -> {true, station_was_involved(ConvertedSlotMessages, StationName)}
         end.
 
 station_was_involved([], _StationName) ->
