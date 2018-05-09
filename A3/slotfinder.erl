@@ -1,7 +1,7 @@
 -module(slotfinder).
 
 -export([
-    find_sot_in_next_frame/2,
+    find_slot_in_next_frame/2,
     get_slot_numer_if_stationname_matches/2,
     get_taken_slots/2,
     delete_possible_slots/2,
@@ -10,7 +10,7 @@
 
 -define(DEFAULT_POSSIBLE_SLOTS, [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]).
 
-find_sot_in_next_frame(Messages, StationName) ->
+find_slot_in_next_frame(Messages, StationName) ->
     case get_slot_numer_if_stationname_matches(Messages, StationName) of
         0 ->
             TakenSlots = get_taken_slots(Messages, []),

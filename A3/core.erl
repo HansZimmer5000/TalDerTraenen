@@ -1,9 +1,11 @@
 -module(core).
 
 -export([
-    start/0,
+    start/1,
 
+    listen_to_frame/1,
     listen_to_slot/1,
+
 
     notify_when_preperation_and_send_due/2
 ]).
@@ -11,30 +13,63 @@
 -define(CLOCKOFFSETMS, 0).
 -define(MESSAGEPREPERATIONTIMEMS, 10).
 
-start() ->
-    start(?CLOCKOFFSETMS).
+start([StationTypeAtom]) ->
+    StationType = atom_to_list(StationTypeAtom),
+    start(StationType, ?CLOCKOFFSETMS);
+start(StationType) ->
+    start(StationType, ?CLOCKOFFSETMS).
 
-start(ClockOffsetMS) ->
+start(StationType, ClockOffsetMS) ->
     io:fwrite("start"),
     StationName = "-team-0602-",
 
     RecvPid = receiver:start(self(), StationName),
     SendPid = sender:start(),
     ClockPid = utcclock:start(ClockOffsetMS, self()),
-    _PayloadServerPid = payloadserver:start(),
+    PayloadServerPid = payloadserver:start(),
 
-    receive_loop(RecvPid, SendPid, ClockPid).
+    entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid).
 
-receive_loop(RecvPid, SendPid, ClockPid) ->
+entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid) ->
     receive
         newframe ->
-            %Einstiegsphase UND Sendephase
-            %io:fwrite("New Frame started: ~p--~p\n", [vsutil:now2string(erlang:timestamp()), vsutil:getUTC()]),
-            receive_loop(RecvPid, SendPid, ClockPid);
+            {Messages, _StationWasInvolved} = listen_to_frame(RecvPid),
+            ClockPid ! {adjust, Messages},
+            SlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName),
+            send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber);
         Any -> 
             io:fwrite("Core Got: ~p", [Any]),
-            receive_loop(RecvPid, SendPid, ClockPid)
+            entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid)
     end.
+
+send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber) ->
+    receive
+        newframe ->
+            spawn(fun() -> prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid) end),
+            {Messages, StationWasInvolved} = listen_to_frame(RecvPid),
+            ClockPid ! {adjust, Messages},
+            
+            case StationWasInvolved of
+                true ->
+                    entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid);
+                false ->
+                    send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber)
+            end;
+        Any -> 
+            io:fwrite("Core Got: ~p", [Any]),
+            send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber)
+    end.
+
+listen_to_frame(RecvPid) ->
+    listen_to_frame(RecvPid, 25, [], false).
+
+listen_to_frame(_RecvPid, 0, Messages, StationWasInvolved) ->
+    {Messages, StationWasInvolved};
+listen_to_frame(RecvPid, RestSlotCount, Messages, StationWasInvolved) ->
+    {ReceivedMessages, ReceivedStationWasInvolved} = listen_to_slot(RecvPid),
+    NewMessages = Messages ++ ReceivedMessages,
+    NewStationWasInvolved = (StationWasInvolved or ReceivedStationWasInvolved),
+    listen_to_frame(RecvPid, RestSlotCount - 1, NewMessages, NewStationWasInvolved).
 
 listen_to_slot(RecvPid) ->
     RecvPid ! listentoslot,
