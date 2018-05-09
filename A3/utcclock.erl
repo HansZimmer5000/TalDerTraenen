@@ -8,46 +8,51 @@
     check_frame/4,
     new_frame_started/2,
     get_current_time/2,
+    calc_slot_beginn_this_frame_time/2,
+    set_alarm/3,
 
     get_8_byte_utc_binary/1
 ]).
 
 -define(FRAMECHECKCYCLEMS, 10).
 -define(FRAMELENGTHMS, 1000).
+-define(SLOTLENGTHMS, 40).
 
 start(OffsetMS, CorePid) ->
     Starttime = vsutil:getUTC(),
     logge_status(io_lib:format("Starttime: ~p\n", [Starttime])),
     FramecheckCycleMS = ?FRAMECHECKCYCLEMS,
-    FrameCount = 0,
-    spawn(fun() -> loop(Starttime, OffsetMS, FramecheckCycleMS, FrameCount, CorePid) end).
+    CurrentFrameNumber = 0,
+    spawn(fun() -> loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid) end).
 
 % --------------------------------------------------
 
-loop(Starttime, OffsetMS, FramecheckCycleMS, FrameCount, CorePid) ->
+loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid) ->
     timer:send_after(FramecheckCycleMS, self(), checkframe),
     receive
         {adjust, Messages} ->
             NewOffsetMS = adjust(OffsetMS, Messages),
-            loop(Starttime, NewOffsetMS, FramecheckCycleMS, FrameCount, CorePid);
+            loop(Starttime, NewOffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid);
         checkframe ->
-            NewFrameCount = check_frame(Starttime, OffsetMS, FrameCount, CorePid),
-            loop(Starttime, OffsetMS, FramecheckCycleMS, NewFrameCount, CorePid);
-        {calcsendtime, _SlotNumber, SenderPid} ->
-            %TODO, calc send time with slotnumber
-            SendtimeMS = 0,
-            SenderPid ! {sendtime, SendtimeMS};
+            NewCurrentFrameNumber = check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid),
+            loop(Starttime, OffsetMS, FramecheckCycleMS, NewCurrentFrameNumber, CorePid);
+        {calcslotbeginn, SlotNumber, SenderPid} ->
+            SendtimeMS = calc_slot_beginn_this_frame_time(CurrentFrameNumber, SlotNumber),
+            SenderPid ! {resultslotbeginn, SendtimeMS};
+        {alarm, AlarmMessage, TimeWhenItsDue, SenderPid} ->
+            TimeTillItsDue = TimeWhenItsDue - get_current_time(Starttime, OffsetMS),
+            set_alarm(AlarmMessage, TimeTillItsDue, SenderPid);
 
         {getcurrentoffsetms, SenderPid} ->
             %For Testing only
             SenderPid ! OffsetMS,
-            loop(Starttime, OffsetMS, FramecheckCycleMS, FrameCount, CorePid);
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid);
         {getcurrenttime, SenderPid} ->
             SenderPid ! get_current_time(Starttime, OffsetMS),
-            loop(Starttime, OffsetMS, FramecheckCycleMS, FrameCount, CorePid);
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid);
         Any -> 
             io:fwrite("Got: ~p", [Any]),
-            loop(Starttime, OffsetMS, FramecheckCycleMS, FrameCount, CorePid)
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid)
     end.
 
 adjust(OffsetMS, Messages) ->
@@ -78,25 +83,39 @@ calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount) -
             calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount)
     end.
 
-check_frame(Starttime, OffsetMS, FrameCount, CorePid) ->   
+check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid) ->   
     CurrentTime = get_current_time(Starttime, OffsetMS),
-    case new_frame_started(CurrentTime, FrameCount) of
+    case new_frame_started(CurrentTime, CurrentFrameNumber) of
         true ->
             CorePid ! newframe,
             logge_status(io_lib:format("New Frame at: ~p", [CurrentTime])),
-            FrameCount + 1;
+            CurrentFrameNumber + 1;
         false ->
             logge_status(io_lib:format("No New Frame at: ~p", [CurrentTime])),
-            FrameCount
+            CurrentFrameNumber
     end.
 
-new_frame_started(CurrentTime, FrameCount) ->
-    TimeElapsedInCurrentFrame = CurrentTime - (FrameCount * ?FRAMELENGTHMS),
+new_frame_started(CurrentTime, CurrentFrameNumber) ->
+    TimeElapsedInCurrentFrame = CurrentTime - (CurrentFrameNumber * ?FRAMELENGTHMS),
     TimeElapsedInCurrentFrame >= ?FRAMELENGTHMS.
 
 get_current_time(Starttime, OffsetMS) ->
     Result = vsutil:getUTC() - Starttime + OffsetMS,
     round(Result).
+
+calc_slot_beginn_this_frame_time(CurrentFrameNumber, SlotNumber) ->
+    FrameBeginnTime = CurrentFrameNumber * ?FRAMELENGTHMS,
+    SlotBeginnInFrame = SlotNumber * ?SLOTLENGTHMS - ?SLOTLENGTHMS, % - SLOTLENGTHMS because we want the start of the slottime
+    FrameBeginnTime + SlotBeginnInFrame.
+
+set_alarm(AlarmMessage, TimeTillItsDue, SenderPid) -> 
+    %TODO Muss das noch genauer da ja ggf. die Uhr sich zu sher snychornisiert?
+    case TimeTillItsDue > 0 of
+        true ->
+            timer:send_after(TimeTillItsDue, SenderPid, AlarmMessage);
+        false ->
+            SenderPid ! AlarmMessage
+    end.
 
 get_8_byte_utc_binary(ErlangTS) ->
     TSAsUTC = vsutil:now2UTC(ErlangTS),

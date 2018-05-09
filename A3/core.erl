@@ -59,9 +59,9 @@ send_message(SendPid, SlotNumber, StationType,ClockPid, PayloadServerPid) ->
     end.
 
 notify_when_preperation_and_send_due(ClockPid, SlotNumber) ->
-    ClockPid ! {calcsendtime, SlotNumber, self()},
+    ClockPid ! {calcslotbeginn, SlotNumber, self()},
     receive
-        {sendtime, SendtimeMS} ->
+        {resultslotbeginn, SendtimeMS} ->
             ClockPid ! {alarm, preperation, SendtimeMS - ?MESSAGEPREPERATIONTIMEMS},
             ClockPid ! {alarm, send, SendtimeMS}
     end.

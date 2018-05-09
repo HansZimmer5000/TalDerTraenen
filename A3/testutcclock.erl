@@ -102,6 +102,73 @@ new_frame_started_4_test() ->
     NewFrameStarted = utcclock:new_frame_started(CurrentTime, FrameCount),
     ?assert(NewFrameStarted).
 
+get_current_time_1_test() ->
+    Starttime = vsutil:getUTC(),
+    OffsetMS = 0,
+    ?assertEqual(
+        0,
+        utcclock:get_current_time(Starttime, OffsetMS)
+    ).
+
+get_current_time_2_test() ->
+    Starttime = vsutil:getUTC(),
+    OffsetMS = 0,
+    timer:sleep(100),
+    CurrentTime = utcclock:get_current_time(Starttime, OffsetMS),
+    ?assert(
+        (CurrentTime >= 100) and (CurrentTime < 111) %Sleeping needs some additional time.
+    ).
+
+get_current_time_3_test() ->
+    Starttime = vsutil:getUTC(),
+    OffsetMS = 10,
+    ?assertEqual(
+        10,
+        utcclock:get_current_time(Starttime, OffsetMS)
+    ).
+
+calc_slot_beginn_this_frame_time_1_test() ->
+    FrameCount = 0,
+    SlotNumber = 1,
+    ?assertEqual(
+        00, 
+        utcclock:calc_slot_beginn_this_frame_time(FrameCount, SlotNumber)).
+
+calc_slot_beginn_this_frame_time_2_test() ->
+    FrameCount = 1,
+    SlotNumber = 25,
+    ?assertEqual(
+        1960, 
+        utcclock:calc_slot_beginn_this_frame_time(FrameCount, SlotNumber)).
+
+set_alarm_1_test() ->
+    AlarmMessage = send,
+    TimeTillItsDue = 500,
+    ThisPid = self(),
+    StartFunction = vsutil:getUTC(),
+    utcclock:set_alarm(AlarmMessage, TimeTillItsDue, ThisPid),
+    receive
+        Any ->
+            EndFunction = vsutil:getUTC(),
+            TimeNeeded = EndFunction - StartFunction,
+            ?assertEqual(AlarmMessage, Any),
+            ?assert((TimeNeeded >= 500) and (TimeNeeded < 520)) %Timer:send_after in utcclock needs some additional time
+    end.
+
+set_alarm_2_test() ->
+    AlarmMessage = send,
+    TimeTillItsDue = -5,
+    ThisPid = self(),
+    StartFunction = vsutil:getUTC(),
+    utcclock:set_alarm(AlarmMessage, TimeTillItsDue, ThisPid),
+    receive
+        Any ->
+            EndFunction = vsutil:getUTC(),
+            TimeNeeded = EndFunction - StartFunction,
+            ?assertEqual(AlarmMessage, Any),
+            ?assert((TimeNeeded >= 0) and (TimeNeeded < 20)) %Timer:send_after in utcclock needs some additional time
+    end.
+
 get_8_byte_utc_binary_1_test() ->
     TS = erlang:timestamp(),
     ShouldResult = vsutil:now2UTC(TS),
