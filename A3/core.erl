@@ -44,22 +44,40 @@ listen_to_slot(RecvPid) ->
     end.
 
 
-send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid) ->
-    notify_when_preperation_and_send_due(ClockPid, SlotNumber),
+prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid) ->
+    SendtimeMS = notify_when_preperation_and_send_due(ClockPid, SlotNumber),
     receive
         preperation ->
             IncompleteMessage = messagehelper:createIncompleteMessage(StationType, SlotNumber),
             receive
                 send ->
-                    
-                    SendTime = vsutil:getUTC(),
-                    PayloadServerPid ! {self(), getNextPayload},
+                    ClockPid ! {calcdifftime, SendtimeMS, self()},
                     receive
-                        {payload, Payload} ->
-                            Message = messagehelper:prepareIncompleteMessageForSending(IncompleteMessage, SendTime, Payload),
-                            SendPid ! {send, Message}
+                        {resultdifftime, DiffTime} ->
+                            case DiffTime of
+                                DiffTime when DiffTime < 0 -> 
+                                    %SendTime is in the future
+                                    timer:sleep(DiffTime),
+                                    send_message(IncompleteMessage, PayloadServerPid, SendPid);
+                                DiffTime when DiffTime > 40 -> 
+                                    %SendTime is in the past
+                                    %TODO: !Wechsel zur Einstiegsphase
+                                    donothing; 
+                                DiffTime -> 
+                                    %SendTime is now
+                                    send_message(IncompleteMessage, PayloadServerPid, SendPid)
+                            end
                     end
             end
+    end.
+
+send_message(IncompleteMessage, PayloadServerPid, SendPid) ->
+    SendTime = vsutil:getUTC(),
+    PayloadServerPid ! {self(), getNextPayload},
+    receive
+        {payload, Payload} ->
+            Message = messagehelper:prepareIncompleteMessageForSending(IncompleteMessage, SendTime, Payload),
+            SendPid ! {send, Message}
     end.
 
 notify_when_preperation_and_send_due(ClockPid, SlotNumber) ->
@@ -68,5 +86,6 @@ notify_when_preperation_and_send_due(ClockPid, SlotNumber) ->
         {resultslotbeginn, SendtimeMS} ->
             ClockPid ! {alarm, preperation, SendtimeMS - ?MESSAGEPREPERATIONTIMEMS},
             ClockPid ! {alarm, send, SendtimeMS}
-    end.
+    end,
+    SendtimeMS.
 

@@ -41,7 +41,12 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid) ->
             SenderPid ! {resultslotbeginn, SendtimeMS};
         {alarm, AlarmMessage, TimeWhenItsDue, SenderPid} ->
             TimeTillItsDue = TimeWhenItsDue - get_current_time(Starttime, OffsetMS),
-            set_alarm(AlarmMessage, TimeTillItsDue, SenderPid);
+            set_alarm(AlarmMessage, TimeTillItsDue, SenderPid),
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid);
+        {calcdifftime, SlotBeginnInFrame, SenderPid} ->
+            CurrentTime = get_current_time(Starttime, OffsetMS),
+            calc_diff_time(CurrentTime, SlotBeginnInFrame, SenderPid),
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid);
 
         {getcurrentoffsetms, SenderPid} ->
             %For Testing only
@@ -116,6 +121,11 @@ set_alarm(AlarmMessage, TimeTillItsDue, SenderPid) ->
         false ->
             SenderPid ! AlarmMessage
     end.
+
+calc_diff_time(CurrentTime, SlotBeginnInFrame, SenderPid) ->
+    DiffTime = CurrentTime - SlotBeginnInFrame,
+    SenderPid ! {resultdifftime, DiffTime}.
+
 
 get_8_byte_utc_binary(ErlangTS) ->
     TSAsUTC = vsutil:now2UTC(ErlangTS),
