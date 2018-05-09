@@ -45,15 +45,22 @@ entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPi
 send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber) ->
     receive
         newframe ->
-            spawn(fun() -> prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid) end),
+            ThisPid = self(),
+            spawn(fun() -> 
+                    MessageWasSend = prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid),
+                    ThisPid ! {messagewassend, MessageWasSend}
+                end),
             {Messages, StationWasInvolved} = listen_to_frame(RecvPid),
             ClockPid ! {adjust, Messages},
             
-            case StationWasInvolved of
-                true ->
-                    entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid);
-                false ->
-                    send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber)
+            receive
+                {messagewassend, MessageWasSend} -> 
+                    case (StationWasInvolved or not(MessageWasSend)) of
+                        true ->
+                            entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid);
+                        false ->
+                            send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber)
+                    end
             end;
         Any -> 
             io:fwrite("Core Got: ~p", [Any]),
@@ -93,18 +100,21 @@ prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServ
                                 DiffTime when DiffTime < 0 -> 
                                     %SendTime is in the future
                                     timer:sleep(DiffTime),
-                                    send_message(IncompleteMessage, PayloadServerPid, SendPid);
+                                    send_message(IncompleteMessage, PayloadServerPid, SendPid),
+                                    MessageWasSend = true;
                                 DiffTime when DiffTime > 40 -> 
                                     %SendTime is in the past
                                     %TODO: !Wechsel zur Einstiegsphase
-                                    donothing; 
+                                    MessageWasSend = false; 
                                 DiffTime -> 
                                     %SendTime is now
-                                    send_message(IncompleteMessage, PayloadServerPid, SendPid)
+                                    send_message(IncompleteMessage, PayloadServerPid, SendPid),
+                                    MessageWasSend = true
                             end
                     end
             end
-    end.
+    end,
+    MessageWasSend.
 
 send_message(IncompleteMessage, PayloadServerPid, SendPid) ->
     SendTime = vsutil:getUTC(),
