@@ -10,6 +10,7 @@
     get_current_time/2,
     calc_slot_beginn_this_frame_time/2,
     set_alarm/3,
+    calc_diff_time/2,
 
     get_8_byte_utc_binary/1
 ]).
@@ -45,7 +46,8 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid) ->
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid);
         {calcdifftime, SlotBeginnInFrame, SenderPid} ->
             CurrentTime = get_current_time(Starttime, OffsetMS),
-            calc_diff_time(CurrentTime, SlotBeginnInFrame, SenderPid),
+            DiffTime = calc_diff_time(CurrentTime, SlotBeginnInFrame),
+            SenderPid ! {resultdifftime, DiffTime},
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid);
 
         {getcurrentoffsetms, SenderPid} ->
@@ -122,9 +124,8 @@ set_alarm(AlarmMessage, TimeTillItsDue, SenderPid) ->
             SenderPid ! AlarmMessage
     end.
 
-calc_diff_time(CurrentTime, SlotBeginnInFrame, SenderPid) ->
-    DiffTime = CurrentTime - SlotBeginnInFrame,
-    SenderPid ! {resultdifftime, DiffTime}.
+calc_diff_time(CurrentTime, SlotBeginnInFrame) ->
+    CurrentTime - SlotBeginnInFrame.
 
 
 get_8_byte_utc_binary(ErlangTS) ->

@@ -169,6 +169,22 @@ set_alarm_2_test() ->
             ?assert((TimeNeeded >= 0) and (TimeNeeded < 20)) %Timer:send_after in utcclock needs some additional time
     end.
 
+calc_diff_time_1_test() ->
+    CurrentTime = 0,
+    SlotBeginnInFrame = 120,
+    ?assertEqual(
+        -120,
+        utcclock:calc_diff_time(CurrentTime, SlotBeginnInFrame)
+    ).
+
+calc_diff_time_2_test() ->
+    CurrentTime = 120,
+    SlotBeginnInFrame = 120,
+    ?assertEqual(
+        0,
+        utcclock:calc_diff_time(CurrentTime, SlotBeginnInFrame)
+    ).
+
 get_8_byte_utc_binary_1_test() ->
     TS = erlang:timestamp(),
     ShouldResult = vsutil:now2UTC(TS),
