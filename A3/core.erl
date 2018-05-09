@@ -10,9 +10,11 @@ start() ->
 
 start(ClockOffsetMS) ->
     io:fwrite("start"),
-    RecvPid = receiver:start(self()),
+    StationName = "-team-0602-",
+
+    RecvPid = receiver:start(self(), StationName),
     SendPid = sender:start(),
-    ClockPid = utcclock:start(ClockOffsetMS),
+    ClockPid = utcclock:start(ClockOffsetMS, self()),
     _PayloadServerPid = payloadserver:start(),
 
     receive_loop(RecvPid, SendPid, ClockPid).
@@ -20,8 +22,8 @@ start(ClockOffsetMS) ->
 receive_loop(RecvPid, SendPid, ClockPid) ->
     receive
         newframe ->
-            %Einstiegsphase
-            %Sendephase
+            %Einstiegsphase ODER Sendephase
+            %io:fwrite("New Frame started: ~p--~p\n", [vsutil:now2string(erlang:timestamp()), vsutil:getUTC()]),
             receive_loop(RecvPid, SendPid, ClockPid);
         Any -> 
             io:fwrite("Core Got: ~p", [Any]),

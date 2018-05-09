@@ -57,19 +57,7 @@ adjust_4_test() ->
 check_frame_1_test() ->
     ThisPid = self(),
     Starttime = vsutil:getUTC(),
-    utcclock:check_frame(Starttime, 0, 10, ThisPid),
-    receive
-        Any -> 
-            ?assertEqual(newframe, Any)
-        after 50 ->
-            ?assert(false)
-    end.
-
-check_frame_2_test() ->
-    ThisPid = self(),
-    Starttime = vsutil:getUTC(),
-    timer:sleep(30),
-    utcclock:check_frame(Starttime, 0, 10, ThisPid),
+    utcclock:check_frame(Starttime, 0, Starttime, ThisPid),
     receive
         _Any -> 
             ?assert(false)
@@ -77,34 +65,41 @@ check_frame_2_test() ->
             ?assert(true)
     end.
 
-new_frame_started_1_test() ->
+check_frame_2_test() ->
+    ThisPid = self(),
     Starttime = vsutil:getUTC(),
-    NewFrameStarted = utcclock:new_frame_started(Starttime, 0, ?DEFAULTFRAMECHECKCYLCEMS),
+    BeginnLastFrame = -1000,
+    utcclock:check_frame(Starttime, 0, BeginnLastFrame, ThisPid),
+    receive
+        Any -> 
+            ?assertEqual(newframe, Any)
+        after 50 ->
+            ?assert(false)
+    end.
+
+new_frame_started_1_test() ->
+    CurrentTime = utcclock:get_current_time(vsutil:getUTC(), 0),
+    BeginnLastFrame = CurrentTime - 1010,
+    NewFrameStarted = utcclock:new_frame_started(CurrentTime, BeginnLastFrame),
     ?assert(NewFrameStarted).
 
 new_frame_started_2_test() ->
-    Starttime = vsutil:getUTC(),
-    timer:sleep(30),
-    NewFrameStarted = utcclock:new_frame_started(Starttime, 0, ?DEFAULTFRAMECHECKCYLCEMS),
+    CurrentTime = utcclock:get_current_time(vsutil:getUTC(), 0),
+    BeginnLastFrame = CurrentTime,
+    NewFrameStarted = utcclock:new_frame_started(CurrentTime, BeginnLastFrame),
     ?assertNot(NewFrameStarted).
 
 new_frame_started_3_test() ->
-    Starttime = vsutil:getUTC(),
-    OffsetMS = ?DEFAULTFRAMECHECKCYLCEMS,
-    NewFrameStarted = utcclock:new_frame_started(Starttime, OffsetMS, ?DEFAULTFRAMECHECKCYLCEMS),
+    CurrentTime = 0,
+    BeginnLastFrame = -900,
+    NewFrameStarted = utcclock:new_frame_started(CurrentTime, BeginnLastFrame),
     ?assertNot(NewFrameStarted).
 
 new_frame_started_4_test() ->
-    Starttime = vsutil:getUTC(),
-    OffsetMS = ?DEFAULTFRAMECHECKCYLCEMS * - 1,
-    NewFrameStarted = utcclock:new_frame_started(Starttime, OffsetMS, ?DEFAULTFRAMECHECKCYLCEMS),
-    ?assertNot(NewFrameStarted).
-
-new_frame_started_5_test() ->
-    Starttime = vsutil:getUTC() + ?DEFAULTFRAMECHECKCYLCEMS,
-    OffsetMS = 0,
-    NewFrameStarted = utcclock:new_frame_started(Starttime, OffsetMS, ?DEFAULTFRAMECHECKCYLCEMS),
-    ?assertNot(NewFrameStarted).
+    CurrentTime = 0,
+    BeginnLastFrame = -1100,
+    NewFrameStarted = utcclock:new_frame_started(CurrentTime, BeginnLastFrame),
+    ?assert(NewFrameStarted).
 
 get_8_byte_utc_binary_1_test() ->
     TS = erlang:timestamp(),
