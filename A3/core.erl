@@ -53,7 +53,6 @@ send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid
             {Messages, StationWasInvolved} = listen_to_frame(RecvPid),
             ClockPid ! {adjust, Messages},
 
-            logge_status("warten auf messagewassend", LogFile),
             receive
                 {messagewassend, MessageWasSend} -> 
                     logge_status("Send_Loop end with ~p (Involved) ~p (Send)",[StationWasInvolved, MessageWasSend], LogFile),
