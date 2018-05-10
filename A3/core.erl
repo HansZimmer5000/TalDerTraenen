@@ -30,11 +30,11 @@ start(StationType, StationName, LogFile, ClockOffsetMS) ->
 entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid, LogFile) ->
     receive
         newframe ->
-            logge_status("New Frame Started (Entry)", LogFile),
+            logge_status("New Frame Started", LogFile),
             {Messages, _StationWasInvolved} = listen_to_frame(RecvPid),
             ClockPid ! {adjust, Messages},
             SlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName),
-            logge_status("Selected Slotnumber ~p", [SlotNumber], LogFile),
+            logge_status("Selected SlotNumber ~p", [SlotNumber], LogFile),
             send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile);
         Any -> 
             logge_status("Got (Entry): ~p", [Any], LogFile),
@@ -44,7 +44,7 @@ entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPi
 send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile) ->
     receive
         newframe ->
-            logge_status("New Frame Started (Send)", LogFile),
+            logge_status("New Frame Started with SlotNumber ~p", [SlotNumber], LogFile),
             ThisPid = self(),
             spawn(fun() -> 
                     MessageWasSend = prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile),
@@ -91,15 +91,14 @@ prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServ
     SendtimeMS = notify_when_preperation_and_send_due(ClockPid, SlotNumber, LogFile),
     receive
         preperation ->
-            logge_status("preperation", LogFile),
+            %logge_status("preperation", LogFile),
             IncompleteMessage = messagehelper:create_incomplete_message(StationType, SlotNumber),
             receive
                 send ->
-                    logge_status("send", LogFile),
+                    %logge_status("send", LogFile),
                     ClockPid ! {calcdifftime, SendtimeMS, self()},
                     receive
                         {resultdifftime, DiffTime} ->
-                            logge_status("resultdifftime", LogFile),
                             case DiffTime of
                                 DiffTime when DiffTime < 0 -> 
                                     logge_status("SendTime in the future: ~p", [DiffTime], LogFile),
@@ -128,22 +127,22 @@ prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServ
     end,
     MessageWasSend.
 
-send_message(IncompleteMessage, PayloadServerPid, SendPid, LogFile) ->
+send_message(IncompleteMessage, PayloadServerPid, SendPid, _LogFile) ->
     SendTime = vsutil:getUTC(),
     PayloadServerPid ! {self(), getNextPayload},
-    logge_status("Warte auf Payload", LogFile),
+    %logge_status("Warte auf Payload", LogFile),
     receive
         {payload, Payload} ->
-            logge_status("payload", LogFile),
+            %logge_status("payload", LogFile),
             Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, Payload),
             SendPid ! {send, Message}
     end.
 
-notify_when_preperation_and_send_due(ClockPid, SlotNumber, LogFile) ->
+notify_when_preperation_and_send_due(ClockPid, SlotNumber, _LogFile) ->
     ClockPid ! {calcslotbeginn, SlotNumber, self()},
     receive
         {resultslotbeginn, SendtimeMS} ->
-            logge_status("resultslotbeginn", LogFile),
+            %logge_status("resultslotbeginn", LogFile),
             ClockPid ! {alarm, preperation, SendtimeMS - ?MESSAGEPREPERATIONTIMEMS, self()},
             ClockPid ! {alarm, send, SendtimeMS, self()}
     end,

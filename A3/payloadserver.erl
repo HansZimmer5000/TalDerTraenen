@@ -26,7 +26,6 @@ start(CoreNode, LogFile) ->
 	ServerPid.
 
 send([CoreNode, LogFile]) ->
-	logge_status("send Startet", LogFile),
 	case net_adm:ping(CoreNode) of
 		pang ->
 			logge_status("Couldn't find Payloadserver!", LogFile);
@@ -46,10 +45,10 @@ send_(PayloadServerPid) ->
 loop(LogFile) ->
 	receive
 		{AbsenderPid, getNextPayload} ->
-			logge_status("Next Payload to: ~p", [AbsenderPid], LogFile),
+			%logge_status("Next Payload to: ~p", [AbsenderPid], LogFile),
 			receive
 				Payload ->
-					logge_status("Sending Payload to: ~p", [AbsenderPid], LogFile),
+					%logge_status("Sending Payload to: ~p", [AbsenderPid], LogFile),
 					%io:fwrite("Got Request from ~p", [AbsenderPid]),
 					AbsenderPid ! {payload, Payload}
 			end;
@@ -65,6 +64,6 @@ logge_status(Text, Input, LogFile) ->
 
 logge_status(Inhalt, LogFile) ->
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
-    LogNachricht = io_lib:format("~p PYLD ~s.\n", [AktuelleZeit, Inhalt]),
+    LogNachricht = io_lib:format("~p ---- PYLD ~s.\n", [AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(LogFile, LogNachricht).
