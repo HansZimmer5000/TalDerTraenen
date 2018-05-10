@@ -3,7 +3,7 @@
 -export([
     start/3,
 
-    adjust/2,
+    adjust/3,
 
     check_frame/4,
     new_frame_started/2,
@@ -33,7 +33,7 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFil
     timer:send_after(FramecheckCycleMS, self(), checkframe),
     receive
         {adjust, Messages} ->
-            NewOffsetMS = adjust(OffsetMS, Messages),
+            NewOffsetMS = adjust(OffsetMS, Messages, LogFile),
             logge_status("New Offset: ~p (Old: ~p)", [NewOffsetMS, OffsetMS], LogFile),
             loop(Starttime, NewOffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         checkframe ->
@@ -71,13 +71,13 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFil
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile)
     end.
 
-adjust(OffsetMS, Messages) ->
-    AverageDiffMS = calc_average_diff_ms(Messages),
+adjust(OffsetMS, Messages, LogFile) ->
+    AverageDiffMS = calc_average_diff_ms(Messages, LogFile),
     NewOffsetMS = OffsetMS + AverageDiffMS,
     round(NewOffsetMS).
 
-calc_average_diff_ms(Messages) ->
-    {TotalDiffMS, TotalCount} = calc_average_diff_ms(Messages, 0, 0),
+calc_average_diff_ms(Messages, LogFile) ->
+    {TotalDiffMS, TotalCount} = calc_average_diff_ms(Messages, 0, 0, LogFile),
     case TotalCount of
         0 ->
             0;
@@ -86,17 +86,19 @@ calc_average_diff_ms(Messages) ->
     end.
 
 
-calc_average_diff_ms([], TotalDiffMS, TotalCount) ->
+calc_average_diff_ms([], TotalDiffMS, TotalCount, _LogFile) ->
     {TotalDiffMS, TotalCount};
-calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount) ->
+calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount, LogFile) ->
     case messagehelper:get_station_type(CurrentMessage) of
         "A" ->
             SendTime = messagehelper:get_sendtime(CurrentMessage),
             RecvTime = messagehelper:get_receivedtime(CurrentMessage),
             NewTotalDiffMS = TotalDiffMS + RecvTime - SendTime,
-            calc_average_diff_ms(RestMessages, NewTotalDiffMS, TotalCount + 1);
-        _Any ->
-            calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount)
+            logge_status("Send (~p) Recv (~p) Total (~p) Count(~p)", [SendTime, RecvTime, NewTotalDiffMS, TotalCount + 1], LogFile),
+            calc_average_diff_ms(RestMessages, NewTotalDiffMS, TotalCount + 1, LogFile);
+        Any ->
+            logge_status("Unkown Station: ~p", [Any], LogFile),
+            calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount, LogFile)
     end.
 
 check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid) ->   

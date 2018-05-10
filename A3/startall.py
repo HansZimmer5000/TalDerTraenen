@@ -30,6 +30,16 @@ def __start_node_mac(nodename, modulename, parameter):
     command = "osascript -e " + "'" + "tell application " + '"' + "Terminal" + '"'+ " to do script " + '"' + erlcommand + '"' + "'"
     os.system(command)
 
+def __start_stations(count):
+    while(count > 0):
+        count_str = str(count)
+        stationname = "team-06-"
+        if(count < 10):
+            stationname = stationname + "0"
+        stationname = stationname + count_str
+        __start_node("core" + count_str, "station", "A " + stationname)
+        count = count - 1
+
 def __start_normal_shell(nodename):
     os.system("start erl -sname " + nodename)
 
@@ -65,9 +75,7 @@ if __name__ == "__main__":
         __make_all_modules()
         __remove_all_unecessary_files([".log"])
         __start_node("ns", "nameservice", "")
-        __start_node("core1", "station", "A team-06-01")
-        __start_node("core2", "station", "A team-06-02")
-        __start_node("core3", "station", "A team-06-03")
+        __start_stations(4)
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     else:
