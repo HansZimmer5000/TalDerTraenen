@@ -3,16 +3,14 @@
 -export([
     start/3,
 
-    adjust/3,
+    adjust/4,
 
     check_frame/4,
     new_frame_started/2,
     get_current_time/2,
     calc_slot_beginn_this_frame_time/2,
     set_alarm/3,
-    calc_diff_time/2,
-
-    get_8_byte_utc_binary/1
+    calc_diff_time/2
 ]).
 
 -define(FRAMECHECKCYCLEMS, 10).
@@ -33,7 +31,7 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFil
     timer:send_after(FramecheckCycleMS, self(), checkframe),
     receive
         {adjust, Messages} ->
-            NewOffsetMS = adjust(OffsetMS, Messages, LogFile),
+            NewOffsetMS = adjust(Starttime, OffsetMS, Messages, LogFile),
             logge_status("New Offset: ~p (Old: ~p)", [NewOffsetMS, OffsetMS], LogFile),
             loop(Starttime, NewOffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         checkframe ->
@@ -71,13 +69,13 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFil
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile)
     end.
 
-adjust(OffsetMS, Messages, LogFile) ->
-    AverageDiffMS = calc_average_diff_ms(Messages, LogFile),
+adjust(Starttime, OffsetMS, Messages, LogFile) ->
+    AverageDiffMS = calc_average_diff_ms(Messages, Starttime, OffsetMS, LogFile),
     NewOffsetMS = OffsetMS + AverageDiffMS,
     round(NewOffsetMS).
 
-calc_average_diff_ms(Messages, LogFile) ->
-    {TotalDiffMS, TotalCount} = calc_average_diff_ms(Messages, 0, 0, LogFile),
+calc_average_diff_ms(Messages, Starttime, OffsetMS, LogFile) ->
+    {TotalDiffMS, TotalCount} = calc_average_diff_ms(Messages, 0, 0, Starttime, OffsetMS, LogFile),
     case TotalCount of
         0 ->
             0;
@@ -86,19 +84,19 @@ calc_average_diff_ms(Messages, LogFile) ->
     end.
 
 
-calc_average_diff_ms([], TotalDiffMS, TotalCount, _LogFile) ->
+calc_average_diff_ms([], TotalDiffMS, TotalCount, _Starttime, _OffsetMS, _LogFile) ->
     {TotalDiffMS, TotalCount};
-calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount, LogFile) ->
+calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount, Starttime, OffsetMS, LogFile) ->
     case messagehelper:get_station_type(CurrentMessage) of
         "A" ->
             SendTime = messagehelper:get_sendtime(CurrentMessage),
-            RecvTime = messagehelper:get_receivedtime(CurrentMessage),
+            RecvTime = messagehelper:get_receivedtime(CurrentMessage) - Starttime + OffsetMS,
             NewTotalDiffMS = TotalDiffMS + RecvTime - SendTime,
             logge_status("Send (~p) Recv (~p) Total (~p) Count(~p)", [SendTime, RecvTime, NewTotalDiffMS, TotalCount + 1], LogFile),
-            calc_average_diff_ms(RestMessages, NewTotalDiffMS, TotalCount + 1, LogFile);
+            calc_average_diff_ms(RestMessages, NewTotalDiffMS, TotalCount + 1, Starttime, OffsetMS, LogFile);
         Any ->
             logge_status("Unkown Station: ~p", [Any], LogFile),
-            calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount, LogFile)
+            calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount, Starttime, OffsetMS, LogFile)
     end.
 
 check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid) ->   
@@ -137,12 +135,6 @@ set_alarm(AlarmMessage, TimeTillItsDue, SenderPid) ->
 
 calc_diff_time(CurrentTime, SlotBeginnInFrame) ->
     CurrentTime - SlotBeginnInFrame.
-
-
-get_8_byte_utc_binary(ErlangTS) ->
-    TSAsUTC = vsutil:now2UTC(ErlangTS),
-    Tmp = binary:encode_unsigned(TSAsUTC, big),
-    <<0,0, Tmp/binary>>.
 
 %------------------------------------------
 logge_status(Text, Input, LogFile) ->

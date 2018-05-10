@@ -103,14 +103,14 @@ prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServ
                                 DiffTime when DiffTime < 0 -> 
                                     logge_status("SendTime in the future: ~p", [DiffTime], LogFile),
                                     timer:sleep(DiffTime),
-                                    send_message(IncompleteMessage, PayloadServerPid, SendPid, LogFile),
+                                    send_message(IncompleteMessage, PayloadServerPid, SendPid, SendtimeMS, LogFile),
                                     MessageWasSend = true;
                                 DiffTime when DiffTime > 40 -> 
                                     logge_status("SendTime in the past: ~p", [DiffTime], LogFile),
                                     MessageWasSend = false; 
                                 DiffTime -> 
                                     logge_status("SendTime is now: ~p", [DiffTime], LogFile),
-                                    send_message(IncompleteMessage, PayloadServerPid, SendPid, LogFile),
+                                    send_message(IncompleteMessage, PayloadServerPid, SendPid, SendtimeMS,LogFile),
                                     MessageWasSend = true
                             end
                         after timer:seconds(1) ->
@@ -127,8 +127,7 @@ prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServ
     end,
     MessageWasSend.
 
-send_message(IncompleteMessage, PayloadServerPid, SendPid, _LogFile) ->
-    SendTime = vsutil:getUTC(),
+send_message(IncompleteMessage, PayloadServerPid, SendPid, SendTime, _LogFile) ->
     PayloadServerPid ! {self(), getNextPayload},
     %logge_status("Warte auf Payload", LogFile),
     receive

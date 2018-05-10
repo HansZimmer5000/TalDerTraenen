@@ -185,12 +185,6 @@ calc_diff_time_2_test() ->
         utcclock:calc_diff_time(CurrentTime, SlotBeginnInFrame)
     ).
 
-get_8_byte_utc_binary_1_test() ->
-    TS = erlang:timestamp(),
-    ShouldResult = vsutil:now2UTC(TS),
-    IsResult = binary:decode_unsigned(utcclock:get_8_byte_utc_binary(TS), big),
-    ?assertEqual(ShouldResult, IsResult).
-
 
 % -------------------
 
