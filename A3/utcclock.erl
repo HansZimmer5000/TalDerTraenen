@@ -21,11 +21,10 @@
 
 start(OffsetMS, CorePid, LogFile) ->
     Starttime = vsutil:getUTC(),
-    logge_status("Starttime: ~p\n", [Starttime], LogFile),
+    logge_status("Starttime: ~p", [Starttime], LogFile),
     FramecheckCycleMS = ?FRAMECHECKCYCLEMS,
     CurrentFrameNumber = 0,
     ClockPid = spawn(fun() -> loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile) end),
-    logge_status("started", LogFile),
     ClockPid.
 
 % --------------------------------------------------
@@ -34,29 +33,37 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFil
     timer:send_after(FramecheckCycleMS, self(), checkframe),
     receive
         {adjust, Messages} ->
+            logge_status("adjust", LogFile),
             NewOffsetMS = adjust(OffsetMS, Messages),
             loop(Starttime, NewOffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         checkframe ->
+            %logge_status("checkframe", LogFile),
             NewCurrentFrameNumber = check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid),
             loop(Starttime, OffsetMS, FramecheckCycleMS, NewCurrentFrameNumber, CorePid, LogFile);
         {calcslotbeginn, SlotNumber, SenderPid} ->
+            logge_status("calcslotbeginn", LogFile),
             SendtimeMS = calc_slot_beginn_this_frame_time(CurrentFrameNumber, SlotNumber),
-            SenderPid ! {resultslotbeginn, SendtimeMS};
+            SenderPid ! {resultslotbeginn, SendtimeMS},
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         {alarm, AlarmMessage, TimeWhenItsDue, SenderPid} ->
+            logge_status("alarm", LogFile),
             TimeTillItsDue = TimeWhenItsDue - get_current_time(Starttime, OffsetMS),
             set_alarm(AlarmMessage, TimeTillItsDue, SenderPid),
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         {calcdifftime, SlotBeginnInFrame, SenderPid} ->
+            logge_status("calcdifftime", LogFile),
             CurrentTime = get_current_time(Starttime, OffsetMS),
             DiffTime = calc_diff_time(CurrentTime, SlotBeginnInFrame),
             SenderPid ! {resultdifftime, DiffTime},
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
 
         {getcurrentoffsetms, SenderPid} ->
+            logge_status("getcurrentoffsetms", LogFile),
             %For Testing only
             SenderPid ! OffsetMS,
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         {getcurrenttime, SenderPid} ->
+            logge_status("getcurrenttime", LogFile),
             SenderPid ! get_current_time(Starttime, OffsetMS),
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         Any -> 

@@ -124,7 +124,7 @@ notify_when_preperation_and_send_due_1_test() ->
     ThisPid = self(),
     SlotNumber = 2,
     TestPid = spawn(fun() -> 
-                    core:notify_when_preperation_and_send_due(ThisPid, SlotNumber)
+                    core:notify_when_preperation_and_send_due(ThisPid, SlotNumber, "testcore.log")
                 end),
 
     receive 

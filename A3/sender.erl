@@ -1,6 +1,8 @@
 -module(sender).
 
--export([start/1]).
+-export([
+    start/1
+]).
 
 -define(NSNODE, hole_wert_aus_config_mit_key(node)).
 -define(NSNAME, nameservice).

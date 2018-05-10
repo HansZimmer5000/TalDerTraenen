@@ -66,8 +66,8 @@ if __name__ == "__main__":
         __remove_all_unecessary_files([".log"])
         __start_node("ns", "nameservice", "")
         __start_node("core1", "station", "A team-06-01")
-        __start_node("core2", "station", "A team-06-02")
-        __start_node("core3", "station", "A team-06-03")
+        #__start_node("core2", "station", "A team-06-02")
+        #__start_node("core3", "station", "A team-06-03")
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     else:
