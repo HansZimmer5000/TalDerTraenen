@@ -23,7 +23,7 @@ start(StationType, StationName, LogFile, ClockOffsetMS) ->
     RecvPid = receiver:start(self(), StationName, LogFile),
     SendPid = sender:start(LogFile),
     ClockPid = utcclock:start(ClockOffsetMS, self(), LogFile),
-    PayloadServerPid = payloadserver:start(LogFile),
+    PayloadServerPid = payloadserver:start(node(), LogFile),
 
     entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid, LogFile).
 
@@ -105,26 +105,37 @@ prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServ
                                 DiffTime when DiffTime < 0 -> 
                                     logge_status("SendTime in the future: ~p", [DiffTime], LogFile),
                                     timer:sleep(DiffTime),
-                                    send_message(IncompleteMessage, PayloadServerPid, SendPid),
+                                    send_message(IncompleteMessage, PayloadServerPid, SendPid, LogFile),
                                     MessageWasSend = true;
                                 DiffTime when DiffTime > 40 -> 
                                     logge_status("SendTime in the past: ~p", [DiffTime], LogFile),
                                     MessageWasSend = false; 
                                 DiffTime -> 
                                     logge_status("SendTime is now: ~p", [DiffTime], LogFile),
-                                    send_message(IncompleteMessage, PayloadServerPid, SendPid),
+                                    send_message(IncompleteMessage, PayloadServerPid, SendPid, LogFile),
                                     MessageWasSend = true
                             end
+                        after timer:seconds(1) ->
+                            logge_status("Timeout resultdifftime", LogFile),
+                            MessageWasSend = false
                     end
+                after timer:seconds(1) ->
+                    logge_status("Timeout send", LogFile),
+                    MessageWasSend = false
             end
+        after timer:seconds(1) ->
+            logge_status("Timeout preperation", LogFile),
+            MessageWasSend = false
     end,
     MessageWasSend.
 
-send_message(IncompleteMessage, PayloadServerPid, SendPid) ->
+send_message(IncompleteMessage, PayloadServerPid, SendPid, LogFile) ->
     SendTime = vsutil:getUTC(),
     PayloadServerPid ! {self(), getNextPayload},
+    logge_status("Warte auf Payload", LogFile),
     receive
         {payload, Payload} ->
+            logge_status("payload", LogFile),
             Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, Payload),
             SendPid ! {send, Message}
     end.

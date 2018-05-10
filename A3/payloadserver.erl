@@ -1,34 +1,32 @@
 -module(payloadserver).
 -export([
-	start/1, 
-	send/1, 
+	start/2, 
+	send/1,
 	loop/1
 ]).
 
--define(SERVERNODE, 'payloadserver@Michael-X250').
--define(SERVERIP, {payloadserver, ?SERVERNODE}).
+-define(SERVERNAME, payloadserver).
 
 -define(TEAMNUMBER, "3").
 -define(PRAKTIKUMSNUMBER, "2").
 
-start(LogFile) ->
+start(CoreNode, LogFile) ->
+	CoreNodeString = atom_to_list(CoreNode),
 	ServerPid = spawn(fun() -> loop(LogFile) end),
 	register(payloadserver, ServerPid),
 	VesselPid = spawn(fun() ->
-			os:cmd("java vessel3.Vessel "++ ?TEAMNUMBER ++ " " ++ ?PRAKTIKUMSNUMBER ++ " | erl -sname test -noshell -s payloadserver send")
+			os:cmd("java vessel3.Vessel "++ ?TEAMNUMBER ++ " " ++ ?PRAKTIKUMSNUMBER ++ " | erl -sname test -noshell -s payloadserver send " ++ CoreNodeString ++ " " ++ LogFile ++ "")
 		 end),
-	logge_status("PayloadserverPID: ~p // Vessel3 with Send Pipe PID: ~p\n", [self(), VesselPid], LogFile),
+	logge_status("PayloadserverPID: ~p // Vessel3 with Send Pipe PID: ~p", [self(), VesselPid], LogFile),
 	ServerPid.
 
-send(LogFile) ->
-	PingResult = net_adm:ping(?SERVERNODE),
-	case PingResult of
+send([CoreNode, LogFile]) ->
+	case net_adm:ping(CoreNode) of
 		pang ->
 			logge_status("Couldn't find Payloadserver!", LogFile);
 		pong ->
-			timer:sleep(timer:seconds(1)),
-			logge_status("Could find Payloadserver!", LogFile),
-			send_(?SERVERIP)
+			ServerPid = {?SERVERNAME, CoreNode},
+			send_(ServerPid)
 	end.
 
 send_(PayloadServerPid) ->
@@ -41,13 +39,15 @@ send_(PayloadServerPid) ->
 loop(LogFile) ->
 	receive
 		{AbsenderPid, getNextPayload} ->
+			logge_status("Next Payload to: ~p", [AbsenderPid], LogFile),
 			receive
 				Payload ->
+					logge_status("Sending Payload to: ~p", [AbsenderPid], LogFile),
 					%io:fwrite("Got Request from ~p", [AbsenderPid]),
 					AbsenderPid ! {payload, Payload}
 			end;
-		Any ->
-			logge_status("got: ~p\n", [Any], LogFile)
+		_Any ->
+			nothing%logge_status("got: ~p\n", [Any], LogFile)
 	end,
 	loop(LogFile).
 
