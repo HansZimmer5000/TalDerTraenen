@@ -20,29 +20,36 @@ start_1_test() ->
     kill_pid_and_clear_this_box(TestPid).
 
 adjust_1_test() ->
+    Starttime = 0,
     OffsetMS = ?DEFAULTOFFSETMS,
     Messages = [],
+    LogFile = "testutc.log",
     ?assertEqual(
         OffsetMS, 
-        utcclock:adjust(OffsetMS, Messages)).
+        utcclock:adjust(Starttime, OffsetMS, Messages, LogFile)).
 
 adjust_2_test() ->
+    Starttime = 0,
     OffsetMS = ?DEFAULTOFFSETMS,
     Message1 = {{"A", "-team-0602-", "123456789012-", 4, 77394825}, 77394825},
     Messages = [Message1],
+    LogFile = "testutc.log",
     ?assertEqual(
-        OffsetMS, 
-        utcclock:adjust(OffsetMS, Messages)).
+        0, 
+        utcclock:adjust(Starttime, OffsetMS, Messages, LogFile)).
 
 adjust_3_test() ->
+    Starttime = 0,
     OffsetMS = ?DEFAULTOFFSETMS,
     Message1 = {{"B", "-team-0602-", "123456789012-", 4, 0}, 77394825},
     Messages = [Message1],
+    LogFile = "testutc.log",
     ?assertEqual(
         OffsetMS, 
-        utcclock:adjust(OffsetMS, Messages)).
+        utcclock:adjust(Starttime, OffsetMS, Messages, LogFile)).
 
 adjust_4_test() ->
+    Starttime = 0,
     OffsetMS = ?DEFAULTOFFSETMS,
     Message1 = {{"A", "-team-0602-", "123456789012-", 4, 0}, 1},
     Message2 = {{"A", "-team-0602-", "123456789012-", 4, 0}, 2},
@@ -50,9 +57,10 @@ adjust_4_test() ->
     Message4 = {{"A", "-team-0602-", "123456789012-", 4, 0}, 4},
     Message5 = {{"B", "-team-0602-", "123456789012-", 4, 0}, 77394825},
     Messages = [Message1, Message2, Message3, Message4, Message5],
+    LogFile = "testutc.log",
     ?assertEqual(
-        OffsetMS + 3, 
-        utcclock:adjust(OffsetMS, Messages)).
+        0, 
+        utcclock:adjust(Starttime, OffsetMS, Messages, LogFile)).
 
 check_frame_1_test() ->
     ThisPid = self(),
@@ -146,7 +154,8 @@ set_alarm_1_test() ->
     TimeTillItsDue = 500,
     ThisPid = self(),
     StartFunction = vsutil:getUTC(),
-    utcclock:set_alarm(AlarmMessage, TimeTillItsDue, ThisPid),
+    LogFile = "testutc.log",
+    utcclock:set_alarm(AlarmMessage, TimeTillItsDue, ThisPid, LogFile),
     receive
         Any ->
             EndFunction = vsutil:getUTC(),
@@ -160,7 +169,8 @@ set_alarm_2_test() ->
     TimeTillItsDue = -5,
     ThisPid = self(),
     StartFunction = vsutil:getUTC(),
-    utcclock:set_alarm(AlarmMessage, TimeTillItsDue, ThisPid),
+    LogFile = "testutc.log",
+    utcclock:set_alarm(AlarmMessage, TimeTillItsDue, ThisPid, LogFile),
     receive
         Any ->
             EndFunction = vsutil:getUTC(),
@@ -168,22 +178,6 @@ set_alarm_2_test() ->
             ?assertEqual(AlarmMessage, Any),
             ?assert((TimeNeeded >= 0) and (TimeNeeded < 20)) %Timer:send_after in utcclock needs some additional time
     end.
-
-calc_diff_time_1_test() ->
-    CurrentTime = 0,
-    SlotBeginnInFrame = 120,
-    ?assertEqual(
-        -120,
-        utcclock:calc_diff_time(CurrentTime, SlotBeginnInFrame)
-    ).
-
-calc_diff_time_2_test() ->
-    CurrentTime = 120,
-    SlotBeginnInFrame = 120,
-    ?assertEqual(
-        0,
-        utcclock:calc_diff_time(CurrentTime, SlotBeginnInFrame)
-    ).
 
 
 % -------------------

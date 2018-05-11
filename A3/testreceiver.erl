@@ -113,3 +113,74 @@ loop_3_test() ->
             after timer:seconds(1) -> 
                 ?assert(false)
         end.
+
+collision_happend_1_test() ->
+    ConvertedSlotMessages = [],
+    StationName = "team 06-02",
+    LogFile = "testreceiver.log",
+    {CollisionHappend, StationWasInvolved} = receiver:collision_happend(ConvertedSlotMessages, StationName, LogFile),
+    ?assertNot(CollisionHappend),
+    ?assertNot(StationWasInvolved).
+
+collision_happend_2_test() ->
+    ConvertedSlotMessages = [
+        {{"A", "team 06-01", "-1234567890123", 24, empty}, empty},
+        {{"A", "team 06-03", "-1234567890123", 24, empty}, empty}
+    ],
+    StationName = "team 06-02",
+    LogFile = "testreceiver.log",
+    {CollisionHappend, StationWasInvolved} = receiver:collision_happend(ConvertedSlotMessages, StationName, LogFile),
+    ?assert(CollisionHappend),
+    ?assertNot(StationWasInvolved).
+
+collision_happend_3_test() ->
+    ConvertedSlotMessages = [
+        {{"A", "team 06-01", "-1234567890123", 25, empty}, empty},
+        {{"A", "team 06-03", "-1234567890123", 24, empty}, empty}
+    ],
+    StationName = "team 06-02",
+    LogFile = "testreceiver.log",
+    {CollisionHappend, StationWasInvolved} = receiver:collision_happend(ConvertedSlotMessages, StationName, LogFile),
+    ?assert(CollisionHappend),
+    ?assertNot(StationWasInvolved).
+
+collision_happend_4_test() ->
+    ConvertedSlotMessages = [
+        {{"A", "team 06-02", "-1234567890123", 24, empty}, empty},
+        {{"A", "team 06-03", "-1234567890123", 24, empty}, empty}
+    ],
+    StationName = "team 06-02",
+    LogFile = "testreceiver.log",
+    {CollisionHappend, StationWasInvolved} = receiver:collision_happend(ConvertedSlotMessages, StationName, LogFile),
+    ?assert(CollisionHappend),
+    ?assert(StationWasInvolved).
+
+
+send_to_core_1_test() ->
+    ConvertedSlotMessages = [],
+    CollisionHappend = false,
+    StationWasInvolved = false,
+    CorePid = self(),
+    LogFile = "testreceiver.log",
+    receiver:send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile),
+    receive
+        Any ->
+            ?assertEqual({slotmessages, ConvertedSlotMessages, StationWasInvolved}, Any)
+    end.
+
+send_to_core_2_test() ->
+    ConvertedSlotMessages = [
+        {{"A", "team 06-02", "-1234567890123", 24, empty}, empty},
+        {{"A", "team 06-03", "-1234567890123", 24, empty}, empty}
+    ],
+    CollisionHappend = true,
+    StationWasInvolved = true,
+    CorePid = self(),
+    LogFile = "testreceiver.log",
+    receiver:send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile),
+    receive
+        Any ->
+            ?assertEqual({slotmessages, [], StationWasInvolved}, Any)
+    end.
+
+    

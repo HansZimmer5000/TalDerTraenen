@@ -9,8 +9,7 @@
     new_frame_started/2,
     get_current_time/2,
     calc_slot_beginn_this_frame_time/2,
-    set_alarm/4,
-    calc_diff_time/2
+    set_alarm/4
 ]).
 
 -define(FRAMECHECKCYCLEMS, 10).
@@ -46,7 +45,7 @@ loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, LogFile) ->
             loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, LogFile);
         {calcdifftime, SlotBeginnInFrame, SenderPid} ->
             CurrentTime = get_current_time(Starttime, OffsetMS),
-            DiffTime = calc_diff_time(CurrentTime, SlotBeginnInFrame),
+            DiffTime = CurrentTime - SlotBeginnInFrame,
             SenderPid ! {resultdifftime, DiffTime},
             loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, LogFile);
         {getcurrenttime, SenderPid} ->
@@ -125,9 +124,6 @@ set_alarm(AlarmMessage, TimeTillItsDue, SenderPid, LogFile) ->
             SenderPid ! AlarmMessage,
             logge_status("~s mit ~p zu spaet!", [AlarmMessage, TimeTillItsDue], LogFile)
     end.
-
-calc_diff_time(CurrentTime, SlotBeginnInFrame) ->
-    CurrentTime - SlotBeginnInFrame.
 
 %------------------------------------------
 logge_status(Text, Input, LogFile) ->

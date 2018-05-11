@@ -5,8 +5,11 @@
     start/4,
     
     loop/3,
-    listen_to_slot/3
-    ]).
+    listen_to_slot/3,
+
+    collision_happend/3,
+    send_to_core/5
+]).
 
 -define(NSNODE, hole_wert_aus_config_mit_key(node)).
 -define(NSNAME, nameservice).
@@ -102,7 +105,7 @@ logge_status(Text, Input, LogFile) ->
 
 logge_status(Inhalt, LogFile) ->
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
-    LogNachricht = io_lib:format("~p - Recv ~s.\n", [AktuelleZeit, Inhalt]),
+    LogNachricht = io_lib:format("~p - Recv ~p.\n", [AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(LogFile, LogNachricht).
 

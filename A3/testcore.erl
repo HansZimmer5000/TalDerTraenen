@@ -136,15 +136,17 @@ notify_when_preperation_and_send_due_1_test() ->
     end,
     receive
         Any2 -> 
-            {alarm, AlarmMessage1, TimeMS1} = Any2,
+            {alarm, AlarmMessage1, TimeMS1, SenderPid1} = Any2,
             ?assertEqual(preperation, AlarmMessage1),
-            ?assertEqual(40, TimeMS1)
+            ?assertEqual(40, TimeMS1),
+            ?assertEqual(TestPid, SenderPid1)
     end,
     receive
         Any3 -> 
-            {alarm, AlarmMessage2, TimeMS2} = Any3,
+            {alarm, AlarmMessage2, TimeMS2, SenderPid2} = Any3,
             ?assertEqual(send, AlarmMessage2),
-            ?assertEqual(50, TimeMS2)
+            ?assertEqual(40, TimeMS2),
+            ?assertEqual(TestPid, SenderPid2)
     end.
 
 
