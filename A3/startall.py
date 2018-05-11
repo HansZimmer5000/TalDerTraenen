@@ -75,7 +75,8 @@ if __name__ == "__main__":
         __make_all_modules()
         __remove_all_unecessary_files([".log"])
         __start_node("ns", "nameservice", "")
-        __start_stations(4)
+        __start_node("bench", "benchmark", "")
+        #__start_stations(1)
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     else:

@@ -15,7 +15,8 @@
     get_station_name/1,
     get_slotnumber/1,
     get_sendtime/1,
-    get_receivedtime/1
+    get_receivedtime/1,
+    check_format/1
 ]).
 
 -define(SLOTNUMBERPOS, 26). %Because String as List starts at 1 instead of 0.
@@ -104,3 +105,11 @@ get_sendtime(Message) ->
 get_receivedtime(Message) ->
     {{_, _, _, _, _}, ReceivedTime} = Message,
     ReceivedTime.
+
+check_format(Message) ->
+    case Message of
+        {{_,_,_,_,_},_} ->
+            true;
+        _ ->
+            false
+    end.
