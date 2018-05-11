@@ -1,6 +1,6 @@
 -module(payloadserver).
 -export([
-	start/2, 
+	start/3, 
 	send/1,
 	loop/1
 ]).
@@ -10,14 +10,14 @@
 -define(TEAMNUMBER, "6").
 -define(PRAKTIKUMSNUMBER, "2").
 
-start(CoreNode, LogFile) ->
+start(CoreNode, StationNumberString, LogFile) ->
 	CoreNodeString = atom_to_list(CoreNode),
 	PipeNode = (lists:sublist(LogFile, 1) ++ "-pipe"),
-		 
+
 	ServerPid = spawn(fun() -> loop(LogFile) end),
 	register(payloadserver, ServerPid),
 
-	CommandString = "java vessel3.Vessel " ++ ?TEAMNUMBER ++ " " ++ ?PRAKTIKUMSNUMBER ++ 
+	CommandString = "java vessel3.Vessel " ++ ?TEAMNUMBER ++ " " ++ StationNumberString ++ 
 					" | erl -sname " ++ PipeNode ++ " -noshell -s payloadserver send " ++ CoreNodeString ++ " " ++ LogFile,
 	VesselPid = spawn(fun() ->
 			os:cmd(CommandString)

@@ -62,7 +62,7 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFil
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         {getcurrenttime, SenderPid} ->
             %logge_status("getcurrenttime", LogFile),
-            SenderPid ! get_current_time(Starttime, OffsetMS),
+            SenderPid ! {currenttime, get_current_time(Starttime, OffsetMS)},
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         Any -> 
             logge_status("Got: ~p", [Any], LogFile),

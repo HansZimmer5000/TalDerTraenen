@@ -18,12 +18,13 @@ start(StationType, StationName, LogFile) ->
     start(StationType, StationName, LogFile, ?CLOCKOFFSETMS).
 
 start(StationType, StationName, LogFile, ClockOffsetMS) ->
-    logge_status("Startet", LogFile),
+    logge_status("Startet as ~p", [StationName], LogFile),
+    StationNumberString = lists:sublist(StationName, 9,2),
 
     RecvPid = receiver:start(self(), StationName, LogFile),
     SendPid = sender:start(LogFile),
     ClockPid = utcclock:start(ClockOffsetMS, self(), LogFile),
-    PayloadServerPid = payloadserver:start(node(), LogFile),
+    PayloadServerPid = payloadserver:start(node(), StationNumberString,LogFile),
 
     entry_loop(StationName, StationType, RecvPid, SendPid, PayloadServerPid, ClockPid, LogFile).
 
@@ -88,6 +89,11 @@ listen_to_slot(RecvPid) ->
 
 
 prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile) ->
+    %TODO: Nearly all the time they miss the slotbeginn!!!!!!
+
+
+
+
     SendtimeMS = notify_when_preperation_and_send_due(ClockPid, SlotNumber, LogFile),
     receive
         preperation ->
@@ -95,17 +101,19 @@ prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServ
             IncompleteMessage = messagehelper:create_incomplete_message(StationType, SlotNumber),
             receive
                 send ->
+                    ClockPid ! {getcurrenttime, self()},
                     %logge_status("send", LogFile),
-                    ClockPid ! {calcdifftime, SendtimeMS, self()},
                     receive
-                        {resultdifftime, DiffTime} ->
+                        {currenttime, CurrentTime} ->
+                            logge_status("~p (Seti) ~p (Now)", [SendtimeMS, CurrentTime], LogFile),
+                            DiffTime = SendtimeMS - CurrentTime,
                             case DiffTime of
-                                DiffTime when DiffTime < 0 -> 
+                                DiffTime when DiffTime > 40 -> 
                                     logge_status("SendTime in the future: ~p", [DiffTime], LogFile),
-                                    timer:sleep(DiffTime),
+                                    timer:sleep(DiffTime - 40), %So he wakes up in the beginning of the slot
                                     send_message(IncompleteMessage, PayloadServerPid, SendPid, SendtimeMS, LogFile),
                                     MessageWasSend = true;
-                                DiffTime when DiffTime > 40 -> 
+                                DiffTime when DiffTime < -40 -> 
                                     logge_status("SendTime in the past: ~p", [DiffTime], LogFile),
                                     MessageWasSend = false; 
                                 DiffTime -> 
