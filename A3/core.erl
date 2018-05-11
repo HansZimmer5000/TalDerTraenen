@@ -89,11 +89,6 @@ listen_to_slot(RecvPid) ->
 
 
 prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile) ->
-    %TODO: Nearly all the time they miss the slotbeginn!!!!!!
-
-
-
-
     SendtimeMS = notify_when_preperation_and_send_due(ClockPid, SlotNumber, LogFile),
     receive
         preperation ->

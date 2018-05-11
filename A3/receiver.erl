@@ -40,10 +40,12 @@ listen_to_slot(CorePid, StationName, LogFile) ->
     timer:send_after(?SLOTLENGTHMS, self(), stop_listening),
     {SlotMessages, ReceivedTimes} = listen([], [], LogFile),
     ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
-    {CollisionHappend, StationWasInvolved} = collision_happend(ConvertedSlotMessages, StationName),
+    {CollisionHappend, StationWasInvolved} = collision_happend(ConvertedSlotMessages, StationName, LogFile),
+    logge_status("Sending to Core", LogFile),
     case CollisionHappend of
         true ->
-            CorePid ! {slotmessages, [], StationWasInvolved};
+            CorePid ! {slotmessages, [], StationWasInvolved},
+            logge_status("(Involved: ~p) Collision detected in: ~p", [StationWasInvolved, ConvertedSlotMessages], LogFile);
         false ->
             CorePid ! {slotmessages, ConvertedSlotMessages, StationWasInvolved}
     end.
@@ -61,23 +63,27 @@ listen(SlotMessages, ReceivedTimes, LogFile) ->
             listen(SlotMessages, ReceivedTimes, LogFile)
     end.
 
-collision_happend(ConvertedSlotMessages, StationName) ->
+collision_happend(ConvertedSlotMessages, StationName, LogFile) ->
         case length(ConvertedSlotMessages) of
-            0 -> {true, false};
+            0 -> {false, false};
             1 -> {false, false};
-            _Any -> {true, station_was_involved(ConvertedSlotMessages, StationName)}
+            _Any -> 
+                StationWasInvolved = station_was_involved(ConvertedSlotMessages, StationName, LogFile),
+                {true, StationWasInvolved}
         end.
 
-station_was_involved([], _StationName) ->
+station_was_involved([], StationName, LogFile) ->
+    logge_status("Wasn't Involved: ~p", [StationName], LogFile),
     false;
-station_was_involved(ConvertedSlotMessages, StationName) ->
+station_was_involved(ConvertedSlotMessages, StationName, LogFile) ->
     [FirstConvertedSlotMessage | RestConvertedSlotMessages] = ConvertedSlotMessages,
     MessageStationName = messagehelper:get_station_name(FirstConvertedSlotMessage),
-    case MessageStationName of
-        StationName ->
+    case string:equal(MessageStationName, StationName) of
+        true ->
+            logge_status("Was Involved: ~p ~p", [StationName, messagehelper:get_station_name(FirstConvertedSlotMessage)], LogFile),
             true;
-        _Any ->
-            station_was_involved(RestConvertedSlotMessages, StationName)
+        false ->
+            station_was_involved(RestConvertedSlotMessages, StationName, LogFile)
     end.    
 
 %------------------------------------------

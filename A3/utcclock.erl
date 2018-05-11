@@ -71,7 +71,7 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFil
 
 adjust(Starttime, OffsetMS, Messages, LogFile) ->
     AverageDiffMS = calc_average_diff_ms(Messages, Starttime, OffsetMS, LogFile),
-    NewOffsetMS = OffsetMS + AverageDiffMS,
+    NewOffsetMS = OffsetMS - AverageDiffMS,
     round(NewOffsetMS).
 
 calc_average_diff_ms(Messages, Starttime, OffsetMS, LogFile) ->
@@ -91,7 +91,7 @@ calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount, S
         "A" ->
             SendTime = messagehelper:get_sendtime(CurrentMessage),
             RecvTime = messagehelper:get_receivedtime(CurrentMessage) - Starttime + OffsetMS,
-            NewTotalDiffMS = TotalDiffMS + RecvTime - SendTime,
+            NewTotalDiffMS = TotalDiffMS + RecvTime - SendTime - 150, %150 is about Transporttime
             logge_status("Send (~p) Recv (~p) Total (~p) Count(~p)", [SendTime, RecvTime, NewTotalDiffMS, TotalCount + 1], LogFile),
             calc_average_diff_ms(RestMessages, NewTotalDiffMS, TotalCount + 1, Starttime, OffsetMS, LogFile);
         Any ->

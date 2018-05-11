@@ -51,6 +51,14 @@ def __remove_all_unecessary_files(unecessary_file_types):
     for unecessary_file in unecessary_files:
         os.remove(unecessary_file)
 
+# Clears a certain file (filename) of any content.
+def __clear_file(filename):
+    open(filename, "w").close()
+
+def __clear_all_log_files_in_current_dir():
+    log_filenames = glob.glob("*.log")
+    for log_filename in log_filenames:
+        __clear_file(log_filename)
 
 # According to given Input, either all Testfiles gonna be executed or 
 # the distributed system is going to startup
@@ -73,7 +81,7 @@ if __name__ == "__main__":
         __remove_all_unecessary_files([".beam", ".dump"])
     elif user_input == "2":
         __make_all_modules()
-        __remove_all_unecessary_files([".log"])
+        __clear_all_log_files_in_current_dir()
         __start_node("ns", "nameservice", "")
         #__start_node("bench", "benchmark", "")
         __start_stations(5)
