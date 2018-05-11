@@ -102,12 +102,12 @@ prepare_and_send_message(SendPid, SlotNumber, StationType, ClockPid, PayloadServ
                             logge_status("~p (Seti) ~p (Now)", [SendtimeMS, CurrentTime], LogFile),
                             DiffTime = SendtimeMS - CurrentTime,
                             case DiffTime of
-                                DiffTime when DiffTime > 40 -> 
+                                DiffTime when DiffTime >= 40 -> 
                                     logge_status("SendTime in the future: ~p", [DiffTime], LogFile),
                                     timer:sleep(DiffTime - 40), %So he wakes up in the beginning of the slot
                                     send_message(IncompleteMessage, PayloadServerPid, SendPid, SendtimeMS, LogFile),
                                     MessageWasSend = true;
-                                DiffTime when DiffTime < -40 -> 
+                                DiffTime when DiffTime =< -40 -> 
                                     logge_status("SendTime in the past: ~p", [DiffTime], LogFile),
                                     MessageWasSend = false; 
                                 DiffTime -> 
