@@ -145,7 +145,7 @@ notify_when_preperation_and_send_due(ClockPid, SlotNumber, _LogFile) ->
         {resultslotbeginn, SendtimeMS} ->
             %logge_status("resultslotbeginn", LogFile),
             ClockPid ! {alarm, preperation, SendtimeMS - ?MESSAGEPREPERATIONTIMEMS, self()},
-            ClockPid ! {alarm, send, SendtimeMS, self()}
+            ClockPid ! {alarm, send, SendtimeMS - ?MESSAGEPREPERATIONTIMEMS, self()}
     end,
     SendtimeMS.
 
