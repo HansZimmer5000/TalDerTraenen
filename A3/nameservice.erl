@@ -11,29 +11,25 @@ start() ->
     logge_status("nameservice gestartet"),
     register(?NSNAME, self()),
     Starttime = vsutil:getUTC(),
-    DiffTime = Starttime rem 1000,
-    timer:sleep(DiffTime),
-    receive_loop([], Starttime, false).
+    spawn(fun() -> new_frame_loop(Starttime) end),
+    receive_loop([], Starttime).
 
-receive_loop(StationPids, Starttime, TimerSet) ->
-    case TimerSet of
-        false ->
-            timer:send_after(timer:seconds(1), newframe);
-        true ->
-            nothing
-    end,
+new_frame_loop(Starttime) ->
+    DiffTime = 1000 - vsutil:getUTC() rem 1000,
+    timer:sleep(DiffTime), %Its about 5 MS behind the second on average
+    logge_status("--- New Frame at ~p ---", [vsutil:getUTC() - Starttime]),
+    new_frame_loop(Starttime).
+
+receive_loop(StationPids, Starttime) ->
     receive
-        newframe ->
-            logge_status("--- New Frame ---"),
-            receive_loop(StationPids, Starttime, false);
         {enlist, Pid} ->    logge_status("got enlist"),
                             NewStationPids = enlist(StationPids, Pid),
-                            receive_loop(NewStationPids, Starttime, true);
+                            receive_loop(NewStationPids, Starttime);
         {multicast, Message} ->     multicast(StationPids, Message),
                                     spawn(fun() -> print_message(Message, Starttime) end),
-                                    receive_loop(StationPids, Starttime, true);
+                                    receive_loop(StationPids, Starttime);
         Any ->  logge_status(io_lib:format("Got: ~p", [Any])),
-                receive_loop(StationPids, Starttime, true)
+                receive_loop(StationPids, Starttime)
     end.
 
 enlist(StationPids, NewPid) ->
@@ -53,7 +49,9 @@ print_message(Message, Starttime) ->
     StationName = messagehelper:get_station_name(ConvertedMessage),
     Slotnumber = messagehelper:get_slotnumber(ConvertedMessage),
     SendTime = messagehelper:get_sendtime(ConvertedMessage),
-    logge_status("~p(~p) in Slot ~p at ~p", [StationName, StationType, Slotnumber, SendTime]).
+    logge_status(
+        "~p(~p) in Slot ~p at ~p (~pms since Send)", 
+        [StationName, StationType, Slotnumber, SendTime, SendTime - (vsutil:getUTC() - Starttime)]).
 
 
 %--------------
@@ -63,6 +61,6 @@ logge_status(Text, Input) ->
 
 logge_status(Inhalt) ->
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
-    LogNachricht = io_lib:format("~p ~s.\n", [AktuelleZeit, Inhalt]),
+    LogNachricht = io_lib:format("~p ~s\n", [AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(?LOG_DATEI_NAME, LogNachricht).
