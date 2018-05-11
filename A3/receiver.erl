@@ -37,18 +37,16 @@ loop(CorePid, StationName, LogFile) ->
     loop(CorePid, StationName, LogFile).
 
 listen_to_slot(CorePid, StationName, LogFile) ->
+    ConvertedSlotMessages = get_converted_slot_messages(LogFile),
+
+    {CollisionHappend, StationWasInvolved} = collision_happend(ConvertedSlotMessages, StationName, LogFile),
+    send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile).
+
+get_converted_slot_messages(LogFile) ->
     timer:send_after(?SLOTLENGTHMS, self(), stop_listening),
     {SlotMessages, ReceivedTimes} = listen([], [], LogFile),
     ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
-    {CollisionHappend, StationWasInvolved} = collision_happend(ConvertedSlotMessages, StationName, LogFile),
-    %logge_status("Sending to Core", LogFile),
-    case CollisionHappend of
-        true ->
-            CorePid ! {slotmessages, [], StationWasInvolved},
-            logge_status("(Involved: ~p) Collision detected in: ~p", [StationWasInvolved, ConvertedSlotMessages], LogFile);
-        false ->
-            CorePid ! {slotmessages, ConvertedSlotMessages, StationWasInvolved}
-    end.
+    ConvertedSlotMessages.
 
 listen(SlotMessages, ReceivedTimes, LogFile) ->
     receive
@@ -64,13 +62,24 @@ listen(SlotMessages, ReceivedTimes, LogFile) ->
     end.
 
 collision_happend(ConvertedSlotMessages, StationName, LogFile) ->
-        case length(ConvertedSlotMessages) of
-            0 -> {false, false};
-            1 -> {false, false};
-            _Any -> 
-                StationWasInvolved = station_was_involved(ConvertedSlotMessages, StationName, LogFile),
-                {true, StationWasInvolved}
-        end.
+    %What if Messages were "in a slot" but its based upon desynchronized clocks?
+    case length(ConvertedSlotMessages) of
+        0 -> {false, false};
+        1 -> {false, false};
+        _Any -> 
+            StationWasInvolved = station_was_involved(ConvertedSlotMessages, StationName, LogFile),
+            {true, StationWasInvolved}
+    end.
+
+send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile) ->
+    case CollisionHappend of
+        true ->
+            CorePid ! {slotmessages, [], StationWasInvolved},
+            logge_status("(Involved: ~p) Collision detected in: ~p", [StationWasInvolved, ConvertedSlotMessages], LogFile);
+        false ->
+            CorePid ! {slotmessages, ConvertedSlotMessages, StationWasInvolved}
+    end.
+
 
 station_was_involved([], StationName, LogFile) ->
     logge_status("Wasn't Involved: ~p", [StationName], LogFile),

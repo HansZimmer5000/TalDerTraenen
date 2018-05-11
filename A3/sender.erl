@@ -18,21 +18,13 @@ loop(Nameservice, LogFile) ->
     receive
         {send, Message} -> 
             send(Nameservice, Message)
-            %spawn(fun() -> send_log(Message, LogFile) end)
     end,
     loop(Nameservice, LogFile).
 
 send(Nameservice, Message) ->
     Nameservice ! {multicast, Message}.
 
-send_log(Message, LogFile) ->
-    [ConvertedMessage] = messagehelper:convert_received_messages_from_byte([Message], [empty]),
-    logge_status("Send ~p", [ConvertedMessage], LogFile).
-
 %------------------------------------------
-logge_status(Text, Input, LogFile) ->
-    Inhalt = io_lib:format(Text,Input),
-    logge_status(Inhalt, LogFile).
 
 logge_status(Inhalt, LogFile) ->
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
