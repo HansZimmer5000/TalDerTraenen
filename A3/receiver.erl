@@ -41,7 +41,7 @@ listen_to_slot(CorePid, StationName, LogFile) ->
     {SlotMessages, ReceivedTimes} = listen([], [], LogFile),
     ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
     {CollisionHappend, StationWasInvolved} = collision_happend(ConvertedSlotMessages, StationName, LogFile),
-    logge_status("Sending to Core", LogFile),
+    %logge_status("Sending to Core", LogFile),
     case CollisionHappend of
         true ->
             CorePid ! {slotmessages, [], StationWasInvolved},

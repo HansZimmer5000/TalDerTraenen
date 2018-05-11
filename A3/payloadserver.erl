@@ -7,18 +7,16 @@
 
 -define(SERVERNAME, payloadserver).
 
--define(TEAMNUMBER, "6").
--define(PRAKTIKUMSNUMBER, "2").
+-define(TEAMNUMBER, "06").
 
 start(CoreNode, StationNumberString, LogFile) ->
 	CoreNodeString = atom_to_list(CoreNode),
-	PipeNode = (lists:sublist(LogFile, 1) ++ "-pipe"),
 
 	ServerPid = spawn(fun() -> loop(LogFile) end),
 	register(payloadserver, ServerPid),
 
 	CommandString = "java vessel3.Vessel " ++ ?TEAMNUMBER ++ " " ++ StationNumberString ++ 
-					" | erl -sname " ++ PipeNode ++ " -noshell -s payloadserver send " ++ CoreNodeString ++ " " ++ LogFile,
+					" | erl -sname team-" ++ ?TEAMNUMBER ++ "-" ++ StationNumberString ++ "-pipe -noshell -s payloadserver send " ++ CoreNodeString ++ " " ++ LogFile,
 	VesselPid = spawn(fun() ->
 			os:cmd(CommandString)
 		 end),
@@ -27,12 +25,12 @@ start(CoreNode, StationNumberString, LogFile) ->
 
 send([CoreNode, LogFile]) ->
 	case net_adm:ping(CoreNode) of
-		pang ->
-			logge_status("Couldn't find Payloadserver!", LogFile);
 		pong ->
 			logge_status("Found Payloadserver: ~p", [CoreNode], LogFile),
 			ServerPid = {?SERVERNAME, CoreNode},
-			send_(ServerPid)
+			send_(ServerPid);
+		_Any ->
+			logge_status("Couldn't find Payloadserver!", LogFile)
 	end.
 
 send_(PayloadServerPid) ->

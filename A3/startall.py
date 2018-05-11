@@ -37,7 +37,7 @@ def __start_stations(count):
         if(count < 10):
             stationname = stationname + "0"
         stationname = stationname + count_str
-        __start_node("core" + count_str, "station", "A " + stationname)
+        __start_node("station" + count_str, "station", "A " + stationname)
         count = count - 1
 
 def __start_normal_shell(nodename):

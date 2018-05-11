@@ -7,7 +7,6 @@
     listen_to_frame/1,
     listen_to_slot/1,
 
-
     notify_when_preperation_and_send_due/3
 ]).
 
@@ -18,7 +17,6 @@ start(StationType, StationName, LogFile) ->
     start(StationType, StationName, LogFile, ?CLOCKOFFSETMS).
 
 start(StationType, StationName, LogFile, ClockOffsetMS) ->
-    logge_status("Startet as ~p", [StationName], LogFile),
     StationNumberString = lists:sublist(StationName, 9,2),
 
     RecvPid = receiver:start(self(), StationName, LogFile),
@@ -52,6 +50,7 @@ send_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid
                     ThisPid ! {messagewassend, MessageWasSend}
                 end),
             {Messages, StationWasInvolved} = listen_to_frame(RecvPid),
+            logge_status("Listend to frame, now adjusting clock", LogFile),
             ClockPid ! {adjust, Messages},
 
             receive
