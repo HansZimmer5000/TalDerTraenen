@@ -13,6 +13,8 @@
 -define(CLOCKOFFSETMS, 0).
 -define(MESSAGEPREPERATIONTIMEMS, 10).
 
+%TODO: They are missing the slots way too often!!!
+
 start(StationType, StationName, LogFile) ->
     start(StationType, StationName, LogFile, ?CLOCKOFFSETMS).
 
@@ -34,7 +36,7 @@ entry_loop(StationName, StationType, Pids, LogFile) ->
     {RecvPid, _SendPid, ClockPid, _PayloadServerPid} = Pids,
     receive
         newframe ->
-            logge_status("New Frame Started", LogFile),
+            logge_status("New Frame Started ---------------------------------", LogFile),
             {Messages, _StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid),
             SlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName),
             logge_status("Received ~p Messages this Frame", [length(Messages)], LogFile),
@@ -48,7 +50,7 @@ send_loop(StationName, StationType, Pids, SlotNumber, LogFile) ->
     {RecvPid, SendPid, ClockPid, PayloadServerPid} = Pids,
     receive
         newframe ->
-            logge_status("New Frame Started with SlotNumber ~p", [SlotNumber], LogFile),
+            logge_status("New Frame Started with SlotNumber ~p --------------", [SlotNumber], LogFile),
             start_sending_process(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile),
             {_Messages, StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid),
             wait_for_messagewassend_and_handle_loop_end(

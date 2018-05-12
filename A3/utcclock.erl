@@ -149,7 +149,7 @@ set_alarm(AlarmMessage, TimeTillItsDue, SenderPid, LogFile) ->
             timer:send_after(TimeTillItsDue, SenderPid, AlarmMessage);
         false ->
             SenderPid ! AlarmMessage,
-            logge_status("~s mit ~p zu spaet!", [AlarmMessage, TimeTillItsDue], LogFile)
+            logge_status("alarm '~s' with ~pms already too late!", [AlarmMessage, TimeTillItsDue], LogFile)
     end.
 
 %------------------------------------------
