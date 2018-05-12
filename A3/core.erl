@@ -52,7 +52,8 @@ send_loop(StationName, StationType, Pids, SlotNumber, LogFile) ->
         newframe ->
             logge_status("New Frame Started with SlotNumber ~p --------------", [SlotNumber], LogFile),
             start_sending_process(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile),
-            {_Messages, StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid),
+            {Messages, StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid),
+            logge_status("Received ~p Messages this Frame", [length(Messages)], LogFile),
             wait_for_messagewassend_and_handle_loop_end(
                 StationWasInvolved, StationName, StationType, SlotNumber, Pids, LogFile);
         Any -> 
@@ -102,7 +103,7 @@ notify_when_preperation_and_send_due(ClockPid, SlotNumber, _LogFile) ->
     receive
         {resultslotbeginn, SendtimeMS} ->
             ClockPid ! {alarm, preperation, SendtimeMS - ?MESSAGEPREPERATIONTIMEMS, self()},
-            ClockPid ! {alarm, send, SendtimeMS - ?MESSAGEPREPERATIONTIMEMS, self()}
+            ClockPid ! {alarm, send, SendtimeMS, self()}
     end,
     SendtimeMS.
 

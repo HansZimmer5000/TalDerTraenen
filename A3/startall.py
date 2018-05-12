@@ -83,6 +83,7 @@ if __name__ == "__main__":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
         __start_node("ns", "nameservice", "")
+        time.sleep(1)
         #__start_node("bench", "benchmark", "")
         __start_stations(5)
     elif user_input == "3":
