@@ -22,13 +22,16 @@ start(OffsetMS, CorePid, StationName, LogFile) ->
     CurrentFrameNumber = 0,
     TransportTupel = {StationName, 0, 0},
     ClockPid = spawn(fun() -> loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile) end),
+    _CheckPid = spawn(fun() -> check_frame_loop(ClockPid) end),
     ClockPid.
 
 % --------------------------------------------------
+check_frame_loop(ClockPid) ->
+    timer:sleep(?FRAMECHECKCYCLEMS),
+    ClockPid ! checkframe,
+    check_frame_loop(ClockPid).
 
 loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile) ->
-    %TODO: wird öfter als CycleMS ausgeführt, da dies von der loop/6 Ausfuehrung abhaengt!
-    timer:send_after(?FRAMECHECKCYCLEMS, self(), checkframe),
     receive
         {adjust, Messages} ->
             {NewOffsetMS, NewTransportTupel} = adjust(Starttime, OffsetMS, Messages, TransportTupel, LogFile),
