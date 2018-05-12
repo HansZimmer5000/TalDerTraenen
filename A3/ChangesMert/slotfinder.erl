@@ -1,6 +1,8 @@
 -module(slotfinder).
 
 -export([
+	start/3,
+	loop/4,
     find_slot_in_next_frame/2,
     get_slot_numer_if_stationname_matches/2,
     get_taken_slots/2,
@@ -21,12 +23,12 @@ loop(CorePid, StationName, Messages, LogFile) ->
  receive
 	{messageFromBC, Message} ->			
 			Messages = [Message | Messages],
-			loop(ClockPid, StationName, Messages, LogFile);
+			loop(CorePid, StationName, Messages, LogFile);
 			
 	{getFreeSlotNum} ->			
 			NewSlotNumber = find_slot_in_next_frame(Messages, StationName),
 			CorePid ! NewSlotNumber,
-			loop(ClockPid, StationName, [], LogFile)
+			loop(CorePid, StationName, [], LogFile)
  end.
 	
 
@@ -75,4 +77,14 @@ select_random_slot(PossibleSlots) ->
             [RandomSlot] = lists:sublist(PossibleSlots, RandomIndex, 1),
             RandomSlot
     end.
+	
+logge_status(Text, Input, LogFile) ->
+    Inhalt = io_lib:format(Text,Input),
+    logge_status(Inhalt, LogFile).
+
+logge_status(Inhalt, LogFile) ->
+    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
+    LogNachricht = io_lib:format("~p - Send ~s.\n", [AktuelleZeit, Inhalt]),
+    io:fwrite(LogNachricht),
+    util:logging(LogFile, LogNachricht).
     

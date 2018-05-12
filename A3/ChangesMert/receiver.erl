@@ -4,8 +4,7 @@
     start/3,
     start/4,
     
-    loop/3,
-    listen_to_slot/3
+    loop/3
     ]).
 
 -define(NSNODE, hole_wert_aus_config_mit_key(node)).

@@ -4,6 +4,7 @@
     start/3,
 
     adjust/4,
+	calcOffSet/3,
 
     check_frame/4,
     new_frame_started/2,
@@ -67,7 +68,7 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFil
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
 			
 		{messageFromBC, Message, FrameStartTime} ->
-			OffsetMS = messagehelper(Message, OffsetMS, FrameStartTime),
+			OffsetMS = calcOffSet(Message, OffsetMS, FrameStartTime),
 			loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
 			
         Any -> 

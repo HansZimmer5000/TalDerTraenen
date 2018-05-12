@@ -26,10 +26,6 @@ send(Nameservice, Message) ->
 	timer:sleep(20),
     Nameservice ! {multicast, Message}.
 
-send_log(Message, LogFile) ->
-    [ConvertedMessage] = messagehelper:convert_received_messages_from_byte([Message], [empty]),
-    logge_status("Send ~p", [ConvertedMessage], LogFile).
-
 %------------------------------------------
 logge_status(Text, Input, LogFile) ->
     Inhalt = io_lib:format(Text,Input),

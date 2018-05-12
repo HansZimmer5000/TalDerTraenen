@@ -2,12 +2,7 @@
 
 -export([
     start/3,
-    start/4,
-
-    listen_to_frame/1,
-    listen_to_slot/1,
-
-    notify_when_preperation_and_send_due/3
+    start/4
 ]).
 
 -define(CLOCKOFFSETMS, 0).
@@ -27,19 +22,23 @@ start(StationType, StationName, LogFile, ClockOffsetMS) ->
     frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile).
 	
 %------------------------------------------ FRAME	
-frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile)
+frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile) ->
 	ClockPid ! {getcurrentoffsetms, self()},
 	receive
 		Offset ->
 			timer:sleep(Offset),
-			SlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName)
-			%change method return actual free slot,
+			SlotFinderPid ! {getFreeSlotNum},
+			receive
+				SlotNumFromSlotFinder ->
+					SlotNumber = SlotNumFromSlotFinder
+					
+			end,
 			FrameStartTime = vsutil:getUTC(),
 			slot_loop(?SLOTLENGTHMS, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, 0, FrameStartTime)
 	end.
 	
 %------------------------------------------ SLOT	
-slot_loop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime)
+slot_loop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime) ->
 	SlotStartTime = vsutil:getUTC(),
     case (SlotNumber == CurrentSlot) of
 		true ->
@@ -47,14 +46,14 @@ slot_loop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, Payload
 				true ->
 					IncompleteMessage = messagehelper:create_incomplete_message(StationType, SlotNumber),
 					SendtimeMS = vsutil:getUTC(),
-					send_message(IncompleteMessage, PayloadServerPid, SendPid, SendtimeMS, LogFile);
+					send_message(IncompleteMessage, PayloadServerPid, SendPid, SendtimeMS, LogFile)
 					%INFO: sender wartet die 20 ms
-        false ->
+			end				
     end,	
 	receive %TODO recive arbeitet proaktiv, nicht nach abruf
 		{messageFromBC, Message} ->
 			ClockPid ! {messageFromBC, Message, FrameStartTime},
-			SlotHandlerPid ! {messageFromBC, Message},	%Slots	in Liste einpflegen, nach find slot leeren.
+			SlotFinderPid ! {messageFromBC, Message},	%Slots	in Liste einpflegen, nach find slot leeren.
 		
 		% loop mit rest slotZeit
 		SlotBreakTime = vsutil:getUTC(),
@@ -66,9 +65,8 @@ slot_loop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, Payload
 				frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile);
 			false ->
 				slot_loop(40, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot + 1, FrameStartTime)
- 			end	
+		end
 	end.
-
 
 send_message(IncompleteMessage, PayloadServerPid, SendPid, SendTime, _LogFile) ->
     PayloadServerPid ! {self(), getNextPayload},
