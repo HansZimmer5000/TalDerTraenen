@@ -5,7 +5,7 @@
 
     adjust/5,
 
-    check_frame/4,
+    check_frame/5,
     new_frame_started/2,
     get_current_time/2,
     calc_slot_beginn_this_frame_time/2,
@@ -22,14 +22,10 @@ start(OffsetMS, CorePid, StationName, LogFile) ->
     CurrentFrameNumber = 0,
     TransportTupel = {StationName, 0, 0},
     ClockPid = spawn(fun() -> loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile) end),
-    _CheckPid = spawn(fun() -> check_frame_loop(ClockPid) end),
+    _CheckPid = timer:send_interval(?FRAMECHECKCYCLEMS, ClockPid, checkframe),
     ClockPid.
 
 % --------------------------------------------------
-check_frame_loop(ClockPid) ->
-    timer:sleep(?FRAMECHECKCYCLEMS),
-    ClockPid ! checkframe,
-    check_frame_loop(ClockPid).
 
 loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile) ->
     receive
@@ -37,7 +33,7 @@ loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile) 
             {NewOffsetMS, NewTransportTupel} = adjust(Starttime, OffsetMS, Messages, TransportTupel, LogFile),
             loop(Starttime, NewOffsetMS, CurrentFrameNumber, CorePid, NewTransportTupel, LogFile);
         checkframe ->
-            NewCurrentFrameNumber = check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid),
+            NewCurrentFrameNumber = check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid, LogFile),
             loop(Starttime, OffsetMS, NewCurrentFrameNumber, CorePid, TransportTupel, LogFile);
         {calcslotbeginn, SlotNumber, SenderPid} ->
             SendtimeMS = calc_slot_beginn_this_frame_time(CurrentFrameNumber, SlotNumber),
@@ -119,15 +115,16 @@ adjust_transport_tupel_and_calc_new_average(TransportTupel, CurrentMessage, TmpD
     end,
     {NewTransportTupel, AverageTransportDelay}.
 
-check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid) ->   
+check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid, _LogFile) ->   
     CurrentTime = get_current_time(Starttime, OffsetMS),
     case new_frame_started(CurrentTime, CurrentFrameNumber) of
         true ->
             CorePid ! newframe,
-            CurrentFrameNumber + 1;
+            ResultFrameNumber = CurrentFrameNumber + 1;
         false ->
-            CurrentFrameNumber
-    end.
+            ResultFrameNumber = CurrentFrameNumber
+    end,
+    ResultFrameNumber.
 
 new_frame_started(CurrentTime, CurrentFrameNumber) ->
     TimeElapsedInCurrentFrame = CurrentTime - (CurrentFrameNumber * ?FRAMELENGTHMS),

@@ -36,7 +36,11 @@ entry_loop(StationName, StationType, Pids, LogFile) ->
     {RecvPid, _SendPid, ClockPid, _PayloadServerPid} = Pids,
     receive
         newframe ->
-            logge_status("New Frame Started ---------------------------------", LogFile),
+            ClockPid ! {getcurrenttime, self()},
+            receive 
+                {currenttime, CurrentTime} ->  
+                    logge_status("New Frame Started at ~p", [CurrentTime], LogFile)
+            end,
             {Messages, _StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid),
             SlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName),
             logge_status("Received ~p Messages this Frame", [length(Messages)], LogFile),
@@ -50,7 +54,11 @@ send_loop(StationName, StationType, Pids, SlotNumber, LogFile) ->
     {RecvPid, SendPid, ClockPid, PayloadServerPid} = Pids,
     receive
         newframe ->
-            logge_status("New Frame Started with SlotNumber ~p --------------", [SlotNumber], LogFile),
+            ClockPid ! {getcurrenttime, self()},
+            receive 
+                {currenttime, CurrentTime} ->  
+                    logge_status("New Frame Started with SlotNumber ~p at ~p", [SlotNumber, CurrentTime], LogFile)
+            end,
             start_sending_process(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile),
             {Messages, StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid),
             logge_status("Received ~p Messages this Frame", [length(Messages)], LogFile),
