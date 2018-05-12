@@ -22,6 +22,6 @@ logge_status(Text, Input, LogFile) ->
 
 logge_status(Inhalt, LogFile) ->
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
-    LogNachricht = io_lib:format("~p - Recv ~s.\n", [AktuelleZeit, Inhalt]),
+    LogNachricht = io_lib:format("~p STATION ~s.\n", [AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(LogFile, LogNachricht).

@@ -65,7 +65,7 @@ listen(SlotMessages, ReceivedTimes, LogFile) ->
     end.
 
 collision_happend(ConvertedSlotMessages, StationName, LogFile) ->
-    %What if Messages were "in a slot" but its based upon desynchronized clocks?
+    %If a message is handled as received in slot X but was meant for slot Y (X <> Y) its a collision.
     case length(ConvertedSlotMessages) of
         0 -> {false, false};
         1 -> {false, false};
@@ -78,6 +78,8 @@ send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePi
     case CollisionHappend of
         true ->
             CorePid ! {slotmessages, [], StationWasInvolved},
+            
+            %TODO: make better logging for this, don't print all the messages just the necessary infos
             logge_status("(Involved: ~p) Collision detected in: ~p", [StationWasInvolved, ConvertedSlotMessages], LogFile);
         false ->
             CorePid ! {slotmessages, ConvertedSlotMessages, StationWasInvolved}
@@ -105,7 +107,7 @@ logge_status(Text, Input, LogFile) ->
 
 logge_status(Inhalt, LogFile) ->
     AktuelleZeit = vsutil:now2string(erlang:timestamp()),
-    LogNachricht = io_lib:format("~p - Recv ~p.\n", [AktuelleZeit, Inhalt]),
+    LogNachricht = io_lib:format("~p - Recv ~s.\n", [AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(LogFile, LogNachricht).
 

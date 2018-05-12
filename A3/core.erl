@@ -24,7 +24,7 @@ start(StationType, StationName, LogFile, ClockOffsetMS) ->
 start_other_components(StationName, StationNumberString, ClockOffsetMS, LogFile) ->
     RecvPid = receiver:start(self(), StationName, LogFile),
     SendPid = sender:start(LogFile),
-    ClockPid = utcclock:start(ClockOffsetMS, self(), LogFile),
+    ClockPid = utcclock:start(ClockOffsetMS, self(), StationName, LogFile),
     PayloadServerPid = payloadserver:start(node(), StationNumberString,LogFile),
     {RecvPid, SendPid, ClockPid, PayloadServerPid}.
 
@@ -37,6 +37,7 @@ entry_loop(StationName, StationType, Pids, LogFile) ->
             logge_status("New Frame Started", LogFile),
             {Messages, _StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid),
             SlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName),
+            logge_status("Received ~p Messages this Frame", [length(Messages)], LogFile),
             send_loop(StationName, StationType, Pids, SlotNumber, LogFile);
         Any -> 
             logge_status("Got Unkown (In Entryphase): ~p", [Any], LogFile),
@@ -144,14 +145,14 @@ check_sendtime_and_send(SendtimeMS, CurrentTime, IncompleteMessage, PayloadServe
         DiffTime when DiffTime >= 40 -> 
             logge_status("SendTime in the future: ~p", [DiffTime], LogFile),
             timer:sleep(DiffTime - 40), %So he wakes up in the beginning of the slot
-            send_message(IncompleteMessage, PayloadServerPid, SendPid, SendtimeMS, LogFile),
+            send_message(IncompleteMessage, PayloadServerPid, SendPid, CurrentTime, LogFile),
             MessageWasSend = true;
         DiffTime when DiffTime =< -40 -> 
             logge_status("SendTime in the past: ~p", [DiffTime], LogFile),
             MessageWasSend = false; 
         DiffTime -> 
             logge_status("SendTime is now: ~p", [DiffTime], LogFile),
-            send_message(IncompleteMessage, PayloadServerPid, SendPid, SendtimeMS,LogFile),
+            send_message(IncompleteMessage, PayloadServerPid, SendPid, CurrentTime,LogFile),
             MessageWasSend = true
     end,
     MessageWasSend.
