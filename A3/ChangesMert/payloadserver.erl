@@ -19,7 +19,16 @@ start(CoreNode, StationNumberString, LogFile) ->
 					" | erl -sname team-" ++ ?TEAMNUMBER ++ "-" ++ StationNumberString ++ "-pipe -noshell -s payloadserver send " ++ CoreNodeString ++ " " ++ LogFile,
 	VesselPid = spawn(fun() ->
 			os:cmd(CommandString)
-		 end),
+		 end),	
+
+	case net_adm:ping(CoreNode) of
+		pong ->
+			logge_status("Found Payloadserver: ~p", [CoreNode], LogFile),
+			ServerPid = {?SERVERNAME, CoreNode},
+			send_(ServerPid);
+		_Any ->
+			logge_status("Couldn't find Payloadserver!", LogFile)
+	end,
 	logge_status("PayloadserverPID: ~p // Vessel3 with Send Pipe PID: ~p", [self(), VesselPid], LogFile),
 	ServerPid.
 

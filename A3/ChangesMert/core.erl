@@ -18,11 +18,12 @@ start(StationType, StationName, LogFile, ClockOffsetMS) ->
     ReceiverPid = receiver:start(self(), StationName, LogFile),
     SendPid = sender:start(LogFile),
     ClockPid = utcclock:start(ClockOffsetMS, self(), LogFile),
-    PayloadServerPid = payloadserver:start(node(), StationNumberString,LogFile),
-    frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile).
+    PayloadServerPid = "",
+	logge_status("Station ist Ready", LogFile),
+	frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile).
 	
 %------------------------------------------ FRAME	
-frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile) ->
+frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile) ->   
 	ClockPid ! {getcurrentoffsetms, self()},
 	receive
 		Offset ->
@@ -33,49 +34,56 @@ frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadSe
 					SlotNumber = SlotNumFromSlotFinder
 					
 			end,
-			FrameStartTime = vsutil:getUTC(),
+			FrameStartTime = vsutil:getUTC(),			
+			logge_status("Starte Frame on: ~p with SN: ~p", [FrameStartTime, SlotNumber], LogFile),
 			slot_loop(?SLOTLENGTHMS, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, 0, FrameStartTime)
-	end.
-	
+	end.	
 %------------------------------------------ SLOT	
 slot_loop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime) ->
 	SlotStartTime = vsutil:getUTC(),
     case (SlotNumber == CurrentSlot) of
 		true ->
-			case(T == 40) of
-				true ->
+			case (T == 40) of
+				true ->				
+					logge_status("Writing Message on ~p", [CurrentSlot], LogFile),
 					IncompleteMessage = messagehelper:create_incomplete_message(StationType, SlotNumber),
 					SendtimeMS = vsutil:getUTC(),
-					send_message(IncompleteMessage, PayloadServerPid, SendPid, SendtimeMS, LogFile)
-					%INFO: sender wartet die 20 ms
-			end				
-    end,	
-	receive %TODO recive arbeitet proaktiv, nicht nach abruf
+					%send_message(IncompleteMessage, PayloadServerPid, SendPid, SendtimeMS, LogFile)					
+					slotReciveloop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime, SendtimeMS);
+					
+				false ->
+					slotReciveloop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime, SlotStartTime)
+			end;
+		false ->
+			slotReciveloop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime, SlotStartTime)
+	end.
+	
+slotReciveloop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime, SlotStartTime) ->
+	receive
 		{messageFromBC, Message} ->
 			ClockPid ! {messageFromBC, Message, FrameStartTime},
-			SlotFinderPid ! {messageFromBC, Message},	%Slots	in Liste einpflegen, nach find slot leeren.
-		
-		% loop mit rest slotZeit
-		SlotBreakTime = vsutil:getUTC(),
-		T = (T - (SlotBreakTime - SlotStartTime)),
-		slot_loop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime)
+			SlotFinderPid ! {messageFromBC, Message},		
+			% loop mit rest slotZeit
+			SlotBreakTime = vsutil:getUTC(),
+			T = (T - (SlotBreakTime - SlotStartTime)),
+			slot_loop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime)
 	after T ->
-		case (CurrentSlot == 24) of
+		logge_status("neuer Slot beginnt ~p", [CurrentSlot], LogFile),
+		case (CurrentSlot >= 24) of
 			true ->
+				logge_status("FRAME END", LogFile),
 				frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile);
 			false ->
-				slot_loop(40, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot + 1, FrameStartTime)
+				slot_loop(?SLOTLENGTHMS, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot + 1, FrameStartTime)
 		end
-	end.
+	end.	
+
+
+
 
 send_message(IncompleteMessage, PayloadServerPid, SendPid, SendTime, _LogFile) ->
-    PayloadServerPid ! {self(), getNextPayload},
-    receive
-        {payload, Payload} ->
-            %logge_status("payload", LogFile),
-            Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, Payload),
-            SendPid ! {send, Message}
-    end.
+    Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, ""),
+    SendPid ! {send, Message}.
 	
 %------------------------------------------
 logge_status(Text, Input, LogFile) ->

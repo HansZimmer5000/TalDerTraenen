@@ -56,7 +56,6 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFil
             DiffTime = calc_diff_time(CurrentTime, SlotBeginnInFrame),
             SenderPid ! {resultdifftime, DiffTime},
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
-
         {getcurrentoffsetms, SenderPid} ->
             %logge_status("getcurrentoffsetms", LogFile),
             %For Testing only
@@ -65,12 +64,10 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFil
         {getcurrenttime, SenderPid} ->
             %logge_status("getcurrenttime", LogFile),
             SenderPid ! {currenttime, get_current_time(Starttime, OffsetMS)},
-            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
-			
+            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);			
 		{messageFromBC, Message, FrameStartTime} ->
 			OffsetMS = calcOffSet(Message, OffsetMS, FrameStartTime),
-			loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
-			
+			loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);			
         Any -> 
             logge_status("Got: ~p", [Any], LogFile),
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile)
@@ -85,6 +82,7 @@ calcOffSet(CurrentMessage, CurrentOffSet, FrameStartTime) ->
             NewOffSet = (FrameStartTime + CurrentOffSet) - (SendTime - ((SlotNumber * 40) + 20)),
 			NewOffSet
     end.
+
 	
 	
 adjust(Starttime, OffsetMS, Messages, LogFile) ->
