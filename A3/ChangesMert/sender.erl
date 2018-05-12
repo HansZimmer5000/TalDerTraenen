@@ -23,6 +23,7 @@ loop(Nameservice, LogFile) ->
     loop(Nameservice, LogFile).
 
 send(Nameservice, Message) ->
+	timer:sleep(20),
     Nameservice ! {multicast, Message}.
 
 send_log(Message, LogFile) ->

@@ -10,6 +10,26 @@
 
 -define(DEFAULT_POSSIBLE_SLOTS, [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]).
 
+start(CorePid, StationName, LogFile) ->
+    Starttime = vsutil:getUTC(),
+    logge_status("Starttime of slotfinder: ~p", [Starttime], LogFile),
+    ClockPid = spawn(fun() -> loop(CorePid, StationName, [], LogFile) end),
+    ClockPid.
+	
+	
+loop(CorePid, StationName, Messages, LogFile) ->
+ receive
+	{messageFromBC, Message} ->			
+			Messages = [Message | Messages],
+			loop(ClockPid, StationName, Messages, LogFile);
+			
+	{getFreeSlotNum} ->			
+			NewSlotNumber = find_slot_in_next_frame(Messages, StationName),
+			CorePid ! NewSlotNumber,
+			loop(ClockPid, StationName, [], LogFile)
+ end.
+	
+
 find_slot_in_next_frame(Messages, StationName) ->
     case get_slot_numer_if_stationname_matches(Messages, StationName) of
         0 ->

@@ -60,7 +60,7 @@ loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFil
             %logge_status("getcurrentoffsetms", LogFile),
             %For Testing only
             SenderPid ! OffsetMS,
-            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
+            loop(Starttime, 0, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
         {getcurrenttime, SenderPid} ->
             %logge_status("getcurrenttime", LogFile),
             SenderPid ! {currenttime, get_current_time(Starttime, OffsetMS)},
@@ -80,7 +80,7 @@ calcOffSet(CurrentMessage, CurrentOffSet, FrameStartTime) ->
     case messagehelper:get_station_type(CurrentMessage) of
         "A" ->
             SendTime = messagehelper:get_sendtime(CurrentMessage),
-			SlotNumber = messagehelper:get_slotnumber(CurrentMessage),
+			SlotNumber = messagehelper:get_slotnumber(CurrentMessage) - 1,
             NewOffSet = (FrameStartTime + CurrentOffSet) - (SendTime - ((SlotNumber * 40) + 20)),
 			NewOffSet
     end.

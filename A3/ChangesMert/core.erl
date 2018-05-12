@@ -27,35 +27,37 @@ start(StationType, StationName, LogFile, ClockOffsetMS) ->
 	
 %------------------------------------------ FRAME	
 frame_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, LogFile)
-	ClockPid ! {getcurrentoffsetms, self()}, % offset = 0 after asking
-	FrameStartTime = vsutil:getUTC(),
+	ClockPid ! {getcurrentoffsetms, self()},
 	receive
 		Offset ->
 			timer:sleep(Offset),
-			SlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName)%change method return actual free slot,
+			SlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName)
+			%change method return actual free slot,
+			FrameStartTime = vsutil:getUTC(),
 			slot_loop(?SLOTLENGTHMS, StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, 0, FrameStartTime)
 	end.
 	
-%------------------------------------------ SLOT
-	
+%------------------------------------------ SLOT	
 slot_loop(T, StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime)
-	{_, _, StartMC} = erlang:timestamp(),
+	SlotStartTime = vsutil:getUTC(),
     case (SlotNumber == CurrentSlot) of
 		true ->
-			IncompleteMessage = messagehelper:create_incomplete_message(StationType, SlotNumber),
-			send_message(IncompleteMessage, PayloadServerPid, SendPid, SendtimeMS, LogFile); %time soll die methode selber machen beim erstellen des Paketes
-            %TODO: nur 1 mal senden (flag)
+			case(T == 40) of
+				true ->
+					IncompleteMessage = messagehelper:create_incomplete_message(StationType, SlotNumber),
+					SendtimeMS = vsutil:getUTC(),
+					send_message(IncompleteMessage, PayloadServerPid, SendPid, SendtimeMS, LogFile);
+					%INFO: sender wartet die 20 ms
         false ->
-    end,
-	
-	receive 
+    end,	
+	receive %TODO recive arbeitet proaktiv, nicht nach abruf
 		{messageFromBC, Message} ->
 			ClockPid ! {messageFromBC, Message, FrameStartTime},
 			SlotHandlerPid ! {messageFromBC, Message},	%Slots	in Liste einpflegen, nach find slot leeren.
 		
 		% loop mit rest slotZeit
-		{_, _, EndMC} = erlang:timestamp(),
-		T = (T - (EndMC - StartMC)),
+		SlotBreakTime = vsutil:getUTC(),
+		T = (T - (SlotBreakTime - SlotStartTime)),
 		slot_loop(T, StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime)
 	after T ->
 		case (CurrentSlot == 24) of
@@ -69,7 +71,6 @@ slot_loop(T, StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServer
 
 send_message(IncompleteMessage, PayloadServerPid, SendPid, SendTime, _LogFile) ->
     PayloadServerPid ! {self(), getNextPayload},
-    %logge_status("Warte auf Payload", LogFile),
     receive
         {payload, Payload} ->
             %logge_status("payload", LogFile),
