@@ -8,7 +8,7 @@
     check_frame/5,
     new_frame_started/2,
     get_current_time/2,
-    calc_slot_beginn_this_frame_time/2,
+    calc_slot_mid_this_frame_time/2,
     set_alarm/4
 ]).
 
@@ -35,17 +35,17 @@ loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile) 
         checkframe ->
             NewCurrentFrameNumber = check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid, LogFile),
             loop(Starttime, OffsetMS, NewCurrentFrameNumber, CorePid, TransportTupel, LogFile);
-        {calcslotbeginn, SlotNumber, SenderPid} ->
-            SendtimeMS = calc_slot_beginn_this_frame_time(CurrentFrameNumber, SlotNumber),
-            SenderPid ! {resultslotbeginn, SendtimeMS},
+        {calcslotmid, SlotNumber, SenderPid} ->
+            SendtimeMS = calc_slot_mid_this_frame_time(CurrentFrameNumber, SlotNumber),
+            SenderPid ! {resultslotmid, SendtimeMS},
             loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile);
         {alarm, AlarmMessage, TimeWhenItsDue, SenderPid} ->
             TimeTillItsDue = TimeWhenItsDue - get_current_time(Starttime, OffsetMS),
             set_alarm(AlarmMessage, TimeTillItsDue, SenderPid, LogFile),
             loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile);
-        {calcdifftime, SlotBeginnInFrame, SenderPid} ->
+        {calcdifftime, UTCTime, SenderPid} ->
             CurrentTime = get_current_time(Starttime, OffsetMS),
-            DiffTime = CurrentTime - SlotBeginnInFrame,
+            DiffTime = CurrentTime - UTCTime,
             SenderPid ! {resultdifftime, DiffTime},
             loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile);
         {getcurrenttime, SenderPid} ->
@@ -134,10 +134,10 @@ get_current_time(Starttime, OffsetMS) ->
     Result = vsutil:getUTC() - Starttime + OffsetMS,
     round(Result).
 
-calc_slot_beginn_this_frame_time(CurrentFrameNumber, SlotNumber) ->
+calc_slot_mid_this_frame_time(CurrentFrameNumber, SlotNumber) ->
     FrameBeginnTime = CurrentFrameNumber * ?FRAMELENGTHMS,
     SlotBeginnInFrame = SlotNumber * ?SLOTLENGTHMS - ?SLOTLENGTHMS, % - SLOTLENGTHMS because we want the start of the slottime
-    FrameBeginnTime + SlotBeginnInFrame.
+    FrameBeginnTime + SlotBeginnInFrame + ?SLOTLENGTHMS / 2. % + SLOTLENGTHMS/2 because we want middle of the slot
 
 set_alarm(AlarmMessage, TimeTillItsDue, SenderPid, LogFile) -> 
     %TODO Muss das noch genauer da ja ggf. die Uhr sich zu sehr snychornisiert?

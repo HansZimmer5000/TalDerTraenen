@@ -60,6 +60,7 @@ send_loop(StationName, StationType, Pids, SlotNumber, LogFile) ->
                     logge_status("New Frame Started with SlotNumber ~p at ~p", [SlotNumber, CurrentTime], LogFile)
             end,
             start_sending_process(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile),
+
             {Messages, StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid),
             logge_status("Received ~p Messages this Frame", [length(Messages)], LogFile),
             wait_for_messagewassend_and_handle_loop_end(
@@ -107,9 +108,9 @@ sending_process(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid, Lo
     MessageWasSend.
 
 notify_when_preperation_and_send_due(ClockPid, SlotNumber, _LogFile) ->
-    ClockPid ! {calcslotbeginn, SlotNumber, self()},
+    ClockPid ! {calcslotmid, SlotNumber, self()},
     receive
-        {resultslotbeginn, SendtimeMS} ->
+        {resultslotmid, SendtimeMS} ->
             ClockPid ! {alarm, preperation, SendtimeMS - ?MESSAGEPREPERATIONTIMEMS, self()},
             ClockPid ! {alarm, send, SendtimeMS, self()}
     end,
@@ -153,12 +154,12 @@ check_sendtime_and_send(SendtimeMS, CurrentTime, IncompleteMessage, PayloadServe
     logge_status("~p (Seti) ~p (Now)", [SendtimeMS, CurrentTime], LogFile),
     DiffTime = SendtimeMS - CurrentTime,
     case DiffTime of
-        DiffTime when DiffTime >= 40 -> 
+        DiffTime when DiffTime > 0 -> 
             logge_status("SendTime in the future: ~p", [DiffTime], LogFile),
-            timer:sleep(DiffTime - 40), %So he wakes up in the beginning of the slot
+            timer:sleep(DiffTime), %So he wakes up in the beginning of the slot
             send_message(IncompleteMessage, PayloadServerPid, SendPid, CurrentTime, LogFile),
             MessageWasSend = true;
-        DiffTime when DiffTime =< -40 -> 
+        DiffTime when DiffTime < 0 -> 
             logge_status("SendTime in the past: ~p", [DiffTime], LogFile),
             MessageWasSend = false; 
         DiffTime -> 
