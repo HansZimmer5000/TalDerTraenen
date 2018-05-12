@@ -21,11 +21,8 @@ start(CorePid, StationName, LogFile) ->
     start(CorePid, StationName, LogFile, {?NSNAME, ?NSNODE}).
 
 start(CorePid, StationName, LogFile, NsPid) ->
-    Pid = spawn(fun() -> 
-            NsPid ! {enlist, self()},
-            loop(CorePid, StationName, LogFile)
-        end),
-    %NsPid ! {enlist, Pid},
+    Pid = spawn(fun() -> loop(CorePid, StationName, LogFile) end),
+    NsPid ! {enlist, Pid},
     logge_status("starte", LogFile),
     Pid.
 
