@@ -19,14 +19,15 @@ start(StationType, StationName, LogFile) ->
 
 start(StationType, StationName, LogFile, ClockOffsetMS) ->
     StationNumberString = lists:sublist(StationName, 9,2),
-    RecvPid = receiver:start(self(), StationName, LogFile),
+    SlotFinderPid = slotfinder:start(self(), StationName, LogFile),	
+    ReceiverPid = receiver:start(self(), StationName, LogFile),
     SendPid = sender:start(LogFile),
     ClockPid = utcclock:start(ClockOffsetMS, self(), LogFile),
     PayloadServerPid = payloadserver:start(node(), StationNumberString,LogFile),
-    frame_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, LogFile).
+    frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile).
 	
 %------------------------------------------ FRAME	
-frame_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, LogFile)
+frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile)
 	ClockPid ! {getcurrentoffsetms, self()},
 	receive
 		Offset ->
@@ -34,11 +35,11 @@ frame_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPi
 			SlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName)
 			%change method return actual free slot,
 			FrameStartTime = vsutil:getUTC(),
-			slot_loop(?SLOTLENGTHMS, StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, 0, FrameStartTime)
+			slot_loop(?SLOTLENGTHMS, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, 0, FrameStartTime)
 	end.
 	
 %------------------------------------------ SLOT	
-slot_loop(T, StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime)
+slot_loop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime)
 	SlotStartTime = vsutil:getUTC(),
     case (SlotNumber == CurrentSlot) of
 		true ->
@@ -58,13 +59,13 @@ slot_loop(T, StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServer
 		% loop mit rest slotZeit
 		SlotBreakTime = vsutil:getUTC(),
 		T = (T - (SlotBreakTime - SlotStartTime)),
-		slot_loop(T, StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime)
+		slot_loop(T, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot, FrameStartTime)
 	after T ->
 		case (CurrentSlot == 24) of
 			true ->
-				frame_loop(StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, LogFile);
+				frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile);
 			false ->
-				slot_loop(40, StationName, StationType, RecvPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot + 1, FrameStartTime)
+				slot_loop(40, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, CurrentSlot + 1, FrameStartTime)
  			end	
 	end.
 
