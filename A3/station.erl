@@ -11,7 +11,7 @@ start([StationTypeAtom, StationNameAtom]) ->
     StationName = "team " ++ lists:sublist(StationNameRaw, 6,5),
     LogFile = io_lib:format("~s.log", [StationNameRaw]),
     
-    logge_status("Starting as ~p and writing to Logfile: ~s\n", [StationName, LogFile], LogFile),
+    logge_status("Starting as ~p and writing to Logfile: ~s", [StationName, LogFile], LogFile),
     core:start(StationType, StationName, LogFile).
 
 %------------------------------------------

@@ -5,60 +5,55 @@
 
     adjust/5,
 
-    check_frame/5,
     new_frame_started/2,
     get_current_time/2,
-    calc_slot_mid_this_frame_time/2,
+    calc_slot_mid_this_frame_time/3,
     set_alarm/4
 ]).
 
--define(FRAMECHECKCYCLEMS, 10).
+
 -define(FRAMELENGTHMS, 1000).
 -define(SLOTLENGTHMS, 40).
 
 start(OffsetMS, CorePid, StationName, LogFile) ->
     Starttime = vsutil:getUTC(),
     logge_status("Starttime: ~p with Offset: ~p", [Starttime, OffsetMS], LogFile),
-    CurrentFrameNumber = 0,
     TransportTupel = {StationName, 0, 0},
-    ClockPid = spawn(fun() -> loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile) end),
-    _CheckPid = timer:send_interval(?FRAMECHECKCYCLEMS, ClockPid, checkframe),
+    ClockPid = spawn(fun() -> loop(Starttime, OffsetMS, CorePid, TransportTupel, LogFile) end),
     ClockPid.
 
 % --------------------------------------------------
 
-loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile) ->
+loop(Starttime, OffsetMS, CorePid, TransportTupel, LogFile) ->
     receive
         {adjust, Messages} ->
             {NewOffsetMS, NewTransportTupel} = adjust(Starttime, OffsetMS, Messages, TransportTupel, LogFile),
-            loop(Starttime, NewOffsetMS, CurrentFrameNumber, CorePid, NewTransportTupel, LogFile);
-        checkframe ->
-            NewCurrentFrameNumber = check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid, LogFile),
-            loop(Starttime, OffsetMS, NewCurrentFrameNumber, CorePid, TransportTupel, LogFile);
-        {calcslotmid, SlotNumber, SenderPid} ->
-            SendtimeMS = calc_slot_mid_this_frame_time(CurrentFrameNumber, SlotNumber),
+            loop(Starttime, NewOffsetMS, CorePid, NewTransportTupel, LogFile);
+        {calcslotmid, FrameNumber, SlotNumber, SenderPid} ->
+            SendtimeMS = calc_slot_mid_this_frame_time(FrameNumber, SlotNumber, LogFile),
             SenderPid ! {resultslotmid, SendtimeMS},
-            loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile);
+            logge_status("calc got: ~p ~p = ~p", [FrameNumber, SlotNumber, SendtimeMS], LogFile),
+            loop(Starttime, OffsetMS, CorePid, TransportTupel, LogFile);
         {alarm, AlarmMessage, TimeWhenItsDue, SenderPid} ->
             TimeTillItsDue = TimeWhenItsDue - get_current_time(Starttime, OffsetMS),
             set_alarm(AlarmMessage, TimeTillItsDue, SenderPid, LogFile),
-            loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile);
+            loop(Starttime, OffsetMS, CorePid, TransportTupel, LogFile);
         {calcdifftime, UTCTime, SenderPid} ->
             CurrentTime = get_current_time(Starttime, OffsetMS),
             DiffTime = CurrentTime - UTCTime,
             SenderPid ! {resultdifftime, DiffTime},
-            loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile);
+            loop(Starttime, OffsetMS, CorePid, TransportTupel, LogFile);
         {getcurrenttime, SenderPid} ->
             SenderPid ! {currenttime, get_current_time(Starttime, OffsetMS)},
-            loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile);
+            loop(Starttime, OffsetMS, CorePid, TransportTupel, LogFile);
 
         {getcurrentoffsetms, SenderPid} ->
             %For Testing only
             SenderPid ! OffsetMS,
-            loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile);
+            loop(Starttime, OffsetMS, CorePid, TransportTupel, LogFile);
         Any -> 
             logge_status("Got: ~p", [Any], LogFile),
-            loop(Starttime, OffsetMS, CurrentFrameNumber, CorePid, TransportTupel, LogFile)
+            loop(Starttime, OffsetMS, CorePid, TransportTupel, LogFile)
     end.
 
 % --------------------------------------------------
@@ -115,17 +110,6 @@ adjust_transport_tupel_and_calc_new_average(TransportTupel, CurrentMessage, TmpD
     end,
     {NewTransportTupel, AverageTransportDelay}.
 
-check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid, _LogFile) ->   
-    CurrentTime = get_current_time(Starttime, OffsetMS),
-    case new_frame_started(CurrentTime, CurrentFrameNumber) of
-        true ->
-            CorePid ! newframe,
-            ResultFrameNumber = CurrentFrameNumber + 1;
-        false ->
-            ResultFrameNumber = CurrentFrameNumber
-    end,
-    ResultFrameNumber.
-
 new_frame_started(CurrentTime, CurrentFrameNumber) ->
     TimeElapsedInCurrentFrame = CurrentTime - (CurrentFrameNumber * ?FRAMELENGTHMS),
     TimeElapsedInCurrentFrame >= ?FRAMELENGTHMS.
@@ -134,10 +118,11 @@ get_current_time(Starttime, OffsetMS) ->
     Result = vsutil:getUTC() - Starttime + OffsetMS,
     round(Result).
 
-calc_slot_mid_this_frame_time(CurrentFrameNumber, SlotNumber) ->
+calc_slot_mid_this_frame_time(CurrentFrameNumber, SlotNumber, LogFile) ->
     FrameBeginnTime = CurrentFrameNumber * ?FRAMELENGTHMS,
-    SlotBeginnInFrame = SlotNumber * ?SLOTLENGTHMS - ?SLOTLENGTHMS, % - SLOTLENGTHMS because we want the start of the slottime
-    FrameBeginnTime + SlotBeginnInFrame + ?SLOTLENGTHMS / 2. % + SLOTLENGTHMS/2 because we want middle of the slot
+    SlotBeginnInMid = round(SlotNumber * ?SLOTLENGTHMS - (?SLOTLENGTHMS / 2)), % - SLOTLENGTHMS because we want the mid of the slottime
+    %logge_status("FrameBeginn: ~p, SlotMid: ~p", [FrameBeginnTime, SlotBeginnInMid], LogFile),
+    FrameBeginnTime + SlotBeginnInMid.
 
 set_alarm(AlarmMessage, TimeTillItsDue, SenderPid, LogFile) -> 
     %TODO Muss das noch genauer da ja ggf. die Uhr sich zu sehr snychornisiert?

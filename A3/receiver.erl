@@ -46,8 +46,10 @@ listen_to_slot(CorePid, StationName, LogFile) ->
     send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile).
 
 get_converted_slot_messages(LogFile) ->
+    %Start = vsutil:getUTC(),
     timer:send_after(?SLOTLENGTHMS, self(), stop_listening),
     {SlotMessages, ReceivedTimes} = listen([], [], LogFile),
+    %logge_status("Converting at ~p length: ~p", [vsutil:getUTC() rem 10000, (vsutil:getUTC() - Start) rem 10000], LogFile),
     ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
     ConvertedSlotMessages.
 
@@ -58,6 +60,7 @@ listen(SlotMessages, ReceivedTimes, LogFile) ->
             NewReceivedTimes = [vsutil:getUTC() | ReceivedTimes],
             listen(NewSlotMessages, NewReceivedTimes, LogFile);
         stop_listening ->
+            %logge_status("Stopped Listening at ~p", [vsutil:getUTC() rem 10000], LogFile),
             {SlotMessages, ReceivedTimes};
         Any -> 
             logge_status("Got: ~p in listen_to_slot", [Any], LogFile),
