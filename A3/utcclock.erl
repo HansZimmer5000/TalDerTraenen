@@ -58,56 +58,69 @@ loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
 % --------------------------------------------------
 
 adjust(OffsetMS, Messages, TransportTupel, LogFile) ->
-    {AverageDiffMS, NewTransportTupel} = calc_average_diff_ms(Messages, OffsetMS, TransportTupel, LogFile),
+    NewTransportTupel = adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile),
+    AverageTransportDelay = calc_new_transport_delay_average(TransportTupel),
+    AverageDiffMS = calc_average_diff_ms(Messages, OffsetMS, AverageTransportDelay, LogFile),
     NewOffsetMS = round(OffsetMS - AverageDiffMS),
-    logge_status("New Offset: ~p (Old: ~p)", [NewOffsetMS, OffsetMS], LogFile),
+    logge_status("New Offset: ~p (Old: ~p) | New Delay: ~p", [NewOffsetMS, OffsetMS, AverageTransportDelay], LogFile),
     {NewOffsetMS, NewTransportTupel}.
 
-calc_average_diff_ms(Messages, OffsetMS, TransportTupel, LogFile) ->
-    {TotalDiffMS, TotalCount, NewTransportTupel} = calc_average_diff_ms(Messages, 0, 0, OffsetMS, TransportTupel, LogFile),
-    case TotalCount of
-        0 ->
-            {0, NewTransportTupel};
-        TotalCountBigger0 ->
-            {TotalDiffMS / TotalCountBigger0, NewTransportTupel}
-    end.
-
-calc_average_diff_ms([], TotalDiffMS, TotalCount, _OffsetMS, TransportTupel, _LogFile) ->
-    {TotalDiffMS, TotalCount, TransportTupel};
-calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount, OffsetMS, TransportTupel, LogFile) ->
-    case messagehelper:get_station_type(CurrentMessage) of
-        "A" ->
-            SendTime = messagehelper:get_sendtime(CurrentMessage),
-            RecvTime = messagehelper:get_receivedtime(CurrentMessage) + OffsetMS,
-            TmpDiffMS = RecvTime - SendTime,
-
-            {NewTransportTupel, AverageTransportDelay} = adjust_transport_tupel_and_calc_new_average(TransportTupel, CurrentMessage, TmpDiffMS),
-            NewTotalDiffMS = TotalDiffMS + (TmpDiffMS - AverageTransportDelay),
-            NewTotalCount = TotalCount + 1,
-
-            logge_status("Send (~p) Recv (~p) Diff (~p) Delay (~p)", [SendTime, RecvTime, TmpDiffMS, AverageTransportDelay], LogFile),
-            calc_average_diff_ms(RestMessages, NewTotalDiffMS, NewTotalCount, OffsetMS, NewTransportTupel, LogFile);
-        _Any ->
-            calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount, OffsetMS, TransportTupel, LogFile)
-    end.
-
-adjust_transport_tupel_and_calc_new_average(TransportTupel, CurrentMessage, TmpDiffMS) ->
+adjust_transport_tupel([], _OffsetMS, TransportTupel, _LogFile) ->
+    TransportTupel;
+adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile) ->
+    [CurrentMessage | RestMessages] = Messages,
     {StationName, TransportDelayTotal, TransportCount} = TransportTupel,
     case messagehelper:get_station_name(CurrentMessage) of
         StationName ->
+            SendTime = messagehelper:get_sendtime(CurrentMessage),
+            RecvTime = messagehelper:get_receivedtime(CurrentMessage) + OffsetMS,
+            TmpDiffMS = RecvTime - SendTime,
             NewTransportDelayTotal = TransportDelayTotal + TmpDiffMS,
-            NewTransportCount = TransportCount + 1;
-        _Any ->
-            NewTransportDelayTotal = TransportDelayTotal,
-            NewTransportCount = TransportCount
-    end,
-    NewTransportTupel = {StationName, NewTransportDelayTotal, NewTransportCount},
+            NewTransportCount = TransportCount + 1,
+            NewTransportTupel = {StationName, NewTransportDelayTotal, NewTransportCount},
+            adjust_transport_tupel(RestMessages, OffsetMS, NewTransportTupel, LogFile);
+        _ -> 
+            adjust_transport_tupel(RestMessages, OffsetMS, TransportTupel, LogFile)
+    end.
 
-    case NewTransportCount of
+calc_average_diff_ms(Messages, OffsetMS, AverageTransportDelay, LogFile) ->
+    {TotalDiffMS, TotalCount} = calc_average_diff_ms(Messages, 0, 0, OffsetMS, AverageTransportDelay, LogFile),
+    case TotalCount of
+        0 ->
+            0;
+        TotalCountBigger0 ->
+            TotalDiffMS / TotalCountBigger0
+    end.
+
+calc_average_diff_ms([], TotalDiffMS, TotalCount, _OffsetMS, _AverageTransportDelay, _LogFile) ->
+    {TotalDiffMS, TotalCount};
+calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount, OffsetMS, AverageTransportDelay, LogFile) ->
+    case messagehelper:get_station_type(CurrentMessage) of
+        "A" ->
+            TmpDiffMS = calc_diff_ms(CurrentMessage, OffsetMS),
+
+            NewTotalDiffMS = TotalDiffMS + (TmpDiffMS - AverageTransportDelay),
+            NewTotalCount = TotalCount + 1,
+
+            logge_status("Diff (~p)", [TmpDiffMS], LogFile),
+            calc_average_diff_ms(RestMessages, NewTotalDiffMS, NewTotalCount, OffsetMS, AverageTransportDelay, LogFile);
+        _Any ->
+            calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount, OffsetMS, AverageTransportDelay, LogFile)
+    end.
+
+calc_diff_ms(Message, OffsetMS) ->
+    SendTime = messagehelper:get_sendtime(Message),
+    RecvTime = messagehelper:get_receivedtime(Message) + OffsetMS,
+    TmpDiffMS = RecvTime - SendTime,
+    TmpDiffMS.
+
+calc_new_transport_delay_average(TransportTupel) ->
+    {_StationName, TransportDelayTotal, TransportCount} = TransportTupel,
+    case TransportCount of
         0 -> AverageTransportDelay = 0;
-        _ -> AverageTransportDelay = round(NewTransportDelayTotal / NewTransportCount)
+        _ -> AverageTransportDelay = round(TransportDelayTotal / TransportCount)
     end,
-    {NewTransportTupel, AverageTransportDelay}.
+    AverageTransportDelay.
 
 new_frame_started(CurrentTime, CurrentFrameNumber) ->
     TimeElapsedInCurrentFrame = CurrentTime - (CurrentFrameNumber * ?FRAMELENGTHMS),

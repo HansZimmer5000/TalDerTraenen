@@ -1,4 +1,4 @@
--module(test).
+-module(timertest).
 
 -export([start/0]).
 
