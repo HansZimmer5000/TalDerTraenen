@@ -47,12 +47,10 @@ listen_to_slot(CorePid, StationName, LogFile) ->
 
 get_converted_slot_messages(LogFile) ->
     {_,StartSec,StartMicroSec} = erlang:timestamp(),
-    StartTime = StartSec * 1000 + StartMicroSec / 1000,
+    _StartTime = StartSec * 1000 + StartMicroSec / 1000,
     %timer:send_after(?SLOTLENGTHMS, self(), stop_listening),
-    {SlotMessages, ReceivedTimes} = listen(40, [], [], LogFile),
-    {_,EndSec,EndMicroSec} = erlang:timestamp(),
-    EndTime = EndSec * 1000 + EndMicroSec / 1000,
-    logge_status("Converting at ~p length: ~p", [vsutil:getUTC(), EndTime - StartTime], LogFile),
+    {SlotMessages, ReceivedTimes} = listen(39, [], [], LogFile),
+    %logge_status("Receiving and Converting length: ~p", [vsutil:getUTC() - Start], LogFile),
     ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
     ConvertedSlotMessages.
 

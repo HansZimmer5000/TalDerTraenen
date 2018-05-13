@@ -25,34 +25,34 @@ start_payload_server(LogFile) ->
 
 start_vessel(CoreNodeString, StationNumberString, LogFile) ->
 	CommandString = create_vessel_command_string(CoreNodeString, StationNumberString, LogFile),
+	logge_status(CommandString, LogFile),
 	VesselPid = spawn(fun() -> os:cmd(CommandString) end),
 	VesselPid.
 
 send([CoreNode, LogFile]) ->
+	logge_status(CoreNode, LogFile),
 	case net_adm:ping(CoreNode) of
 		pong ->
 			logge_status("Found Payloadserver: ~p", [CoreNode], LogFile),
 			ServerPid = {?SERVERNAME, CoreNode},
-			send_loop(ServerPid);
+			send_loop(ServerPid, LogFile);
 		_Any ->
 			logge_status("Couldn't find Payloadserver!", LogFile)
 	end.
 
-send_loop(PayloadServerPid) ->
+send_loop(PayloadServerPid, LogFile) ->
 	Text = io:get_chars('', 24),
 	PayloadServerPid ! Text,
-	send_loop(PayloadServerPid).
+	send_loop(PayloadServerPid, LogFile).
 
 % Bekommt alle Payloads, verwirft sie direkt ausser:
 % Wenn aktueller Payload angefragt bekommt der Absender den nächsten empfangenen Payload
 receive_loop(LogFile) ->
 	receive
 		{AbsenderPid, getNextPayload} ->
-			%logge_status("Next Payload to: ~p", [AbsenderPid], LogFile),
 			receive
 				Payload ->
-					%logge_status("Sending Payload to: ~p", [AbsenderPid], LogFile),
-					%io:fwrite("Got Request from ~p", [AbsenderPid]),
+					%logge_status("Sending Payload ~s to: ~p", [Payload, AbsenderPid], LogFile),
 					AbsenderPid ! {payload, Payload}
 			end;
 		_Any ->
@@ -61,8 +61,8 @@ receive_loop(LogFile) ->
 	receive_loop(LogFile).
 
 create_vessel_command_string(CoreNodeString, StationNumberString, LogFile) ->
-	CommandString = "java vessel3.Vessel " ++ ?TEAMNUMBER ++ " " ++ StationNumberString ++ 
-					" | erl -sname team-" ++ ?TEAMNUMBER ++ "-" ++ StationNumberString ++ 
+	Vessel3Cmd = "noah Gegeben/datasource/64bit/Vessel3 " ++ ?TEAMNUMBER ++ " " ++ StationNumberString,
+	CommandString = Vessel3Cmd ++ " | erl -sname team-" ++ ?TEAMNUMBER ++ "-" ++ StationNumberString ++ 
 					"-pipe -noshell -s payloadserver send " ++ CoreNodeString ++ " " ++ LogFile,
 	CommandString.
 

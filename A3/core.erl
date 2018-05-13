@@ -38,7 +38,7 @@ frame_loop(StationName, StationType, FrameNumber, SendingSlotNumber, Pids, LogFi
     receive 
         {currenttime, CurrentTime} ->  
             FrameStart = CurrentTime,
-            logge_status("New Frame Started at ~p with Slot ~p", [CurrentTime, SendingSlotNumber], LogFile),
+            logge_status("New Frame Started at ~p with Slot ~p --------", [CurrentTime, SendingSlotNumber], LogFile),
 
             case SendingSlotNumber of
                 empty ->
@@ -47,7 +47,7 @@ frame_loop(StationName, StationType, FrameNumber, SendingSlotNumber, Pids, LogFi
                     start_sending_process(SendPid, FrameStart, SendingSlotNumber, StationType, ClockPid, PayloadServerPid, LogFile)
             end,
             {Messages, StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid, FrameStart, LogFile),
-            logge_status("Received ~p Messages this Frame at ~p", [length(Messages), vsutil:getUTC() - FrameStart], LogFile),
+            logge_status("Received ~p Messages this Frame after ~p", [length(Messages), vsutil:getUTC() - FrameStart], LogFile),
             case SendingSlotNumber of
                 empty ->
                     NextSlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName);
@@ -63,7 +63,7 @@ frame_loop(StationName, StationType, FrameNumber, SendingSlotNumber, Pids, LogFi
                             end
                     end
             end,
-            logge_status("Frame Ended at ~p", [vsutil:getUTC() - FrameStart], LogFile),
+            logge_status("Frame Ended after ~p", [vsutil:getUTC() - FrameStart], LogFile),
             frame_loop(StationName, StationType, FrameNumber + 1, NextSlotNumber, Pids, LogFile)
     end.
 
