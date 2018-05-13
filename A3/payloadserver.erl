@@ -29,6 +29,7 @@ start_vessel(CoreNodeString, StationNumberString, LogFile) ->
 	VesselPid.
 
 send([CoreNode, LogFile]) ->
+	io:fwrite(CoreNode),
 	case net_adm:ping(CoreNode) of
 		pong ->
 			logge_status("Found Payloadserver: ~p", [CoreNode], LogFile),
@@ -61,6 +62,11 @@ receive_loop(LogFile) ->
 	receive_loop(LogFile).
 
 create_vessel_command_string(CoreNodeString, StationNumberString, LogFile) ->
+	Macerlcommand = "cd /Users/hapemac/Repo/TalDerTraenen/a3 && java vessel3.Vessel " ++ ?TEAMNUMBER ++ 
+					" " ++ StationNumberString ++ " | " ++
+					"erl -noshell -sname team-" ++ ?TEAMNUMBER ++ "-" ++ StationNumberString ++ 
+					"-pipe -noshell -s payloadserver send " ++ CoreNodeString ++ " " ++ LogFile,
+    %_CommandStringMac = "osascript -e " + "'" + "tell application " ++ atom_to_list('"') ++ "Terminal" ++ '"' ++ " to do script " ++ '"' ++ Macerlcommand ++ '"' ++ "'",
 	CommandString = "java vessel3.Vessel " ++ ?TEAMNUMBER ++ " " ++ StationNumberString ++ 
 					" | erl -sname team-" ++ ?TEAMNUMBER ++ "-" ++ StationNumberString ++ 
 					"-pipe -noshell -s payloadserver send " ++ CoreNodeString ++ " " ++ LogFile,
