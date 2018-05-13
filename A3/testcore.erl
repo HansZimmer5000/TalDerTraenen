@@ -159,6 +159,9 @@ notify_when_preperation_and_send_due_1_test() ->
             ?assertEqual(TestPid, SenderPid2)
     end.
 
+start_sending_process_1_test() ->
+    io:fwrite("Not implemented yet"),
+    ?assert(false).
 
 % ----------------
 
