@@ -47,24 +47,32 @@ listen_to_slot(CorePid, StationName, LogFile) ->
 
 get_converted_slot_messages(LogFile) ->
     %Start = vsutil:getUTC(),
-    timer:send_after(?SLOTLENGTHMS, self(), stop_listening),
-    {SlotMessages, ReceivedTimes} = listen([], [], LogFile),
+    %timer:send_after(?SLOTLENGTHMS, self(), stop_listening),
+    {SlotMessages, ReceivedTimes} = listen(40, [], [], LogFile),
     %logge_status("Converting at ~p length: ~p", [vsutil:getUTC() rem 10000, (vsutil:getUTC() - Start) rem 10000], LogFile),
     ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
     ConvertedSlotMessages.
 
-listen(SlotMessages, ReceivedTimes, LogFile) ->
+listen(RestTime, SlotMessages, ReceivedTimes, _LogFile) when RestTime =< 0 ->
+    {SlotMessages, ReceivedTimes};
+listen(RestTime, SlotMessages, ReceivedTimes, LogFile) ->
+    StartListeningAt = vsutil:getUTC(),
     receive
         {udp, _Socket0, _Ip0, _Port0, Message} -> 
             NewSlotMessages = [Message | SlotMessages],
             NewReceivedTimes = [vsutil:getUTC() | ReceivedTimes],
-            listen(NewSlotMessages, NewReceivedTimes, LogFile);
-        stop_listening ->
-            %logge_status("Stopped Listening at ~p", [vsutil:getUTC() rem 10000], LogFile),
-            {SlotMessages, ReceivedTimes};
+            EndingListeningAt = vsutil:getUTC(),
+            ElapsedTime = EndingListeningAt - StartListeningAt,
+            NewRestTime = RestTime - ElapsedTime,
+            listen(NewRestTime, NewSlotMessages, NewReceivedTimes, LogFile);
         Any -> 
             logge_status("Got: ~p in listen_to_slot", [Any], LogFile),
-            listen(SlotMessages, ReceivedTimes, LogFile)
+            EndingListeningAt = vsutil:getUTC(),
+            ElapsedTime = EndingListeningAt - StartListeningAt,
+            NewRestTime = RestTime - ElapsedTime,
+            listen(NewRestTime, SlotMessages, ReceivedTimes, LogFile)
+        after RestTime ->
+            {SlotMessages, ReceivedTimes}
     end.
 
 collision_happend(ConvertedSlotMessages, StationName, LogFile) ->
