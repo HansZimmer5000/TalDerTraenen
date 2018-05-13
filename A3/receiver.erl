@@ -46,9 +46,8 @@ listen_to_slot(CorePid, StationName, LogFile) ->
     send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile).
 
 get_converted_slot_messages(LogFile) ->
-    {_,StartSec,StartMicroSec} = erlang:timestamp(),
-    _StartTime = StartSec * 1000 + StartMicroSec / 1000,
-    %timer:send_after(?SLOTLENGTHMS, self(), stop_listening),
+    %{_,StartSec,StartMicroSec} = erlang:timestamp(),
+    %_StartTime = StartSec * 1000 + StartMicroSec / 1000,
     {SlotMessages, ReceivedTimes} = listen(39, [], [], LogFile),
     %logge_status("Receiving and Converting length: ~p", [vsutil:getUTC() - Start], LogFile),
     ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
@@ -66,22 +65,10 @@ listen(RestTimeMilliSec, SlotMessages, ReceivedTimes, LogFile) ->
             {_,EndingListeningAtSec,EndingListeningAtMicroSec} = erlang:timestamp(),
             EndingListeningAt = EndingListeningAtSec * 1000 + EndingListeningAtMicroSec / 1000,
             ElapsedTimeMilliSec = EndingListeningAt - StartListeningAt,
-            NewRestTimeMilliSec = round(RestTimeMilliSec - ElapsedTimeMilliSec),
-            listen(NewRestTimeMilliSec, NewSlotMessages, NewReceivedTimes, LogFile);
-        Any -> 
-            logge_status("Got: ~p in listen_to_slot", [Any], LogFile),
-            {_,EndingListeningAtSec,EndingListeningAtMicroSec} = erlang:timestamp(),
-            EndingListeningAt = EndingListeningAtSec * 1000 + EndingListeningAtMicroSec / 1000,
-            ElapsedTimeMilliSec = EndingListeningAt - StartListeningAt,
-            NewRestTimeMilliSec = round(RestTimeMilliSec - ElapsedTimeMilliSec),
-            listen(NewRestTimeMilliSec, SlotMessages, ReceivedTimes, LogFile)
-        after 1 ->
-            {_,EndingListeningAtSec,EndingListeningAtMicroSec} = erlang:timestamp(),
-            EndingListeningAt = EndingListeningAtSec * 1000 + EndingListeningAtMicroSec / 1000,
-            ElapsedTimeMilliSec = EndingListeningAt - StartListeningAt,
-            NewRestTimeMilliSec = round(RestTimeMilliSec - ElapsedTimeMilliSec),
-            logge_status("Timout, new RestTime: ~p", [NewRestTimeMilliSec], LogFile),
-            listen(NewRestTimeMilliSec, SlotMessages, ReceivedTimes, LogFile)
+            NewRestTimeMilliSec = RestTimeMilliSec - ElapsedTimeMilliSec,
+            listen(NewRestTimeMilliSec, NewSlotMessages, NewReceivedTimes, LogFile)
+        after round(RestTimeMilliSec) ->
+            listen(0, SlotMessages, ReceivedTimes, LogFile)
     end.
 
 collision_happend(ConvertedSlotMessages, StationName, LogFile) ->

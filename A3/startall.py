@@ -94,7 +94,7 @@ if __name__ == "__main__":
         __start_node_mac("ns", "nameservice", "")
         time.sleep(1)
         #__start_node("bench", "benchmark", "")
-        __start_stations(1,4)
+        __start_stations(5,0)
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     else:
