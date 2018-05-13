@@ -4,7 +4,7 @@
     start/1
 ]).
 
-start(Input) when length(Input) == 2->
+start(Input) when length(Input) == 5 ->
     [InterfaceName, McastAddress, ReceivePort, StationClass, UTCoffsetMs] = Input,
     io:fwrite("~p", [Input]);
 

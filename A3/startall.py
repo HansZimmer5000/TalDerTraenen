@@ -31,6 +31,7 @@ def __start_node_mac(nodename, modulename, parameter):
     os.system(command)
 
 def __start_stations(a_count, b_count):
+    total_a_count = a_count
     while(a_count > 0):
         a_count_str = str(a_count)
         stationname = "team-06-"
@@ -40,7 +41,7 @@ def __start_stations(a_count, b_count):
         __start_node_mac("station" + a_count_str, "station", "A " + stationname)
         a_count = a_count - 1
     while(b_count > 0):
-        b_count_str = str(b_count)
+        b_count_str = str(b_count + total_a_count)
         stationname = "team-06-"
         if(b_count < 10):
             stationname = stationname + "0"
