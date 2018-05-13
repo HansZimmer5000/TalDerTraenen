@@ -25,24 +25,27 @@ start_payload_server(LogFile) ->
 
 start_vessel(CoreNodeString, StationNumberString, LogFile) ->
 	CommandString = create_vessel_command_string(CoreNodeString, StationNumberString, LogFile),
+	logge_status(CommandString, LogFile),
 	VesselPid = spawn(fun() -> os:cmd(CommandString) end),
 	VesselPid.
 
 send([CoreNode, LogFile]) ->
-	io:fwrite(CoreNode),
+	logge_status(CoreNode, LogFile),
 	case net_adm:ping(CoreNode) of
 		pong ->
 			logge_status("Found Payloadserver: ~p", [CoreNode], LogFile),
 			ServerPid = {?SERVERNAME, CoreNode},
-			send_loop(ServerPid);
+			send_loop(ServerPid, LogFile);
 		_Any ->
 			logge_status("Couldn't find Payloadserver!", LogFile)
 	end.
 
-send_loop(PayloadServerPid) ->
+send_loop(PayloadServerPid, LogFile) ->
 	Text = io:get_chars('', 24),
+	%Text = "team 06-01-1234567890123",
+	%logge_status("Got ~p ~n", [Text], LogFile),
 	PayloadServerPid ! Text,
-	send_loop(PayloadServerPid).
+	send_loop(PayloadServerPid, LogFile).
 
 % Bekommt alle Payloads, verwirft sie direkt ausser:
 % Wenn aktueller Payload angefragt bekommt der Absender den nächsten empfangenen Payload
@@ -51,9 +54,10 @@ receive_loop(LogFile) ->
 		{AbsenderPid, getNextPayload} ->
 			%logge_status("Next Payload to: ~p", [AbsenderPid], LogFile),
 			receive
+				eof ->
+					logge_status("Got eof", LogFile);
 				Payload ->
-					%logge_status("Sending Payload to: ~p", [AbsenderPid], LogFile),
-					%io:fwrite("Got Request from ~p", [AbsenderPid]),
+					logge_status("Sending Payload ~s to: ~p", [Payload, AbsenderPid], LogFile),
 					AbsenderPid ! {payload, Payload}
 			end;
 		_Any ->
@@ -62,12 +66,12 @@ receive_loop(LogFile) ->
 	receive_loop(LogFile).
 
 create_vessel_command_string(CoreNodeString, StationNumberString, LogFile) ->
-	Macerlcommand = "cd /Users/hapemac/Repo/TalDerTraenen/a3 && java vessel3.Vessel " ++ ?TEAMNUMBER ++ 
+	_Macerlcommand = "cd /Users/hapemac/Repo/TalDerTraenen/a3 && java vessel3.Vessel " ++ ?TEAMNUMBER ++ 
 					" " ++ StationNumberString ++ " | " ++
 					"erl -noshell -sname team-" ++ ?TEAMNUMBER ++ "-" ++ StationNumberString ++ 
 					"-pipe -noshell -s payloadserver send " ++ CoreNodeString ++ " " ++ LogFile,
     %_CommandStringMac = "osascript -e " + "'" + "tell application " ++ atom_to_list('"') ++ "Terminal" ++ '"' ++ " to do script " ++ '"' ++ Macerlcommand ++ '"' ++ "'",
-	CommandString = "java vessel3.Vessel " ++ ?TEAMNUMBER ++ " " ++ StationNumberString ++ 
+	CommandString = "noah Gegeben/datasource/64bit/Vessel3 " ++ ?TEAMNUMBER ++ " " ++ StationNumberString ++ 
 					" | erl -sname team-" ++ ?TEAMNUMBER ++ "-" ++ StationNumberString ++ 
 					"-pipe -noshell -s payloadserver send " ++ CoreNodeString ++ " " ++ LogFile,
 	CommandString.
