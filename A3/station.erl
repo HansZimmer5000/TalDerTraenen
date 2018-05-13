@@ -4,6 +4,9 @@
     start/1
 ]).
 
+start(Input) when length(Input) > 2->
+    io:fwrite("~p", [Input]);
+
 start([StationTypeAtom, StationNameAtom]) ->
     StationNameRaw = atom_to_list(StationNameAtom),
 
