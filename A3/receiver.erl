@@ -40,10 +40,17 @@ loop(CorePid, StationName, LogFile) ->
     loop(CorePid, StationName, LogFile).
 
 listen_to_slot(CorePid, StationName, LogFile) ->
+    StartTime = vsutil:getUTC(),
     ConvertedSlotMessages = get_converted_slot_messages(LogFile),
-
+    Duration = vsutil:getUTC() - StartTime,
     {CollisionHappend, StationWasInvolved} = collision_happend(ConvertedSlotMessages, StationName, LogFile),
-    send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile).
+    send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile),
+    case Duration > 40 of
+        true ->
+            logge_status("Needed ~p MS for Slotlistening", [Duration], LogFile);
+        _ ->
+            nothing
+    end.
 
 get_converted_slot_messages(LogFile) ->
     %{_,StartSec,StartMicroSec} = erlang:timestamp(),
