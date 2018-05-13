@@ -42,8 +42,6 @@ send([CoreNode, LogFile]) ->
 
 send_loop(PayloadServerPid, LogFile) ->
 	Text = io:get_chars('', 24),
-	%Text = "team 06-01-1234567890123",
-	%logge_status("Got ~p ~n", [Text], LogFile),
 	PayloadServerPid ! Text,
 	send_loop(PayloadServerPid, LogFile).
 
@@ -52,12 +50,9 @@ send_loop(PayloadServerPid, LogFile) ->
 receive_loop(LogFile) ->
 	receive
 		{AbsenderPid, getNextPayload} ->
-			%logge_status("Next Payload to: ~p", [AbsenderPid], LogFile),
 			receive
-				eof ->
-					logge_status("Got eof", LogFile);
 				Payload ->
-					logge_status("Sending Payload ~s to: ~p", [Payload, AbsenderPid], LogFile),
+					%logge_status("Sending Payload ~s to: ~p", [Payload, AbsenderPid], LogFile),
 					AbsenderPid ! {payload, Payload}
 			end;
 		_Any ->
@@ -66,13 +61,8 @@ receive_loop(LogFile) ->
 	receive_loop(LogFile).
 
 create_vessel_command_string(CoreNodeString, StationNumberString, LogFile) ->
-	_Macerlcommand = "cd /Users/hapemac/Repo/TalDerTraenen/a3 && java vessel3.Vessel " ++ ?TEAMNUMBER ++ 
-					" " ++ StationNumberString ++ " | " ++
-					"erl -noshell -sname team-" ++ ?TEAMNUMBER ++ "-" ++ StationNumberString ++ 
-					"-pipe -noshell -s payloadserver send " ++ CoreNodeString ++ " " ++ LogFile,
-    %_CommandStringMac = "osascript -e " + "'" + "tell application " ++ atom_to_list('"') ++ "Terminal" ++ '"' ++ " to do script " ++ '"' ++ Macerlcommand ++ '"' ++ "'",
-	CommandString = "noah Gegeben/datasource/64bit/Vessel3 " ++ ?TEAMNUMBER ++ " " ++ StationNumberString ++ 
-					" | erl -sname team-" ++ ?TEAMNUMBER ++ "-" ++ StationNumberString ++ 
+	Vessel3Cmd = "noah Gegeben/datasource/64bit/Vessel3 " ++ ?TEAMNUMBER ++ " " ++ StationNumberString,
+	CommandString = Vessel3Cmd ++ " | erl -sname team-" ++ ?TEAMNUMBER ++ "-" ++ StationNumberString ++ 
 					"-pipe -noshell -s payloadserver send " ++ CoreNodeString ++ " " ++ LogFile,
 	CommandString.
 
