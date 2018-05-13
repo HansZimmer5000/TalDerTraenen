@@ -46,33 +46,44 @@ listen_to_slot(CorePid, StationName, LogFile) ->
     send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile).
 
 get_converted_slot_messages(LogFile) ->
-    Start = vsutil:getUTC(),
+    {_,StartSec,StartMicroSec} = erlang:timestamp(),
+    StartTime = StartSec * 1000 + StartMicroSec / 1000,
     %timer:send_after(?SLOTLENGTHMS, self(), stop_listening),
     {SlotMessages, ReceivedTimes} = listen(40, [], [], LogFile),
-    logge_status("Converting at ~p length: ~p", [vsutil:getUTC() rem 10000, (vsutil:getUTC() - Start) rem 10000], LogFile),
+    {_,EndSec,EndMicroSec} = erlang:timestamp(),
+    EndTime = EndSec * 1000 + EndMicroSec / 1000,
+    logge_status("Converting at ~p length: ~p", [vsutil:getUTC(), EndTime - StartTime], LogFile),
     ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
     ConvertedSlotMessages.
 
-listen(RestTime, SlotMessages, ReceivedTimes, _LogFile) when RestTime =< 0 ->
+listen(RestTimeMilliSec, SlotMessages, ReceivedTimes, _LogFile) when RestTimeMilliSec =< 0 ->
     {SlotMessages, ReceivedTimes};
-listen(RestTime, SlotMessages, ReceivedTimes, LogFile) ->
-    StartListeningAt = vsutil:getUTC(),
+listen(RestTimeMilliSec, SlotMessages, ReceivedTimes, LogFile) ->
+    {_,StartListeningAtSec,StartListeningAtMicroSec} = erlang:timestamp(),
+    StartListeningAt = StartListeningAtSec * 1000 + StartListeningAtMicroSec / 1000,
     receive
         {udp, _Socket0, _Ip0, _Port0, Message} -> 
             NewSlotMessages = [Message | SlotMessages],
             NewReceivedTimes = [vsutil:getUTC() | ReceivedTimes],
-            EndingListeningAt = vsutil:getUTC(),
-            ElapsedTime = EndingListeningAt - StartListeningAt,
-            NewRestTime = RestTime - ElapsedTime,
-            listen(NewRestTime, NewSlotMessages, NewReceivedTimes, LogFile);
+            {_,EndingListeningAtSec,EndingListeningAtMicroSec} = erlang:timestamp(),
+            EndingListeningAt = EndingListeningAtSec * 1000 + EndingListeningAtMicroSec / 1000,
+            ElapsedTimeMilliSec = EndingListeningAt - StartListeningAt,
+            NewRestTimeMilliSec = round(RestTimeMilliSec - ElapsedTimeMilliSec),
+            listen(NewRestTimeMilliSec, NewSlotMessages, NewReceivedTimes, LogFile);
         Any -> 
             logge_status("Got: ~p in listen_to_slot", [Any], LogFile),
-            EndingListeningAt = vsutil:getUTC(),
-            ElapsedTime = EndingListeningAt - StartListeningAt,
-            NewRestTime = RestTime - ElapsedTime,
-            listen(NewRestTime, SlotMessages, ReceivedTimes, LogFile)
-        after RestTime ->
-            {SlotMessages, ReceivedTimes}
+            {_,EndingListeningAtSec,EndingListeningAtMicroSec} = erlang:timestamp(),
+            EndingListeningAt = EndingListeningAtSec * 1000 + EndingListeningAtMicroSec / 1000,
+            ElapsedTimeMilliSec = EndingListeningAt - StartListeningAt,
+            NewRestTimeMilliSec = round(RestTimeMilliSec - ElapsedTimeMilliSec),
+            listen(NewRestTimeMilliSec, SlotMessages, ReceivedTimes, LogFile)
+        after 1 ->
+            {_,EndingListeningAtSec,EndingListeningAtMicroSec} = erlang:timestamp(),
+            EndingListeningAt = EndingListeningAtSec * 1000 + EndingListeningAtMicroSec / 1000,
+            ElapsedTimeMilliSec = EndingListeningAt - StartListeningAt,
+            NewRestTimeMilliSec = round(RestTimeMilliSec - ElapsedTimeMilliSec),
+            logge_status("Timout, new RestTime: ~p", [NewRestTimeMilliSec], LogFile),
+            listen(NewRestTimeMilliSec, SlotMessages, ReceivedTimes, LogFile)
     end.
 
 collision_happend(ConvertedSlotMessages, StationName, LogFile) ->
