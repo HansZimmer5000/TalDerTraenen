@@ -51,6 +51,10 @@ listen_to_slot_2_test() ->
             ?assert(false)
     end.
 
+listen_to_slot_3_test() ->
+    io:fwrite("Not implemented yet: check duration"),
+    ?assert(false).
+
 loop_1_test() ->
     ThisPid = self(),
     TestPid = spawn(fun() ->
