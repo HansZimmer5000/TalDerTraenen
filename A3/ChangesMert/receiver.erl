@@ -17,20 +17,16 @@ start(CorePid, StationName, LogFile) ->
     start(CorePid, StationName, LogFile, {?NSNAME, ?NSNODE}).
 
 start(CorePid, StationName, LogFile, NsPid) ->
-    Pid = spawn(fun() -> loop(CorePid, StationName, LogFile) end),
-    {ns} ! {enlist, Pid},
-			logge_status("starte", LogFile),
-			Pid.
+    Pid = spawn(fun() -> loop(CorePid, StationName, LogFile) end),	
+    NsPid ! {enlist, Pid},
+    logge_status("starte", LogFile),
+    Pid.
 	
-	
-	
-
 % ------------------------------------------
 
 loop(CorePid, StationName, LogFile) ->
     receive
         {udp, _Socket0, _Ip0, _Port0, Message} ->
-            logge_status("Missed Message: ~p in loop", [Message], LogFile),
 			CorePid ! {messageFromBC, Message};
         Any -> 
             logge_status("Got: ~p in loop", [Any], LogFile)

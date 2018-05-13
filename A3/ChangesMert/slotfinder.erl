@@ -21,16 +21,16 @@ start(CorePid, StationName, LogFile) ->
 	
 loop(CorePid, StationName, Messages, LogFile) ->
  receive
-	{messageFromBC, Message} ->			
-			Messages = [Message | Messages],
-			loop(CorePid, StationName, Messages, LogFile);
+	{messageFromBC, Message} ->	
+			NewMessages = [Message | Messages],
+			loop(CorePid, StationName, NewMessages, LogFile);
 			
-	{getFreeSlotNum} ->			
+	getFreeSlotNum ->			
 			NewSlotNumber = find_slot_in_next_frame(Messages, StationName),
-			CorePid ! NewSlotNumber,
+			CorePid ! {slotnum, NewSlotNumber},
 			loop(CorePid, StationName, [], LogFile)
  end.
-	
+ 
 
 find_slot_in_next_frame(Messages, StationName) ->
     case get_slot_numer_if_stationname_matches(Messages, StationName) of

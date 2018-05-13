@@ -30,18 +30,16 @@ start(OffsetMS, CorePid, LogFile) ->
 
 loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile) ->
     receive
-          {getcurrentoffsetms, SenderPid} ->
-            %logge_status("getcurrentoffsetms", LogFile),
-            %For Testing only
-            SenderPid ! OffsetMS,
+        {getcurrentoffsetms, SenderPid} ->
+		
+            logge_status("Got offset request", LogFile),
+            SenderPid ! {offset, OffsetMS},
             loop(Starttime, 0, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
-        {getcurrenttime, SenderPid} ->
-            %logge_status("getcurrenttime", LogFile),
-            SenderPid ! {currenttime, get_current_time(Starttime, OffsetMS)},
-            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);			
+			
 		{messageFromBC, Message, FrameStartTime} ->
-			OffsetMS = calcOffSet(Message, OffsetMS, FrameStartTime),
-			loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);			
+			NewOffsetMS = calcOffSet(Message, OffsetMS, FrameStartTime),
+			loop(Starttime, NewOffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);	
+			
         Any -> 
             logge_status("Got: ~p", [Any], LogFile),
             loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile)
@@ -53,8 +51,13 @@ calcOffSet(CurrentMessage, CurrentOffSet, FrameStartTime) ->
         "A" ->
             SendTime = messagehelper:get_sendtime(CurrentMessage),
 			SlotNumber = messagehelper:get_slotnumber(CurrentMessage) - 1,
-            NewOffSet = (FrameStartTime + CurrentOffSet) - (SendTime - ((SlotNumber * 40) + 20)),
-			NewOffSet
+            NewOffSet = (FrameStartTime - (SendTime - ((SlotNumber * 40) + 20))),
+			case NewOffSet < 0 of
+				true ->
+					NewOffSet * (-1);
+				false ->
+					NewOffSet
+			end
     end.
 
 	
