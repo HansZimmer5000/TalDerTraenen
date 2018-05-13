@@ -37,17 +37,17 @@ frame_loop(StationName, StationType, FrameNumber, SendingSlotNumber, Pids, LogFi
     ClockPid ! {getcurrenttime, self()},
     receive 
         {currenttime, CurrentTime} ->  
-            FrameStart = vsutil:getUTC() + FrameNumber * 1000,
-            logge_status("New Frame Started at ~p (~p) with Slot ~p", [CurrentTime, 0, SendingSlotNumber], LogFile),
+            FrameStart = CurrentTime,
+            logge_status("New Frame Started at ~p with Slot ~p", [CurrentTime, SendingSlotNumber], LogFile),
 
             case SendingSlotNumber of
                 empty ->
                     continue;
                 _ ->            
-                    start_sending_process(SendPid, FrameNumber, SendingSlotNumber, StationType, ClockPid, PayloadServerPid, LogFile)
+                    start_sending_process(SendPid, FrameStart, SendingSlotNumber, StationType, ClockPid, PayloadServerPid, LogFile)
             end,
             {Messages, StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid, FrameStart, LogFile),
-            logge_status("Received ~p Messages this Frame at ~p", [length(Messages), vsutil:getUTC() - FrameStart + FrameNumber * 1000], LogFile),
+            logge_status("Received ~p Messages this Frame at ~p", [length(Messages), vsutil:getUTC() - FrameStart], LogFile),
             case SendingSlotNumber of
                 empty ->
                     NextSlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName);
@@ -63,7 +63,7 @@ frame_loop(StationName, StationType, FrameNumber, SendingSlotNumber, Pids, LogFi
                             end
                     end
             end,
-            logge_status("Frame Ended at ~p", [vsutil:getUTC() - FrameStart + FrameNumber * 1000], LogFile),
+            logge_status("Frame Ended at ~p", [vsutil:getUTC() - FrameStart], LogFile),
             frame_loop(StationName, StationType, FrameNumber + 1, NextSlotNumber, Pids, LogFile)
     end.
 
@@ -77,7 +77,7 @@ listen_to_frame_and_adjust_clock(RecvPid, ClockPid, FrameStart, LogFile) ->
 listen_to_frame(RecvPid, FrameStart, LogFile) ->
     listen_to_frame(RecvPid, 25, [], false, FrameStart, LogFile).
 
-listen_to_frame(_RecvPid, 0, Messages, StationWasInvolved, FrameStart, LogFile) ->
+listen_to_frame(_RecvPid, 0, Messages, StationWasInvolved, _FrameStart, _LogFile) ->
     {Messages, StationWasInvolved};
 listen_to_frame(RecvPid, RestSlotCount, Messages, StationWasInvolved, FrameStart, LogFile) ->
     {ReceivedMessages, ReceivedStationWasInvolved} = listen_to_slot(RecvPid),
@@ -93,21 +93,21 @@ listen_to_slot(RecvPid) ->
             {ConvertedSlotMessages, StationWasInvolved}
     end.
 
-start_sending_process(SendPid, FrameNumber, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile) ->
+start_sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile) ->
     ThisPid = self(),
     spawn(fun() -> 
-            MessageWasSend = sending_process(SendPid, FrameNumber, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile),
+            MessageWasSend = sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile),
             ThisPid ! {messagewassend, MessageWasSend}
         end).
 
-sending_process(SendPid, FrameNumber, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile) ->
-    SendtimeMS = notify_when_preperation_and_send_due(ClockPid, FrameNumber, SlotNumber, LogFile),
+sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile) ->
+    SendtimeMS = notify_when_preperation_and_send_due(ClockPid, FrameStart, SlotNumber, LogFile),
     logge_status("SendTimeMS at ~p", [SendtimeMS], LogFile),
     MessageWasSend = wait_for_prepare(StationType, SlotNumber, SendtimeMS, ClockPid, PayloadServerPid, SendPid, LogFile),
     MessageWasSend.
 
-notify_when_preperation_and_send_due(ClockPid, FrameNumber, SlotNumber, _LogFile) ->
-    ClockPid ! {calcslotmid, FrameNumber, SlotNumber, self()},
+notify_when_preperation_and_send_due(ClockPid, FrameStart, SlotNumber, _LogFile) ->
+    ClockPid ! {calcslotmid, FrameStart, SlotNumber, self()},
     receive
         {resultslotmid, SendtimeMS} ->
             ClockPid ! {alarm, preperation, SendtimeMS - 20, self()},
