@@ -18,7 +18,6 @@ loop(Nameservice, LogFile) ->
     receive
         {send, Message} -> 
             send(Nameservice, Message)
-            %spawn(fun() -> send_log(Message, LogFile) end)
     end,
     loop(Nameservice, LogFile).
 

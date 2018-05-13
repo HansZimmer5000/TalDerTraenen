@@ -8,11 +8,10 @@
 -define(LOG_DATEI_NAME, "nameservice.log").
 
 start() ->
-    logge_status("nameservice gestartet"),
-    register(?NSNAME, self()),
     Starttime = vsutil:getUTC(),
-    spawn(fun() -> new_frame_loop(Starttime) end),
-    receive_loop([], Starttime).
+	Pid = spawn(fun() -> receive_loop([], Starttime) end),	
+    logge_status("nameservice gestartet ~p", [Pid]),	
+    register (?NSNAME, Pid).
 
 new_frame_loop(Starttime) ->
     DiffTime = 1000 - vsutil:getUTC() rem 1000,
@@ -21,6 +20,7 @@ new_frame_loop(Starttime) ->
     new_frame_loop(Starttime).
 
 receive_loop(StationPids, Starttime) ->
+    logge_status("loop gestartet"),	
     receive
         {enlist, Pid} ->    logge_status("got enlist"),
                             NewStationPids = enlist(StationPids, Pid),

@@ -29,34 +29,8 @@ start(OffsetMS, CorePid, LogFile) ->
 % --------------------------------------------------
 
 loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile) ->
-    timer:send_after(FramecheckCycleMS, self(), checkframe),
     receive
-        {adjust, Messages} ->
-            logge_status("Adjusting", LogFile),
-            NewOffsetMS = adjust(Starttime, OffsetMS, Messages, LogFile),
-            logge_status("New Offset: ~p (Old: ~p)", [NewOffsetMS, OffsetMS], LogFile),
-            loop(Starttime, NewOffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
-        checkframe ->
-            %logge_status("checkframe", LogFile),
-            NewCurrentFrameNumber = check_frame(Starttime, OffsetMS, CurrentFrameNumber, CorePid),
-            loop(Starttime, OffsetMS, FramecheckCycleMS, NewCurrentFrameNumber, CorePid, LogFile);
-        {calcslotbeginn, SlotNumber, SenderPid} ->
-            %logge_status("calcslotbeginn", LogFile),
-            SendtimeMS = calc_slot_beginn_this_frame_time(CurrentFrameNumber, SlotNumber),
-            SenderPid ! {resultslotbeginn, SendtimeMS},
-            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
-        {alarm, AlarmMessage, TimeWhenItsDue, SenderPid} ->
-            %logge_status("alarm", LogFile),
-            TimeTillItsDue = TimeWhenItsDue - get_current_time(Starttime, OffsetMS),
-            set_alarm(AlarmMessage, TimeTillItsDue, SenderPid),
-            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
-        {calcdifftime, SlotBeginnInFrame, SenderPid} ->
-            %logge_status("calcdifftime", LogFile),
-            CurrentTime = get_current_time(Starttime, OffsetMS),
-            DiffTime = calc_diff_time(CurrentTime, SlotBeginnInFrame),
-            SenderPid ! {resultdifftime, DiffTime},
-            loop(Starttime, OffsetMS, FramecheckCycleMS, CurrentFrameNumber, CorePid, LogFile);
-        {getcurrentoffsetms, SenderPid} ->
+          {getcurrentoffsetms, SenderPid} ->
             %logge_status("getcurrentoffsetms", LogFile),
             %For Testing only
             SenderPid ! OffsetMS,
