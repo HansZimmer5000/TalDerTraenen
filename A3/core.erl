@@ -1,8 +1,8 @@
 -module(core).
 
 -export([
-    start/3,
     start/4,
+    start/7,
 
     frame_loop/6,
     listen_to_frame/3,
@@ -14,21 +14,18 @@
 
 -define(CLOCKOFFSETMS, 0).
 
-%TODO: They are missing the slots way too often!!!
+start(StationType, StationName, ClockOffsetMS, LogFile) ->
+    start(StationType, StationName, ClockOffsetMS, empty, empty, empty, LogFile).
 
-start(StationType, StationName, LogFile) ->
-    start(StationType, StationName, LogFile, ?CLOCKOFFSETMS).
-
-start(StationType, StationName, LogFile, ClockOffsetMS) ->
-    StationNumberString = lists:sublist(StationName, 9,2),
-    Pids = start_other_components(StationName, StationNumberString, ClockOffsetMS, LogFile),
+start(StationType, StationName, ClockOffsetMS, InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, LogFile) ->
+    Pids = start_other_components(StationName, ClockOffsetMS, LogFile),
     frame_loop(StationName, StationType, 0, empty, Pids, LogFile).
 
-start_other_components(StationName, StationNumberString, ClockOffsetMS, LogFile) ->
+start_other_components(StationName, ClockOffsetMS, LogFile) ->
     RecvPid = receiver:start(self(), StationName, LogFile),
     SendPid = sender:start(LogFile),
     ClockPid = utcclock:start(ClockOffsetMS, self(), StationName, LogFile),
-    PayloadServerPid = payloadserver:start(node(), StationNumberString,LogFile),
+    PayloadServerPid = payloadserver:start(LogFile),
     {RecvPid, SendPid, ClockPid, PayloadServerPid}.
 
 %-----------------------------------

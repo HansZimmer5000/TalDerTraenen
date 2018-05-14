@@ -13,7 +13,7 @@
 #
 # Example: stationCmd="java aufgabe4.MyStation"
 ########################################################################################################
-stationCmd=""
+stationCmd="erl -noshell -s station start $interfaceName $mcastAddress $receivePort $stationClass $UTCoffsetMs"
 
 ########################################################################################################
 # TODO: Enter data source programme with full path, but WITHOUT parameters 
@@ -21,7 +21,7 @@ stationCmd=""
 # Example:    dataSource="~/somewhere/Vessel3"
 #         or  dataSource="java -cp . vessel3.Vessel"
 ########################################################################################################
-dataSource="java -cp . vessel3.Vessel"
+dataSource="noah /Users/hapemac/Repo/TalDerTraenen/a3/Gegeben/datasource/64bit/Vessel3"
 
 
 if [ "$1" = "--help" ]; then

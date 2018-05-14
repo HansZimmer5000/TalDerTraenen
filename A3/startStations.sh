@@ -49,7 +49,7 @@ teamNo="6"
 # Example:    dataSource="~/somewhere/DataSource"
 #         or  dataSource="java -cp . datasource.DataSource"
 ########################################################################################################
-dataSource="~/Gegeben/datasource/64bit/Vessel3"
+dataSource="noah /Users/hapemac/Repo/TalDerTraenen/a3/Gegeben/datasource/64bit/Vessel3"
 
 ########################################################################################################
 # TODO: Enter your station's start command.
@@ -57,7 +57,7 @@ dataSource="~/Gegeben/datasource/64bit/Vessel3"
 #
 # Example: stationCmd="java aufgabe4.MyStation $interfaceName $mcastAddress $receivePort $stationClass"
 ########################################################################################################
-stationCmd="erl -noshell -sname station -s station start $interfaceName $mcastAddress $receivePort $stationClass $UTCoffsetMs"
+stationCmd="erl -noshell -s station start $interfaceName $mcastAddress $receivePort $stationClass $UTCoffsetMs"
 #erl -noshell -sname " + nodename + " -s " + modulename + " start" + " " + parameter
 
 printUsage() {
@@ -79,7 +79,9 @@ then
 				for i in `seq $firstIndex $lastIndex`
 				do
 					# Launching data source and station.
-					$dataSource $teamNo $i | $stationCmd &
+					$dataSource $teamNo $i | $stationCmd $i &
+					#$dataSource $teamNo $i | ${stationCmd:0:23}$i${stationCmd:23} &
+					#${time:0:2}:${time:2:2}:${time:4:2}
 					#
 					# If your are annoyed by all the output, try this instead:
 					#  $dataSource $teamNo $i | $stationCmd > /dev/null 2>&1 &

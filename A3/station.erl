@@ -4,19 +4,32 @@
     start/1
 ]).
 
-start(Input) when length(Input) == 5 ->
-    [InterfaceName, McastAddress, ReceivePort, StationClass, UTCoffsetMs] = Input,
-    io:fwrite("~p", [Input]);
+start(Input) when length(Input) == 6 ->
+    [InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, StationClassAtom, UTCoffsetMsAtom, StationNumberAtom] = Input,
+    io:fwrite("Got all that stuff ~p", [Input]),
 
-start([StationTypeAtom, StationNameAtom]) ->
-    StationNameRaw = atom_to_list(StationNameAtom),
-
-    StationType = atom_to_list(StationTypeAtom),
-    StationName = "team " ++ lists:sublist(StationNameRaw, 6,5),
-    LogFile = io_lib:format("~s.log", [StationNameRaw]),
+    StationType = atom_to_list(StationClassAtom),
+    OffsetMs = erlang:list_to_integer(atom_to_list(UTCoffsetMsAtom)),
+    case atom_to_list(StationNumberAtom) > 9 of
+        true -> StationName = "team 06-" ++ atom_to_list(StationNumberAtom);
+        false -> StationName = "team 06-0" ++ atom_to_list(StationNumberAtom)
+    end,
+    LogFile = io_lib:format("~s.log", [StationName]),
     
-    logge_status("Starting as ~p and writing to Logfile: ~s", [StationName, LogFile], LogFile),
-    core:start(StationType, StationName, LogFile).
+    logge_status("Starte Station~p mit ~p", [StationNumberAtom, [InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, StationClassAtom, UTCoffsetMsAtom]], LogFile),
+    core:start(StationType, StationName, OffsetMs, InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, LogFile);
+
+start([StationClassAtom, UTCoffsetMsAtom, StationNumberAtom]) ->
+    StationType = atom_to_list(StationClassAtom),
+    OffsetMs = erlang:list_to_integer(atom_to_list(UTCoffsetMsAtom)),
+    case atom_to_list(StationNumberAtom) > 9 of
+        true -> StationName = "team 06-" ++ atom_to_list(StationNumberAtom);
+        false -> StationName = "team 06-0" ++ atom_to_list(StationNumberAtom)
+    end,
+    LogFile = io_lib:format("~s.log", [StationName]),
+
+    logge_status("Starte Station~p mit ~p", [StationNumberAtom, [StationType, OffsetMs]], LogFile),
+    core:start(StationType, StationName, OffsetMs, LogFile).
 
 %------------------------------------------
 
