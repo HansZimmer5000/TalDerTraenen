@@ -4,9 +4,11 @@
     start/3,
     start/4,
 
+    frame_loop/6,
     listen_to_frame/3,
     listen_to_slot/1,
 
+    start_sending_process/7,
     notify_when_preperation_and_send_due/4
 ]).
 
@@ -43,11 +45,12 @@ frame_loop(StationName, StationType, FrameNumber, SendingSlotNumber, Pids, LogFi
             case SendingSlotNumber of
                 empty ->
                     continue;
-                _ ->            
+                _ ->
                     start_sending_process(SendPid, FrameStart, SendingSlotNumber, StationType, ClockPid, PayloadServerPid, LogFile)
             end,
             {Messages, StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid, FrameStart, LogFile),
             logge_status("Received ~p Messages this Frame after ~p", [length(Messages), vsutil:getUTC() - FrameStart], LogFile),
+            RestFrameTime = 1000 - vsutil:getUTC() - FrameStart,
             case SendingSlotNumber of
                 empty ->
                     NextSlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName);
@@ -61,10 +64,17 @@ frame_loop(StationName, StationType, FrameNumber, SendingSlotNumber, Pids, LogFi
                                 false ->
                                     NextSlotNumber = SendingSlotNumber
                             end
+                        after RestFrameTime ->
+                            logge_status("Messagewassend was never received", LogFile),
+                            NextSlotNumber = empty
                     end
             end,
             logge_status("Frame Ended after ~p", [vsutil:getUTC() - FrameStart], LogFile),
             frame_loop(StationName, StationType, FrameNumber + 1, NextSlotNumber, Pids, LogFile)
+
+        after timer:seconds(1) ->
+            logge_status("Currenttime from Clock not within 1 second", LogFile),
+            frame_loop(StationName, StationType, FrameNumber + 1, empty, Pids, LogFile)
     end.
 
 %-----------------------------------

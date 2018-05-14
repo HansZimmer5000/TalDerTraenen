@@ -52,8 +52,24 @@ listen_to_slot_2_test() ->
     end.
 
 listen_to_slot_3_test() ->
-    io:fwrite("Not implemented yet: check duration"),
-    ?assert(false).
+        StationName = "Station1",
+        ThisPid = self(),
+        StartZeit = vsutil:getUTC(),
+        _TestPid = spawn(fun() ->
+                            receiver:listen_to_slot(ThisPid, StationName, "testrecv.log")
+                        end),
+        receive 
+            Any -> 
+                EndZeit = vsutil:getUTC(),
+                {slotmessages, ConvertedMessages, StationWasInvolved} = Any,
+                ?assertEqual([], ConvertedMessages),
+                ?assertEqual(false, StationWasInvolved),
+                DiffZeit = EndZeit - StartZeit,
+                io:fwrite("~p, ~p, ~p", [DiffZeit, StartZeit rem 10000, EndZeit rem 10000]),
+                ?assert((DiffZeit >= 40) and (DiffZeit =< 41))
+            after timer:seconds(1) -> 
+                ?assert(false)
+        end.
 
 loop_1_test() ->
     ThisPid = self(),
