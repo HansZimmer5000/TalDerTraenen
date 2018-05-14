@@ -50,7 +50,7 @@ frame_loop(StationName, StationType, FrameNumber, SendingSlotNumber, Pids, LogFi
             end,
             {Messages, StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid, FrameStart, LogFile),
             logge_status("Received ~p Messages this Frame after ~p", [length(Messages), vsutil:getUTC() - FrameStart], LogFile),
-            RestFrameTime = 1000 - vsutil:getUTC() - FrameStart,
+            %RestFrameTime = 1000 - vsutil:getUTC() - FrameStart,
             case SendingSlotNumber of
                 empty ->
                     NextSlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName);
@@ -64,9 +64,9 @@ frame_loop(StationName, StationType, FrameNumber, SendingSlotNumber, Pids, LogFi
                                 false ->
                                     NextSlotNumber = SendingSlotNumber
                             end
-                        after RestFrameTime ->
-                            logge_status("Messagewassend was never received", LogFile),
-                            NextSlotNumber = empty
+                        %after RestFrameTime ->
+                        %    logge_status("Messagewassend was never received", LogFile),
+                        %    NextSlotNumber = empty
                     end
             end,
             logge_status("Frame Ended after ~p", [vsutil:getUTC() - FrameStart], LogFile),
@@ -178,8 +178,10 @@ check_sendtime_and_send(SendtimeMS, CurrentTime, IncompleteMessage, PayloadServe
     end,
     MessageWasSend.
 
-send_message(IncompleteMessage, PayloadServerPid, SendPid, SendTime, _LogFile) ->
+send_message(IncompleteMessage, PayloadServerPid, SendPid, SendTime, LogFile) ->
+    logge_status("Frage nach Payload", LogFile),
     Payload = request_payload(PayloadServerPid),
+    logge_status("Sende Nachricht", LogFile),
     Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, Payload),
     SendPid ! {send, Message}.
 

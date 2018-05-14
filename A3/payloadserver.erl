@@ -30,7 +30,9 @@ start_vessel(CoreNodeString, StationNumberString, LogFile) ->
 	VesselPid.
 
 send([CoreNode, LogFile]) ->
+	% If no log at all, check if the node (which this is executed in "something-pipe") is really running or not.
 	logge_status(CoreNode, LogFile),
+	io:fwrite("----- ~p ----- ~n", [CoreNode]),
 	case net_adm:ping(CoreNode) of
 		pong ->
 			logge_status("Found Payloadserver: ~p", [CoreNode], LogFile),
@@ -41,6 +43,13 @@ send([CoreNode, LogFile]) ->
 	end.
 
 send_loop(PayloadServerPid, LogFile) ->
+	% If problems, check with nodes/0 if node for Vessel3 is already running and restart or try to kill with
+	%	erl -sname test
+	% 	Strg + G
+	% 	r node@as.atom
+	% 	j
+	% 	c (number in which node is)
+	%	exit(self(), kill)
 	Text = io:get_chars('', 24),
 	PayloadServerPid ! Text,
 	send_loop(PayloadServerPid, LogFile).
@@ -50,9 +59,10 @@ send_loop(PayloadServerPid, LogFile) ->
 receive_loop(LogFile) ->
 	receive
 		{AbsenderPid, getNextPayload} ->
+			logge_status("Got getNextPayload", LogFile),
 			receive
 				Payload ->
-					%logge_status("Sending Payload ~s to: ~p", [Payload, AbsenderPid], LogFile),
+					logge_status("Sending Payload ~s to: ~p", [Payload, AbsenderPid], LogFile),
 					AbsenderPid ! {payload, Payload}
 			end;
 		_Any ->

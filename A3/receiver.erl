@@ -41,24 +41,22 @@ loop(CorePid, StationName, LogFile) ->
 
 listen_to_slot(CorePid, StationName, LogFile) ->
     StartTime = vsutil:getUTC(),
-    ConvertedSlotMessages = get_converted_slot_messages(LogFile),
-    Duration = vsutil:getUTC() - StartTime,
-    {CollisionHappend, StationWasInvolved} = collision_happend(ConvertedSlotMessages, StationName, LogFile),
-    send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile),
-    case Duration > 40 of
-        true ->
-            logge_status("Needed ~p MS for Slotlistening", [Duration], LogFile);
-        _ ->
-            nothing
-    end.
-
-get_converted_slot_messages(LogFile) ->
-    %{_,StartSec,StartMicroSec} = erlang:timestamp(),
-    %_StartTime = StartSec * 1000 + StartMicroSec / 1000,
     {SlotMessages, ReceivedTimes} = listen(39, [], [], LogFile),
-    %logge_status("Receiving and Converting length: ~p", [vsutil:getUTC() - Start], LogFile),
-    ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
-    ConvertedSlotMessages.
+    spawn(fun() ->
+            ReceivedTime = vsutil:getUTC(),
+            ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
+            {CollisionHappend, StationWasInvolved} = collision_happend(ConvertedSlotMessages, StationName, LogFile),
+            send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile),
+            DoneTime = vsutil:getUTC(),
+            TotalTime = DoneTime - StartTime,
+            case TotalTime > 40 of
+                    true ->
+                        logge_status("Time Spend: ~p (Listening) ~p (Converting and Collision check) ~p (Total)", [ReceivedTime - StartTime, DoneTime - ReceivedTime, TotalTime], LogFile);
+                    _ ->
+                        nothing
+            end
+        end).
+
 
 listen(RestTimeMilliSec, SlotMessages, ReceivedTimes, _LogFile) when RestTimeMilliSec =< 0 ->
     {SlotMessages, ReceivedTimes};
