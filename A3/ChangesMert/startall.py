@@ -26,7 +26,7 @@ def __start_node(nodename, modulename, parameter):
 
 def __start_node_mac(nodename, modulename, parameter):
     erlcommand = "erl -noshell -sname " + nodename + " -s " + modulename + " start" + " " + parameter
-    erlcommand = "cd /Users/hapemac/Repo/TalDerTraenen/a3 && " + erlcommand
+    erlcommand = "cd /Users/hapemac/Repo/TalDerTraenen/a3/changesmert && " + erlcommand
     command = "osascript -e " + "'" + "tell application " + '"' + "Terminal" + '"'+ " to do script " + '"' + erlcommand + '"' + "'"
     os.system(command)
 
@@ -37,7 +37,7 @@ def __start_stations(count):
         if(count < 10):
             stationname = stationname + "0"
         stationname = stationname + count_str
-        __start_node("station" + count_str, "station", "A " + stationname)
+        __start_node_mac("station" + count_str, "station", "A " + stationname)
         count = count - 1
 
 def __start_normal_shell(nodename):
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
-        __start_node("ns", "nameservice", "")
+        __start_node_mac("ns", "nameservice", "")
         #__start_node("bench", "benchmark", "")
         __start_stations(5)
     elif user_input == "3":
