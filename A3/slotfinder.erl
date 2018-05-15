@@ -1,6 +1,8 @@
 -module(slotfinder).
 
 -export([
+    start/3,
+
     find_slot_in_next_frame/2,
     get_slot_numer_if_stationname_matches/2,
     get_taken_slots/2,
@@ -9,6 +11,25 @@
 ]).
 
 -define(DEFAULT_POSSIBLE_SLOTS, [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]).
+
+start(CorePid, StationName, LogFile) ->
+    logge_status("Startet", LogFile),
+    ClockPid = spawn(fun() -> loop(CorePid, StationName, [], LogFile) end),
+    ClockPid.
+	
+	
+loop(CorePid, StationName, Messages, LogFile) ->
+ receive
+    newframe -> 
+            loop(CorePid, StationName, [], LogFile);
+	{messageFromBC, ReceivedMessages} ->	
+			NewMessages = ReceivedMessages ++ Messages,
+			loop(CorePid, StationName, NewMessages, LogFile);
+	{getFreeSlotNum, SenderPid} ->			
+			NewSlotNumber = find_slot_in_next_frame(Messages, StationName),
+			SenderPid ! {slotnum, NewSlotNumber},
+			loop(CorePid, StationName, Messages, LogFile)
+ end.
 
 find_slot_in_next_frame(Messages, StationName) ->
     case get_slot_numer_if_stationname_matches(Messages, StationName) of
@@ -56,3 +77,13 @@ select_random_slot(PossibleSlots) ->
             RandomSlot
     end.
     
+%------------------------------------------
+logge_status(Text, Input, LogFile) ->
+        Inhalt = io_lib:format(Text,Input),
+        logge_status(Inhalt, LogFile).
+    
+    logge_status(Inhalt, LogFile) ->
+        AktuelleZeit = vsutil:now2string(erlang:timestamp()),
+        LogNachricht = io_lib:format("~p SlotFinder ~s.\n", [AktuelleZeit, Inhalt]),
+        io:fwrite(LogNachricht),
+        util:logging(LogFile, LogNachricht).

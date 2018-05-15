@@ -67,16 +67,16 @@ listen_to_slot(CorePid, StationName, Socket, LogFile) ->
 listen(RestTimeMilliSec, SlotMessages, ReceivedTimes, _Socket, _LogFile) when RestTimeMilliSec =< 0 ->
     {SlotMessages, ReceivedTimes};
 listen(RestTimeMilliSec, SlotMessages, ReceivedTimes, Socket, LogFile) ->
-    StartListeningAt = vsutil:getUT(),
+    StartListeningAt = vsutil:getUTC(),
 
     case gen_udp:recv(Socket, 0, RestTimeMilliSec) of
         {ok, {_Address, _Port, Message}} ->
             NewSlotMessages = [Message | SlotMessages],
             NewReceivedTimes = [vsutil:getUTC() | ReceivedTimes];
-        {error, Reason} ->
+        {error, _Reason} ->
             NewSlotMessages = SlotMessages,
-            NewReceivedTimes = ReceivedTimes,
-            logge_status("Got gen_udp:recv error: ~p", [Reason], LogFile)
+            NewReceivedTimes = ReceivedTimes
+            %logge_status("Got gen_udp:recv error: ~p", [Reason], LogFile)
     end,
     EndingListeningAt = vsutil:getUTC(),
     ElapsedTimeMilliSec = EndingListeningAt - StartListeningAt,

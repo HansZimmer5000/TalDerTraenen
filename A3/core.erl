@@ -4,11 +4,11 @@
     start/4,
     start/7,
 
-    frame_loop/6,
+    frame_loop/7,
     listen_to_frame/3,
     listen_to_slot/1,
 
-    start_sending_process/7,
+    start_sending_process/8,
     notify_when_preperation_and_send_due/4
 ]).
 
@@ -19,67 +19,77 @@ start(StationType, StationName, ClockOffsetMS, LogFile) ->
 
 start(StationType, StationName, ClockOffsetMS, InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, LogFile) ->
     ReceivePort = erlang:list_to_integer(atom_to_list(ReceivePortAtom)),
-    Pids = start_other_components(StationName, InterfaceNameAtom, McastAddressAtom, ReceivePort, ClockOffsetMS, LogFile),
-    frame_loop(StationName, StationType, 0, empty, Pids, LogFile).
+    CorePid = self(),
+    Pids = start_other_components(StationName, CorePid, InterfaceNameAtom, McastAddressAtom, ReceivePort, ClockOffsetMS, LogFile),
+    frame_loop(StationName, StationType, 0, 0, false, Pids, LogFile).
 
-start_other_components(StationName, InterfaceNameAtom, McastAddressAtom, ReceivePort, ClockOffsetMS, LogFile) ->
+start_other_components(StationName, CorePid, InterfaceNameAtom, McastAddressAtom, ReceivePort, ClockOffsetMS, LogFile) ->
     RecvPid = receiver:start(self(), StationName, InterfaceNameAtom, McastAddressAtom, ReceivePort,LogFile),
     SendPid = sender:start(McastAddressAtom, ReceivePort, LogFile),
     ClockPid = utcclock:start(ClockOffsetMS, self(), StationName, LogFile),
     PayloadServerPid = payloadserver:start(LogFile),
-    {RecvPid, SendPid, ClockPid, PayloadServerPid}.
+    SlotFinderPid = slotfinder:start(CorePid, StationName, LogFile),
+    {RecvPid, SendPid, ClockPid, SlotFinderPid, PayloadServerPid}.
 
 %-----------------------------------
 
-frame_loop(StationName, StationType, FrameNumber, SendingSlotNumber, Pids, LogFile) ->
-    {RecvPid, SendPid, ClockPid, PayloadServerPid} = Pids,
+frame_loop(StationName, StationType, FrameNumber, CurrentSlotNumber, InSendphase, Pids, LogFile) ->
+    {RecvPid, SendPid, ClockPid, SlotFinderPid, PayloadServerPid} = Pids,
 
     ClockPid ! {getcurrenttime, self()},
     receive 
         {currenttime, CurrentTime} ->  
             FrameStart = CurrentTime,
-            logge_status("New Frame Started at ~p with Slot ~p --------", [CurrentTime, SendingSlotNumber], LogFile),
+            logge_status("New Frame Started at ~p with Slot ~p --------", [CurrentTime, CurrentSlotNumber], LogFile),
+            SlotFinderPid ! newframe,
 
-            case SendingSlotNumber of
-                empty ->
+            case InSendphase of
+                false ->
                     continue;
-                _ ->
-                    start_sending_process(SendPid, FrameStart, SendingSlotNumber, StationType, ClockPid, PayloadServerPid, LogFile)
+                true ->
+                    start_sending_process(SendPid, FrameStart, CurrentSlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile)
             end,
-            {Messages, StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid, FrameStart, LogFile),
+            {Messages, StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid, SlotFinderPid, FrameStart, LogFile),
             logge_status("Received ~p Messages this Frame after ~p", [length(Messages), vsutil:getUTC() - FrameStart], LogFile),
-            %RestFrameTime = 1000 - vsutil:getUTC() - FrameStart,
-            case SendingSlotNumber of
-                empty ->
+            TimeElapsedInfRame = 1000 - vsutil:getUTC() - FrameStart,
+            case TimeElapsedInfRame > 0 of
+                true -> RestFrameTime = TimeElapsedInfRame;
+                false -> RestFrameTime = 0
+            end,
+            case InSendphase of
+                false ->
+                    NextInSendphase = true,
                     NextSlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName);
-                _ -> 
+                true -> 
                     receive
-                        {messagewassend, MessageWasSend} -> 
+                        {messagewassend, MessageWasSend, NextSlotNumber} -> 
                             logge_status("Send_Loop end with ~p (Involved) ~p (Send)",[StationWasInvolved, MessageWasSend], LogFile),
                             case (StationWasInvolved or not(MessageWasSend)) of
                                 true ->
-                                    NextSlotNumber = empty;
+                                    NextInSendphase = false;
                                 false ->
-                                    NextSlotNumber = SendingSlotNumber
+                                    NextInSendphase = true
                             end
-                        %after RestFrameTime ->
-                        %    logge_status("Messagewassend was never received", LogFile),
-                        %    NextSlotNumber = empty
+                        after RestFrameTime ->
+                            logge_status("Messagewassend was never received", LogFile),
+                            NextInSendphase = false,
+                            NextSlotNumber = 0
                     end
             end,
             logge_status("Frame Ended after ~p", [vsutil:getUTC() - FrameStart], LogFile),
-            frame_loop(StationName, StationType, FrameNumber + 1, NextSlotNumber, Pids, LogFile)
+            frame_loop(StationName, StationType, FrameNumber + 1, NextSlotNumber, NextInSendphase, Pids, LogFile)
 
         after timer:seconds(1) ->
             logge_status("Currenttime from Clock not within 1 second", LogFile),
-            frame_loop(StationName, StationType, FrameNumber + 1, empty, Pids, LogFile)
+            frame_loop(StationName, StationType, FrameNumber + 1, 0, false, Pids, LogFile)
     end.
 
 %-----------------------------------
 
-listen_to_frame_and_adjust_clock(RecvPid, ClockPid, FrameStart, LogFile) ->
+listen_to_frame_and_adjust_clock(RecvPid, ClockPid, SlotFinderPid, FrameStart, LogFile) ->
     {Messages, StationWasInvolved} = listen_to_frame(RecvPid, FrameStart, LogFile),
     ClockPid ! {adjust, Messages},
+    SlotFinderPid ! {messageFromBC, Messages},
     {Messages, StationWasInvolved}.
 
 listen_to_frame(RecvPid, FrameStart, LogFile) ->
@@ -101,18 +111,18 @@ listen_to_slot(RecvPid) ->
             {ConvertedSlotMessages, StationWasInvolved}
     end.
 
-start_sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile) ->
+start_sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile) ->
     ThisPid = self(),
     spawn(fun() -> 
-            MessageWasSend = sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile),
-            ThisPid ! {messagewassend, MessageWasSend}
+            {MessageWasSend, NextSlotNumber} = sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile),
+            ThisPid ! {messagewassend, MessageWasSend, NextSlotNumber}
         end).
 
-sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile) ->
+sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile) ->
     SendtimeMS = notify_when_preperation_and_send_due(ClockPid, FrameStart, SlotNumber, LogFile),
     logge_status("SendTimeMS at ~p", [SendtimeMS], LogFile),
-    MessageWasSend = wait_for_prepare(StationType, SlotNumber, SendtimeMS, ClockPid, PayloadServerPid, SendPid, LogFile),
-    MessageWasSend.
+    {MessageWasSend, NextSlotNumber} = wait_for_prepare(StationType, SendtimeMS, ClockPid, SlotFinderPid, PayloadServerPid, SendPid, LogFile),
+    {MessageWasSend, NextSlotNumber}.
 
 notify_when_preperation_and_send_due(ClockPid, FrameStart, SlotNumber, _LogFile) ->
     ClockPid ! {calcslotmid, FrameStart, SlotNumber, self()},
@@ -124,16 +134,27 @@ notify_when_preperation_and_send_due(ClockPid, FrameStart, SlotNumber, _LogFile)
     SendtimeMS.
 
 
-wait_for_prepare(StationType, SlotNumber, SendtimeMS, ClockPid, PayloadServerPid, SendPid, LogFile) ->
+wait_for_prepare(StationType, SendtimeMS, ClockPid, SlotFinderPid, PayloadServerPid, SendPid, LogFile) ->
     receive
         preperation ->
-            IncompleteMessage = messagehelper:create_incomplete_message(StationType, SlotNumber),
+            SlotFinderPid ! {getFreeSlotNum, self()},
+            receive 
+                {slotnum, NextSlotNumber} -> 
+                    NextSlotNumber,
+                    logge_status("Got NextSlotnumber ~p", [NextSlotNumber], LogFile)
+                after 20 -> 
+                    NextSlotNumber = 0,
+                    logge_status("Never received Slotnumber", LogFile),
+                    exit(self(), kill) 
+            end,
+            IncompleteMessage = messagehelper:create_incomplete_message(StationType, NextSlotNumber),
             MessageWasSend = wait_for_send(SendtimeMS, IncompleteMessage, ClockPid, PayloadServerPid, SendPid, LogFile)
         after 980 ->
             logge_status("Timeout preperation", LogFile),
-            MessageWasSend = false
+            MessageWasSend = false,
+            NextSlotNumber = 0
     end,
-    MessageWasSend.
+    {MessageWasSend, NextSlotNumber}.
 
 wait_for_send(SendtimeMS, IncompleteMessage, ClockPid, PayloadServerPid, SendPid, LogFile) ->
     receive
