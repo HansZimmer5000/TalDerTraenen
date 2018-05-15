@@ -6,7 +6,7 @@
 
 start(Input) when length(Input) == 6 ->
     [InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, StationClassAtom, UTCoffsetMsAtom, StationNumberAtom] = Input,
-    io:fwrite("Got all that stuff ~p", [Input]),
+    %io:fwrite("Got all that stuff ~p", [Input]),
 
     StationType = atom_to_list(StationClassAtom),
     OffsetMs = erlang:list_to_integer(atom_to_list(UTCoffsetMsAtom)),
@@ -17,7 +17,11 @@ start(Input) when length(Input) == 6 ->
     end,
     LogFile = io_lib:format("~s.log", [StationName]),
     
-    logge_status("Starte Station~p mit ~p", [StationNumber, [StationName, OffsetMs, InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, LogFile]], LogFile),
+    Now = vsutil:getUTC(),
+    WaitingTimeTillFirstFrame = round(2000 - Now rem 1000),
+    timer:sleep(WaitingTimeTillFirstFrame),
+    logge_status("Starte Station~p um ~p", [StationNumber, vsutil:getUTC()], LogFile),
+    %logge_status("Starte Station~p mit ~p", [StationNumber, [StationName, OffsetMs, InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, LogFile]], LogFile),
     core:start(StationType, StationName, OffsetMs, InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, LogFile);
 
 start([StationClassAtom, UTCoffsetMsAtom, StationNumberAtom]) ->

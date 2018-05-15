@@ -59,7 +59,7 @@ loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
 
 adjust(OffsetMS, Messages, TransportTupel, LogFile) ->
     NewTransportTupel = adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile),
-    AverageTransportDelay = calc_new_transport_delay_average(TransportTupel),
+    AverageTransportDelay = 0,%calc_new_transport_delay_average(TransportTupel),
     AverageDiffMS = calc_average_diff_ms(Messages, OffsetMS, AverageTransportDelay, LogFile),
     NewOffsetMS = round(OffsetMS - AverageDiffMS),
     logge_status("New Offset: ~p (Old: ~p) | New Delay: ~p", [NewOffsetMS, OffsetMS, AverageTransportDelay], LogFile),
@@ -75,7 +75,7 @@ adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile) ->
         true ->
             SendTime = messagehelper:get_sendtime(CurrentMessage),
             RecvTime = messagehelper:get_receivedtime(CurrentMessage) + OffsetMS,
-            TmpDiffMS = RecvTime - SendTime,
+            TmpDiffMS = round((RecvTime - SendTime) / 2),
             NewTransportDelayTotal = TransportDelayTotal + TmpDiffMS,
             NewTransportCount = TransportCount + 1,
             NewTransportTupel = {StationName, NewTransportDelayTotal, NewTransportCount},
