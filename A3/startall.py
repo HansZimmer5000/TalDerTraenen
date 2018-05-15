@@ -49,6 +49,15 @@ def __start_stations(a_count, b_count):
         __start_node_mac("station" + b_count_str, "station", "B " + stationname)
         b_count = b_count - 1
 
+def __start_stations_via_shell_script(a_count, b_count):
+    script = "./startStations.sh"
+    params = "eth0 224.0.0.251 15006"
+    os.system(script + " " + params + " 1 " + str(a_count) + " A 2")
+    os.system(script + " " + params + " " + str(a_count + 1) + " " + str(b_count + a_count) + " B 2")
+
+def __stop_all_stations():
+    os.system("./pkillAllStations.sh")
+
 def __start_normal_shell(nodename):
     os.system("start erl -sname " + nodename)
 
@@ -91,11 +100,14 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
-        __start_node_mac("ns", "nameservice", "")
-        time.sleep(1)
+        __start_stations_via_shell_script(0, 0)
+        #__start_node_mac("ns", "nameservice", "")
+        #time.sleep(1)
         #__start_node("bench", "benchmark", "")
-        __start_stations(0,0)
+        #__start_stations(0,0)
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
+    elif user_input == "4":
+        __stop_all_stations()
     else:
         print("Argument: '" + user_input + "' unkonwn.")

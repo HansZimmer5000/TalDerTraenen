@@ -35,14 +35,14 @@ send(PayloadServerPid, LogFile) ->
 receive_loop(LogFile) ->
 	receive
 		{AbsenderPid, getNextPayload} ->
-			logge_status("Got getNextPayload", LogFile),
+			%logge_status("Got getNextPayload", LogFile),
 			receive
 				Payload ->
-					logge_status("Sending Payload ~s to: ~p", [Payload, AbsenderPid], LogFile),
+					%logge_status("Sending Payload ~s to: ~p", [Payload, AbsenderPid], LogFile),
 					AbsenderPid ! {payload, Payload}
 			end;
 		_Any ->
-			nothing%logge_status("got: ~p\n", [Any], LogFile)
+			nothing %logge_status("got: ~p\n", [Any], LogFile)
 	end,
 	receive_loop(LogFile).
 

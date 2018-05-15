@@ -1,47 +1,52 @@
 -module(receiver).
 
 -export([
-    start/3,
-    start/4,
+    start/6,
     
-    loop/3,
-    listen_to_slot/3,
+    loop/4,
+    listen_to_slot/4,
 
     collision_happend/3,
     send_to_core/5
 ]).
 
--define(NSNODE, hole_wert_aus_config_mit_key(node)).
--define(NSNAME, nameservice).
-
 -define(SLOTLENGTHMS, 40).
 
 
-start(CorePid, StationName, LogFile) ->
-    start(CorePid, StationName, LogFile, {?NSNAME, ?NSNODE}).
-
-start(CorePid, StationName, LogFile, NsPid) ->
-    Pid = spawn(fun() -> loop(CorePid, StationName, LogFile) end),
-    NsPid ! {enlist, Pid},
-    logge_status("starte", LogFile),
+start(CorePid, StationName, InterfaceNameAtom, McastAddressAtom, ReceivePort,LogFile) ->
+    Socket = create_socket(InterfaceNameAtom, McastAddressAtom, ReceivePort),
+    Pid = spawn(fun() -> loop(CorePid, StationName, Socket, LogFile) end),
+    logge_status("startet", LogFile),
     Pid.
 
+create_socket(_InterfaceNameAtom, McastAddressAtom, ReceivePort) ->
+        Interface = {0, 0, 0, 0},
+        {ok, McastAddress} = inet_parse:address(atom_to_list(McastAddressAtom)),
+        {ok, Socket} = gen_udp:open(ReceivePort, [
+            {mode, binary},
+            {reuseaddr, true},
+            {ip, McastAddress},
+            {multicast_ttl, 4},
+            {multicast_loop, true},
+            {broadcast, true},
+            {add_membership, {McastAddress, Interface}},
+            {active, false}]), %once = dann mit receive Any -> ... end holen
+        Socket.
+    
 % --------------------------------------------------
 
-loop(CorePid, StationName, LogFile) ->
+loop(CorePid, StationName, Socket, LogFile) ->
     receive
-        {udp, _Socket0, _Ip0, _Port0, Message} ->
-            logge_status("Missed Message: ~p in loop", [Message], LogFile);
         listentoslot -> 
-            listen_to_slot(CorePid, StationName, LogFile);
+            listen_to_slot(CorePid, StationName, Socket, LogFile);
         Any -> 
-            logge_status("Got: ~p in loop", [Any], LogFile)
+            logge_status("Missed: ~p in loop", [Any], LogFile)
     end,
-    loop(CorePid, StationName, LogFile).
+    loop(CorePid, StationName, Socket, LogFile).
 
-listen_to_slot(CorePid, StationName, LogFile) ->
+listen_to_slot(CorePid, StationName, Socket, LogFile) ->
     StartTime = vsutil:getUTC(),
-    {SlotMessages, ReceivedTimes} = listen(39, [], [], LogFile),
+    {SlotMessages, ReceivedTimes} = listen(39, [], [], Socket, LogFile),
     spawn(fun() ->
             ReceivedTime = vsutil:getUTC(),
             ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
@@ -58,23 +63,24 @@ listen_to_slot(CorePid, StationName, LogFile) ->
         end).
 
 
-listen(RestTimeMilliSec, SlotMessages, ReceivedTimes, _LogFile) when RestTimeMilliSec =< 0 ->
+listen(RestTimeMilliSec, SlotMessages, ReceivedTimes, _Socket, _LogFile) when RestTimeMilliSec =< 0 ->
     {SlotMessages, ReceivedTimes};
-listen(RestTimeMilliSec, SlotMessages, ReceivedTimes, LogFile) ->
-    {_,StartListeningAtSec,StartListeningAtMicroSec} = erlang:timestamp(),
-    StartListeningAt = StartListeningAtSec * 1000 + StartListeningAtMicroSec / 1000,
-    receive
-        {udp, _Socket0, _Ip0, _Port0, Message} -> 
+listen(RestTimeMilliSec, SlotMessages, ReceivedTimes, Socket, LogFile) ->
+    StartListeningAt = vsutil:getUT(),
+
+    case gen_udp:recv(Socket, 0, RestTimeMilliSec) of
+        {ok, {_Address, _Port, Message}} ->
             NewSlotMessages = [Message | SlotMessages],
-            NewReceivedTimes = [vsutil:getUTC() | ReceivedTimes],
-            {_,EndingListeningAtSec,EndingListeningAtMicroSec} = erlang:timestamp(),
-            EndingListeningAt = EndingListeningAtSec * 1000 + EndingListeningAtMicroSec / 1000,
-            ElapsedTimeMilliSec = EndingListeningAt - StartListeningAt,
-            NewRestTimeMilliSec = RestTimeMilliSec - ElapsedTimeMilliSec,
-            listen(NewRestTimeMilliSec, NewSlotMessages, NewReceivedTimes, LogFile)
-        after round(RestTimeMilliSec) ->
-            listen(0, SlotMessages, ReceivedTimes, LogFile)
-    end.
+            NewReceivedTimes = [vsutil:getUTC() | ReceivedTimes];
+        {error, Reason} ->
+            NewSlotMessages = SlotMessages,
+            NewReceivedTimes = ReceivedTimes,
+            logge_status("Got gen_udp:recv error: ~p", [Reason], LogFile)
+    end,
+    EndingListeningAt = vsutil:getUTC(),
+    ElapsedTimeMilliSec = EndingListeningAt - StartListeningAt,
+    NewRestTimeMilliSec = RestTimeMilliSec - ElapsedTimeMilliSec,
+    listen(NewRestTimeMilliSec, NewSlotMessages, NewReceivedTimes, Socket, LogFile).
 
 collision_happend(ConvertedSlotMessages, StationName, LogFile) ->
     %If a message is handled as received in slot X but was meant for slot Y (X <> Y) its a collision.
@@ -122,9 +128,4 @@ logge_status(Inhalt, LogFile) ->
     LogNachricht = io_lib:format("~p - Recv ~s.\n", [AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(LogFile, LogNachricht).
-
-hole_wert_aus_config_mit_key(Key) ->
-    {ok, ConfigListe} = file:consult('nameservice.cfg'),
-    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
-    Value.
 

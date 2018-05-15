@@ -18,12 +18,13 @@ start(StationType, StationName, ClockOffsetMS, LogFile) ->
     start(StationType, StationName, ClockOffsetMS, empty, empty, empty, LogFile).
 
 start(StationType, StationName, ClockOffsetMS, InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, LogFile) ->
-    Pids = start_other_components(StationName, ClockOffsetMS, LogFile),
+    ReceivePort = erlang:list_to_integer(atom_to_list(ReceivePortAtom)),
+    Pids = start_other_components(StationName, InterfaceNameAtom, McastAddressAtom, ReceivePort, ClockOffsetMS, LogFile),
     frame_loop(StationName, StationType, 0, empty, Pids, LogFile).
 
-start_other_components(StationName, ClockOffsetMS, LogFile) ->
-    RecvPid = receiver:start(self(), StationName, LogFile),
-    SendPid = sender:start(LogFile),
+start_other_components(StationName, InterfaceNameAtom, McastAddressAtom, ReceivePort, ClockOffsetMS, LogFile) ->
+    RecvPid = receiver:start(self(), StationName, InterfaceNameAtom, McastAddressAtom, ReceivePort,LogFile),
+    SendPid = sender:start(McastAddressAtom, ReceivePort, LogFile),
     ClockPid = utcclock:start(ClockOffsetMS, self(), StationName, LogFile),
     PayloadServerPid = payloadserver:start(LogFile),
     {RecvPid, SendPid, ClockPid, PayloadServerPid}.

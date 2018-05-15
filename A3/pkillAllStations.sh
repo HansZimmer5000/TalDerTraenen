@@ -13,7 +13,7 @@
 #
 # Example: stationCmd="java aufgabe4.MyStation"
 ########################################################################################################
-stationCmd="erl -noshell -s station start $interfaceName $mcastAddress $receivePort $stationClass $UTCoffsetMs"
+stationCmd="erl -noshell -s station start"
 
 ########################################################################################################
 # TODO: Enter data source programme with full path, but WITHOUT parameters 
