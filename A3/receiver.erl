@@ -27,7 +27,7 @@ create_socket(_InterfaceNameAtom, McastAddressAtom, ReceivePort) ->
             {mode, binary},
             {reuseaddr, true},
             {ip, McastAddress},
-            {multicast_ttl, 4},
+            {multicast_ttl, 1},
             {multicast_loop, true},
             {broadcast, true},
             {add_membership, {McastAddress, Interface}},
