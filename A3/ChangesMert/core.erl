@@ -24,7 +24,6 @@ start(StationType, StationName, LogFile, ClockOffsetMS) ->
 	
 %------------------------------------------ FRAME	
 frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, LogFile) ->   
-	FrameStartTime = vsutil:getUTC(),	
 	ClockPid ! {getcurrentoffsetms, self()},
 	receive
 		{offset, OffsetMS} ->
@@ -37,6 +36,7 @@ frame_loop(StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadSe
 						SlotNumber = SlotNumFromSlotFinder
 			end
 	end,
+	FrameStartTime = vsutil:getUTC(),			
 	logge_status("Starte Frame on: ~p with SN: ~p", [FrameStartTime, SlotNumber], LogFile),
 	SendTakenTimeStart = vsutil:getUTC(),
 	slot_loop(?SLOTLENGTHMS, StationName, StationType, SlotFinderPid, SendPid, ClockPid, PayloadServerPid, SlotNumber, LogFile, 1, FrameStartTime, SendTakenTimeStart).	
