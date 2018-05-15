@@ -10,13 +10,14 @@ start(Input) when length(Input) == 6 ->
 
     StationType = atom_to_list(StationClassAtom),
     OffsetMs = erlang:list_to_integer(atom_to_list(UTCoffsetMsAtom)),
-    case atom_to_list(StationNumberAtom) > 9 of
-        true -> StationName = "team 06-" ++ atom_to_list(StationNumberAtom);
-        false -> StationName = "team 06-0" ++ atom_to_list(StationNumberAtom)
+    StationNumber  = erlang:list_to_integer(lists:flatten(io_lib:format("~s", [StationNumberAtom]))),
+    case StationNumber > 9 of
+        true -> StationName = lists:flatten(io_lib:format("team 06-~p", [StationNumber]));
+        false -> StationName = lists:flatten(io_lib:format("team 06-0~p", [StationNumber]))
     end,
     LogFile = io_lib:format("~s.log", [StationName]),
     
-    logge_status("Starte Station~p mit ~p", [StationNumberAtom, [InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, StationClassAtom, UTCoffsetMsAtom]], LogFile),
+    logge_status("Starte Station~p mit ~p", [StationNumber, [StationName, OffsetMs, InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, LogFile]], LogFile),
     core:start(StationType, StationName, OffsetMs, InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, LogFile);
 
 start([StationClassAtom, UTCoffsetMsAtom, StationNumberAtom]) ->

@@ -70,8 +70,9 @@ adjust_transport_tupel([], _OffsetMS, TransportTupel, _LogFile) ->
 adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile) ->
     [CurrentMessage | RestMessages] = Messages,
     {StationName, TransportDelayTotal, TransportCount} = TransportTupel,
-    case messagehelper:get_station_name(CurrentMessage) of
-        StationName ->
+    %logge_status("My Name: ~p, other Name: ~p", [StationName, messagehelper:get_station_name(CurrentMessage)], LogFile),
+    case StationName == messagehelper:get_station_name(CurrentMessage) of
+        true ->
             SendTime = messagehelper:get_sendtime(CurrentMessage),
             RecvTime = messagehelper:get_receivedtime(CurrentMessage) + OffsetMS,
             TmpDiffMS = RecvTime - SendTime,
@@ -79,7 +80,7 @@ adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile) ->
             NewTransportCount = TransportCount + 1,
             NewTransportTupel = {StationName, NewTransportDelayTotal, NewTransportCount},
             adjust_transport_tupel(RestMessages, OffsetMS, NewTransportTupel, LogFile);
-        _ -> 
+        false -> 
             adjust_transport_tupel(RestMessages, OffsetMS, TransportTupel, LogFile)
     end.
 
