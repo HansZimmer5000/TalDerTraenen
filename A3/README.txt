@@ -7,6 +7,7 @@ Zu dem Paket gehoeren die Datein:
     - slotfinder.erl
     - station.erl
     - tunnel.erl
+    - utcclock.erl
 
 Sowie Dateien zum testen des Codes und, vom Professor gestellte, Werkzeug dateien ("util").
 
