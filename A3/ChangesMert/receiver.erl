@@ -1,10 +1,10 @@
 -module(receiver).
 
 -export([
-    start/3,
     start/4,
+    start/5,
     
-    loop/3
+    loop/4
     ]).
 
 -define(NSNODE, hole_wert_aus_config_mit_key(node)).
@@ -13,25 +13,29 @@
 -define(SLOTLENGTHMS, 40).
 
 
-start(CorePid, StationName, LogFile) ->
-    start(CorePid, StationName, LogFile, {?NSNAME, ?NSNODE}).
+start(SlotFinderPid, ClockPid, StationName, LogFile) ->
+    start(SlotFinderPid, ClockPid, StationName, LogFile, {?NSNAME, ?NSNODE}).
 
-start(CorePid, StationName, LogFile, NsPid) ->
-    Pid = spawn(fun() -> loop(CorePid, StationName, LogFile) end),	
-    NsPid ! {enlist, Pid},
-    logge_status("starte", LogFile),
-    Pid.
+start(SlotFinderPid, ClockPid, StationName, LogFile, NsPid) ->
+    Pid = spawn(fun() -> loop(SlotFinderPid, ClockPid, StationName, LogFile) end),	
+	NsPid ! {enlist, Pid},
+	logge_status("starte", LogFile),
+	Pid.
 	
 % ------------------------------------------
 
-loop(CorePid, StationName, LogFile) ->
+loop(SlotFinderPid, ClockPid, StationName, LogFile) ->
     receive
         {udp, _Socket0, _Ip0, _Port0, Message} ->
-			CorePid ! {messageFromBC, Message};
+			ReceivedTime = vsutil:getUTC(),
+			ConvertedMessage = messagehelper:convert_message_from_byte(Message, ReceivedTime),
+			ClockPid ! {messageFromBC, ConvertedMessage},
+			SlotFinderPid ! {messageFromBC, ConvertedMessage},
+			loop(SlotFinderPid, ClockPid, StationName, LogFile);
         Any -> 
-            logge_status("Got: ~p in loop", [Any], LogFile)
-    end,
-    loop(CorePid, StationName, LogFile).
+            logge_status("Got: ~p in loop", [Any], LogFile),
+			loop(SlotFinderPid, ClockPid, StationName, LogFile)
+    end.
 
 %------------------------------------------
 logge_status(Text, Input, LogFile) ->

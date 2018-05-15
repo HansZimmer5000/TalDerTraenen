@@ -18,9 +18,12 @@ receive_loop(StationPids) ->
     receive
         {enlist, Pid} ->    logge_status("got enlist"),
                             NewStationPids = enlist(StationPids, Pid),
-                            receive_loop(NewStationPids);
+                            receive_loop(NewStationPids),
+							Pid ! ok;
+							
         {multicast, Message} ->     multicast(StationPids, Message),
                                     receive_loop(StationPids);
+									
         Any ->  logge_status(io_lib:format("Got: ~p", [Any])),
                 receive_loop(StationPids)
     end.

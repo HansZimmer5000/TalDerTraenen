@@ -1,29 +1,41 @@
 -module(sender).
 
 -export([
-    start/1
+    start/2
 ]).
 
 -define(NSNODE, hole_wert_aus_config_mit_key(node)).
 -define(NSNAME, nameservice).
 
-start(LogFile) ->
-    Pid = spawn(fun() -> loop({?NSNAME, ?NSNODE}, LogFile) end),
+start(PayloadServerPid, LogFile) ->
+    Pid = spawn(fun() -> loop({?NSNAME, ?NSNODE}, PayloadServerPid, LogFile) end),
     logge_status("startet", LogFile),
     Pid.
 
 % --------------------------------------------------
 
-loop(Nameservice, LogFile) ->
+loop(Nameservice, PayloadServerPid, LogFile) ->
     receive
-        {send, Message} -> 
+        {sendMessage, [StationType, SlotNumber]} -> 
+			Payload = request_payload(PayloadServerPid),
+			SendTime = vsutil:getUTC(),			
+			IncompleteMessage = messagehelper:create_incomplete_message(StationType, SlotNumber),
+			Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, Payload),
             send(Nameservice, Message)
     end,
-    loop(Nameservice, LogFile).
+    loop(Nameservice, PayloadServerPid, LogFile).
 
 send(Nameservice, Message) ->
 	timer:sleep(20),
     Nameservice ! {multicast, Message}.
+	
+	
+request_payload(PayloadServerPid) ->
+    PayloadServerPid ! {self(), getNextPayload},
+    receive
+        {payload, Payload} ->
+            Payload
+    end.
 
 %------------------------------------------
 logge_status(Text, Input, LogFile) ->
