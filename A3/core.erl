@@ -76,7 +76,7 @@ frame_loop(StationName, StationType, FrameNumber, CurrentSlotNumber, InSendphase
                             NextSlotNumber = 0
                     end
             end,
-            logge_status("Frame Ended after ~p", [vsutil:getUTC() - FrameStart], LogFile),
+            logge_status("Frame Ended after ~p with NextInSendphase = ~p", [vsutil:getUTC() - FrameStart, NextInSendphase], LogFile),
             frame_loop(StationName, StationType, FrameNumber + 1, NextSlotNumber, NextInSendphase, Pids, LogFile)
 
         after timer:seconds(1) ->

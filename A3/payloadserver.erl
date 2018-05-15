@@ -27,6 +27,7 @@ start_vessel(PayloadServerPid, LogFile) ->
 
 send(PayloadServerPid, LogFile) ->
 	Text = io:get_chars('', 24),
+	%logge_status("Got Payload: ~p", [Text], LogFile),
 	PayloadServerPid ! Text,
 	send(PayloadServerPid, LogFile).
 
