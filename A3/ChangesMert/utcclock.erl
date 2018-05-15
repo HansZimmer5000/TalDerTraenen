@@ -49,7 +49,7 @@ calcOffSet(CurrentMessage, FrameStartTime, OffsetMS, LogFile) ->
             SendTime = messagehelper:get_sendtime(CurrentMessage),
             StationName = messagehelper:get_station_name(CurrentMessage),
 			SlotNumber = messagehelper:get_slotnumber(CurrentMessage) - 1,
-            NewOffSet = round((((FrameStartTime - (SendTime - ((SlotNumber * 31) + 15)))+OffsetMS)/2)),	
+            NewOffSet = round((((FrameStartTime - (SendTime - ((SlotNumber * 40) + 20)))+OffsetMS)/2)),	
             logge_status("Nachricht erhalten vo ~p mit offset ~p",[StationName, NewOffSet], LogFile),			
             case NewOffSet < 0 of
 				true ->
