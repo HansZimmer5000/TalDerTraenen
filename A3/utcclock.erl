@@ -26,6 +26,7 @@ start(OffsetMS, CorePid, StationName, LogFile) ->
 loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
     receive
         {adjust, Messages} ->
+            logge_status("Got Adjust", LogFile),
             {NewOffsetMS, NewTransportTupel} = adjust(OffsetMS, Messages, TransportTupel, LogFile),
             loop(NewOffsetMS, CorePid, NewTransportTupel, LogFile);
         {calcslotmid, FrameStart, SlotNumber, SenderPid} ->
@@ -59,7 +60,7 @@ loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
 
 adjust(OffsetMS, Messages, TransportTupel, LogFile) ->
     NewTransportTupel = adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile),
-    AverageTransportDelay = 0,%calc_new_transport_delay_average(TransportTupel),
+    AverageTransportDelay = calc_new_transport_delay_average(TransportTupel),
     AverageDiffMS = calc_average_diff_ms(Messages, OffsetMS, AverageTransportDelay, LogFile),
     NewOffsetMS = round(OffsetMS - AverageDiffMS),
     logge_status("New Offset: ~p (Old: ~p) | New Delay: ~p", [NewOffsetMS, OffsetMS, AverageTransportDelay], LogFile),

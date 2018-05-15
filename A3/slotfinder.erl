@@ -22,7 +22,7 @@ loop(CorePid, StationName, Messages, LogFile) ->
  receive
     newframe -> 
             loop(CorePid, StationName, [], LogFile);
-	{messageFromBC, ReceivedMessages} ->	
+	{newmessages, ReceivedMessages} ->	
 			NewMessages = ReceivedMessages ++ Messages,
 			loop(CorePid, StationName, NewMessages, LogFile);
 	{getFreeSlotNum, SenderPid} ->			
@@ -78,12 +78,8 @@ select_random_slot(PossibleSlots) ->
     end.
     
 %------------------------------------------
-logge_status(Text, Input, LogFile) ->
-        Inhalt = io_lib:format(Text,Input),
-        logge_status(Inhalt, LogFile).
-    
-    logge_status(Inhalt, LogFile) ->
-        AktuelleZeit = vsutil:now2string(erlang:timestamp()),
-        LogNachricht = io_lib:format("~p SlotFinder ~s.\n", [AktuelleZeit, Inhalt]),
-        io:fwrite(LogNachricht),
-        util:logging(LogFile, LogNachricht).
+logge_status(Inhalt, LogFile) ->
+    AktuelleZeit = vsutil:now2string(erlang:timestamp()),
+    LogNachricht = io_lib:format("~p -- Slot ~s.\n", [AktuelleZeit, Inhalt]),
+    io:fwrite(LogNachricht),
+    util:logging(LogFile, LogNachricht).

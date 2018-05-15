@@ -4,20 +4,18 @@
     start/6,
     create_socket/3,
     
-    loop/4,
-    listen_to_slot/4,
+    listen_loop/4,
 
-    collision_happend/3,
-    send_to_core/5
+    collision_happend/3
 ]).
 
 -define(SLOTLENGTHMS, 40).
 
 
-start(CorePid, StationName, InterfaceNameAtom, McastAddressAtom, ReceivePort,LogFile) ->
+start(CorePid, ClockPid, InterfaceNameAtom, McastAddressAtom, ReceivePort,LogFile) ->
     Socket = create_socket(InterfaceNameAtom, McastAddressAtom, ReceivePort),
-    Pid = spawn(fun() -> loop(CorePid, StationName, Socket, LogFile) end),
-    logge_status("startet", LogFile),
+    Pid = spawn(fun() -> listen_loop(CorePid, ClockPid, Socket, LogFile) end),
+    logge_status("Listening to ~p:~p", [McastAddressAtom, ReceivePort], LogFile),
     Pid.
 
 create_socket(_InterfaceNameAtom, McastAddressAtom, ReceivePort) ->
@@ -36,52 +34,15 @@ create_socket(_InterfaceNameAtom, McastAddressAtom, ReceivePort) ->
     
 % --------------------------------------------------
 
-loop(CorePid, StationName, Socket, LogFile) ->
-    receive
-        listentoslot -> 
-            listen_to_slot(CorePid, StationName, Socket, LogFile);
-        Any -> 
-            logge_status("Missed: ~p in loop", [Any], LogFile)
-    end,
-    loop(CorePid, StationName, Socket, LogFile).
-
-listen_to_slot(CorePid, StationName, Socket, LogFile) ->
-    StartTime = vsutil:getUTC(),
-    {SlotMessages, ReceivedTimes} = listen(39, [], [], Socket, LogFile),
-    spawn(fun() ->
-            ReceivedTime = vsutil:getUTC(),
-            ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
-            {CollisionHappend, StationWasInvolved} = collision_happend(ConvertedSlotMessages, StationName, LogFile),
-            send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile),
-            DoneTime = vsutil:getUTC(),
-            TotalTime = DoneTime - StartTime,
-            case TotalTime > 40 of
-                    true ->
-                        logge_status("Time Spend: ~p (Listening) ~p (Converting and Collision check) ~p (Total)", [ReceivedTime - StartTime, DoneTime - ReceivedTime, TotalTime], LogFile);
-                    _ ->
-                        nothing
-            end
-        end).
-
-
-listen(RestTimeMilliSec, SlotMessages, ReceivedTimes, _Socket, _LogFile) when RestTimeMilliSec =< 0 ->
-    {SlotMessages, ReceivedTimes};
-listen(RestTimeMilliSec, SlotMessages, ReceivedTimes, Socket, LogFile) ->
-    StartListeningAt = vsutil:getUTC(),
-
-    case gen_udp:recv(Socket, 0, RestTimeMilliSec) of
+listen_loop(CorePid, ClockPid, Socket, LogFile) ->
+    case gen_udp:recv(Socket, 0) of
         {ok, {_Address, _Port, Message}} ->
-            NewSlotMessages = [Message | SlotMessages],
-            NewReceivedTimes = [vsutil:getUTC() | ReceivedTimes];
+            logge_status("Got Message, sending to Core", LogFile),
+            CorePid ! {receivedmessage, Message, vsutil:getUTC()};
         {error, _Reason} ->
-            NewSlotMessages = SlotMessages,
-            NewReceivedTimes = ReceivedTimes
-            %logge_status("Got gen_udp:recv error: ~p", [Reason], LogFile)
+            nothing
     end,
-    EndingListeningAt = vsutil:getUTC(),
-    ElapsedTimeMilliSec = EndingListeningAt - StartListeningAt,
-    NewRestTimeMilliSec = RestTimeMilliSec - ElapsedTimeMilliSec,
-    listen(NewRestTimeMilliSec, NewSlotMessages, NewReceivedTimes, Socket, LogFile).
+    listen_loop(CorePid, ClockPid, Socket, LogFile).
 
 collision_happend(ConvertedSlotMessages, StationName, LogFile) ->
     %If a message is handled as received in slot X but was meant for slot Y (X <> Y) its a collision.
@@ -92,18 +53,6 @@ collision_happend(ConvertedSlotMessages, StationName, LogFile) ->
             StationWasInvolved = station_was_involved(ConvertedSlotMessages, StationName, LogFile),
             {true, StationWasInvolved}
     end.
-
-send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile) ->
-    case CollisionHappend of
-        true ->
-            CorePid ! {slotmessages, [], StationWasInvolved},
-
-            %TODO: make better logging for this, don't print all the messages just the necessary infos
-            logge_status("(Involved: ~p) Collision detected in: ~p", [StationWasInvolved, ConvertedSlotMessages], LogFile);
-        false ->
-            CorePid ! {slotmessages, ConvertedSlotMessages, StationWasInvolved}
-    end.
-
 
 station_was_involved([], StationName, LogFile) ->
     logge_status("Wasn't Involved: ~p", [StationName], LogFile),

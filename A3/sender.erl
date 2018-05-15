@@ -7,7 +7,7 @@
 start(McastAddressAtom, ReceivePort, LogFile) ->
     Socket = create_socket(),
     Pid = spawn(fun() -> loop(Socket, McastAddressAtom, ReceivePort, LogFile) end),
-    logge_status("startet", LogFile),
+    logge_status("Sending to ~p:~p", [McastAddressAtom, ReceivePort], LogFile),
     Pid.
 
 create_socket() ->
