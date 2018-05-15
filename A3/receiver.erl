@@ -2,6 +2,7 @@
 
 -export([
     start/6,
+    create_socket/3,
     
     loop/4,
     listen_to_slot/4,
