@@ -60,7 +60,7 @@ loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
 
 adjust(OffsetMS, Messages, TransportTupel, LogFile) ->
     NewTransportTupel = adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile),
-    AverageTransportDelay = calc_new_transport_delay_average(TransportTupel),
+    AverageTransportDelay = 0,%calc_new_transport_delay_average(TransportTupel),
     AverageDiffMS = calc_average_diff_ms(Messages, OffsetMS, AverageTransportDelay, LogFile),
     NewOffsetMS = round(OffsetMS - AverageDiffMS),
     logge_status("New Offset: ~p (Old: ~p) | New Delay: ~p", [NewOffsetMS, OffsetMS, AverageTransportDelay], LogFile),
