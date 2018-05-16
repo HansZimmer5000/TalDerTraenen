@@ -38,7 +38,11 @@ create_socket(_InterfaceNameAtom, McastAddressAtom, ReceivePort) ->
 listen_loop(CorePid, ClockPid, Socket, LogFile) ->
     case gen_udp:recv(Socket, 0) of
         {ok, {_Address, _Port, Message}} ->
-            CorePid ! {receivedmessage, Message, vsutil:getUTC()};
+            ClockPid ! {getcurrenttime, self()},
+            receive
+                {currenttime, CurrentTime} ->
+                    CorePid ! {receivedmessage, Message, CurrentTime}
+            end;
         {error, _Reason} ->
             nothing
     end,

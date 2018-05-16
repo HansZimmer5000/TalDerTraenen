@@ -3,7 +3,7 @@
 -export([
     start/4,
 
-    adjust/4,
+    adjust/5,
 
     new_frame_started/2,
     get_current_time/1,
@@ -25,24 +25,37 @@ start(OffsetMS, CorePid, StationName, LogFile) ->
 
 loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
     receive
-        {adjust, Messages} ->
-            logge_status("Got Adjust", LogFile),
-            {NewOffsetMS, NewTransportTupel} = adjust(OffsetMS, Messages, TransportTupel, LogFile),
+        {newoffsetandtransporttupel, ReceivedOffsetDiff, NewTransportTupel} ->
+            NewOffsetMS = OffsetMS - ReceivedOffsetDiff,
+            logge_status("New Offset: ~p (Old: ~p)", [NewOffsetMS, OffsetMS], LogFile),
             loop(NewOffsetMS, CorePid, NewTransportTupel, LogFile);
-        {calcslotmid, FrameStart, SlotNumber, SenderPid} ->
-            SendtimeMS = calc_slot_mid_this_frame_time(FrameStart, SlotNumber, LogFile),
-            SenderPid ! {resultslotmid, SendtimeMS},
-            logge_status("calc got: ~p ~p = ~p", [FrameStart, SlotNumber, SendtimeMS], LogFile),
+        {adjust, Messages} ->
+            ClockPid = self(),
+            spawn(fun () -> 
+                    logge_status("Got Adjust", LogFile),
+                    adjust(OffsetMS, ClockPid, Messages, TransportTupel, LogFile)
+                end),
             loop(OffsetMS, CorePid, TransportTupel, LogFile);
+        {calcslotmid, FrameStart, SlotNumber, SenderPid} ->
+            spawn(fun() -> 
+                    SendtimeMS = calc_slot_mid_this_frame_time(FrameStart, SlotNumber, LogFile),
+                    SenderPid ! {resultslotmid, SendtimeMS},
+                    logge_status("calc got: ~p ~p = ~p", [FrameStart, SlotNumber, SendtimeMS], LogFile),
+                    loop(OffsetMS, CorePid, TransportTupel, LogFile)
+                end);
         {alarm, AlarmMessage, TimeWhenItsDue, SenderPid} ->
-            TimeTillItsDue = TimeWhenItsDue - get_current_time(OffsetMS),
-            set_alarm(AlarmMessage, TimeTillItsDue, SenderPid, LogFile),
+            spawn(fun() ->
+                    TimeTillItsDue = TimeWhenItsDue - get_current_time(OffsetMS),
+                    set_alarm(AlarmMessage, TimeTillItsDue, SenderPid, LogFile)
+                end),
             loop(OffsetMS, CorePid, TransportTupel, LogFile);
         {calcdifftime, UTCTime, SenderPid} ->
-            CurrentTime = get_current_time(OffsetMS),
-            DiffTime = CurrentTime - UTCTime,
-            SenderPid ! {resultdifftime, DiffTime},
-            loop(OffsetMS, CorePid, TransportTupel, LogFile);
+            spawn(fun() -> 
+                    CurrentTime = get_current_time(OffsetMS),
+                    DiffTime = CurrentTime - UTCTime,
+                    SenderPid ! {resultdifftime, DiffTime},
+                    loop(OffsetMS, CorePid, TransportTupel, LogFile)
+                end);
         {getcurrenttime, SenderPid} ->
             SenderPid ! {currenttime, get_current_time(OffsetMS)},
             loop(OffsetMS, CorePid, TransportTupel, LogFile);
@@ -58,13 +71,11 @@ loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
 
 % --------------------------------------------------
 
-adjust(OffsetMS, Messages, TransportTupel, LogFile) ->
+adjust(OffsetMS, ClockPid, Messages, TransportTupel, LogFile) ->
     NewTransportTupel = adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile),
     AverageTransportDelay = 0,%calc_new_transport_delay_average(TransportTupel),
     AverageDiffMS = calc_average_diff_ms(Messages, OffsetMS, AverageTransportDelay, LogFile),
-    NewOffsetMS = round(OffsetMS - AverageDiffMS),
-    logge_status("New Offset: ~p (Old: ~p) | New Delay: ~p", [NewOffsetMS, OffsetMS, AverageTransportDelay], LogFile),
-    {NewOffsetMS, NewTransportTupel}.
+    ClockPid ! {newoffsetandtransporttupel, AverageDiffMS, NewTransportTupel}.
 
 adjust_transport_tupel([], _OffsetMS, TransportTupel, _LogFile) ->
     TransportTupel;
@@ -75,8 +86,8 @@ adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile) ->
     case StationName == messagehelper:get_station_name(CurrentMessage) of
         true ->
             SendTime = messagehelper:get_sendtime(CurrentMessage),
-            RecvTime = messagehelper:get_receivedtime(CurrentMessage) + OffsetMS,
-            TmpDiffMS = round((RecvTime - SendTime) / 2),
+            RecvTime = messagehelper:get_receivedtime(CurrentMessage),
+            TmpDiffMS = (RecvTime - SendTime) div 2,
             NewTransportDelayTotal = TransportDelayTotal + TmpDiffMS,
             NewTransportCount = TransportCount + 1,
             NewTransportTupel = {StationName, NewTransportDelayTotal, NewTransportCount},
@@ -91,7 +102,7 @@ calc_average_diff_ms(Messages, OffsetMS, AverageTransportDelay, LogFile) ->
         0 ->
             0;
         TotalCountBigger0 ->
-            TotalDiffMS / TotalCountBigger0
+            TotalDiffMS div TotalCountBigger0
     end.
 
 calc_average_diff_ms([], TotalDiffMS, TotalCount, _OffsetMS, _AverageTransportDelay, _LogFile) ->
@@ -110,9 +121,9 @@ calc_average_diff_ms([CurrentMessage | RestMessages], TotalDiffMS, TotalCount, O
             calc_average_diff_ms(RestMessages, TotalDiffMS, TotalCount, OffsetMS, AverageTransportDelay, LogFile)
     end.
 
-calc_diff_ms(Message, OffsetMS, LogFile) ->
+calc_diff_ms(Message, _OffsetMS, LogFile) ->
     SendTime = messagehelper:get_sendtime(Message),
-    RecvTime = messagehelper:get_receivedtime(Message) + OffsetMS,
+    RecvTime = messagehelper:get_receivedtime(Message),
     logge_status("Send ~p Recv ~p", [SendTime, RecvTime], LogFile),
     TmpDiffMS = RecvTime - SendTime,
     TmpDiffMS.
@@ -121,7 +132,7 @@ calc_new_transport_delay_average(TransportTupel) ->
     {_StationName, TransportDelayTotal, TransportCount} = TransportTupel,
     case TransportCount of
         0 -> AverageTransportDelay = 0;
-        _ -> AverageTransportDelay = round(TransportDelayTotal / TransportCount)
+        _ -> AverageTransportDelay = TransportDelayTotal div TransportCount
     end,
     AverageTransportDelay.
 
@@ -131,7 +142,7 @@ new_frame_started(CurrentTime, CurrentFrameNumber) ->
 
 get_current_time(OffsetMS) ->
     Result = vsutil:getUTC() + OffsetMS,
-    round(Result).
+    Result.
 
 calc_slot_mid_this_frame_time(FrameStart, SlotNumber, _LogFile) ->
     SlotBeginnInMid = round(SlotNumber * ?SLOTLENGTHMS - (?SLOTLENGTHMS / 2)), % - SLOTLENGTHMS because we want the mid of the slottime
