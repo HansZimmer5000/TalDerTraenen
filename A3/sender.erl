@@ -1,12 +1,12 @@
 -module(sender).
 
 -export([
-    start/3
+    start/4
 ]).
 
-start(McastAddressAtom, ReceivePort, LogFile) ->
+start(McastAddressAtom, ReceivePort, ClockPid, LogFile) ->
     Socket = create_socket(ReceivePort),
-    Pid = spawn(fun() -> loop(Socket, McastAddressAtom, ReceivePort, LogFile) end),
+    Pid = spawn(fun() -> loop(Socket, McastAddressAtom, ReceivePort, ClockPid, LogFile) end),
     logge_status("Sending to ~p:~p", [McastAddressAtom, ReceivePort], LogFile),
     Pid.
 
@@ -16,12 +16,18 @@ create_socket(ReceivePort) ->
     %Socket.
 % --------------------------------------------------
 
-loop(Socket, McastAddressAtom, ReceivePort, LogFile) ->
+loop(Socket, McastAddressAtom, ReceivePort, ClockPid, LogFile) ->
     receive
-        {send, Message} -> 
-            send(Socket, McastAddressAtom, ReceivePort, Message, LogFile)
+        {send, IncompleteMessage, Payload} -> 
+	    ClockPid ! {getcurrenttime, self()},
+	    receive 
+		{currenttime, SendTime} -> 
+			Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, Payload),
+    			logge_status("Sende Nachricht", LogFile),
+			send(Socket, McastAddressAtom, ReceivePort, Message, LogFile)
+	    end
     end,
-    loop(Socket, McastAddressAtom, ReceivePort, LogFile).
+    loop(Socket, McastAddressAtom, ReceivePort, ClockPid, LogFile).
 
 send(Socket, McastAddressAtom, ReceivePort, Message, LogFile) ->
     {ok, McastAddress} = inet_parse:address(atom_to_list(McastAddressAtom)),

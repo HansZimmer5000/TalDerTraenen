@@ -42,7 +42,8 @@ loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
                     SenderPid ! {resultslotmid, SendtimeMS},
                     logge_status("calc got: ~p ~p = ~p", [FrameStart, SlotNumber, SendtimeMS], LogFile),
                     loop(OffsetMS, CorePid, TransportTupel, LogFile)
-                end);
+                end),
+            loop(OffsetMS, CorePid, TransportTupel, LogFile);
         {alarm, AlarmMessage, TimeWhenItsDue, SenderPid} ->
             spawn(fun() ->
                     TimeTillItsDue = TimeWhenItsDue - get_current_time(OffsetMS),
@@ -55,7 +56,8 @@ loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
                     DiffTime = CurrentTime - UTCTime,
                     SenderPid ! {resultdifftime, DiffTime},
                     loop(OffsetMS, CorePid, TransportTupel, LogFile)
-                end);
+                end),
+            loop(OffsetMS, CorePid, TransportTupel, LogFile);
         {getcurrenttime, SenderPid} ->
             SenderPid ! {currenttime, get_current_time(OffsetMS)},
             loop(OffsetMS, CorePid, TransportTupel, LogFile);

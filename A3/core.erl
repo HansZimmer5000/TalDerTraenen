@@ -25,7 +25,7 @@ start(StationType, StationName, ClockOffsetMS, InterfaceNameAtom, McastAddressAt
 start_other_components(StationName, CorePid, InterfaceNameAtom, McastAddressAtom, ReceivePort, ClockOffsetMS, LogFile) ->
     ClockPid = utcclock:start(ClockOffsetMS, self(), StationName, LogFile),
     RecvPid = receiver:start(self(), ClockPid, InterfaceNameAtom, McastAddressAtom, ReceivePort,LogFile),
-    SendPid = sender:start(McastAddressAtom, ReceivePort, LogFile),
+    SendPid = sender:start(McastAddressAtom, ReceivePort, ClockPid, LogFile),
     PayloadServerPid = payloadserver:start(LogFile),
     SlotFinderPid = slotfinder:start(CorePid, StationName, LogFile),
     {RecvPid, SendPid, ClockPid, SlotFinderPid, PayloadServerPid}.
@@ -236,9 +236,7 @@ check_sendtime_and_send(SendtimeMS, CurrentTime, IncompleteMessage, PayloadServe
 send_message(IncompleteMessage, PayloadServerPid, SendPid, SendTime, LogFile) ->
     logge_status("Frage nach Payload", LogFile),
     Payload = request_payload(PayloadServerPid),
-    logge_status("Sende Nachricht", LogFile),
-    Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, Payload),
-    SendPid ! {send, Message}.
+    SendPid ! {send, IncompleteMessage, Payload}.
 
 request_payload(PayloadServerPid) ->
     PayloadServerPid ! {self(), getNextPayload},
