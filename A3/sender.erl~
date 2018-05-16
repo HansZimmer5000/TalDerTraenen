@@ -11,9 +11,9 @@ start(McastAddressAtom, ReceivePort, LogFile) ->
     Pid.
 
 create_socket(ReceivePort) ->
-    vsutil:openSe({172,16,1,2}, ReceivePort).
-    %{ok, Socket} = gen_udp:open(0, [binary]),
-    %Socket.
+    %vsutil:openSe({172,16,1,2}, ReceivePort).
+    {ok, Socket} = gen_udp:open(0, [binary]),
+    Socket.
 % --------------------------------------------------
 
 loop(Socket, McastAddressAtom, ReceivePort, LogFile) ->

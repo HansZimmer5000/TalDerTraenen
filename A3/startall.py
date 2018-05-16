@@ -51,9 +51,10 @@ def __start_stations(a_count, b_count):
 
 def __start_stations_via_shell_script(a_count, b_count):
     script = "./startStations.sh"
-    params = "eth0 224.0.0.251 15006"
-    os.system(script + " " + params + " 1 " + str(a_count) + " A 2")
-    os.system(script + " " + params + " " + str(a_count + 1) + " " + str(b_count + a_count) + " B 2")
+    paramsPraktikum = "eth0 224.0.0.251 15006"
+    params = "eth2 225.10.1.2 16000"
+    #os.system(script + " " + params + " 16 " + str(15 + a_count) + " A 0")
+    os.system(script + " " + params + " 16 " + str(15 + b_count) + " B 0")
 
 def __stop_all_stations():
     os.system("./pkillAllStations.sh")
@@ -100,11 +101,11 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
-        __start_stations_via_shell_script(5, 0)
+        __start_stations_via_shell_script(0, 5)
         #__start_node_mac("ns", "nameservice", "")
         #time.sleep(1)
         #__start_node("bench", "benchmark", "")
-        #__start_stations(0,0)
+        #__start_stations(1,0)
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     elif user_input == "4":
