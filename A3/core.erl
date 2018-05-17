@@ -1,7 +1,6 @@
 -module(core).
 
 -export([
-    start/4,
     start/7,
 
     frame_loop/6,
@@ -13,19 +12,16 @@
 
 -define(CLOCKOFFSETMS, 0).
 
-start(StationType, StationName, ClockOffsetMS, LogFile) ->
-    start(StationType, StationName, ClockOffsetMS, empty, empty, empty, LogFile).
-
-start(StationType, StationName, ClockOffsetMS, InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, LogFile) ->
+start(StationType, StationName, ClockOffsetMS, InterfaceAddress, McastAddressAtom, ReceivePortAtom, LogFile) ->
     ReceivePort = erlang:list_to_integer(atom_to_list(ReceivePortAtom)),
     CorePid = self(),
-    Pids = start_other_components(StationName, CorePid, InterfaceNameAtom, McastAddressAtom, ReceivePort, ClockOffsetMS, LogFile),
+    Pids = start_other_components(StationName, CorePid, InterfaceAddress, McastAddressAtom, ReceivePort, ClockOffsetMS, LogFile),
     frame_loop(StationName, StationType, 0, false, Pids, LogFile).
 
-start_other_components(StationName, CorePid, InterfaceNameAtom, McastAddressAtom, ReceivePort, ClockOffsetMS, LogFile) ->
+start_other_components(StationName, CorePid, InterfaceAddress, McastAddressAtom, ReceivePort, ClockOffsetMS, LogFile) ->
     ClockPid = utcclock:start(ClockOffsetMS, self(), StationName, LogFile),
-    RecvPid = receiver:start(self(), ClockPid, InterfaceNameAtom, McastAddressAtom, ReceivePort,LogFile),
-    SendPid = sender:start(McastAddressAtom, ReceivePort, ClockPid, LogFile),
+    RecvPid = receiver:start(self(), ClockPid, InterfaceAddress, McastAddressAtom, ReceivePort,LogFile),
+    SendPid = sender:start(InterfaceAddress, McastAddressAtom, ReceivePort, ClockPid, LogFile),
     PayloadServerPid = payloadserver:start(LogFile),
     SlotFinderPid = slotfinder:start(CorePid, StationName, LogFile),
     {RecvPid, SendPid, ClockPid, SlotFinderPid, PayloadServerPid}.

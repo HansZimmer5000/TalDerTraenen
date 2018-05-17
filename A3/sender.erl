@@ -1,17 +1,17 @@
 -module(sender).
 
 -export([
-    start/4
+    start/5
 ]).
 
-start(McastAddressAtom, ReceivePort, ClockPid, LogFile) ->
-    Socket = create_socket(ReceivePort),
+start(InterfaceAddress,  McastAddressAtom, ReceivePort, ClockPid, LogFile) ->
+    Socket = create_socket(InterfaceAddress, ReceivePort),
     Pid = spawn(fun() -> loop(Socket, McastAddressAtom, ReceivePort, ClockPid, LogFile) end),
     logge_status("Sending to ~p:~p", [McastAddressAtom, ReceivePort], LogFile),
     Pid.
 
-create_socket(ReceivePort) ->
-    vsutil:openSe({172,16,1,2}, ReceivePort).
+create_socket(InterfaceAddress, ReceivePort) ->
+    vsutil:openSe(InterfaceAddress, ReceivePort).
     %{ok, Socket} = gen_udp:open(0, [binary]),
     %Socket.
 % --------------------------------------------------

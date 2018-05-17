@@ -1,27 +1,37 @@
 -module(inettest).
 
--export([test/0]).
+-export([test/1]).
 
-test() ->
+test(InterfaceName) ->
+    find_ipv4_addr_of_interface(InterfaceName).
+
+find_ipv4_addr_of_interface(InterfaceName) ->
     {ok, IfList} = inet:getifaddrs(),
-    go_through_iflist(IfList).
+    case go_through_iflist(InterfaceName, IfList) of
+        not_found -> 
+            io:fwrite("No IfListEntry for InterfaceName~n");
+        Addr -> 
+            io:fwrite("Found Addr: ~p~n", [Addr])
+    end.
 
-go_through_iflist([]) -> done;
-go_through_iflist(IfList) ->
+go_through_iflist(_Name, []) -> not_found;
+go_through_iflist(InterfaceName, IfList) ->
     [CurrentIf | RestIfs] = IfList,
     {CurrentIfName, CurrentIfOpts} = CurrentIf,
-    io:fwrite("Looking for ~p: ", [CurrentIfName]),
-    look_up_for_addr_tupel(CurrentIfOpts),
-    go_through_iflist(RestIfs).
+    case CurrentIfName == InterfaceName of
+        true ->
+            look_up_for_addr_tupel(CurrentIfOpts);
+        false ->
+            go_through_iflist(InterfaceName, RestIfs)
+    end.
 
-look_up_for_addr_tupel([]) -> done;
+look_up_for_addr_tupel([]) -> not_found;
 look_up_for_addr_tupel(IfOpts) ->
     [CurrentIfOpt | RestIfOpts] = IfOpts,
     {CurrentIfOptName, CurrentIfOptValue} = CurrentIfOpt,
     case CurrentIfOptValue of
         {A,B,C,D} when CurrentIfOptName == addr ->
-            io:fwrite("~p~n", [{A,B,C,D}]);
+            {A,B,C,D};
         _ ->
-            nothing
-    end,
-    look_up_for_addr_tupel(RestIfOpts).
+            look_up_for_addr_tupel(RestIfOpts)
+    end.

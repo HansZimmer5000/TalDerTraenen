@@ -12,24 +12,23 @@
 -define(SLOTLENGTHMS, 40).
 
 
-start(CorePid, ClockPid, _InterfaceNameAtom, McastAddressAtom, ReceivePort,LogFile) ->
+start(CorePid, ClockPid, InterfaceAddress, McastAddressAtom, ReceivePort,LogFile) ->
        {ok, McastAddress} = inet_parse:address(atom_to_list(McastAddressAtom)),
-    Socket = vsutil:openRec(McastAddress, {172,16,1,2}, ReceivePort),%create_socket({172,16,1,2}, McastAddressAtom, ReceivePort),
+    Socket = vsutil:openRec(McastAddress, InterfaceAddress, ReceivePort),%create_socket({172,16,1,2}, McastAddressAtom, ReceivePort),
     Pid = spawn(fun() -> listen_loop(CorePid, ClockPid, Socket, LogFile) end),
     logge_status("Listening to ~p:~p", [McastAddressAtom, ReceivePort], LogFile),
     Pid.
 
-create_socket(_InterfaceNameAtom, McastAddressAtom, ReceivePort) ->
-	Interface = {172,16,1,2},
+create_socket(InterfaceAddress, McastAddressAtom, ReceivePort) ->
         {ok, McastAddress} = inet_parse:address(atom_to_list(McastAddressAtom)),
         {ok, Socket} = gen_udp:open(ReceivePort, [
             {mode, binary},
             {reuseaddr, true},
-            {ip, Interface}, %may use Mcast
+            {ip, InterfaceAddress}, %may use Mcast
             {multicast_ttl, 1},
             {multicast_loop, true},
             {broadcast, true},
-            {add_membership, {McastAddress, Interface}},
+            {add_membership, {McastAddress, InterfaceAddress}},
             {active, false}]), %once = dann mit receive Any -> ... end holen
         Socket.
     
