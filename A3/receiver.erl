@@ -38,7 +38,7 @@ listen_loop(CorePid, ClockPid, Socket, LogFile) ->
 listen_to_slots_and_adjust_clock_and_slots(0, _ClockPid, _SlotFinderPid, CorePid, _StationName, _LogFile) ->
     CorePid ! donelistening;
 listen_to_slots_and_adjust_clock_and_slots(RestSlotCount, ClockPid, SlotFinderPid, CorePid, StationName, LogFile) ->
-    {ReceivedMessages, ReceivedTimes} = listen_to_slot(39, [],[], LogFile),
+    {ReceivedMessages, ReceivedTimes} = listen_to_slot(40, [],[], LogFile),
     spawn(fun() -> 
             %logge_status("Received ~p Messages this slot", [length(ReceivedMessages)], LogFile),
             case length(ReceivedMessages) of
@@ -76,7 +76,7 @@ create_socket(InterfaceAddress, McastAddress, ReceivePort) ->
             {active, false}]), %once = dann mit receive Any -> ... end holen
         Socket.
     
-listen_to_slot(RestSlotTime, Messages, ReceivedTimes, _LogFile) when RestSlotTime =< 0 ->
+listen_to_slot(RestSlotTime, Messages, ReceivedTimes, _LogFile) when RestSlotTime =< 1 ->
     {Messages, ReceivedTimes};
 listen_to_slot(RestSlotTime, Messages, ReceivedTimes, LogFile) ->
     StartTime = vsutil:getUTC(),
@@ -85,9 +85,9 @@ listen_to_slot(RestSlotTime, Messages, ReceivedTimes, LogFile) ->
         {receivedmessage, Message, ReceivedTime} ->
             NewMessages = [Message | Messages],
             NewReceivedTimes = [ReceivedTime | ReceivedTimes],
-            NewRestSlotTime = vsutil:getUTC() - StartTime,
+            NewRestSlotTime = 40 - (vsutil:getUTC() - StartTime),
             listen_to_slot(NewRestSlotTime, NewMessages, NewReceivedTimes, LogFile)
-        after RestSlotTime ->  
+        after RestSlotTime - 1 ->  
             %logge_status("Got no receivedmessage this slot", LogFile),
             {Messages, ReceivedTimes}
     end.
