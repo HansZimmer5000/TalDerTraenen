@@ -6,10 +6,9 @@ Zu dem Paket gehoeren die Datein:
     - sender.erl
     - slotfinder.erl
     - station.erl
-    - tunnel.erl
     - utcclock.erl
 
-Sowie Dateien zum testen des Codes und, vom Professor gestellte, Werkzeug dateien ("util").
+Sowie Dateien vom Professor ("util.erl" und "vsutil.erl") und die Datenquelle.
 
 ------------------------
 Starten der Applikation:
@@ -20,7 +19,7 @@ python startall.py
     Danach werden alle .beam Dateien (außer nameservice.beam und *util.beam) geloescht.
     Ist dazu gedacht, schnell zu pruefen ob alle Dateien compilen.
 python startall.py 0
-    Siehe ohne Paramter
+    Siehe ohne Parameter
 python startall.py 1
     Compiled alle .erl Dateien und fuehrt alle Tests aus.
     Loescht danach alle .beam (Ausnahmen siehe ohne Paramter) Dateien.
@@ -32,10 +31,6 @@ python startall.py 3
     Loescht alle .beam (Ausnahmen siehe ohne Paramter), .dump, .log Dateien.
     Raeumt quasi den Ordner auf, so dass nur noch bestimmte .beam Dateien, .cfg und .erl Dateien übrig bleiben.
 
---------------------
-
-Oder wenn Python 3.6 auf Windows vorhanden:
-python startall.py 2
 
 --------------------
 Starten der Station:
