@@ -1,197 +1,140 @@
 -module(core).
 
 -export([
-    start/3,
-    start/4,
+    start/7,
 
-    listen_to_frame/1,
-    listen_to_slot/1,
-
-    notify_when_preperation_and_send_due/3
+    frame_loop/6
 ]).
 
 -define(CLOCKOFFSETMS, 0).
--define(MESSAGEPREPERATIONTIMEMS, 10).
 
-%TODO: They are missing the slots way too often!!!
+% ------------------ Init --------------
+start(StationType, StationName, ClockOffsetMS, InterfaceAddress, McastAddress, ReceivePortAtom, LogFile) ->
+    ReceivePort = erlang:list_to_integer(atom_to_list(ReceivePortAtom)),
+    CorePid = self(),
+    Pids = start_other_components(StationName, CorePid, InterfaceAddress, McastAddress, ReceivePort, ClockOffsetMS, LogFile),
+    frame_loop(StationName, StationType, 0, false, Pids, LogFile).
 
-start(StationType, StationName, LogFile) ->
-    start(StationType, StationName, LogFile, ?CLOCKOFFSETMS).
-
-start(StationType, StationName, LogFile, ClockOffsetMS) ->
-    StationNumberString = lists:sublist(StationName, 9,2),
-    Pids = start_other_components(StationName, StationNumberString, ClockOffsetMS, LogFile),
-    entry_loop(StationName, StationType, Pids, LogFile).
-
-start_other_components(StationName, StationNumberString, ClockOffsetMS, LogFile) ->
-    RecvPid = receiver:start(self(), StationName, LogFile),
-    SendPid = sender:start(LogFile),
+start_other_components(StationName, CorePid, InterfaceAddress, McastAddress, ReceivePort, ClockOffsetMS, LogFile) ->
     ClockPid = utcclock:start(ClockOffsetMS, self(), StationName, LogFile),
-    PayloadServerPid = payloadserver:start(node(), StationNumberString,LogFile),
-    {RecvPid, SendPid, ClockPid, PayloadServerPid}.
+    RecvPid = receiver:start(self(), ClockPid, InterfaceAddress, McastAddress, ReceivePort,LogFile),
+    SendPid = sender:start(InterfaceAddress, McastAddress, ReceivePort, ClockPid, LogFile),
+    PayloadServerPid = payloadserver:start(LogFile),
+    SlotFinderPid = slotfinder:start(CorePid, StationName, LogFile),
+    {RecvPid, SendPid, ClockPid, SlotFinderPid, PayloadServerPid}.
 
-%-----------------------------------
+%---------------- Loop ----------------
 
-entry_loop(StationName, StationType, Pids, LogFile) ->
-    {RecvPid, _SendPid, ClockPid, _PayloadServerPid} = Pids,
-    receive
-        newframe ->
-            ClockPid ! {getcurrenttime, self()},
-            receive 
-                {currenttime, CurrentTime} ->  
-                    logge_status("New Frame Started at ~p", [CurrentTime], LogFile)
+frame_loop(StationName, StationType, CurrentSlotNumber, InSendphase, Pids, LogFile) ->
+    {_RecvPid, SendPid, ClockPid, SlotFinderPid, PayloadServerPid} = Pids,
+    CorePid = self(),
+
+    ClockPid ! {getcurrenttime, CorePid},
+    receive 
+        {currenttime, StationFrameStart} ->  
+            logge_status("New Frame Started at ~p with Slot ~p --------", [StationFrameStart, CurrentSlotNumber], LogFile),
+            SlotFinderPid ! newframe,
+
+            % Will start concurrent start_sending_process if insendphase = true
+            check_insendphase_and_start_sending_process(InSendphase, SendPid, StationFrameStart, CurrentSlotNumber, StationType, CorePid, ClockPid, SlotFinderPid, PayloadServerPid, LogFile),
+            
+            % Will concurrently listen to the received messages and eventually (around frame end) will return {stationwasinvolved, Bool}
+            receiver:listen_to_slots_and_adjust_clock_and_slots(25, ClockPid, SlotFinderPid, CorePid, StationName, LogFile),
+            
+            ClockPid ! {calcdifftime, StationFrameStart, CorePid},
+            case utcclock:get_frame_rest_time(StationFrameStart, ClockPid, LogFile) of
+            ReturnValue when ReturnValue > 0 ->
+                RestFrameTime = ReturnValue;
+            _Else ->
+                RestFrameTime = 0
             end,
-            {Messages, _StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid),
-            SlotNumber = slotfinder:find_slot_in_next_frame(Messages, StationName),
-            logge_status("Received ~p Messages this Frame", [length(Messages)], LogFile),
-            send_loop(StationName, StationType, Pids, SlotNumber, LogFile);
-        Any -> 
-            logge_status("Got Unkown (In Entryphase): ~p", [Any], LogFile),
-            entry_loop(StationName, StationType, Pids, LogFile)
-    end.
-
-send_loop(StationName, StationType, Pids, SlotNumber, LogFile) ->
-    {RecvPid, SendPid, ClockPid, PayloadServerPid} = Pids,
-    receive
-        newframe ->
-            ClockPid ! {getcurrenttime, self()},
-            receive 
-                {currenttime, CurrentTime} ->  
-                    logge_status("New Frame Started with SlotNumber ~p at ~p", [SlotNumber, CurrentTime], LogFile)
-            end,
-            start_sending_process(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile),
-            {Messages, StationWasInvolved} = listen_to_frame_and_adjust_clock(RecvPid, ClockPid),
-            logge_status("Received ~p Messages this Frame", [length(Messages)], LogFile),
-            wait_for_messagewassend_and_handle_loop_end(
-                StationWasInvolved, StationName, StationType, SlotNumber, Pids, LogFile);
-        Any -> 
-            logge_status("Got Unkown (In Sendphase): ~p", [Any], LogFile),
-            send_loop(StationName, StationType, Pids, SlotNumber, LogFile)
-    end.
-
-%-----------------------------------
-
-listen_to_frame_and_adjust_clock(RecvPid, ClockPid) ->
-    {Messages, StationWasInvolved} = listen_to_frame(RecvPid),
-    ClockPid ! {adjust, Messages},
-    {Messages, StationWasInvolved}.
-
-listen_to_frame(RecvPid) ->
-    listen_to_frame(RecvPid, 25, [], false).
-
-listen_to_frame(_RecvPid, 0, Messages, StationWasInvolved) ->
-    {Messages, StationWasInvolved};
-listen_to_frame(RecvPid, RestSlotCount, Messages, StationWasInvolved) ->
-    {ReceivedMessages, ReceivedStationWasInvolved} = listen_to_slot(RecvPid),
-    NewMessages = Messages ++ ReceivedMessages,
-    NewStationWasInvolved = (StationWasInvolved or ReceivedStationWasInvolved),
-    listen_to_frame(RecvPid, RestSlotCount - 1, NewMessages, NewStationWasInvolved).
-
-listen_to_slot(RecvPid) ->
-    RecvPid ! listentoslot,
-    receive
-        {slotmessages, ConvertedSlotMessages, StationWasInvolved} ->
-            {ConvertedSlotMessages, StationWasInvolved}
-    end.
-
-start_sending_process(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile) ->
-    ThisPid = self(),
-    spawn(fun() -> 
-            MessageWasSend = sending_process(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile),
-            ThisPid ! {messagewassend, MessageWasSend}
-        end).
-
-sending_process(SendPid, SlotNumber, StationType, ClockPid, PayloadServerPid, LogFile) ->
-    SendtimeMS = notify_when_preperation_and_send_due(ClockPid, SlotNumber, LogFile),
-    MessageWasSend = wait_for_prepare(StationType, SlotNumber, SendtimeMS, ClockPid, PayloadServerPid, SendPid, LogFile),
-    MessageWasSend.
-
-notify_when_preperation_and_send_due(ClockPid, SlotNumber, _LogFile) ->
-    ClockPid ! {calcslotbeginn, SlotNumber, self()},
-    receive
-        {resultslotbeginn, SendtimeMS} ->
-            ClockPid ! {alarm, preperation, SendtimeMS - ?MESSAGEPREPERATIONTIMEMS, self()},
-            ClockPid ! {alarm, send, SendtimeMS, self()}
-    end,
-    SendtimeMS.
+            logge_status("RestFrameTime = ~p", [RestFrameTime], LogFile),
+            % Will check in which Station is and will act accordingly (Entry- or Sendphase)
+            {NextInSendphase, NextSlotNumber} = check_insendphase_and_return_nextinsendphase_and_nextslotnumber(InSendphase, CorePid, SlotFinderPid, RestFrameTime, LogFile),
 
 
-wait_for_prepare(StationType, SlotNumber, SendtimeMS, ClockPid, PayloadServerPid, SendPid, LogFile) ->
-    receive
-        preperation ->
-            IncompleteMessage = messagehelper:create_incomplete_message(StationType, SlotNumber),
-            MessageWasSend = wait_for_send(SendtimeMS, IncompleteMessage, ClockPid, PayloadServerPid, SendPid, LogFile)
+	    %utcclock:sleep_till_frame_end(StationFrameStart, ClockPid, LogFile)
+	    % Danger! Should be 1000 but if its not something is terrible wrong or its:
+	    %Changes in Offset from Beginn to End are not recognized!
+	    FrameTotalTime = 1000 - utcclock:get_frame_rest_time(StationFrameStart, ClockPid, LogFile),
+            logge_status(
+                "Frame Ended after ~p  with NextInSendphase = ~p", 
+                [FrameTotalTime, NextInSendphase], LogFile),
+            
+            frame_loop(StationName, StationType, NextSlotNumber, NextInSendphase, Pids, LogFile)
+
         after timer:seconds(1) ->
-            logge_status("Timeout preperation", LogFile),
-            MessageWasSend = false
-    end,
-    MessageWasSend.
-
-wait_for_send(SendtimeMS, IncompleteMessage, ClockPid, PayloadServerPid, SendPid, LogFile) ->
-    receive
-        send ->
-            ClockPid ! {getcurrenttime, self()},
-            MessageWasSend = wait_for_currenttime(SendtimeMS, IncompleteMessage, PayloadServerPid, SendPid, LogFile)
-        after timer:seconds(1) ->
-            logge_status("Timeout send", LogFile),
-            MessageWasSend = false
-    end,
-    MessageWasSend.
-
-wait_for_currenttime(SendtimeMS, IncompleteMessage, PayloadServerPid, SendPid, LogFile) ->
-    receive
-        {currenttime, CurrentTime} ->
-            MessageWasSend = check_sendtime_and_send(
-                                SendtimeMS, CurrentTime, IncompleteMessage, PayloadServerPid, SendPid, LogFile)
-        after timer:seconds(1) ->
-            logge_status("Timeout resultdifftime", LogFile),
-            MessageWasSend = false
-    end,
-    MessageWasSend.
-
-check_sendtime_and_send(SendtimeMS, CurrentTime, IncompleteMessage, PayloadServerPid, SendPid, LogFile) ->
-    logge_status("~p (Seti) ~p (Now)", [SendtimeMS, CurrentTime], LogFile),
-    DiffTime = SendtimeMS - CurrentTime,
-    case DiffTime of
-        DiffTime when DiffTime >= 40 -> 
-            logge_status("SendTime in the future: ~p", [DiffTime], LogFile),
-            timer:sleep(DiffTime - 40), %So he wakes up in the beginning of the slot
-            send_message(IncompleteMessage, PayloadServerPid, SendPid, CurrentTime, LogFile),
-            MessageWasSend = true;
-        DiffTime when DiffTime =< -40 -> 
-            logge_status("SendTime in the past: ~p", [DiffTime], LogFile),
-            MessageWasSend = false; 
-        DiffTime -> 
-            logge_status("SendTime is now: ~p", [DiffTime], LogFile),
-            send_message(IncompleteMessage, PayloadServerPid, SendPid, CurrentTime,LogFile),
-            MessageWasSend = true
-    end,
-    MessageWasSend.
-
-send_message(IncompleteMessage, PayloadServerPid, SendPid, SendTime, _LogFile) ->
-    Payload = request_payload(PayloadServerPid),
-    Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, Payload),
-    SendPid ! {send, Message}.
-
-request_payload(PayloadServerPid) ->
-    PayloadServerPid ! {self(), getNextPayload},
-    receive
-        {payload, Payload} ->
-            Payload
+            logge_status("Currenttime from Clock not within 1 second", LogFile),
+            frame_loop(StationName, StationType, 0, false, Pids, LogFile)
     end.
 
-wait_for_messagewassend_and_handle_loop_end(StationWasInvolved, StationName, StationType, SlotNumber, Pids, LogFile) ->
+%---------------- Internal Functions ---------------
+check_insendphase_and_start_sending_process(InSendphase, SendPid, StationFrameStart, CurrentSlotNumber, StationType, CorePid, ClockPid, SlotFinderPid, PayloadServerPid, LogFile) -> 
+    case InSendphase of
+        true ->
+            sender:start_sending_process(CorePid, SendPid, StationFrameStart, CurrentSlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile);
+        false ->
+            continue
+    end.
+
+check_insendphase_and_return_nextinsendphase_and_nextslotnumber(InSendphase, CorePid, SlotFinderPid, RestFrameTime, LogFile) ->
+    case InSendphase of
+            false ->
+                % Entryphase
+		receive 
+			donelistening -> continue
+		end,
+                {NextInSendphase, NextSlotNumber} = get_nextinsendphase_and_nextslotnumber(CorePid, SlotFinderPid, RestFrameTime, LogFile);
+            true -> 
+                % Sendphase
+                {NextInSendphase, NextSlotNumber} = handle_sendphase_messages(RestFrameTime, LogFile),
+		receive 
+			donelistening -> continue
+		end
+    end,
+    {NextInSendphase, NextSlotNumber}.
+
+get_nextinsendphase_and_nextslotnumber(CorePid, SlotFinderPid, RestFrameTime, LogFile) ->
+    SlotFinderPid ! {getFreeSlotNum, CorePid},
+    receive 
+        {slotnum, NextSlotNumber} -> 
+            NextInSendphase = true
+        after RestFrameTime -> 
+            NextSlotNumber = 0,
+            NextInSendphase = false,
+            logge_status("Never received Slotnumber", LogFile)
+    end,
+    {NextInSendphase, NextSlotNumber}.
+
+handle_sendphase_messages(RestFrameTime, LogFile) ->
     receive
-        {messagewassend, MessageWasSend} -> 
-            logge_status("Send_Loop end with ~p (Involved) ~p (Send)",[StationWasInvolved, MessageWasSend], LogFile),
-            case (StationWasInvolved or not(MessageWasSend)) of
+            {messagewassend, MessageWasSend, ReceivedNextSlotNumber} -> 
+                {NextInSendphase, NextSlotNumber} = wait_for_stationwasinvolved_and_return_nextinsendphase_and_nextslotnumber(MessageWasSend, ReceivedNextSlotNumber, RestFrameTime, LogFile)
+            after RestFrameTime ->
+                logge_status("Messagewassend was never received", LogFile),
+                NextInSendphase = false,
+                NextSlotNumber = 0
+    end,
+    {NextInSendphase, NextSlotNumber}.
+
+wait_for_stationwasinvolved_and_return_nextinsendphase_and_nextslotnumber(MessageWasSend, ReceivedNextSlotNumber, RestFrameTime, LogFile) ->
+    receive 
+        {stationwasinvolved, true} ->
+            logge_status("Send_Loop end with ~p (Involved) ~p (Send)",[true, MessageWasSend], LogFile),
+            NextInSendphase = false,
+            NextSlotNumber = 0
+        after RestFrameTime -> 
+            logge_status("stationwasinvolved,true was never received", LogFile),
+            case MessageWasSend of
                 true ->
-                    entry_loop(StationName, StationType, Pids, LogFile);
+                    NextInSendphase = true,
+                    NextSlotNumber = ReceivedNextSlotNumber;
                 false ->
-                    send_loop(StationName, StationType, Pids, SlotNumber, LogFile)
+                    NextInSendphase = false,
+                    NextSlotNumber = 0
             end
-    end.
-
+    end,
+    {NextInSendphase, NextSlotNumber}.
 %------------------------------------------
 logge_status(Text, Input, LogFile) ->
     Inhalt = io_lib:format(Text,Input),

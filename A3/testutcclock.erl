@@ -8,7 +8,10 @@
 start_1_test() ->
     OffsetMS = ?DEFAULTOFFSETMS,
     ThisPid = self(),
-    TestPid = utcclock:start(OffsetMS,ThisPid, "testclock.log"),
+    CorePid = ThisPid,
+    StationName = "team 06-01",
+    LogFile = "testutc.log",
+    TestPid = utcclock:start(OffsetMS, CorePid, StationName, LogFile),
     TestPid ! {adjust, []},
     TestPid ! {getcurrentoffsetms, self()},
     receive
@@ -20,71 +23,69 @@ start_1_test() ->
     kill_pid_and_clear_this_box(TestPid).
 
 adjust_1_test() ->
-    Starttime = 0,
     OffsetMS = ?DEFAULTOFFSETMS,
     Messages = [],
+    TransportTupel = {"team 06-01", 0, 0},
     LogFile = "testutc.log",
     ?assertEqual(
-        OffsetMS, 
-        utcclock:adjust(Starttime, OffsetMS, Messages, LogFile)).
+        {OffsetMS, TransportTupel}, 
+        utcclock:adjust(OffsetMS, Messages, TransportTupel, LogFile)).
 
 adjust_2_test() ->
-    Starttime = 0,
     OffsetMS = ?DEFAULTOFFSETMS,
-    Message1 = {{"A", "-team-0602-", "123456789012-", 4, 77394825}, 77394825},
+    Message1 = {{"A", "team 06-02", "123456789012-", 4, 77394825}, 77394825},
     Messages = [Message1],
+    TransportTupel = {"team 06-01", 0, 0},
     LogFile = "testutc.log",
     ?assertEqual(
-        0, 
-        utcclock:adjust(Starttime, OffsetMS, Messages, LogFile)).
+        {0, TransportTupel}, 
+        utcclock:adjust(OffsetMS, Messages, TransportTupel, LogFile)).
 
 adjust_3_test() ->
-    Starttime = 0,
     OffsetMS = ?DEFAULTOFFSETMS,
-    Message1 = {{"B", "-team-0602-", "123456789012-", 4, 0}, 77394825},
+    Message1 = {{"B", "team 06-02", "123456789012-", 4, 0}, 77394825},
     Messages = [Message1],
+    TransportTupel = {"team 06-01", 0, 0},
     LogFile = "testutc.log",
     ?assertEqual(
-        OffsetMS, 
-        utcclock:adjust(Starttime, OffsetMS, Messages, LogFile)).
+        {OffsetMS, TransportTupel}, 
+        utcclock:adjust(OffsetMS, Messages, TransportTupel, LogFile)).
 
 adjust_4_test() ->
-    Starttime = 0,
     OffsetMS = ?DEFAULTOFFSETMS,
-    Message1 = {{"A", "-team-0602-", "123456789012-", 4, 0}, 1},
-    Message2 = {{"A", "-team-0602-", "123456789012-", 4, 0}, 2},
-    Message3 = {{"A", "-team-0602-", "123456789012-", 4, 0}, 3},
-    Message4 = {{"A", "-team-0602-", "123456789012-", 4, 0}, 4},
-    Message5 = {{"B", "-team-0602-", "123456789012-", 4, 0}, 77394825},
+    Message1 = {{"A", "team 06-02", "123456789012-", 4, 0}, 1},
+    Message2 = {{"A", "team 06-02", "123456789012-", 4, 0}, 2},
+    Message3 = {{"A", "team 06-02", "123456789012-", 4, 0}, 3},
+    Message4 = {{"A", "team 06-02", "123456789012-", 4, 0}, 4},
+    Message5 = {{"B", "team 06-02", "123456789012-", 4, 0}, 77394825},
     Messages = [Message1, Message2, Message3, Message4, Message5],
+    TransportTupel = {"team 06-01", 0, 0},
     LogFile = "testutc.log",
     ?assertEqual(
-        0, 
-        utcclock:adjust(Starttime, OffsetMS, Messages, LogFile)).
+        {-3, TransportTupel}, 
+        utcclock:adjust(OffsetMS, Messages, TransportTupel, LogFile)).
 
-check_frame_1_test() ->
-    ThisPid = self(),
-    Starttime = vsutil:getUTC(),
-    FrameCount = 0,
-    utcclock:check_frame(Starttime, 0, FrameCount, ThisPid),
-    receive
-        _Any -> 
-            ?assert(false)
-        after 50 ->
-            ?assert(true)
-    end.
+adjust_5_test() ->
+    OffsetMS = ?DEFAULTOFFSETMS,
+    Message1 = {{"A", "team 06-01", "123456789012-", 4, 0}, -?DEFAULTOFFSETMS + 1},
+    Message2 = {{"A", "team 06-02", "123456789012-", 4, 0}, 2},
+    Messages = [Message1, Message2],
+    TransportTupel = {"team 06-01", 0, 0},
+    LogFile = "testutc.log",
+    ?assertEqual(
+        {4, {"team 06-01", 1, 1}}, 
+        utcclock:adjust(OffsetMS, Messages, TransportTupel, LogFile)).
 
-check_frame_2_test() ->
-    ThisPid = self(),
-    Starttime = vsutil:getUTC(),
-    FrameCount = -1,
-    utcclock:check_frame(Starttime, 0, FrameCount, ThisPid),
-    receive
-        Any -> 
-            ?assertEqual(newframe, Any)
-        after 50 ->
-            ?assert(false)
-    end.
+adjust_6_test() ->
+    OffsetMS = ?DEFAULTOFFSETMS,
+    Message1 = {{"A", "team 06-02", "123456789012-", 4, 0}, 2},
+    Message2 = {{"A", "team 06-01", "123456789012-", 4, 0}, -?DEFAULTOFFSETMS + 1},
+    Messages = [Message1, Message2],
+    TransportTupel = {"team 06-01", 0, 0},
+    LogFile = "testutc.log",
+    ?assertEqual(
+        {4, {"team 06-01", 1, 1}}, 
+        utcclock:adjust(OffsetMS, Messages, TransportTupel, LogFile)).
 
 new_frame_started_1_test() ->
     CurrentTime = 0,
@@ -111,43 +112,52 @@ new_frame_started_4_test() ->
     ?assert(NewFrameStarted).
 
 get_current_time_1_test() ->
-    Starttime = vsutil:getUTC(),
     OffsetMS = 0,
-    ?assertEqual(
-        0,
-        utcclock:get_current_time(Starttime, OffsetMS)
+    CurrentTime = utcclock:get_current_time(OffsetMS),
+    Now = vsutil:getUTC(),
+    Diff = Now - CurrentTime,
+    io:fwrite("~p", [Diff]),
+    ?assert(
+        (Diff >= 0) and (Diff =< 1) %Sleeping needs some additional time.
     ).
 
 get_current_time_2_test() ->
-    Starttime = vsutil:getUTC(),
     OffsetMS = 0,
+    CurrentTime = utcclock:get_current_time(OffsetMS),
     timer:sleep(100),
-    CurrentTime = utcclock:get_current_time(Starttime, OffsetMS),
+    Now = vsutil:getUTC(),
+    Diff = Now - CurrentTime,
+    io:fwrite("~p", [Diff]),
     ?assert(
-        (CurrentTime >= 100) and (CurrentTime < 111) %Sleeping needs some additional time.
+        (Diff >= 100) or (Diff =< 102) %Sleeping needs some additional time.
     ).
 
 get_current_time_3_test() ->
-    Starttime = vsutil:getUTC(),
     OffsetMS = 10,
-    ?assertEqual(
-        10,
-        utcclock:get_current_time(Starttime, OffsetMS)
+    CurrentTime = utcclock:get_current_time(OffsetMS),
+    Now = vsutil:getUTC(),
+    Diff = Now - CurrentTime,
+    io:fwrite("~p", [Diff]),
+    ?assert(
+        (Diff == -10) or (Diff == -9) %Sleeping needs some additional time.
     ).
-
-calc_slot_beginn_this_frame_time_1_test() ->
-    FrameCount = 0,
+calc_slot_mid_this_frame_time_1_test() ->
+    FrameStart = 0,
     SlotNumber = 1,
-    ?assertEqual(
-        00, 
-        utcclock:calc_slot_beginn_this_frame_time(FrameCount, SlotNumber)).
+    LogFile = "testutc.log",
+    SlotMid = utcclock:calc_slot_mid_this_frame_time(FrameStart, SlotNumber, LogFile),
+    Diff = SlotMid - 20 - FrameStart,
+    io:fwrite("~p", [Diff]),
+    ?assert((Diff == 0) or (Diff == 1)).
 
-calc_slot_beginn_this_frame_time_2_test() ->
-    FrameCount = 1,
+calc_slot_mid_this_frame_time_2_test() ->
+    FrameStart = 7,
     SlotNumber = 25,
-    ?assertEqual(
-        1960, 
-        utcclock:calc_slot_beginn_this_frame_time(FrameCount, SlotNumber)).
+    LogFile = "testutc.log",
+    SlotMid = utcclock:calc_slot_mid_this_frame_time(FrameStart, SlotNumber, LogFile),
+    Diff = SlotMid - 980 - FrameStart,
+    io:fwrite("~p", [Diff]),
+    ?assert((Diff == 0) or (Diff == 1)).
 
 set_alarm_1_test() ->
     AlarmMessage = send,

@@ -5,24 +5,42 @@
 start_1_test() ->
     StationName = "Station1",
     ThisPid = self(),
-    TestPid = receiver:start(ThisPid, StationName, "testrecv.log", ThisPid),
+    CorePid = self(),
+    InterfaceNameAtom = '127.0.0.1',
+    McastAddressAtom = '224.0.0.251',
+    ReceivePort = 15006,
+    LogFile = "testreceiver.log",
+    TestPid = receiver:start(CorePid, StationName, InterfaceNameAtom, McastAddressAtom, ReceivePort,LogFile),
+    TestPid ! listentoslot,
     receive
         Any ->
-            {enlist, Pid} = Any,
-            ?assertEqual(TestPid, Pid)
-        after timer:seconds(1) ->
+            {slotmessages, SlotMessages, StationWasInvolved} = Any,
+            ?assertEqual([], SlotMessages),
+            ?assertNot(StationWasInvolved)
+        after timer:seconds(41) ->
             ?assert(false)
     end.
+
+create_socket_1_test() ->
+    io:fwrite("Not implemented yet"),
+    ?assert(false).
 
 listen_to_slot_1_test() ->
     StationName = "Station1",
     SendTimeBinary = <<0,0,1,98,108,153,173,43>>,
     Message2AsByte = <<"Ateam 06-021234567890123-", 25, SendTimeBinary/binary>>,
     ThisPid = self(),
-    TestPid = spawn(fun() ->
-                        receiver:listen_to_slot(ThisPid, StationName, "testrecv.log")
+    CorePid = ThisPid,
+    InterfaceNameAtom = '0,0,0,0',
+    McastAddressAtom = '224.0.0.251',
+    ReceivePort = 15006,
+    Socket = receiver:create_socket(InterfaceNameAtom, McastAddressAtom, ReceivePort),
+    LogFile = "testreceiver.log",
+    _TestPid = spawn(fun() ->
+                        receiver:listen_to_slot(CorePid, StationName, Socket, LogFile)
                     end),
-    TestPid ! {udp, empty, empty, empty, Message2AsByte},
+    io:fwrite("TODO: Send message!"),
+    ?assert(false),
 
     receive 
         Any -> 
@@ -37,19 +55,30 @@ listen_to_slot_1_test() ->
     end.
 
 listen_to_slot_2_test() ->
-    StationName = "Station1",
-    ThisPid = self(),
-    _TestPid = spawn(fun() ->
-                        receiver:listen_to_slot(ThisPid, StationName, "testrecv.log")
-                    end),
-    receive 
-        Any -> 
-            {slotmessages, ConvertedMessages, StationWasInvolved} = Any,
-            ?assertEqual([], ConvertedMessages),
-            ?assertEqual(false, StationWasInvolved)
-        after timer:seconds(1) -> 
-            ?assert(false)
-    end.
+        StationName = "Station1",
+        ThisPid = self(),
+        CorePid = ThisPid,
+        InterfaceNameAtom = '0,0,0,0',
+        McastAddressAtom = '224.0.0.251',
+        ReceivePort = 15006,
+        Socket = receiver:create_socket(InterfaceNameAtom, McastAddressAtom, ReceivePort),
+        LogFile = "testreceiver.log",
+        StartZeit = vsutil:getUTC(),
+        _TestPid = spawn(fun() ->
+                            receiver:listen_to_slot(CorePid, StationName, Socket, LogFile)
+                        end),
+        receive 
+            Any -> 
+                EndZeit = vsutil:getUTC(),
+                {slotmessages, ConvertedMessages, StationWasInvolved} = Any,
+                ?assertEqual([], ConvertedMessages),
+                ?assertEqual(false, StationWasInvolved),
+                DiffZeit = EndZeit - StartZeit,
+                io:fwrite("~p, ~p, ~p", [DiffZeit, StartZeit rem 10000, EndZeit rem 10000]),
+                ?assert((DiffZeit >= 40) and (DiffZeit =< 41))
+            after timer:seconds(1) -> 
+                ?assert(false)
+        end.
 
 loop_1_test() ->
     ThisPid = self(),

@@ -1,67 +1,95 @@
 -module(receiver).
 
 -export([
-    start/3,
-    start/4,
+    start/6,
+    create_socket/3,
     
-    loop/3,
-    listen_to_slot/3,
+    listen_loop/4,
 
-    collision_happend/3,
-    send_to_core/5
+    listen_to_slots_and_adjust_clock_and_slots/6,
+    collision_happend/3
 ]).
-
--define(NSNODE, hole_wert_aus_config_mit_key(node)).
--define(NSNAME, nameservice).
 
 -define(SLOTLENGTHMS, 40).
 
-
-start(CorePid, StationName, LogFile) ->
-    start(CorePid, StationName, LogFile, {?NSNAME, ?NSNODE}).
-
-start(CorePid, StationName, LogFile, NsPid) ->
-    Pid = spawn(fun() -> loop(CorePid, StationName, LogFile) end),
-    NsPid ! {enlist, Pid},
-    logge_status("starte", LogFile),
+% -------------------- Init --------------------------
+start(CorePid, ClockPid, InterfaceAddress, McastAddress, ReceivePort,LogFile) ->
+    Socket = create_socket_klc(InterfaceAddress, McastAddress, ReceivePort),
+    Pid = spawn(fun() -> listen_loop(CorePid, ClockPid, Socket, LogFile) end),
+    logge_status("Listening to ~p:~p", [McastAddress, ReceivePort], LogFile),
     Pid.
-
+    
 % --------------------------------------------------
 
-loop(CorePid, StationName, LogFile) ->
-    receive
-        {udp, _Socket0, _Ip0, _Port0, Message} ->
-            logge_status("Missed Message: ~p in loop", [Message], LogFile);
-        listentoslot -> 
-            listen_to_slot(CorePid, StationName, LogFile);
-        Any -> 
-            logge_status("Got: ~p in loop", [Any], LogFile)
+listen_loop(CorePid, ClockPid, Socket, LogFile) ->
+    case gen_udp:recv(Socket, 0) of
+        {ok, {_Address, _Port, Message}} ->
+            ClockPid ! {getcurrenttime, self()},
+            receive
+                {currenttime, CurrentTime} ->
+                    CorePid ! {receivedmessage, Message, CurrentTime}
+            end;
+        {error, _Reason} ->
+            nothing
     end,
-    loop(CorePid, StationName, LogFile).
+    listen_loop(CorePid, ClockPid, Socket, LogFile).
 
-listen_to_slot(CorePid, StationName, LogFile) ->
-    ConvertedSlotMessages = get_converted_slot_messages(LogFile),
+% ---------- Exported Functions -------------
+listen_to_slots_and_adjust_clock_and_slots(0, _ClockPid, _SlotFinderPid, CorePid, _StationName, _LogFile) ->
+    CorePid ! donelistening;
+listen_to_slots_and_adjust_clock_and_slots(RestSlotCount, ClockPid, SlotFinderPid, CorePid, StationName, LogFile) ->
+    {ReceivedMessages, ReceivedTimes} = listen_to_slot(39, [],[], LogFile),
+    spawn(fun() -> 
+            %logge_status("Received ~p Messages this slot", [length(ReceivedMessages)], LogFile),
+            case length(ReceivedMessages) of
+                0 ->
+                    CorePid ! {stationwasinvolved, false};
+                _Any ->
+                    ConvertedMessages = messagehelper:convert_received_messages_from_byte(ReceivedMessages, ReceivedTimes),
+                    {CollisionHappend, StationWasInvolved} = receiver:collision_happend(ConvertedMessages, StationName, LogFile),
+                    case CollisionHappend of
+                        true -> 
+                            CorePid ! {stationwasinvolved, StationWasInvolved};
+                        false ->
+                            ClockPid ! {adjust, ConvertedMessages},
+                            SlotFinderPid ! {newmessages, ConvertedMessages},
+                            CorePid ! {stationwasinvolved, StationWasInvolved}
+                    end
+            end
+        end),
+    %logge_status("Got SlotMessages at ~p", [vsutil:getUTC() - FrameStart], LogFile),
+    listen_to_slots_and_adjust_clock_and_slots(RestSlotCount - 1, ClockPid, SlotFinderPid, CorePid, StationName, LogFile).
 
-    {CollisionHappend, StationWasInvolved} = collision_happend(ConvertedSlotMessages, StationName, LogFile),
-    send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile).
+% ------------ Internal Functions ---------
+create_socket_klc(InterfaceAddress, McastAddress, ReceivePort) ->
+    vsutil:openRec(McastAddress, InterfaceAddress, ReceivePort).
 
-get_converted_slot_messages(LogFile) ->
-    timer:send_after(?SLOTLENGTHMS, self(), stop_listening),
-    {SlotMessages, ReceivedTimes} = listen([], [], LogFile),
-    ConvertedSlotMessages = messagehelper:convert_received_messages_from_byte(SlotMessages, ReceivedTimes),
-    ConvertedSlotMessages.
-
-listen(SlotMessages, ReceivedTimes, LogFile) ->
+create_socket(InterfaceAddress, McastAddress, ReceivePort) ->
+        {ok, Socket} = gen_udp:open(ReceivePort, [
+            {mode, binary},
+            {reuseaddr, true},
+            {ip, InterfaceAddress}, %may use Mcast
+            {multicast_ttl, 1},
+            {multicast_loop, true},
+            {broadcast, true},
+            {add_membership, {McastAddress, InterfaceAddress}},
+            {active, false}]), %once = dann mit receive Any -> ... end holen
+        Socket.
+    
+listen_to_slot(RestSlotTime, Messages, ReceivedTimes, _LogFile) when RestSlotTime =< 0 ->
+    {Messages, ReceivedTimes};
+listen_to_slot(RestSlotTime, Messages, ReceivedTimes, LogFile) ->
+    StartTime = vsutil:getUTC(),
+    %logge_status("Waiting for next receivedmessage", LogFile),
     receive
-        {udp, _Socket0, _Ip0, _Port0, Message} -> 
-            NewSlotMessages = [Message | SlotMessages],
-            NewReceivedTimes = [vsutil:getUTC() | ReceivedTimes],
-            listen(NewSlotMessages, NewReceivedTimes, LogFile);
-        stop_listening ->
-            {SlotMessages, ReceivedTimes};
-        Any -> 
-            logge_status("Got: ~p in listen_to_slot", [Any], LogFile),
-            listen(SlotMessages, ReceivedTimes, LogFile)
+        {receivedmessage, Message, ReceivedTime} ->
+            NewMessages = [Message | Messages],
+            NewReceivedTimes = [ReceivedTime | ReceivedTimes],
+            NewRestSlotTime = vsutil:getUTC() - StartTime,
+            listen_to_slot(NewRestSlotTime, NewMessages, NewReceivedTimes, LogFile)
+        after RestSlotTime ->  
+            %logge_status("Got no receivedmessage this slot", LogFile),
+            {Messages, ReceivedTimes}
     end.
 
 collision_happend(ConvertedSlotMessages, StationName, LogFile) ->
@@ -73,18 +101,6 @@ collision_happend(ConvertedSlotMessages, StationName, LogFile) ->
             StationWasInvolved = station_was_involved(ConvertedSlotMessages, StationName, LogFile),
             {true, StationWasInvolved}
     end.
-
-send_to_core(ConvertedSlotMessages, CollisionHappend, StationWasInvolved, CorePid, LogFile) ->
-    case CollisionHappend of
-        true ->
-            CorePid ! {slotmessages, [], StationWasInvolved},
-
-            %TODO: make better logging for this, don't print all the messages just the necessary infos
-            logge_status("(Involved: ~p) Collision detected in: ~p", [StationWasInvolved, ConvertedSlotMessages], LogFile);
-        false ->
-            CorePid ! {slotmessages, ConvertedSlotMessages, StationWasInvolved}
-    end.
-
 
 station_was_involved([], StationName, LogFile) ->
     logge_status("Wasn't Involved: ~p", [StationName], LogFile),
@@ -110,9 +126,4 @@ logge_status(Inhalt, LogFile) ->
     LogNachricht = io_lib:format("~p - Recv ~s.\n", [AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(LogFile, LogNachricht).
-
-hole_wert_aus_config_mit_key(Key) ->
-    {ok, ConfigListe} = file:consult('nameservice.cfg'),
-    {ok, Value} = vsutil:get_config_value(Key, ConfigListe),
-    Value.
 

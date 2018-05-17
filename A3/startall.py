@@ -30,15 +30,39 @@ def __start_node_mac(nodename, modulename, parameter):
     command = "osascript -e " + "'" + "tell application " + '"' + "Terminal" + '"'+ " to do script " + '"' + erlcommand + '"' + "'"
     os.system(command)
 
-def __start_stations(count):
-    while(count > 0):
-        count_str = str(count)
+def __start_stations(a_count, b_count):
+    total_a_count = a_count
+    while(a_count > 0):
+        a_count_str = str(a_count)
         stationname = "team-06-"
-        if(count < 10):
+        if(a_count < 10):
             stationname = stationname + "0"
-        stationname = stationname + count_str
-        __start_node_mac("station" + count_str, "station", "A " + stationname)
-        count = count - 1
+        stationname = stationname + a_count_str
+        __start_node_mac("station" + a_count_str, "station", "A " + stationname)
+        a_count = a_count - 1
+    while(b_count > 0):
+        b_count_str = str(b_count + total_a_count)
+        stationname = "team-06-"
+        if(b_count < 10):
+            stationname = stationname + "0"
+        stationname = stationname + b_count_str
+        __start_node_mac("station" + b_count_str, "station", "B " + stationname)
+        b_count = b_count - 1
+
+def __start_stations_via_shell_script(a_count, b_count):
+    offset = 0	
+    a_start = 1 + offset
+    a_last = a_start + a_count - 1
+    b_start = a_start + a_count
+    b_last = b_start + b_count - 1
+    script = "./startStations.sh"
+    paramsPraktikum = "eth0 224.0.0.251 15006"
+    params = "eth2 225.10.1.2 16000"
+    os.system(script + " " + params + " " + str(a_start) + " " + str(a_last) + " A 0")
+    os.system(script + " " + params + " " + str(b_start) + " " + str(b_last) + " B 0")
+
+def __stop_all_stations():
+    os.system("./pkillAllStations.sh")
 
 def __start_normal_shell(nodename):
     os.system("start erl -sname " + nodename)
@@ -72,7 +96,7 @@ if __name__ == "__main__":
         __make_all_modules()
     elif user_input == "1":
         __make_all_modules()
-        __remove_all_unecessary_files([".log"])
+        __clear_all_log_files_in_current_dir()
         test_modulenames = __get_all_test_modulenames()
         for modulename in test_modulenames:
             pointIndex = modulename.find(".")
@@ -82,11 +106,14 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
-        __start_node_mac("ns", "nameservice", "")
-        time.sleep(1)
+        __start_stations_via_shell_script(5, 0)
+        #__start_node_mac("ns", "nameservice", "")
+        #time.sleep(1)
         #__start_node("bench", "benchmark", "")
-        __start_stations(5)
+        #__start_stations(1,0)
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
+    elif user_input == "4":
+        __stop_all_stations()
     else:
         print("Argument: '" + user_input + "' unkonwn.")

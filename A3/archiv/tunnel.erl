@@ -17,9 +17,9 @@
 
 test() ->
     spawn(fun() -> receive0() end),
-    %spawn(fun() -> receive0() end),
+    spawn(fun() -> receive0() end),
     timer:sleep(timer:seconds(1)),
-    %spawn(fun() -> send0() end),
+    spawn(fun() -> send0() end),
     spawn(fun() -> send0() end).
 
 receive0() ->

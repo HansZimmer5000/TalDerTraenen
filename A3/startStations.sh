@@ -49,7 +49,7 @@ teamNo="6"
 # Example:    dataSource="~/somewhere/DataSource"
 #         or  dataSource="java -cp . datasource.DataSource"
 ########################################################################################################
-dataSource="java -cp . vessel3.Vessel"
+dataSource="./Gegeben/datasource/64bit/Vessel3"
 
 ########################################################################################################
 # TODO: Enter your station's start command.
@@ -57,12 +57,12 @@ dataSource="java -cp . vessel3.Vessel"
 #
 # Example: stationCmd="java aufgabe4.MyStation $interfaceName $mcastAddress $receivePort $stationClass"
 ########################################################################################################
-stationCmd="erl -noshell -sname station $interfaceName $mcastAddress $receivePort $stationClass"
+stationCmd="erl -noshell -s station start $interfaceName $mcastAddress $receivePort $stationClass $UTCoffsetMs"
 #erl -noshell -sname " + nodename + " -s " + modulename + " start" + " " + parameter
 
 printUsage() {
 	echo "Usage: $0 <interface> <multicast-address> <receive-port> <from-station-index> <to-station-index> <station-class> [ <UTC-offset-(ms)> ]"
-	echo "Example: $0 eth2 225.10.1.2 16000 1 10 A 2"
+	echo "Example: $0 eth2 224.0.0.251 15006 1 10 A 2"
 }
 
 variableNames="teamNo, dataSource and stationCmd"
@@ -79,7 +79,7 @@ then
 				for i in `seq $firstIndex $lastIndex`
 				do
 					# Launching data source and station.
-					$dataSource $teamNo $i | $stationCmd &
+					$dataSource $teamNo $i 4 | $stationCmd $i &
 					#
 					# If your are annoyed by all the output, try this instead:
 					#  $dataSource $teamNo $i | $stationCmd > /dev/null 2>&1 &

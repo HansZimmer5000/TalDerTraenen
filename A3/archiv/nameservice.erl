@@ -10,26 +10,25 @@
 start() ->
     logge_status("nameservice gestartet"),
     register(?NSNAME, self()),
-    Starttime = vsutil:getUTC(),
-    spawn(fun() -> new_frame_loop(Starttime) end),
-    receive_loop([], Starttime).
+    spawn(fun() -> new_frame_loop() end),
+    receive_loop([]).
 
-new_frame_loop(Starttime) ->
+new_frame_loop() ->
     DiffTime = 1000 - vsutil:getUTC() rem 1000,
     timer:sleep(DiffTime), %Its about 5 MS behind the second on average
-    logge_status("--- New Frame at ~p ---", [vsutil:getUTC() - Starttime]),
-    new_frame_loop(Starttime).
+    logge_status("--- New Frame at ~p ---", [vsutil:getUTC()]),
+    new_frame_loop().
 
-receive_loop(StationPids, Starttime) ->
+receive_loop(StationPids) ->
     receive
         {enlist, Pid} ->    logge_status("got enlist"),
                             NewStationPids = enlist(StationPids, Pid),
-                            receive_loop(NewStationPids, Starttime);
+                            receive_loop(NewStationPids);
         {multicast, Message} ->     multicast(StationPids, Message),
-                                    spawn(fun() -> print_message(Message, Starttime) end),
-                                    receive_loop(StationPids, Starttime);
+                                    spawn(fun() -> print_message(Message) end),
+                                    receive_loop(StationPids);
         Any ->  logge_status(io_lib:format("Got: ~p", [Any])),
-                receive_loop(StationPids, Starttime)
+                receive_loop(StationPids)
     end.
 
 enlist(StationPids, NewPid) ->
@@ -43,15 +42,15 @@ multicast(StationPids, Message) ->
     multicast(RestStationPids, Message).
 %-------------
 
-print_message(Message, Starttime) -> 
-    [ConvertedMessage] = messagehelper:convert_received_messages_from_byte([Message],[vsutil:getUTC() - Starttime]),
+print_message(Message) -> 
+    [ConvertedMessage] = messagehelper:convert_received_messages_from_byte([Message],[vsutil:getUTC()]),
     StationType = messagehelper:get_station_type(ConvertedMessage),
     StationName = messagehelper:get_station_name(ConvertedMessage),
     Slotnumber = messagehelper:get_slotnumber(ConvertedMessage),
     SendTime = messagehelper:get_sendtime(ConvertedMessage),
     logge_status(
-        "~p(~p) in Slot ~p at ~p (~pms since Send)", 
-        [StationName, StationType, Slotnumber, SendTime, SendTime - (vsutil:getUTC() - Starttime)]).
+        "~p(~p) in Slot ~p at ~p", 
+        [StationName, StationType, Slotnumber, SendTime]).
 
 
 %--------------
