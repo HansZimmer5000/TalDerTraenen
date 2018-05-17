@@ -79,9 +79,7 @@ then
 				for i in `seq $firstIndex $lastIndex`
 				do
 					# Launching data source and station.
-					$dataSource $teamNo $i | $stationCmd $i &
-					#$dataSource $teamNo $i | ${stationCmd:0:23}$i${stationCmd:23} &
-					#${time:0:2}:${time:2:2}:${time:4:2}
+					$dataSource $teamNo $i 4 | $stationCmd $i &
 					#
 					# If your are annoyed by all the output, try this instead:
 					#  $dataSource $teamNo $i | $stationCmd > /dev/null 2>&1 &

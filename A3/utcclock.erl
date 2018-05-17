@@ -89,17 +89,22 @@ get_frame_rest_time(StationFrameStart, ClockPid, LogFile) ->
 
 sleep_till_frame_end(StationFrameStart, ClockPid, LogFile) ->
     case get_frame_rest_time(StationFrameStart, ClockPid, LogFile) of 
-        RestFrameTime when RestFrameTime > 0 ->
-            timer:sleep(RestFrameTime - 1);
+        RestFrameTime when RestFrameTime > 1 ->
+	    StartTime = vsutil:getUTC(),
+	    logge_status("Schlafe ~pms", [RestFrameTime - 1], LogFile),
+            timer:sleep(RestFrameTime - 1),
+	    logge_status("Schlief ~pms", [vsutil:getUTC() - StartTime], LogFile);
         _ -> 
+	    logge_status("Schlief gar nicht" , LogFile),
             continue
     end.
 
 % ---------------------Internal Functions ---------------------
 
 adjust(OffsetMS, ClockPid, Messages, TransportTupel, LogFile) ->
-    NewTransportTupel = TransportTupel, %adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile),
-    AverageTransportDelay = 0, %calc_new_transport_delay_average(TransportTupel),
+    NewTransportTupel = adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile),
+    AverageTransportDelay = calc_new_transport_delay_average(TransportTupel),
+    logge_status("TransportDelay is ~p", [AverageTransportDelay], LogFile),
     AverageDiffMS = calc_average_diff_ms(Messages, OffsetMS, AverageTransportDelay, LogFile),
     ClockPid ! {newoffsetandtransporttupel, AverageDiffMS, NewTransportTupel}.
 
@@ -171,7 +176,7 @@ get_current_time(OffsetMS) ->
     Result.
 
 calc_slot_mid_this_frame_time(FrameStart, SlotNumber, _LogFile) ->
-    SlotBeginnInMid = round(SlotNumber * ?SLOTLENGTHMS - (?SLOTLENGTHMS / 2)), % - SLOTLENGTHMS because we want the mid of the slottime
+    SlotBeginnInMid = SlotNumber * ?SLOTLENGTHMS - (?SLOTLENGTHMS div 2), % - SLOTLENGTHMS/2 because we want the mid of the slottime
     %logge_status("FrameBeginn: ~p, SlotMid: ~p", [FrameBeginnTime, SlotBeginnInMid], LogFile),
     FrameStart + SlotBeginnInMid.
 

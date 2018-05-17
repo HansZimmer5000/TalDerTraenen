@@ -2,7 +2,7 @@
 -export([
 	start/1, 
 	send/2,
-	receive_loop/1
+	receive_loop/2
 ]).
 
 -define(SERVERNAME, payloadserver).
@@ -17,7 +17,7 @@ start(LogFile) ->
 	ServerPid.
 
 start_payload_server(LogFile) ->
-	ServerPid = spawn(fun() -> receive_loop(LogFile) end),
+	ServerPid = spawn(fun() -> receive_loop("team 00-00-emptydefault-", LogFile) end),
 	register(payloadserver, ServerPid),
 	ServerPid.
 
@@ -33,19 +33,15 @@ send(PayloadServerPid, LogFile) ->
 
 % Bekommt alle Payloads, verwirft sie direkt ausser:
 % Wenn aktueller Payload angefragt bekommt der Absender den nächsten empfangenen Payload
-receive_loop(LogFile) ->
+receive_loop(LastPayload, LogFile) ->
 	receive
 		{AbsenderPid, getNextPayload} ->
 			%logge_status("Got getNextPayload", LogFile),
-			receive
-				Payload ->
-					%logge_status("Sending Payload ~s to: ~p", [Payload, AbsenderPid], LogFile),
-					AbsenderPid ! {payload, Payload}
-			end;
-		_Any ->
-			nothing %logge_status("got: ~p\n", [Any], LogFile)
-	end,
-	receive_loop(LogFile).
+			AbsenderPid ! {payload, LastPayload},
+		 	receive_loop(LastPayload, LogFile);
+		Payload ->
+			receive_loop(Payload, LogFile)
+	end.
 
 %------------------------------------------
 logge_status(Text, Input, LogFile) ->

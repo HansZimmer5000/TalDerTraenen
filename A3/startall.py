@@ -51,11 +51,15 @@ def __start_stations(a_count, b_count):
 
 def __start_stations_via_shell_script(a_count, b_count):
     offset = 0	
+    a_start = 1 + offset
+    a_last = a_start + a_count - 1
+    b_start = a_start + a_count
+    b_last = b_start + b_count - 1
     script = "./startStations.sh"
     paramsPraktikum = "eth0 224.0.0.251 15006"
     params = "eth2 225.10.1.2 16000"
-    os.system(script + " " + params + " 1 " + str(a_count) + " A 0")
-    #os.system(script + " " + params + " 1 " + str(b_count) + " B 0")
+    os.system(script + " " + params + " " + str(a_start) + " " + str(a_last) + " A 0")
+    os.system(script + " " + params + " " + str(b_start) + " " + str(b_last) + " B 0")
 
 def __stop_all_stations():
     os.system("./pkillAllStations.sh")

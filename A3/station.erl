@@ -24,8 +24,8 @@ start(Input) when length(Input) == 6 ->
         "Starte ~p um ~p mit ~p", 
         [StationName, vsutil:getUTC(), 
             [StationType, OffsetMs, InterfaceAddress, McastAddress, ReceivePortAtom, LogFile]], 
-        LogFile).
-    %core:start(StationType, StationName, OffsetMs, InterfaceAddress, McastAddress, ReceivePortAtom, LogFile).
+        LogFile),
+    core:start(StationType, StationName, OffsetMs, InterfaceAddress, McastAddress, ReceivePortAtom, LogFile).
 
 %---------------- Internal Functions ---------------------
 

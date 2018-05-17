@@ -36,15 +36,19 @@ frame_loop(StationName, StationType, CurrentSlotNumber, InSendphase, Pids, LogFi
             SlotFinderPid ! newframe,
 
             % Will start concurrent start_sending_process if insendphase = true
-            check_insendphase_and_start_sending_process(InSendphase, SendPid, StationFrameStart, CurrentSlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile),
+            check_insendphase_and_start_sending_process(InSendphase, SendPid, StationFrameStart, CurrentSlotNumber, StationType, CorePid, ClockPid, SlotFinderPid, PayloadServerPid, LogFile),
             
             % Will concurrently listen to the received messages and eventually (around frame end) will return {stationwasinvolved, Bool}
             receiver:listen_to_slots_and_adjust_clock_and_slots(25, ClockPid, SlotFinderPid, CorePid, StationName, LogFile),
             
             ClockPid ! {calcdifftime, StationFrameStart, CorePid},
-            RestFrameTime = utcclock:get_frame_rest_time(StationFrameStart, ClockPid, LogFile), 
+	    case utcclock:get_frame_rest_time(StationFrameStart, ClockPid, LogFile) of
+		ReturnValue when ReturnValue > 0 ->
+		    RestFrameTime = ReturnValue;
+		_Else ->
+		    RestFrameTime = 0
+	    end,
             logge_status("RestFrameTime = ~p", [RestFrameTime], LogFile),
-
             % Will check in which Station is and will act accordingly (Entry- or Sendphase)
             {NextInSendphase, NextSlotNumber} = check_insendphase_and_return_nextinsendphase_and_nextslotnumber(InSendphase, CorePid, SlotFinderPid, RestFrameTime, LogFile),
 
@@ -62,10 +66,10 @@ frame_loop(StationName, StationType, CurrentSlotNumber, InSendphase, Pids, LogFi
     end.
 
 %---------------- Internal Functions ---------------
-check_insendphase_and_start_sending_process(InSendphase, SendPid, StationFrameStart, CurrentSlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile) -> 
+check_insendphase_and_start_sending_process(InSendphase, SendPid, StationFrameStart, CurrentSlotNumber, StationType, CorePid, ClockPid, SlotFinderPid, PayloadServerPid, LogFile) -> 
     case InSendphase of
         true ->
-            sender:start_sending_process(SendPid, StationFrameStart, CurrentSlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile);
+            sender:start_sending_process(CorePid, SendPid, StationFrameStart, CurrentSlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile);
         false ->
             continue
     end.

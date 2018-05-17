@@ -108,7 +108,7 @@ check_sendtime_and_send(SendtimeMS, CurrentTime, IncompleteMessage, PayloadServe
     case DiffTime of
         DiffTime when DiffTime > 0 -> 
             logge_status("SendTime in the future: ~p", [DiffTime], LogFile),
-            timer:sleep(DiffTime), %So he wakes up in the beginning of the slot
+            timer:sleep(DiffTime - 5), % little bit earlier, because Payload will take some time to get
             send_message(IncompleteMessage, PayloadServerPid, SendPid, LogFile),
             MessageWasSend = true;
         DiffTime when DiffTime < 0 -> 
@@ -123,13 +123,15 @@ check_sendtime_and_send(SendtimeMS, CurrentTime, IncompleteMessage, PayloadServe
 
 send_message(IncompleteMessage, PayloadServerPid, SendPid, LogFile) ->
     logge_status("Frage nach Payload", LogFile),
-    Payload = request_payload(PayloadServerPid),
+    Payload = request_payload(PayloadServerPid, LogFile),
     SendPid ! {send, IncompleteMessage, Payload}.
 
-request_payload(PayloadServerPid) ->
+request_payload(PayloadServerPid, LogFile) ->
+	    StartTime = vsutil:getUTC(),
             PayloadServerPid ! {self(), getNextPayload},
             receive
                 {payload, Payload} ->
+		    logge_status("Took ~p to get Payload", [vsutil:getUTC() - StartTime], LogFile),
                     Payload
             end.
 
