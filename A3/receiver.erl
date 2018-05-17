@@ -6,21 +6,23 @@
     
     listen_loop/4,
 
+    listen_to_slots_and_adjust_clock_and_slots/6,
     collision_happend/3
 ]).
 
 -define(SLOTLENGTHMS, 40).
 
 
-start(CorePid, ClockPid, InterfaceAddress, McastAddressAtom, ReceivePort,LogFile) ->
-       {ok, McastAddress} = inet_parse:address(atom_to_list(McastAddressAtom)),
-    Socket = vsutil:openRec(McastAddress, InterfaceAddress, ReceivePort),%create_socket({172,16,1,2}, McastAddressAtom, ReceivePort),
+start(CorePid, ClockPid, InterfaceAddress, McastAddress, ReceivePort,LogFile) ->
+    Socket = create_socket_klc(InterfaceAddress, McastAddress, ReceivePort),
     Pid = spawn(fun() -> listen_loop(CorePid, ClockPid, Socket, LogFile) end),
-    logge_status("Listening to ~p:~p", [McastAddressAtom, ReceivePort], LogFile),
+    logge_status("Listening to ~p:~p", [McastAddress, ReceivePort], LogFile),
     Pid.
 
-create_socket(InterfaceAddress, McastAddressAtom, ReceivePort) ->
-        {ok, McastAddress} = inet_parse:address(atom_to_list(McastAddressAtom)),
+create_socket_klc(InterfaceAddress, McastAddress, ReceivePort) ->
+    vsutil:openRec(McastAddress, InterfaceAddress, ReceivePort).
+
+create_socket(InterfaceAddress, McastAddress, ReceivePort) ->
         {ok, Socket} = gen_udp:open(ReceivePort, [
             {mode, binary},
             {reuseaddr, true},
@@ -46,6 +48,50 @@ listen_loop(CorePid, ClockPid, Socket, LogFile) ->
             nothing
     end,
     listen_loop(CorePid, ClockPid, Socket, LogFile).
+
+% ---------- Exported Functions -------------
+listen_to_slots_and_adjust_clock_and_slots(0, _ClockPid, _SlotFinderPid, _CorePid, _StationName, _LogFile) ->
+    done;
+listen_to_slots_and_adjust_clock_and_slots(RestSlotCount, ClockPid, SlotFinderPid, CorePid, StationName, LogFile) ->
+    {ReceivedMessages, ReceivedTimes} = listen_to_slot(39, [],[], LogFile),
+    spawn(fun() -> 
+            %logge_status("Received ~p Messages this slot", [length(ReceivedMessages)], LogFile),
+            case length(ReceivedMessages) of
+                0 ->
+                    CorePid ! {stationwasinvolved, false};
+                _Any ->
+                    ConvertedMessages = messagehelper:convert_received_messages_from_byte(ReceivedMessages, ReceivedTimes),
+                    {CollisionHappend, StationWasInvolved} = receiver:collision_happend(ConvertedMessages, StationName, LogFile),
+                    case CollisionHappend of
+                        true -> 
+                            CorePid ! {stationwasinvolved, StationWasInvolved};
+                        false ->
+                            ClockPid ! {adjust, ConvertedMessages},
+                            SlotFinderPid ! {newmessages, ConvertedMessages},
+                            CorePid ! {stationwasinvolved, StationWasInvolved}
+                    end
+            end
+        end),
+    %logge_status("Got SlotMessages at ~p", [vsutil:getUTC() - FrameStart], LogFile),
+    listen_to_slots_and_adjust_clock_and_slots(RestSlotCount - 1, ClockPid, SlotFinderPid, CorePid, StationName, LogFile).
+
+% ------------ Internal Functions ---------
+
+listen_to_slot(RestSlotTime, Messages, ReceivedTimes, _LogFile) when RestSlotTime =< 0 ->
+    {Messages, ReceivedTimes};
+listen_to_slot(RestSlotTime, Messages, ReceivedTimes, LogFile) ->
+    StartTime = vsutil:getUTC(),
+    %logge_status("Waiting for next receivedmessage", LogFile),
+    receive
+        {receivedmessage, Message, ReceivedTime} ->
+            NewMessages = [Message | Messages],
+            NewReceivedTimes = [ReceivedTime | ReceivedTimes],
+            NewRestSlotTime = vsutil:getUTC() - StartTime,
+            listen_to_slot(NewRestSlotTime, NewMessages, NewReceivedTimes, LogFile)
+        after RestSlotTime ->  
+            %logge_status("Got no receivedmessage this slot", LogFile),
+            {Messages, ReceivedTimes}
+    end.
 
 collision_happend(ConvertedSlotMessages, StationName, LogFile) ->
     %If a message is handled as received in slot X but was meant for slot Y (X <> Y) its a collision.

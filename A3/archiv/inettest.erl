@@ -2,6 +2,7 @@
 
 -export([test/1]).
 
+
 test(InterfaceName) ->
     find_ipv4_addr_of_interface(InterfaceName).
 
