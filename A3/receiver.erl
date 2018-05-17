@@ -35,8 +35,8 @@ listen_loop(CorePid, ClockPid, Socket, LogFile) ->
     listen_loop(CorePid, ClockPid, Socket, LogFile).
 
 % ---------- Exported Functions -------------
-listen_to_slots_and_adjust_clock_and_slots(0, _ClockPid, _SlotFinderPid, _CorePid, _StationName, _LogFile) ->
-    done;
+listen_to_slots_and_adjust_clock_and_slots(0, _ClockPid, _SlotFinderPid, CorePid, _StationName, _LogFile) ->
+    CorePid ! donelistening;
 listen_to_slots_and_adjust_clock_and_slots(RestSlotCount, ClockPid, SlotFinderPid, CorePid, StationName, LogFile) ->
     {ReceivedMessages, ReceivedTimes} = listen_to_slot(39, [],[], LogFile),
     spawn(fun() -> 

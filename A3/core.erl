@@ -52,10 +52,13 @@ frame_loop(StationName, StationType, CurrentSlotNumber, InSendphase, Pids, LogFi
             % Will check in which Station is and will act accordingly (Entry- or Sendphase)
             {NextInSendphase, NextSlotNumber} = check_insendphase_and_return_nextinsendphase_and_nextslotnumber(InSendphase, CorePid, SlotFinderPid, RestFrameTime, LogFile),
 
-            utcclock:sleep_till_frame_end(StationFrameStart, ClockPid, LogFile),
-            FrameTotalTime = 1000 - utcclock:get_frame_rest_time(StationFrameStart, ClockPid, LogFile),
+
+	    %utcclock:sleep_till_frame_end(StationFrameStart, ClockPid, LogFile)
+	    % Danger! Should be 1000 but if its not something is terrible wrong or its:
+	    %Changes in Offset from Beginn to End are not recognized!
+	    FrameTotalTime = 1000 - utcclock:get_frame_rest_time(StationFrameStart, ClockPid, LogFile),
             logge_status(
-                "Frame Ended after ~p with NextInSendphase = ~p", 
+                "Frame Ended after ~p  with NextInSendphase = ~p", 
                 [FrameTotalTime, NextInSendphase], LogFile),
             
             frame_loop(StationName, StationType, NextSlotNumber, NextInSendphase, Pids, LogFile)
@@ -78,10 +81,16 @@ check_insendphase_and_return_nextinsendphase_and_nextslotnumber(InSendphase, Cor
     case InSendphase of
             false ->
                 % Entryphase
+		receive 
+			donelistening -> continue
+		end,
                 {NextInSendphase, NextSlotNumber} = get_nextinsendphase_and_nextslotnumber(CorePid, SlotFinderPid, RestFrameTime, LogFile);
             true -> 
                 % Sendphase
-                {NextInSendphase, NextSlotNumber} = handle_sendphase_messages(RestFrameTime, LogFile)
+                {NextInSendphase, NextSlotNumber} = handle_sendphase_messages(RestFrameTime, LogFile),
+		receive 
+			donelistening -> continue
+		end
     end,
     {NextInSendphase, NextSlotNumber}.
 

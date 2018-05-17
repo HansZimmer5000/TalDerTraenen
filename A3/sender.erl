@@ -108,7 +108,7 @@ check_sendtime_and_send(SendtimeMS, CurrentTime, IncompleteMessage, PayloadServe
     case DiffTime of
         DiffTime when DiffTime > 0 -> 
             logge_status("SendTime in the future: ~p", [DiffTime], LogFile),
-            timer:sleep(DiffTime - 5), % little bit earlier, because Payload will take some time to get
+            timer:sleep(DiffTime - 1), % little bit earlier, because Payload will take some time to get
             send_message(IncompleteMessage, PayloadServerPid, SendPid, LogFile),
             MessageWasSend = true;
         DiffTime when DiffTime < 0 -> 

@@ -113,12 +113,12 @@ adjust_transport_tupel([], _OffsetMS, TransportTupel, _LogFile) ->
 adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile) ->
     [CurrentMessage | RestMessages] = Messages,
     {StationName, TransportDelayTotal, TransportCount} = TransportTupel,
-    %logge_status("My Name: ~p, other Name: ~p", [StationName, messagehelper:get_station_name(CurrentMessage)], LogFile),
+    logge_status("My Name: ~p, other Name: ~p", [StationName, messagehelper:get_station_name(CurrentMessage)], LogFile),
     case StationName == messagehelper:get_station_name(CurrentMessage) of
         true ->
             SendTime = messagehelper:get_sendtime(CurrentMessage),
             RecvTime = messagehelper:get_receivedtime(CurrentMessage),
-            TmpDiffMS = (RecvTime - SendTime) div 2,
+            TmpDiffMS = (RecvTime - SendTime),
             NewTransportDelayTotal = TransportDelayTotal + TmpDiffMS,
             NewTransportCount = TransportCount + 1,
             NewTransportTupel = {StationName, NewTransportDelayTotal, NewTransportCount},
@@ -163,7 +163,7 @@ calc_new_transport_delay_average(TransportTupel) ->
     {_StationName, TransportDelayTotal, TransportCount} = TransportTupel,
     case TransportCount of
         0 -> AverageTransportDelay = 0;
-        _ -> AverageTransportDelay = TransportDelayTotal div TransportCount
+        _ -> AverageTransportDelay = round(TransportDelayTotal / TransportCount) %Not using 'div' because 'div' is always rounding down
     end,
     AverageTransportDelay.
 
