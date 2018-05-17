@@ -8,6 +8,7 @@
 
 -define(CLOCKOFFSETMS, 0).
 
+% ------------------ Init --------------
 start(StationType, StationName, ClockOffsetMS, InterfaceAddress, McastAddress, ReceivePortAtom, LogFile) ->
     ReceivePort = erlang:list_to_integer(atom_to_list(ReceivePortAtom)),
     CorePid = self(),
@@ -22,7 +23,7 @@ start_other_components(StationName, CorePid, InterfaceAddress, McastAddress, Rec
     SlotFinderPid = slotfinder:start(CorePid, StationName, LogFile),
     {RecvPid, SendPid, ClockPid, SlotFinderPid, PayloadServerPid}.
 
-%-----------------------------------
+%---------------- Loop ----------------
 
 frame_loop(StationName, StationType, CurrentSlotNumber, InSendphase, Pids, LogFile) ->
     {_RecvPid, SendPid, ClockPid, SlotFinderPid, PayloadServerPid} = Pids,
@@ -41,16 +42,17 @@ frame_loop(StationName, StationType, CurrentSlotNumber, InSendphase, Pids, LogFi
             receiver:listen_to_slots_and_adjust_clock_and_slots(25, ClockPid, SlotFinderPid, CorePid, StationName, LogFile),
             
             ClockPid ! {calcdifftime, StationFrameStart, CorePid},
-            RestFrameTime = get_frame_rest_time(StationFrameStart, ClockPid, LogFile), 
+            RestFrameTime = utcclock:get_frame_rest_time(StationFrameStart, ClockPid, LogFile), 
             logge_status("RestFrameTime = ~p", [RestFrameTime], LogFile),
 
             % Will check in which Station is and will act accordingly (Entry- or Sendphase)
             {NextInSendphase, NextSlotNumber} = check_insendphase_and_return_nextinsendphase_and_nextslotnumber(InSendphase, CorePid, SlotFinderPid, RestFrameTime, LogFile),
 
-            sleep_till_frame_end(StationFrameStart, ClockPid, LogFile),
+            utcclock:sleep_till_frame_end(StationFrameStart, ClockPid, LogFile),
+            FrameTotalTime = 1000 - utcclock:get_frame_rest_time(StationFrameStart, ClockPid, LogFile),
             logge_status(
                 "Frame Ended after ~p with NextInSendphase = ~p", 
-                [1000 - get_frame_rest_time(StationFrameStart, ClockPid, LogFile), NextInSendphase], LogFile),
+                [FrameTotalTime, NextInSendphase], LogFile),
             
             frame_loop(StationName, StationType, NextSlotNumber, NextInSendphase, Pids, LogFile)
 
@@ -59,7 +61,7 @@ frame_loop(StationName, StationType, CurrentSlotNumber, InSendphase, Pids, LogFi
             frame_loop(StationName, StationType, 0, false, Pids, LogFile)
     end.
 
-%-----------------------------------
+%---------------- Internal Functions ---------------
 check_insendphase_and_start_sending_process(InSendphase, SendPid, StationFrameStart, CurrentSlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile) -> 
     case InSendphase of
         true ->
@@ -120,25 +122,6 @@ wait_for_stationwasinvolved_and_return_nextinsendphase_and_nextslotnumber(Messag
             end
     end,
     {NextInSendphase, NextSlotNumber}.
-
-get_frame_rest_time(StationFrameStart, ClockPid, LogFile) ->
-    ClockPid ! {calcdifftime, StationFrameStart, self()},
-    receive 
-        {resultdifftime, TimeElapsedInFrame} -> 
-            1000 - TimeElapsedInFrame
-        after 5 -> 
-            logge_status("Didn't received resultdifftime within 5ms", LogFile),
-            0
-    end.
-
-sleep_till_frame_end(StationFrameStart, ClockPid, LogFile) ->
-    case get_frame_rest_time(StationFrameStart, ClockPid, LogFile) of 
-        RestFrameTime when RestFrameTime > 0 ->
-            timer:sleep(RestFrameTime - 1);
-        _ -> 
-            continue
-    end.
-
 %------------------------------------------
 logge_status(Text, Input, LogFile) ->
     Inhalt = io_lib:format(Text,Input),

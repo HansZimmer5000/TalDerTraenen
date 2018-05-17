@@ -12,27 +12,12 @@
 
 -define(SLOTLENGTHMS, 40).
 
-
+% -------------------- Init --------------------------
 start(CorePid, ClockPid, InterfaceAddress, McastAddress, ReceivePort,LogFile) ->
     Socket = create_socket_klc(InterfaceAddress, McastAddress, ReceivePort),
     Pid = spawn(fun() -> listen_loop(CorePid, ClockPid, Socket, LogFile) end),
     logge_status("Listening to ~p:~p", [McastAddress, ReceivePort], LogFile),
     Pid.
-
-create_socket_klc(InterfaceAddress, McastAddress, ReceivePort) ->
-    vsutil:openRec(McastAddress, InterfaceAddress, ReceivePort).
-
-create_socket(InterfaceAddress, McastAddress, ReceivePort) ->
-        {ok, Socket} = gen_udp:open(ReceivePort, [
-            {mode, binary},
-            {reuseaddr, true},
-            {ip, InterfaceAddress}, %may use Mcast
-            {multicast_ttl, 1},
-            {multicast_loop, true},
-            {broadcast, true},
-            {add_membership, {McastAddress, InterfaceAddress}},
-            {active, false}]), %once = dann mit receive Any -> ... end holen
-        Socket.
     
 % --------------------------------------------------
 
@@ -76,7 +61,21 @@ listen_to_slots_and_adjust_clock_and_slots(RestSlotCount, ClockPid, SlotFinderPi
     listen_to_slots_and_adjust_clock_and_slots(RestSlotCount - 1, ClockPid, SlotFinderPid, CorePid, StationName, LogFile).
 
 % ------------ Internal Functions ---------
+create_socket_klc(InterfaceAddress, McastAddress, ReceivePort) ->
+    vsutil:openRec(McastAddress, InterfaceAddress, ReceivePort).
 
+create_socket(InterfaceAddress, McastAddress, ReceivePort) ->
+        {ok, Socket} = gen_udp:open(ReceivePort, [
+            {mode, binary},
+            {reuseaddr, true},
+            {ip, InterfaceAddress}, %may use Mcast
+            {multicast_ttl, 1},
+            {multicast_loop, true},
+            {broadcast, true},
+            {add_membership, {McastAddress, InterfaceAddress}},
+            {active, false}]), %once = dann mit receive Any -> ... end holen
+        Socket.
+    
 listen_to_slot(RestSlotTime, Messages, ReceivedTimes, _LogFile) when RestSlotTime =< 0 ->
     {Messages, ReceivedTimes};
 listen_to_slot(RestSlotTime, Messages, ReceivedTimes, LogFile) ->

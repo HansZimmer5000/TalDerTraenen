@@ -4,9 +4,11 @@
     start/1
 ]).
 
+% -------------------- Init --------------------------
+
 start(Input) when length(Input) == 6 ->
     [InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, StationClassAtom, UTCoffsetMsAtom, StationNumberAtom] = Input,
-    
+
     StationType = atom_to_list(StationClassAtom),
     StationName = create_station_name(StationNumberAtom),
     OffsetMs = erlang:list_to_integer(atom_to_list(UTCoffsetMsAtom)),
@@ -25,7 +27,7 @@ start(Input) when length(Input) == 6 ->
         LogFile).
     %core:start(StationType, StationName, OffsetMs, InterfaceAddress, McastAddress, ReceivePortAtom, LogFile).
 
-%------------------------------------------
+%---------------- Internal Functions ---------------------
 
 find_ipv4_addr_of_interface(InterfaceName, LogFile) ->
     DefaultAddr = {0,0,0,0},

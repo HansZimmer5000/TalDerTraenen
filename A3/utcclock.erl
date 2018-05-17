@@ -3,6 +3,9 @@
 -export([
     start/4,
 
+    get_frame_rest_time/3,
+    sleep_till_frame_end/3,
+
     adjust/5,
 
     new_frame_started/2,
@@ -15,13 +18,15 @@
 -define(FRAMELENGTHMS, 1000).
 -define(SLOTLENGTHMS, 40).
 
+% -------------------- Init --------------------------
+
 start(OffsetMS, CorePid, StationName, LogFile) ->
     logge_status("Starting with Offset: ~p", [OffsetMS], LogFile),
     TransportTupel = {StationName, 0, 0},
     ClockPid = spawn(fun() -> loop(OffsetMS, CorePid, TransportTupel, LogFile) end),
     ClockPid.
 
-% --------------------------------------------------
+% -------------------- Loop --------------------------
 
 loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
     receive
@@ -71,11 +76,30 @@ loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
             loop(OffsetMS, CorePid, TransportTupel, LogFile)
     end.
 
-% --------------------------------------------------
+% --------------------- Exported Functions -----------
+get_frame_rest_time(StationFrameStart, ClockPid, LogFile) ->
+    ClockPid ! {calcdifftime, StationFrameStart, self()},
+    receive 
+        {resultdifftime, TimeElapsedInFrame} -> 
+            1000 - TimeElapsedInFrame
+        after 5 -> 
+            logge_status("Didn't received resultdifftime within 5ms", LogFile),
+            0
+    end.
+
+sleep_till_frame_end(StationFrameStart, ClockPid, LogFile) ->
+    case get_frame_rest_time(StationFrameStart, ClockPid, LogFile) of 
+        RestFrameTime when RestFrameTime > 0 ->
+            timer:sleep(RestFrameTime - 1);
+        _ -> 
+            continue
+    end.
+
+% ---------------------Internal Functions ---------------------
 
 adjust(OffsetMS, ClockPid, Messages, TransportTupel, LogFile) ->
-    NewTransportTupel = adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile),
-    AverageTransportDelay = 0,%calc_new_transport_delay_average(TransportTupel),
+    NewTransportTupel = TransportTupel, %adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile),
+    AverageTransportDelay = 0, %calc_new_transport_delay_average(TransportTupel),
     AverageDiffMS = calc_average_diff_ms(Messages, OffsetMS, AverageTransportDelay, LogFile),
     ClockPid ! {newoffsetandtransporttupel, AverageDiffMS, NewTransportTupel}.
 

@@ -6,17 +6,14 @@
     start_sending_process/9
 ]).
 
+% -------------------- Init --------------------------
 start(InterfaceAddress,  McastAddress, ReceivePort, ClockPid, LogFile) ->
     Socket = create_socket(InterfaceAddress, ReceivePort),
     Pid = spawn(fun() -> loop(Socket, McastAddress, ReceivePort, ClockPid, LogFile) end),
     logge_status("Sending to ~p:~p", [McastAddress, ReceivePort], LogFile),
     Pid.
 
-create_socket(InterfaceAddress, ReceivePort) ->
-    vsutil:openSe(InterfaceAddress, ReceivePort).
-    %{ok, Socket} = gen_udp:open(0, [binary]),
-    %Socket.
-% --------------------------------------------------
+% ------------------- Loop ---------------------------
 
 loop(Socket, McastAddress, ReceivePort, ClockPid, LogFile) ->
     receive
@@ -31,12 +28,19 @@ loop(Socket, McastAddress, ReceivePort, ClockPid, LogFile) ->
     end,
     loop(Socket, McastAddress, ReceivePort, ClockPid, LogFile).
 
-% ------------------ API --------------
+% ------------------ Exported Functions --------------
 start_sending_process(CorePid, SendPid, FrameStart, SlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile) ->
     spawn(fun() -> 
             {MessageWasSend, NextSlotNumber} = sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile),
             CorePid ! {messagewassend, MessageWasSend, NextSlotNumber}
         end).
+
+
+% ------------------ Internal Functions --------------
+create_socket(InterfaceAddress, ReceivePort) ->
+        vsutil:openSe(InterfaceAddress, ReceivePort).
+        %{ok, Socket} = gen_udp:open(0, [binary]),
+        %Socket.
 
 sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile) ->
     SendtimeMS = notify_when_preperation_and_send_due(ClockPid, FrameStart, SlotNumber, LogFile),

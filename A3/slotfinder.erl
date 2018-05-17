@@ -12,12 +12,13 @@
 
 -define(DEFAULT_POSSIBLE_SLOTS, [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,24]).
 
+% ------------------ Init --------------
 start(CorePid, StationName, LogFile) ->
     logge_status("Startet", LogFile),
     ClockPid = spawn(fun() -> loop(CorePid, StationName, [], LogFile) end),
     ClockPid.
 	
-	
+% ------------------ Loop --------------
 loop(CorePid, StationName, Messages, LogFile) ->
  receive
     newframe -> 
@@ -31,6 +32,7 @@ loop(CorePid, StationName, Messages, LogFile) ->
 			loop(CorePid, StationName, Messages, LogFile)
  end.
 
+% ------------------ Internal Functions --------------
 find_slot_in_next_frame(Messages, StationName) ->
     case get_slot_numer_if_stationname_matches(Messages, StationName) of
         0 ->
