@@ -41,6 +41,7 @@ loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
         {adjust, Messages} ->
             ClockPid = self(),
             spawn(fun () -> 
+                    logge_status("Got Adjust", LogFile),
                     adjust(OffsetMS, ClockPid, Messages, TransportTupel, LogFile)
                 end),
             loop(OffsetMS, CorePid, TransportTupel, LogFile);
@@ -121,7 +122,7 @@ adjust_transport_tupel([], _OffsetMS, TransportTupel, _LogFile) ->
 adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile) ->
     [CurrentMessage | RestMessages] = Messages,
     {StationName, TransportDelayTotal, TransportCount} = TransportTupel,
-    %logge_status("My Name: ~p, other Name: ~p", [StationName, messagehelper:get_station_name(CurrentMessage)], LogFile),
+    logge_status("My Name: ~p, other Name: ~p", [StationName, messagehelper:get_station_name(CurrentMessage)], LogFile),
     case StationName == messagehelper:get_station_name(CurrentMessage) of
         true ->
             SendTime = messagehelper:get_sendtime(CurrentMessage),
