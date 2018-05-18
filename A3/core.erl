@@ -122,6 +122,7 @@ handle_sendphase_messages(RestFrameTime, LogFile) ->
     receive
             {messagewassend, MessageWasSend, ReceivedNextSlotNumber} -> 
 		NewRestFrameTime = RestFrameTime - (vsutil:getUTC() - StartTime),
+		logge_status("NewRestFrameTime ~p", [NewRestFrameTime], LogFile),
                 {NextInSendphase, NextSlotNumber} = wait_for_stationwasinvolved_and_return_nextinsendphase_and_nextslotnumber(MessageWasSend, ReceivedNextSlotNumber, NewRestFrameTime, LogFile)
             after RestFrameTime ->
                 logge_status("Messagewassend was never received", LogFile),
