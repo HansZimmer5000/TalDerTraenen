@@ -16,15 +16,11 @@ start(Input) when length(Input) == 6 ->
 
     InterfaceAddress = find_ipv4_addr_of_interface(atom_to_list(InterfaceNameAtom), LogFile),
     {ok, McastAddress} = inet_parse:address(atom_to_list(McastAddressAtom)),
-
-    Now = vsutil:getUTC(),
-    WaitingTimeTillFirstFrame = 2000 - Now rem 1000,
-    timer:sleep(WaitingTimeTillFirstFrame),
     logge_status(
-        "Starte ~p um ~p mit ~p", 
-        [StationName, vsutil:getUTC(), 
-            [StationType, OffsetMs, InterfaceAddress, McastAddress, ReceivePortAtom, LogFile]], 
-        LogFile),
+	"Starte ~p um ~p mit ~p", 
+	[StationName, vsutil:getUTC(), 
+	[StationType, OffsetMs, InterfaceAddress, McastAddress, ReceivePortAtom, LogFile]], 
+	LogFile),
     core:start(StationType, StationName, OffsetMs, InterfaceAddress, McastAddress, ReceivePortAtom, LogFile).
 
 %---------------- Internal Functions ---------------------

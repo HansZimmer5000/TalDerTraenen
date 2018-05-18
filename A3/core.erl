@@ -13,6 +13,16 @@ start(StationType, StationName, ClockOffsetMS, InterfaceAddress, McastAddress, R
     ReceivePort = erlang:list_to_integer(atom_to_list(ReceivePortAtom)),
     CorePid = self(),
     Pids = start_other_components(StationName, CorePid, InterfaceAddress, McastAddress, ReceivePort, ClockOffsetMS, LogFile),
+    {_RecvPid, _SendPid, ClockPid, _SlotFinderPid, _PayloadServerPid} = Pids,
+
+    ClockPid ! {getcurrenttime, CorePid},
+    receive
+    	{currenttime, Now} ->
+		%MaschineTime or StationTime? Really important?
+		WaitingTimeTillFirstFrame = ((1000 - Now) rem 1000) + 1000,
+		timer:sleep(WaitingTimeTillFirstFrame - 1)
+    end,
+
     frame_loop(StationName, StationType, 0, false, Pids, LogFile).
 
 start_other_components(StationName, CorePid, InterfaceAddress, McastAddress, ReceivePort, ClockOffsetMS, LogFile) ->
@@ -28,35 +38,36 @@ start_other_components(StationName, CorePid, InterfaceAddress, McastAddress, Rec
 frame_loop(StationName, StationType, CurrentSlotNumber, InSendphase, Pids, LogFile) ->
     {_RecvPid, SendPid, ClockPid, SlotFinderPid, PayloadServerPid} = Pids,
     CorePid = self(),
-
-    ClockPid ! {getcurrenttime, CorePid},
+    ClockPid ! {getcurrenttimeandoffset, CorePid},
     receive 
-        {currenttime, StationFrameStart} ->  
+        {currenttimeandoffset, StationFrameStart, StationFrameStartOffset} ->  
             logge_status("New Frame Started at ~p with Slot ~p --------", [StationFrameStart, CurrentSlotNumber], LogFile),
             SlotFinderPid ! newframe,
-
             % Will start concurrent start_sending_process if insendphase = true
             check_insendphase_and_start_sending_process(InSendphase, SendPid, StationFrameStart, CurrentSlotNumber, StationType, CorePid, ClockPid, SlotFinderPid, PayloadServerPid, LogFile),
-            
+		
+    	    ClockpifStartTime = vsutil:getUTC(),
             % Will concurrently listen to the received messages and eventually (around frame end) will return {stationwasinvolved, Bool}
             receiver:listen_to_slots_and_adjust_clock_and_slots(25, ClockPid, SlotFinderPid, CorePid, StationName, LogFile),
-            
-            ClockPid ! {calcdifftime, StationFrameStart, CorePid},
-            case utcclock:get_frame_rest_time(StationFrameStart, ClockPid, LogFile) of
-            ReturnValue when ReturnValue > 0 ->
-                RestFrameTime = ReturnValue;
-            _Else ->
-                RestFrameTime = 0
+
+            case utcclock:get_frame_rest_time(StationFrameStart, StationFrameStartOffset, ClockPid, LogFile) of
+		ReturnValue when ReturnValue > 0 ->
+			RestFrameTime = ReturnValue;
+		_Else ->
+			RestFrameTime = 0
             end,
             logge_status("RestFrameTime = ~p", [RestFrameTime], LogFile),
             % Will check in which Station is and will act accordingly (Entry- or Sendphase)
             {NextInSendphase, NextSlotNumber} = check_insendphase_and_return_nextinsendphase_and_nextslotnumber(InSendphase, CorePid, SlotFinderPid, RestFrameTime, LogFile),
 
+	    logge_status("Before Sleep need ~p ms", [ vsutil:getUTC() - ClockpifStartTime], LogFile),
+	    utcclock:sleep_till_frame_end(StationFrameStart, StationFrameStartOffset, ClockPid, LogFile),
 
-	    %utcclock:sleep_till_frame_end(StationFrameStart, ClockPid, LogFile)
+	    logge_status("After Sleep ~p ms", [ vsutil:getUTC() - ClockpifStartTime], LogFile),
 	    % Danger! Should be 1000 but if its not something is terrible wrong or its:
 	    %Changes in Offset from Beginn to End are not recognized!
-	    FrameTotalTime = 1000 - utcclock:get_frame_rest_time(StationFrameStart, ClockPid, LogFile),
+	    FrameTotalTime = 1000 - utcclock:get_frame_rest_time(StationFrameStart, StationFrameStartOffset, ClockPid, LogFile),
+
             logge_status(
                 "Frame Ended after ~p  with NextInSendphase = ~p", 
                 [FrameTotalTime, NextInSendphase], LogFile),

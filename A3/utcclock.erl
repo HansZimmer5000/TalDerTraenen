@@ -3,8 +3,8 @@
 -export([
     start/4,
 
-    get_frame_rest_time/3,
-    sleep_till_frame_end/3,
+    get_frame_rest_time/4,
+    sleep_till_frame_end/4,
 
     adjust/5,
 
@@ -31,7 +31,8 @@ start(OffsetMS, CorePid, StationName, LogFile) ->
 loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
     receive
         {newoffsetandtransporttupel, ReceivedOffsetDiff, NewTransportTupel} ->
-            NewOffsetMS = OffsetMS - ReceivedOffsetDiff,
+            TmpNewOffsetMS = OffsetMS - ReceivedOffsetDiff,
+	    NewOffsetMS = (OffsetMS + TmpNewOffsetMS) div 2, 
             logge_status("New Offset: ~p (Old: ~p)", [NewOffsetMS, OffsetMS], LogFile),
             loop(NewOffsetMS, CorePid, NewTransportTupel, LogFile);
         {adjust, Messages} ->
@@ -66,7 +67,9 @@ loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
         {getcurrenttime, SenderPid} ->
             SenderPid ! {currenttime, get_current_time(OffsetMS)},
             loop(OffsetMS, CorePid, TransportTupel, LogFile);
-
+	{getcurrenttimeandoffset, SenderPid} ->
+	    SenderPid ! {currenttimeandoffset, get_current_time(OffsetMS), OffsetMS},
+            loop(OffsetMS, CorePid, TransportTupel, LogFile);
         {getcurrentoffsetms, SenderPid} ->
             %For Testing only
             SenderPid ! OffsetMS,
@@ -77,26 +80,30 @@ loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
     end.
 
 % --------------------- Exported Functions -----------
-get_frame_rest_time(StationFrameStart, ClockPid, LogFile) ->
-    ClockPid ! {calcdifftime, StationFrameStart, self()},
-    receive 
-        {resultdifftime, TimeElapsedInFrame} -> 
-            1000 - TimeElapsedInFrame
-        after 5 -> 
-            logge_status("Didn't received resultdifftime within 5ms", LogFile),
-            0
+get_frame_rest_time(StationFrameStart, StationFrameStartOffset, ClockPid, _LogFile) ->
+    ClockPid ! {getcurrenttimeandoffset, self()},
+    receive
+	{currenttimeandoffset, StationFrameNow, StationFrameNowOffset} ->
+		TimeElapsedInFrame = StationFrameNow - StationFrameStart + (StationFrameStartOffset - StationFrameNowOffset),
+		RestFrameTime = 1000 - TimeElapsedInFrame,
+		RestFrameTime
     end.
 
-sleep_till_frame_end(StationFrameStart, ClockPid, LogFile) ->
-    case get_frame_rest_time(StationFrameStart, ClockPid, LogFile) of 
-        RestFrameTime when RestFrameTime > 1 ->
-	    StartTime = vsutil:getUTC(),
-	    logge_status("Schlafe ~pms", [RestFrameTime - 1], LogFile),
-            timer:sleep(RestFrameTime - 1),
-	    logge_status("Schlief ~pms", [vsutil:getUTC() - StartTime], LogFile);
-        _ -> 
-	    logge_status("Schlief gar nicht" , LogFile),
-            continue
+sleep_till_frame_end(StationFrameStart, StationFrameStartOffset, ClockPid, LogFile) ->
+    ClockPid ! {getcurrenttimeandoffset, self()},
+    receive
+	{currenttimeandoffset, StationFrameNow, StationFrameNowOffset} ->
+		logge_status("Sleep_till_frame_end mit: ~p", [[StationFrameStart, StationFrameStartOffset, StationFrameNow, StationFrameNowOffset]], LogFile),
+		StartTime = vsutil:getUTC(),
+		TimeElapsedInFrame = StationFrameNow - StationFrameStart + (StationFrameStartOffset - StationFrameNowOffset),
+		RestFrameTime = 1000 - TimeElapsedInFrame,
+		case RestFrameTime of
+			RestFrameTime when RestFrameTime > 0 ->
+				timer:sleep(RestFrameTime - 1),
+				logge_status("Schlief ~pms", [vsutil:getUTC() - StartTime], LogFile);
+			_Else ->
+				continue
+		end
     end.
 
 % ---------------------Internal Functions ---------------------

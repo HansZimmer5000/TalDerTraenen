@@ -44,8 +44,8 @@ create_socket(InterfaceAddress, ReceivePort) ->
 
 sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile) ->
     SendtimeMS = notify_when_preperation_and_send_due(ClockPid, FrameStart, SlotNumber, LogFile),
-    logge_status("SendTimeMS at ~p", [SendtimeMS], LogFile),
-    {MessageWasSend, NextSlotNumber} = wait_for_prepare(StationType, SendtimeMS, ClockPid, SlotFinderPid, PayloadServerPid, SendPid, LogFile),
+    logge_status("SendTimeMS at ~p",  [SendtimeMS], LogFile),
+    {MessageWasSend, NextSlotNumber}= wait_for_prepare(StationType, SendtimeMS, ClockPid, SlotFinderPid, PayloadServerPid, SendPid, LogFile),
     {MessageWasSend, NextSlotNumber}.
 
 notify_when_preperation_and_send_due(ClockPid, FrameStart, SlotNumber, _LogFile) ->
@@ -69,6 +69,7 @@ wait_for_prepare(StationType, SendtimeMS, ClockPid, SlotFinderPid, PayloadServer
                 after 20 -> 
                     NextSlotNumber = 0,
                     logge_status("Never received Slotnumber", LogFile),
+			%Todo: vll lieber nicht machen sondern wait_for_send in slotnum case reinziehen
                     exit(self(), kill) 
             end,
             IncompleteMessage = messagehelper:create_incomplete_message(StationType, NextSlotNumber),
