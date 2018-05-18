@@ -85,7 +85,7 @@ listen_to_slot(RestSlotTime, Messages, ReceivedTimes, LogFile) ->
         {receivedmessage, Message, ReceivedTime} ->
             NewMessages = [Message | Messages],
             NewReceivedTimes = [ReceivedTime | ReceivedTimes],
-            NewRestSlotTime = 40 - (vsutil:getUTC() - StartTime),
+            NewRestSlotTime = RestSlotTime - (vsutil:getUTC() - StartTime),
             listen_to_slot(NewRestSlotTime, NewMessages, NewReceivedTimes, LogFile)
         after RestSlotTime - 1 ->  
             %logge_status("Got no receivedmessage this slot", LogFile),
