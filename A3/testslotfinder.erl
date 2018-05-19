@@ -2,31 +2,6 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-
-get_slot_numer_if_stationname_matches_1_test() ->
-    Messages = [],
-    StationName = "-team-0000-",
-    FoundSlotNumber = slotfinder:get_slot_numer_if_stationname_matches(Messages, StationName),
-    ?assertEqual(0, FoundSlotNumber).
-
-get_slot_numer_if_stationname_matches_2_test() ->
-    Messages = [
-        {{"A","-team-0001-","123456789012-",4, 77394825}, 77394825}, 
-        {{"A","-team-0002-","123456789012-",4, 77394825}, 77394825}],
-    StationName = "-team-0000-",
-    FoundSlotNumber = slotfinder:get_slot_numer_if_stationname_matches(Messages, StationName),
-    ?assertEqual(0, FoundSlotNumber).
-
-get_slot_numer_if_stationname_matches_3_test() ->
-    Messages = [
-        {{"A","-team-0001-","123456789012-",4, 77394825}, 77394825}, 
-        {{"A","-team-0000-","123456789012-",4, 77394825}, 77394825}],
-    StationName = "-team-0000-",
-    FoundSlotNumber = slotfinder:get_slot_numer_if_stationname_matches(Messages, StationName),
-    ?assertEqual(4, FoundSlotNumber).
-
-
-
 get_taken_slots_1_test() ->
     Messages = [
         {{"A","-team-0001-","123456789012-",4, 77394825}, 77394825}, 

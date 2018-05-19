@@ -1,15 +1,15 @@
--module(nameservice).
+-module(multicast).
 
 -export([
     start/0
 ]).
 
--define(NSNAME, nameservice).
--define(LOG_DATEI_NAME, "nameservice.log").
+-define(NAME, multicast).
+-define(LOG_DATEI_NAME, "multicast.log").
 
 start() ->
-    logge_status("nameservice gestartet"),
-    register(?NSNAME, self()),
+    logge_status("multicast gestartet"),
+    register(?NAME, self()),
     spawn(fun() -> new_frame_loop() end),
     receive_loop([]).
 

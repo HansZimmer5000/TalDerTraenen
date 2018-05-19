@@ -30,24 +30,26 @@ def __start_node_mac(nodename, modulename, parameter):
     command = "osascript -e " + "'" + "tell application " + '"' + "Terminal" + '"'+ " to do script " + '"' + erlcommand + '"' + "'"
     os.system(command)
 
-def __start_stations(a_count, b_count):
+def __start_stations(a_count, b_count, run_on_windows):
     total_a_count = a_count
+    if run_on_windows:
+        function = __start_node
+    else:
+        function =__start_node_mac
+
     while(a_count > 0):
         a_count_str = str(a_count)
-        stationname = "team-06-"
-        if(a_count < 10):
-            stationname = stationname + "0"
-        stationname = stationname + a_count_str
-        __start_node_mac("station" + a_count_str, "station", "A " + stationname)
+        params = __create_params_with("A", a_count_str)
+        function("station" + a_count_str, "station", params)
         a_count = a_count - 1
     while(b_count > 0):
         b_count_str = str(b_count + total_a_count)
-        stationname = "team-06-"
-        if(b_count < 10):
-            stationname = stationname + "0"
-        stationname = stationname + b_count_str
-        __start_node_mac("station" + b_count_str, "station", "B " + stationname)
+        params = __create_params_with("B", b_count_str)
+        function("station" + a_count_str, "station", params)
         b_count = b_count - 1
+
+def __create_params_with(stationtype, stationnumber):
+    return "win 225.10.1.2 16000 " + stationtype + " 0 " + stationnumber
 
 def __start_stations_via_shell_script(a_count, b_count):
     offset = 0	
@@ -114,6 +116,10 @@ if __name__ == "__main__":
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
     elif user_input == "4":
-        __stop_all_stations()
+        __make_all_modules()
+        __clear_all_log_files_in_current_dir()
+        __start_node("tunnel", "multicast", "")
+        time.sleep(1)
+        __start_stations(1,0, True)
     else:
         print("Argument: '" + user_input + "' unkonwn.")

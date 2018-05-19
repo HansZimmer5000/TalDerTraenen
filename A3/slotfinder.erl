@@ -26,7 +26,7 @@ loop(CorePid, StationName, SelectedSlot, Messages, LogFile) ->
 			loop(CorePid, StationName, NewSelectedSlot, [], LogFile);
 	{newmessages, ReceivedMessages} ->	
 			NewMessages = ReceivedMessages ++ Messages,
-			NewSelectedSlot = find_slot_in_next_frame(Messages, StationName, LogFile),
+			NewSelectedSlot = find_slot_in_next_frame(NewMessages, StationName, LogFile),
 			loop(CorePid, StationName, NewSelectedSlot, NewMessages, LogFile);
 	{getFreeSlotNum, SenderPid} ->	
 			%logge_status("Messages: ~p", [Messages], LogFile),	

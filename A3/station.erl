@@ -8,6 +8,7 @@
 
 start(Input) when length(Input) == 6 ->
     [InterfaceNameAtom, McastAddressAtom, ReceivePortAtom, StationClassAtom, UTCoffsetMsAtom, StationNumberAtom] = Input,
+    io:fwrite("\n Got Input: ~p \n", [Input]),
 
     StationType = atom_to_list(StationClassAtom),
     StationName = create_station_name(StationNumberAtom),
@@ -16,11 +17,12 @@ start(Input) when length(Input) == 6 ->
 
     InterfaceAddress = find_ipv4_addr_of_interface(atom_to_list(InterfaceNameAtom), LogFile),
     {ok, McastAddress} = inet_parse:address(atom_to_list(McastAddressAtom)),
+
     logge_status(
-	"Starte ~p um ~p mit ~p", 
-	[StationName, vsutil:getUTC(), 
-	[StationType, OffsetMs, InterfaceAddress, McastAddress, ReceivePortAtom, LogFile]], 
-	LogFile),
+        "Starte ~p um ~p mit ~p", 
+        [StationName, vsutil:getUTC(), 
+            [StationType, OffsetMs, InterfaceAddress, McastAddress, ReceivePortAtom, LogFile]], 
+        LogFile),
     core:start(StationType, StationName, OffsetMs, InterfaceAddress, McastAddress, ReceivePortAtom, LogFile).
 
 %---------------- Internal Functions ---------------------
@@ -60,7 +62,7 @@ look_up_for_addr_tupel(IfOpts) ->
     end.
 
 create_station_name(StationNumberAtom) -> 
-    StationNumber  = erlang:list_to_integer(lists:flatten(io_lib:format("~s", [StationNumberAtom]))),
+    StationNumber = erlang:list_to_integer(lists:flatten(io_lib:format("~s", [StationNumberAtom]))),
     case StationNumber > 9 of
         true -> StationName = lists:flatten(io_lib:format("team 06-~p", [StationNumber]));
         false -> StationName = lists:flatten(io_lib:format("team 06-0~p", [StationNumber]))
