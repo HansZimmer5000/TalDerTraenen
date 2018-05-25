@@ -38,9 +38,9 @@ start_sending_process(CorePid, SendPid, FrameStart, SlotNumber, StationType, Clo
 
 % ------------------ Internal Functions --------------
 create_socket(InterfaceAddress, ReceivePort) ->
-        vsutil:openSe(InterfaceAddress, ReceivePort).
-        %{ok, Socket} = gen_udp:open(0, [binary]),
-        %Socket.
+        %vsutil:openSe(InterfaceAddress, ReceivePort).
+        {ok, Socket} = gen_udp:open(0, [binary]),
+        Socket.
 
 sending_process(SendPid, FrameStart, SlotNumber, StationType, ClockPid, SlotFinderPid, PayloadServerPid, LogFile) ->
     SendtimeMS = notify_when_preperation_and_send_due(ClockPid, FrameStart, SlotNumber, LogFile),

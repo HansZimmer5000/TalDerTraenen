@@ -94,8 +94,8 @@ check_insendphase_and_return_nextinsendphase_and_nextslotnumber(InSendphase, Cor
     case InSendphase of
             false ->
                 % Entryphase
-		logge_status("Schlafe ~pms", [RestFrameTime - 2], LogFile),
-		timer:sleep(RestFrameTime - 2),
+		        logge_status("Schlafe ~pms", [RestFrameTime - 2], LogFile),
+		        timer:sleep(RestFrameTime - 2),
                 {NextInSendphase, NextSlotNumber} = get_nextinsendphase_and_nextslotnumber(CorePid, SlotFinderPid, RestFrameTime, LogFile);
             true -> 
                 % Sendphase
@@ -120,14 +120,14 @@ get_nextinsendphase_and_nextslotnumber(CorePid, SlotFinderPid, RestFrameTime, Lo
 handle_sendphase_messages(RestFrameTime, LogFile) ->
     StartTime = vsutil:getUTC(),
     receive
-            {messagewassend, MessageWasSend, ReceivedNextSlotNumber} -> 
-		NewRestFrameTime = RestFrameTime - (vsutil:getUTC() - StartTime),
-		logge_status("NewRestFrameTime ~p", [NewRestFrameTime], LogFile),
-                {NextInSendphase, NextSlotNumber} = wait_for_stationwasinvolved_and_return_nextinsendphase_and_nextslotnumber(MessageWasSend, ReceivedNextSlotNumber, NewRestFrameTime, LogFile)
-            after RestFrameTime ->
-                logge_status("Messagewassend was never received", LogFile),
-                NextInSendphase = false,
-                NextSlotNumber = 0
+        {messagewassend, MessageWasSend, ReceivedNextSlotNumber} -> 
+            NewRestFrameTime = RestFrameTime - (vsutil:getUTC() - StartTime),
+            logge_status("NewRestFrameTime ~p", [NewRestFrameTime], LogFile),
+            {NextInSendphase, NextSlotNumber} = wait_for_stationwasinvolved_and_return_nextinsendphase_and_nextslotnumber(MessageWasSend, ReceivedNextSlotNumber, NewRestFrameTime, LogFile)
+        after RestFrameTime ->
+            logge_status("Messagewassend was never received", LogFile),
+            NextInSendphase = false,
+            NextSlotNumber = 0
     end,
     {NextInSendphase, NextSlotNumber}.
 

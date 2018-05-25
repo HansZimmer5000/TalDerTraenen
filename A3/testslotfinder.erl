@@ -2,6 +2,39 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
+-define(DEFAULT_FULL_MESSAGE_4, {{"A", "team 06-02", "1234567890123-", 4, 1522240433451}, empty}).
+-define(DEFAULT_FULL_MESSAGE_25, {{"A", "team 06-02", "1234567890123-", 25, 1522240433451}, empty}).
+
+start_1_test() ->
+    ThisPid = self(),
+    PossibleSlots = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],
+
+    CorePid = ThisPid,
+    StationName = "team 06-02",
+    LogFile = "slotfindertest.log",
+    TestPid = slotfinder:start(CorePid, StationName, LogFile),
+
+    TestPid ! {getFreeSlotNum, ThisPid},
+    receive
+        {slotnum, SelectedSlot1} -> 
+            ?assert(lists:member(SelectedSlot1, PossibleSlots))
+    end,
+
+    ReceivedMessages = [?DEFAULT_FULL_MESSAGE_4, ?DEFAULT_FULL_MESSAGE_25],
+    TestPid ! {newmessages, ReceivedMessages},
+    TestPid ! {getFreeSlotNum, ThisPid},
+    receive
+        {slotnum, SelectedSlot2} -> 
+            ?assert(lists:member(SelectedSlot2, [1,2,3,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]))
+    end,
+
+    TestPid ! newframe,
+    TestPid ! {getFreeSlotNum, ThisPid},
+    receive
+        {slotnum, SelectedSlot3} -> 
+            ?assert(lists:member(SelectedSlot3, PossibleSlots))
+    end.
+
 get_taken_slots_1_test() ->
     Messages = [
         {{"A","-team-0001-","123456789012-",4, 77394825}, 77394825}, 
@@ -48,8 +81,6 @@ delete_possible_slots_1_test() ->
 
 delete_possible_slots_2_test() ->
     ?assertEqual([1,2], slotfinder:delete_possible_slots([1,2], [])).
-
-
 
 select_random_slot_1_test() ->
     ?assertEqual(1,slotfinder:select_random_slot([1])).

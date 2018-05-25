@@ -9,7 +9,7 @@
 
 % -------------------- Init --------------------------
 start(CorePid, ClockPid, SlotFinderPid, StationName, InterfaceAddress, McastAddress, ReceivePort,LogFile) ->
-    Socket = create_socket_klc(InterfaceAddress, McastAddress, ReceivePort),
+    Socket = create_socket(InterfaceAddress, McastAddress, ReceivePort),
     HandlerPid = spawn(fun() -> listen_loop(CorePid, ClockPid, SlotFinderPid, StationName, LogFile) end),
     _Receive_loop = spawn(fun() -> receive_loop(HandlerPid, ClockPid, Socket,LogFile) end),
     logge_status("Listening to ~p:~p", [McastAddress, ReceivePort], LogFile),
@@ -73,7 +73,7 @@ create_socket(InterfaceAddress, McastAddress, ReceivePort) ->
         {ok, Socket} = gen_udp:open(ReceivePort, [
             {mode, binary},
             {reuseaddr, true},
-            {ip, InterfaceAddress}, %may use Mcast
+            {ip, McastAddress}, %may use Mcast
             {multicast_ttl, 1},
             {multicast_loop, true},
             {broadcast, true},

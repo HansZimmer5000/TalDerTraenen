@@ -49,7 +49,7 @@ def __start_stations(a_count, b_count, run_on_windows):
         b_count = b_count - 1
 
 def __create_params_with(stationtype, stationnumber):
-    return "win 225.10.1.2 16000 " + stationtype + " 0 " + stationnumber
+    return "eth0 224.0.0.251 15006 " + stationtype + " 0 " + stationnumber
 
 def __start_stations_via_shell_script(a_count, b_count):
     offset = 0	
@@ -58,8 +58,8 @@ def __start_stations_via_shell_script(a_count, b_count):
     b_start = a_start + a_count
     b_last = b_start + b_count - 1
     script = "./startStations.sh"
-    paramsPraktikum = "eth0 224.0.0.251 15006"
-    params = "eth2 225.10.1.2 16000"
+    params = "eth0 224.0.0.251 15006"
+    paramsPraktikum = "eth2 225.10.1.2 16000"
     os.system(script + " " + params + " " + str(a_start) + " " + str(a_last) + " A 0")
     os.system(script + " " + params + " " + str(b_start) + " " + str(b_last) + " B 0")
 
@@ -108,18 +108,12 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
-        __start_stations_via_shell_script(25, 0)
+        __start_stations_via_shell_script(10, 0)
         #__start_node_mac("ns", "nameservice", "")
         #time.sleep(1)
         #__start_node("bench", "benchmark", "")
         #__start_stations(1,0)
     elif user_input == "3":
         __remove_all_unecessary_files([".log", ".beam", ".dump"])
-    elif user_input == "4":
-        __make_all_modules()
-        __clear_all_log_files_in_current_dir()
-        __start_node("tunnel", "multicast", "")
-        time.sleep(1)
-        __start_stations(1,0, True)
     else:
         print("Argument: '" + user_input + "' unkonwn.")
