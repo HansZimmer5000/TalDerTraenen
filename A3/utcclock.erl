@@ -24,61 +24,71 @@ start(OffsetMS, CorePid, StationName, LogFile) ->
     logge_status("Starting with Offset: ~p", [OffsetMS], LogFile),
     TransportTupel = {StationName, 0, 0},
     ClockPid = spawn(fun() -> 
-
-		loop(OffsetMS, CorePid, TransportTupel, LogFile) 
+        TimerTupel = create_checkframe_timer({0, empty}, OffsetMS),
+		loop(OffsetMS, TimerTupel, CorePid, TransportTupel, LogFile) 
 	end),
     ClockPid.
 
 % -------------------- Loop --------------------------
 
-loop(OffsetMS, CorePid, TransportTupel, LogFile) ->
+loop(OffsetMS, TimerTupel, CorePid, TransportTupel, LogFile) ->
     receive
+        newframe -> 
+            CorePid ! {newframe, get_current_time(OffsetMS), OffsetMS},
+            NewTimerTupel = create_checkframe_timer(TimerTupel, OffsetMS),
+            loop(OffsetMS, NewTimerTupel, CorePid, TransportTupel, LogFile);
         {newoffsetandtransporttupel, ReceivedOffsetDiff, NewTransportTupel} ->
             TmpNewOffsetMS = OffsetMS - ReceivedOffsetDiff,
-	    NewOffsetMS = (OffsetMS + TmpNewOffsetMS) div 2, 
+	        NewOffsetMS = (OffsetMS + TmpNewOffsetMS) div 2, 
+            case NewOffsetMS == OffsetMS of
+                false ->
+                    NewTimerTupel = create_checkframe_timer(NewOffsetMS, NewOffsetMS);
+                true ->
+                    NewTimerTupel = TimerTupel
+            end,
             logge_status("New Offset: ~p (Old: ~p)", [NewOffsetMS, OffsetMS], LogFile),
-            loop(NewOffsetMS, CorePid, NewTransportTupel, LogFile);
+            loop(NewOffsetMS, NewTimerTupel, CorePid, NewTransportTupel, LogFile);
         {adjust, Messages} ->
             ClockPid = self(),
             spawn(fun () -> 
                     adjust(OffsetMS, ClockPid, Messages, TransportTupel, LogFile)
                 end),
-            loop(OffsetMS, CorePid, TransportTupel, LogFile);
+            loop(OffsetMS, TimerTupel, CorePid, TransportTupel, LogFile);
         {calcslotmid, FrameStart, SlotNumber, SenderPid} ->
             spawn(fun() -> 
                     SendtimeMS = calc_slot_mid_this_frame_time(FrameStart, SlotNumber, LogFile),
                     SenderPid ! {resultslotmid, SendtimeMS},
                     logge_status("calc got: ~p ~p = ~p", [FrameStart, SlotNumber, SendtimeMS], LogFile),
-                    loop(OffsetMS, CorePid, TransportTupel, LogFile)
+                    loop(OffsetMS, TimerTupel, CorePid, TransportTupel, LogFile)
                 end),
-            loop(OffsetMS, CorePid, TransportTupel, LogFile);
+            loop(OffsetMS, TimerTupel, CorePid, TransportTupel, LogFile);
         {alarm, AlarmMessage, TimeWhenItsDue, SenderPid} ->
             spawn(fun() ->
                     TimeTillItsDue = TimeWhenItsDue - get_current_time(OffsetMS),
                     set_alarm(AlarmMessage, TimeTillItsDue, SenderPid, LogFile)
                 end),
-            loop(OffsetMS, CorePid, TransportTupel, LogFile);
+            loop(OffsetMS, TimerTupel, CorePid, TransportTupel, LogFile);
         {calcdifftime, UTCTime, SenderPid} ->
             spawn(fun() -> 
                     CurrentTime = get_current_time(OffsetMS),
                     DiffTime = CurrentTime - UTCTime,
                     SenderPid ! {resultdifftime, DiffTime},
-                    loop(OffsetMS, CorePid, TransportTupel, LogFile)
+                    loop(OffsetMS, TimerTupel, CorePid, TransportTupel, LogFile)
                 end),
-            loop(OffsetMS, CorePid, TransportTupel, LogFile);
+            loop(OffsetMS, TimerTupel, CorePid, TransportTupel, LogFile);
         {getcurrenttime, SenderPid} ->
             SenderPid ! {currenttime, get_current_time(OffsetMS)},
-            loop(OffsetMS, CorePid, TransportTupel, LogFile);
-	{getcurrenttimeandoffset, SenderPid} ->
-	    SenderPid ! {currenttimeandoffset, get_current_time(OffsetMS), OffsetMS},
-            loop(OffsetMS, CorePid, TransportTupel, LogFile);
+            loop(OffsetMS, TimerTupel, CorePid, TransportTupel, LogFile);
+	    {getcurrenttimeandoffset, SenderPid} ->
+	        SenderPid ! {currenttimeandoffset, get_current_time(OffsetMS), OffsetMS},
+                loop(OffsetMS, TimerTupel, CorePid, TransportTupel, LogFile);
         {getcurrentoffsetms, SenderPid} ->
             %For Testing only
             SenderPid ! OffsetMS,
-            loop(OffsetMS, CorePid, TransportTupel, LogFile);
+            loop(OffsetMS, TimerTupel, CorePid, TransportTupel, LogFile);
         Any -> 
             logge_status("Got: ~p", [Any], LogFile),
-            loop(OffsetMS, CorePid, TransportTupel, LogFile)
+            loop(OffsetMS, TimerTupel, CorePid, TransportTupel, LogFile)
     end.
 
 % --------------------- Exported Functions -----------
@@ -91,23 +101,19 @@ get_frame_rest_time(StationFrameStart, StationFrameStartOffset, ClockPid, _LogFi
 		RestFrameTime
     end.
 
-start_timer_getcurrenttime(StationFrameStart, StationFrameStartOffset, ClockPid, LogFile) ->
-    ClockPid ! {getcurrenttimeandoffset, self()},
-    receive
-	{currenttimeandoffset, StationFrameNow, StationFrameNowOffset} ->
-		logge_status("start_timer_getcurrenttime with: ~p", [[StationFrameStart, StationFrameStartOffset, StationFrameNow, StationFrameNowOffset]], LogFile),
-		_StartTime = vsutil:getUTC(),
-		TimeElapsedInFrame = StationFrameNow - StationFrameStart + (StationFrameStartOffset - StationFrameNowOffset),
-		RestFrameTime = 1000 - TimeElapsedInFrame,
-		case RestFrameTime of
-			RestFrameTime when RestFrameTime > 0 ->
-				timer:send_after(RestFrameTime - 1, ClockPid, {getcurrenttimeandoffset, self()});
-			_Else ->
-				ClockPid ! {getcurrenttimeandoffset, self()}
-		end
-    end.
-
 % ---------------------Internal Functions ---------------------
+
+create_checkframe_timer({LastFrameStart, CurrentTimer}, CurrentOffsetMS) ->
+    CurrentTime = get_current_time(CurrentOffsetMS),
+    TimeTillNextFrame = calc_time_till_next_frame(CurrentTime),
+    timer:cancel(CurrentTimer),
+    {ok, NewTimer} = timer:send_after(TimeTillNextFrame - 1, newframe),
+    {LastFrameStart, NewTimer}.
+
+calc_time_till_next_frame(CurrentTime) ->
+    TimeElapsedInCurrentFrame = CurrentTime rem 1000,
+    TimeTillNextFrame = 1000 - TimeElapsedInCurrentFrame,
+    TimeTillNextFrame.
 
 adjust(OffsetMS, ClockPid, Messages, TransportTupel, LogFile) ->
     NewTransportTupel = adjust_transport_tupel(Messages, OffsetMS, TransportTupel, LogFile),
@@ -208,3 +214,25 @@ logge_status(Inhalt, LogFile) ->
     LogNachricht = io_lib:format("~p -- Clock ~s.\n", [AktuelleZeit, Inhalt]),
     io:fwrite(LogNachricht),
     util:logging(LogFile, LogNachricht).
+
+
+
+
+
+
+
+start_timer_getcurrenttime(StationFrameStart, StationFrameStartOffset, ClockPid, LogFile) ->
+    ClockPid ! {getcurrenttimeandoffset, self()},
+    receive
+        {currenttimeandoffset, StationFrameNow, StationFrameNowOffset} ->
+            logge_status("start_timer_getcurrenttime with: ~p", [[StationFrameStart, StationFrameStartOffset, StationFrameNow, StationFrameNowOffset]], LogFile),
+            _StartTime = vsutil:getUTC(),
+            TimeElapsedInFrame = StationFrameNow - StationFrameStart + (StationFrameStartOffset - StationFrameNowOffset),
+            RestFrameTime = 1000 - TimeElapsedInFrame,
+            case RestFrameTime of
+                RestFrameTime when RestFrameTime > 0 ->
+                    timer:send_after(RestFrameTime - 1, ClockPid, {getcurrenttimeandoffset, self()});
+                _Else ->
+                    ClockPid ! {getcurrenttimeandoffset, self()}
+            end
+    end.
