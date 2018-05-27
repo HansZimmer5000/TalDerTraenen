@@ -85,20 +85,16 @@ wait_for_send(SendtimeMS, IncompleteMessage, ClockPid, PayloadServerPid, SendPid
     receive
         send ->
             ClockPid ! {getcurrenttime, self()},
-            MessageWasSend = wait_for_currenttime(SendtimeMS, IncompleteMessage, PayloadServerPid, SendPid, LogFile)
+            receive
+                {currenttime, CurrentTime} ->
+                    MessageWasSend = check_sendtime_and_send(
+                                        SendtimeMS, CurrentTime, IncompleteMessage, PayloadServerPid, SendPid, LogFile)
+                after 980 ->
+                    logge_status("Timeout resultdifftime", LogFile),
+                    MessageWasSend = false
+            end
         after 980 ->
             logge_status("Timeout send", LogFile),
-            MessageWasSend = false
-    end,
-    MessageWasSend.
-
-wait_for_currenttime(SendtimeMS, IncompleteMessage, PayloadServerPid, SendPid, LogFile) ->
-    receive
-        {currenttime, CurrentTime} ->
-            MessageWasSend = check_sendtime_and_send(
-                                SendtimeMS, CurrentTime, IncompleteMessage, PayloadServerPid, SendPid, LogFile)
-        after 980 ->
-            logge_status("Timeout resultdifftime", LogFile),
             MessageWasSend = false
     end,
     MessageWasSend.
