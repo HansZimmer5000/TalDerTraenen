@@ -123,19 +123,19 @@ handle_sendphase_messages(RestFrameTime, LogFile) ->
 wait_for_stationwasinvolved_and_return_nextinsendphase_and_nextslotnumber(MessageWasSend, ReceivedNextSlotNumber, RestFrameTime, LogFile) ->
     receive 
         {stationwasinvolved, true} ->
-            	logge_status("Send_Loop end with ~p (Involved) ~p (Send)",[true, MessageWasSend], LogFile),
-		NextInSendphase = false,
-		NextSlotNumber = 0
+            logge_status("Send_Loop end with ~p (Involved) ~p (Send)",[true, MessageWasSend], LogFile),
+            NextInSendphase = false,
+            NextSlotNumber = 0
         after RestFrameTime - 1 -> 
-             	logge_status("stationwasinvolved = true was never received", LogFile),
-		case MessageWasSend of
-			true ->
-				NextInSendphase = true,
-				NextSlotNumber = ReceivedNextSlotNumber;
-			false ->
-				NextInSendphase = false,
-				NextSlotNumber = 0
-		end
+            logge_status("stationwasinvolved = true was never received", LogFile),
+            case MessageWasSend of
+                true ->
+                    NextInSendphase = true,
+                    NextSlotNumber = ReceivedNextSlotNumber;
+                false ->
+                    NextInSendphase = false,
+                    NextSlotNumber = 0
+            end
     end,
     {NextInSendphase, NextSlotNumber}.
 %------------------------------------------

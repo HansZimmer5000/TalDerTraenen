@@ -75,7 +75,7 @@ wait_for_send(SendtimeMS, StationType, SlotFinderPid, ClockPid, PayloadServerPid
             ClockPid ! {getcurrenttime, self()},
             receive
                 {currenttime, CurrentTime} ->
-                    {NextSlotNumber, MessageWasSend} = check_sendtime_and_send(
+                    {MessageWasSend, NextSlotNumber} = check_sendtime_and_send(
                                         SendtimeMS, CurrentTime, StationType, SlotFinderPid, PayloadServerPid, SendPid, LogFile)
                 after 980 ->
                     logge_status("Timeout resultdifftime", LogFile),
@@ -87,7 +87,7 @@ wait_for_send(SendtimeMS, StationType, SlotFinderPid, ClockPid, PayloadServerPid
             NextSlotNumber = 0,
             MessageWasSend = false
     end,
-    {NextSlotNumber, MessageWasSend}.
+    {MessageWasSend, NextSlotNumber}.
 
 check_sendtime_and_send(SendtimeMS, CurrentTime, StationType, SlotFinderPid, PayloadServerPid, SendPid, LogFile) ->
     logge_status("~p (Seti) ~p (Now)", [SendtimeMS, CurrentTime], LogFile),
@@ -107,7 +107,7 @@ check_sendtime_and_send(SendtimeMS, CurrentTime, StationType, SlotFinderPid, Pay
             NextSlotNumber = send_message(StationType, SlotFinderPid, PayloadServerPid, SendPid,LogFile),
             MessageWasSend = true
     end,
-    {NextSlotNumber, MessageWasSend}.
+    {MessageWasSend, NextSlotNumber}.
 
 send_message(StationType, SlotFinderPid, PayloadServerPid, SendPid, LogFile) ->
     logge_status("Frage nach Payload", LogFile),

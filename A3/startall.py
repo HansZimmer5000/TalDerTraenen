@@ -108,7 +108,7 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
-        __start_stations_via_shell_script(10, 0)
+        __start_stations_via_shell_script(1, 0)
         #__start_node_mac("ns", "nameservice", "")
         #time.sleep(1)
         #__start_node("bench", "benchmark", "")
