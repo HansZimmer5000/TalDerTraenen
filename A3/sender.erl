@@ -22,7 +22,7 @@ loop(Socket, McastAddress, ReceivePort, ClockPid, LogFile) ->
 	    receive 
 		{currenttime, SendTime} -> 
 			Message = messagehelper:prepare_incomplete_message_for_sending(IncompleteMessage, SendTime, Payload),
-    			logge_status("Sende Nachricht", LogFile),
+    		logge_status("Sende Nachricht", LogFile),
 			send(Socket, McastAddress, ReceivePort, Message, LogFile)
 	    end
     end,
@@ -57,23 +57,11 @@ notify_when_preperation_and_send_due(ClockPid, FrameStart, SlotNumber, _LogFile)
     end,
     SendtimeMS.
 
-
 wait_for_prepare(StationType, SendtimeMS, ClockPid, SlotFinderPid, PayloadServerPid, SendPid, LogFile) ->
     receive
         preperation ->
-            SlotFinderPid ! {getFreeSlotNum, self()},
-            receive 
-                {slotnum, NextSlotNumber} -> 
-                    NextSlotNumber,
-                    logge_status("Got NextSlotnumber ~p", [NextSlotNumber], LogFile)
-                after 20 -> 
-                    NextSlotNumber = 0,
-                    logge_status("Never received Slotnumber", LogFile),
-			%Todo: vll lieber nicht machen sondern wait_for_send in slotnum case reinziehen
-                    exit(self(), kill) 
-            end,
-            IncompleteMessage = messagehelper:create_incomplete_message(StationType, NextSlotNumber),
-            MessageWasSend = wait_for_send(SendtimeMS, IncompleteMessage, ClockPid, PayloadServerPid, SendPid, LogFile)
+            %Lassen wir vorerst drin, dann kann man evtl. noch eine Idee leichter umsetzen.
+            {MessageWasSend, NextSlotNumber} = wait_for_send(SendtimeMS, StationType, SlotFinderPid, ClockPid, PayloadServerPid, SendPid, LogFile)
         after 980 ->
             logge_status("Timeout preperation", LogFile),
             MessageWasSend = false,
@@ -81,47 +69,53 @@ wait_for_prepare(StationType, SendtimeMS, ClockPid, SlotFinderPid, PayloadServer
     end,
     {MessageWasSend, NextSlotNumber}.
 
-wait_for_send(SendtimeMS, IncompleteMessage, ClockPid, PayloadServerPid, SendPid, LogFile) ->
+wait_for_send(SendtimeMS, StationType, SlotFinderPid, ClockPid, PayloadServerPid, SendPid, LogFile) ->
     receive
         send ->
             ClockPid ! {getcurrenttime, self()},
             receive
                 {currenttime, CurrentTime} ->
-                    MessageWasSend = check_sendtime_and_send(
-                                        SendtimeMS, CurrentTime, IncompleteMessage, PayloadServerPid, SendPid, LogFile)
+                    {NextSlotNumber, MessageWasSend} = check_sendtime_and_send(
+                                        SendtimeMS, CurrentTime, StationType, SlotFinderPid, PayloadServerPid, SendPid, LogFile)
                 after 980 ->
                     logge_status("Timeout resultdifftime", LogFile),
+                    NextSlotNumber = 0,
                     MessageWasSend = false
             end
         after 980 ->
             logge_status("Timeout send", LogFile),
+            NextSlotNumber = 0,
             MessageWasSend = false
     end,
-    MessageWasSend.
+    {NextSlotNumber, MessageWasSend}.
 
-check_sendtime_and_send(SendtimeMS, CurrentTime, IncompleteMessage, PayloadServerPid, SendPid, LogFile) ->
+check_sendtime_and_send(SendtimeMS, CurrentTime, StationType, SlotFinderPid, PayloadServerPid, SendPid, LogFile) ->
     logge_status("~p (Seti) ~p (Now)", [SendtimeMS, CurrentTime], LogFile),
     DiffTime = SendtimeMS - CurrentTime,
     case DiffTime of
         DiffTime when DiffTime > 0 -> 
             logge_status("SendTime in the future: ~p", [DiffTime], LogFile),
             timer:sleep(DiffTime - 1), % little bit earlier, because Payload will take some time to get
-            send_message(IncompleteMessage, PayloadServerPid, SendPid, LogFile),
+            NextSlotNumber = send_message(StationType, SlotFinderPid, PayloadServerPid, SendPid, LogFile),
             MessageWasSend = true;
         DiffTime when DiffTime < 0 -> 
             logge_status("SendTime in the past: ~p", [DiffTime], LogFile),
+            NextSlotNumber = 0,
             MessageWasSend = false; 
         DiffTime -> 
             logge_status("SendTime is now: ~p", [DiffTime], LogFile),
-            send_message(IncompleteMessage, PayloadServerPid, SendPid,LogFile),
+            NextSlotNumber = send_message(StationType, SlotFinderPid, PayloadServerPid, SendPid,LogFile),
             MessageWasSend = true
     end,
-    MessageWasSend.
+    {NextSlotNumber, MessageWasSend}.
 
-send_message(IncompleteMessage, PayloadServerPid, SendPid, LogFile) ->
+send_message(StationType, SlotFinderPid, PayloadServerPid, SendPid, LogFile) ->
     logge_status("Frage nach Payload", LogFile),
     Payload = request_payload(PayloadServerPid, LogFile),
-    SendPid ! {send, IncompleteMessage, Payload}.
+    NextSlotNumber = request_nextslotnumber(SlotFinderPid, LogFile),
+    IncompleteMessage = messagehelper:create_incomplete_message(StationType, NextSlotNumber),
+    SendPid ! {send, IncompleteMessage, Payload},
+    NextSlotNumber.
 
 request_payload(PayloadServerPid, LogFile) ->
 	    StartTime = vsutil:getUTC(),
@@ -131,6 +125,15 @@ request_payload(PayloadServerPid, LogFile) ->
 		    logge_status("Took ~p to get Payload", [vsutil:getUTC() - StartTime], LogFile),
                     Payload
             end.
+
+request_nextslotnumber(SlotFinderPid, LogFile) ->
+    SlotFinderPid ! {getFreeSlotNum, self()},
+    receive 
+        {slotnum, NextSlotNumber} -> 
+            NextSlotNumber,
+            logge_status("Got NextSlotnumber ~p", [NextSlotNumber], LogFile)
+    end,
+    NextSlotNumber.
 
 send(Socket, McastAddress, ReceivePort, Message, LogFile) ->
     ReturnVal = gen_udp:send(Socket, McastAddress, ReceivePort, Message),
