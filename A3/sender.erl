@@ -95,7 +95,7 @@ check_sendtime_and_send(SendtimeMS, CurrentTime, StationType, SlotFinderPid, Pay
     case DiffTime of
         DiffTime when DiffTime > 0 -> 
             logge_status("SendTime in the future: ~p", [DiffTime], LogFile),
-            timer:sleep(DiffTime - 1), % little bit earlier, because Payload will take some time to get
+            timer:sleep(DiffTime - 2), % little bit earlier, because Payload and Slotfinder will take some time to get
             NextSlotNumber = send_message(StationType, SlotFinderPid, PayloadServerPid, SendPid, LogFile),
             MessageWasSend = true;
         DiffTime when DiffTime < 0 -> 

@@ -58,8 +58,9 @@ def __start_stations_via_shell_script(a_count, b_count):
     b_start = a_start + a_count
     b_last = b_start + b_count - 1
     script = "./startStations.sh"
-    params = "eth0 224.0.0.251 15006"
-    paramsPraktikum = "eth2 225.10.1.2 16000"
+    paramsDaheim = "eth0 224.0.0.251 15006"
+    params = "eth2 225.10.1.2 16000"
+    params = "eth2 127.0.0.1 16000"
     os.system(script + " " + params + " " + str(a_start) + " " + str(a_last) + " A 0")
     os.system(script + " " + params + " " + str(b_start) + " " + str(b_last) + " B 0")
 
@@ -108,7 +109,7 @@ if __name__ == "__main__":
     elif user_input == "2":
         __make_all_modules()
         __clear_all_log_files_in_current_dir()
-        __start_stations_via_shell_script(1, 0)
+        __start_stations_via_shell_script(25, 0)
         #__start_node_mac("ns", "nameservice", "")
         #time.sleep(1)
         #__start_node("bench", "benchmark", "")
