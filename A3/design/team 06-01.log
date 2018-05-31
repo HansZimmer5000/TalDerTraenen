@@ -1,0 +1,2812 @@
+"18.05 13:26:26,864|" STATION Found Addr: {172,16,1,6}
+.
+"18.05 13:26:26,868|" STATION Starte "team 06-01" um 1526642786866 mit ["A",0,
+                                          {172,16,1,6},
+                                          {225,10,1,2},
+                                          '16000',
+                                          ["team 06-01",46,108,111,103]].
+"18.05 13:26:26,870|" -- Clock Starting with Offset: 0.
+"18.05 13:26:26,871|" - Recv Listening to {225,10,1,2}:16000.
+"18.05 13:26:26,872|" - Send Sending to {225,10,1,2}:16000.
+"18.05 13:26:26,872|" ---- PYLD PayloadserverPID: <0.5.0> // Vessel3 with Send Pipe PID: <0.66.0>.
+"18.05 13:26:26,873|" -- Slot Startet.
+"18.05 13:26:28,001|" Core New Frame Started at 1526642788001 with Slot 0 --------.
+"18.05 13:26:29,002|" Core RestFrameTime = 0.
+"18.05 13:26:29,003|" Core Never received Slotnumber.
+"18.05 13:26:29,006|" Core Frame Ended after 1001  with NextInSendphase = false.
+"18.05 13:26:29,006|" Core New Frame Started at 1526642789006 with Slot 0 --------.
+"18.05 13:26:29,527|" -- Clock Got Adjust.
+"18.05 13:26:29,527|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:29,527|" -- Clock TransportDelay is 0.
+"18.05 13:26:29,527|" -- Clock Send 1526642789507 Recv 1526642789507.
+"18.05 13:26:29,527|" -- Clock Diff (0).
+"18.05 13:26:29,527|" -- Clock New Offset: 0 (Old: 0).
+"18.05 13:26:30,006|" Core RestFrameTime = 0.
+"18.05 13:26:30,007|" Core Frame Ended after 1000  with NextInSendphase = true.
+"18.05 13:26:30,007|" Core New Frame Started at 1526642790007 with Slot 24 --------.
+"18.05 13:26:30,007|" -- Clock calc got: 1526642790007 24 = 1526642790947.
+"18.05 13:26:30,007|" - Send SendTimeMS at 1526642790947.
+"18.05 13:26:30,087|" -- Clock Got Adjust.
+"18.05 13:26:30,087|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:30,087|" -- Clock TransportDelay is 0.
+"18.05 13:26:30,087|" -- Clock Send 1526642790062 Recv 1526642790063.
+"18.05 13:26:30,087|" -- Clock Diff (1).
+"18.05 13:26:30,087|" -- Clock New Offset: -1 (Old: 0).
+"18.05 13:26:30,126|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:30,246|" -- Clock Got Adjust.
+"18.05 13:26:30,246|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:30,246|" -- Clock TransportDelay is 0.
+"18.05 13:26:30,246|" -- Clock Send 1526642790224 Recv 1526642790225.
+"18.05 13:26:30,246|" -- Clock Diff (1).
+"18.05 13:26:30,246|" -- Clock New Offset: -2 (Old: -1).
+"18.05 13:26:30,326|" -- Clock Got Adjust.
+"18.05 13:26:30,326|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:30,326|" -- Clock TransportDelay is 0.
+"18.05 13:26:30,326|" -- Clock Send 1526642790306 Recv 1526642790307.
+"18.05 13:26:30,326|" -- Clock Diff (1).
+"18.05 13:26:30,326|" -- Clock New Offset: -3 (Old: -2).
+"18.05 13:26:30,366|" -- Clock Got Adjust.
+"18.05 13:26:30,366|" -- Clock My Name: "team 06-01", other Name: "team 06-02".
+"18.05 13:26:30,366|" -- Clock TransportDelay is 0.
+"18.05 13:26:30,366|" -- Clock Send 1526642790341 Recv 1526642790342.
+"18.05 13:26:30,366|" -- Clock Diff (1).
+"18.05 13:26:30,366|" -- Clock New Offset: -4 (Old: -3).
+"18.05 13:26:30,406|" -- Clock Got Adjust.
+"18.05 13:26:30,406|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:26:30,406|" -- Clock TransportDelay is 0.
+"18.05 13:26:30,406|" -- Clock Send 1526642790383 Recv 1526642790383.
+"18.05 13:26:30,406|" -- Clock Diff (0).
+"18.05 13:26:30,406|" -- Clock New Offset: -4 (Old: -4).
+"18.05 13:26:30,445|" -- Clock Got Adjust.
+"18.05 13:26:30,445|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:30,445|" -- Clock TransportDelay is 0.
+"18.05 13:26:30,445|" -- Clock Send 1526642790426 Recv 1526642790427.
+"18.05 13:26:30,445|" -- Clock Diff (1).
+"18.05 13:26:30,445|" -- Clock New Offset: -5 (Old: -4).
+"18.05 13:26:30,484|" -- Clock Got Adjust.
+"18.05 13:26:30,484|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:30,484|" -- Clock TransportDelay is 0.
+"18.05 13:26:30,484|" -- Clock Send 1526642790469 Recv 1526642790469.
+"18.05 13:26:30,484|" -- Clock Diff (0).
+"18.05 13:26:30,484|" -- Clock New Offset: -5 (Old: -5).
+"18.05 13:26:30,524|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:30,563|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:30,642|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:30,681|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:30,721|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:30,761|" -- Clock Got Adjust.
+"18.05 13:26:30,761|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:26:30,761|" -- Clock TransportDelay is 0.
+"18.05 13:26:30,761|" -- Clock Send 1526642790741 Recv 1526642790741.
+"18.05 13:26:30,761|" -- Clock Diff (0).
+"18.05 13:26:30,761|" -- Clock New Offset: -5 (Old: -5).
+"18.05 13:26:30,801|" -- Clock Got Adjust.
+"18.05 13:26:30,801|" -- Clock My Name: "team 06-01", other Name: "team 06-25".
+"18.05 13:26:30,801|" -- Clock TransportDelay is 0.
+"18.05 13:26:30,801|" -- Clock Send 1526642790790 Recv 1526642790790.
+"18.05 13:26:30,801|" -- Clock Diff (0).
+"18.05 13:26:30,801|" -- Clock New Offset: -5 (Old: -5).
+"18.05 13:26:30,841|" -- Clock Got Adjust.
+"18.05 13:26:30,841|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:26:30,841|" -- Clock TransportDelay is 0.
+"18.05 13:26:30,841|" -- Clock Send 1526642790831 Recv 1526642790833.
+"18.05 13:26:30,841|" -- Clock Diff (2).
+"18.05 13:26:30,841|" -- Clock New Offset: -7 (Old: -5).
+"18.05 13:26:30,928|" - Send Got NextSlotnumber 10.
+"18.05 13:26:30,938|" - Send 1526642790947 (Seti) 1526642790931 (Now).
+"18.05 13:26:30,938|" - Send SendTime in the future: 16.
+"18.05 13:26:30,954|" - Send Frage nach Payload.
+"18.05 13:26:30,954|" - Send Took 0 to get Payload.
+"18.05 13:26:30,954|" - Send Sende Nachricht.
+"18.05 13:26:30,955|" - Send sended with: ok.
+"18.05 13:26:30,961|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:26:31,001|" Core RestFrameTime = 0.
+"18.05 13:26:31,001|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:26:31,007|" -- Clock Schlief 6ms.
+"18.05 13:26:31,007|" Core Frame Ended after 1001  with NextInSendphase = false.
+"18.05 13:26:31,007|" Core New Frame Started at 1526642791000 with Slot 0 --------.
+"18.05 13:26:31,087|" -- Clock Got Adjust.
+"18.05 13:26:31,087|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:26:31,087|" -- Clock TransportDelay is 0.
+"18.05 13:26:31,087|" -- Clock Send 1526642791064 Recv 1526642791065.
+"18.05 13:26:31,087|" -- Clock Diff (1).
+"18.05 13:26:31,087|" -- Clock New Offset: -8 (Old: -7).
+"18.05 13:26:31,126|" -- Clock Got Adjust.
+"18.05 13:26:31,126|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:31,126|" -- Clock TransportDelay is 0.
+"18.05 13:26:31,126|" -- Clock Send 1526642791099 Recv 1526642791100.
+"18.05 13:26:31,126|" -- Clock Diff (1).
+"18.05 13:26:31,126|" -- Clock New Offset: -9 (Old: -8).
+"18.05 13:26:31,166|" -- Clock Got Adjust.
+"18.05 13:26:31,166|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:31,166|" -- Clock TransportDelay is 0.
+"18.05 13:26:31,166|" -- Clock Send 1526642791143 Recv 1526642791143.
+"18.05 13:26:31,166|" -- Clock Diff (0).
+"18.05 13:26:31,166|" -- Clock New Offset: -9 (Old: -9).
+"18.05 13:26:31,206|" -- Clock Got Adjust.
+"18.05 13:26:31,206|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:31,206|" -- Clock TransportDelay is 0.
+"18.05 13:26:31,206|" -- Clock Send 1526642791175 Recv 1526642791176.
+"18.05 13:26:31,206|" -- Clock Diff (1).
+"18.05 13:26:31,206|" -- Clock New Offset: -10 (Old: -9).
+"18.05 13:26:31,246|" -- Clock Got Adjust.
+"18.05 13:26:31,246|" -- Clock My Name: "team 06-01", other Name: "team 06-02".
+"18.05 13:26:31,246|" -- Clock TransportDelay is 0.
+"18.05 13:26:31,246|" -- Clock Send 1526642791214 Recv 1526642791213.
+"18.05 13:26:31,246|" -- Clock Diff (-1).
+"18.05 13:26:31,246|" -- Clock New Offset: -9 (Old: -10).
+"18.05 13:26:31,286|" -- Clock Got Adjust.
+"18.05 13:26:31,286|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:26:31,286|" -- Clock TransportDelay is 0.
+"18.05 13:26:31,286|" -- Clock Send 1526642791253 Recv 1526642791253.
+"18.05 13:26:31,286|" -- Clock Diff (0).
+"18.05 13:26:31,286|" -- Clock New Offset: -9 (Old: -9).
+"18.05 13:26:31,365|" -- Clock Got Adjust.
+"18.05 13:26:31,365|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:31,365|" -- Clock TransportDelay is 0.
+"18.05 13:26:31,365|" -- Clock Send 1526642791339 Recv 1526642791339.
+"18.05 13:26:31,365|" -- Clock Diff (0).
+"18.05 13:26:31,365|" -- Clock New Offset: -9 (Old: -9).
+"18.05 13:26:31,564|" -- Clock Got Adjust.
+"18.05 13:26:31,564|" -- Clock My Name: "team 06-01", other Name: "team 06-25".
+"18.05 13:26:31,564|" -- Clock TransportDelay is 0.
+"18.05 13:26:31,564|" -- Clock Send 1526642791546 Recv 1526642791545.
+"18.05 13:26:31,564|" -- Clock Diff (-1).
+"18.05 13:26:31,564|" -- Clock New Offset: -8 (Old: -9).
+"18.05 13:26:31,804|" -- Clock Got Adjust.
+"18.05 13:26:31,804|" -- Clock My Name: "team 06-01", other Name: "team 06-20".
+"18.05 13:26:31,804|" -- Clock TransportDelay is 0.
+"18.05 13:26:31,804|" -- Clock Send 1526642791780 Recv 1526642791778.
+"18.05 13:26:31,804|" -- Clock Diff (-2).
+"18.05 13:26:31,804|" -- Clock New Offset: -6 (Old: -8).
+"18.05 13:26:31,844|" -- Clock Got Adjust.
+"18.05 13:26:31,844|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:31,844|" -- Clock TransportDelay is 0.
+"18.05 13:26:31,844|" -- Clock Send 1526642791821 Recv 1526642791821.
+"18.05 13:26:31,844|" -- Clock Diff (0).
+"18.05 13:26:31,844|" -- Clock New Offset: -6 (Old: -6).
+"18.05 13:26:31,923|" -- Clock Got Adjust.
+"18.05 13:26:31,923|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:26:31,923|" -- Clock TransportDelay is 0.
+"18.05 13:26:31,923|" -- Clock Send 1526642791897 Recv 1526642791898.
+"18.05 13:26:31,923|" -- Clock Diff (1).
+"18.05 13:26:31,923|" -- Clock New Offset: -7 (Old: -6).
+"18.05 13:26:32,003|" Core RestFrameTime = 13.
+"18.05 13:26:32,007|" -- Clock Schlief 4ms.
+"18.05 13:26:32,007|" Core Frame Ended after 987  with NextInSendphase = true.
+"18.05 13:26:32,007|" Core New Frame Started at 1526642792000 with Slot 15 --------.
+"18.05 13:26:32,007|" -- Clock calc got: 1526642792000 15 = 1526642792580.
+"18.05 13:26:32,007|" - Send SendTimeMS at 1526642792580.
+"18.05 13:26:32,047|" -- Clock Got Adjust.
+"18.05 13:26:32,047|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:26:32,047|" -- Clock TransportDelay is 0.
+"18.05 13:26:32,047|" -- Clock Send 1526642792025 Recv 1526642792024.
+"18.05 13:26:32,047|" -- Clock Diff (-1).
+"18.05 13:26:32,047|" -- Clock New Offset: -6 (Old: -7).
+"18.05 13:26:32,207|" -- Clock Got Adjust.
+"18.05 13:26:32,207|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:26:32,207|" -- Clock TransportDelay is 0.
+"18.05 13:26:32,207|" -- Clock Send 1526642792183 Recv 1526642792184.
+"18.05 13:26:32,207|" -- Clock Diff (1).
+"18.05 13:26:32,207|" -- Clock New Offset: -7 (Old: -6).
+"18.05 13:26:32,246|" -- Clock Got Adjust.
+"18.05 13:26:32,246|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:26:32,246|" -- Clock TransportDelay is 0.
+"18.05 13:26:32,246|" -- Clock Send 1526642792225 Recv 1526642792225.
+"18.05 13:26:32,246|" -- Clock Diff (0).
+"18.05 13:26:32,246|" -- Clock New Offset: -7 (Old: -7).
+"18.05 13:26:32,326|" -- Clock Got Adjust.
+"18.05 13:26:32,326|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:32,326|" -- Clock TransportDelay is 0.
+"18.05 13:26:32,326|" -- Clock Send 1526642792294 Recv 1526642792295.
+"18.05 13:26:32,326|" -- Clock Diff (1).
+"18.05 13:26:32,326|" -- Clock New Offset: -8 (Old: -7).
+"18.05 13:26:32,365|" -- Clock Got Adjust.
+"18.05 13:26:32,365|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:32,365|" -- Clock TransportDelay is 0.
+"18.05 13:26:32,365|" -- Clock Send 1526642792346 Recv 1526642792346.
+"18.05 13:26:32,365|" -- Clock Diff (0).
+"18.05 13:26:32,365|" -- Clock New Offset: -8 (Old: -8).
+"18.05 13:26:32,405|" -- Clock Got Adjust.
+"18.05 13:26:32,405|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:26:32,405|" -- Clock TransportDelay is 0.
+"18.05 13:26:32,405|" -- Clock Send 1526642792378 Recv 1526642792379.
+"18.05 13:26:32,405|" -- Clock Diff (1).
+"18.05 13:26:32,405|" -- Clock New Offset: -9 (Old: -8).
+"18.05 13:26:32,444|" -- Clock Got Adjust.
+"18.05 13:26:32,444|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:26:32,444|" -- Clock TransportDelay is 0.
+"18.05 13:26:32,444|" -- Clock Send 1526642792435 Recv 1526642792435.
+"18.05 13:26:32,444|" -- Clock Diff (0).
+"18.05 13:26:32,444|" -- Clock New Offset: -9 (Old: -9).
+"18.05 13:26:32,483|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:32,523|" -- Clock Got Adjust.
+"18.05 13:26:32,523|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:32,523|" -- Clock TransportDelay is 0.
+"18.05 13:26:32,523|" -- Clock Send 1526642792503 Recv 1526642792503.
+"18.05 13:26:32,523|" -- Clock Diff (0).
+"18.05 13:26:32,523|" -- Clock New Offset: -9 (Old: -9).
+"18.05 13:26:32,562|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:32,568|" - Send Got NextSlotnumber 8.
+"18.05 13:26:32,579|" - Send 1526642792580 (Seti) 1526642792570 (Now).
+"18.05 13:26:32,579|" - Send SendTime in the future: 10.
+"18.05 13:26:32,589|" - Send Frage nach Payload.
+"18.05 13:26:32,589|" - Send Took 0 to get Payload.
+"18.05 13:26:32,589|" - Send Sende Nachricht.
+"18.05 13:26:32,589|" - Send sended with: ok.
+"18.05 13:26:32,602|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:26:32,681|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:32,761|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:32,880|" -- Clock Got Adjust.
+"18.05 13:26:32,880|" -- Clock My Name: "team 06-01", other Name: "team 06-25".
+"18.05 13:26:32,880|" -- Clock TransportDelay is 0.
+"18.05 13:26:32,880|" -- Clock Send 1526642792835 Recv 1526642792833.
+"18.05 13:26:32,880|" -- Clock Diff (-2).
+"18.05 13:26:32,880|" -- Clock New Offset: -7 (Old: -9).
+"18.05 13:26:32,959|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:33,000|" Core RestFrameTime = 7.
+"18.05 13:26:33,000|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:26:33,000|" -- Clock Got Adjust.
+"18.05 13:26:33,000|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:33,000|" -- Clock TransportDelay is 0.
+"18.05 13:26:33,000|" -- Clock Send 1526642792953 Recv 1526642792952.
+"18.05 13:26:33,000|" -- Clock Diff (-1).
+"18.05 13:26:33,000|" -- Clock New Offset: -6 (Old: -7).
+"18.05 13:26:33,006|" -- Clock Schlief 6ms.
+"18.05 13:26:33,006|" Core Frame Ended after 996  with NextInSendphase = false.
+"18.05 13:26:33,006|" Core New Frame Started at 1526642793000 with Slot 0 --------.
+"18.05 13:26:33,046|" -- Clock Got Adjust.
+"18.05 13:26:33,046|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:33,046|" -- Clock TransportDelay is 0.
+"18.05 13:26:33,046|" -- Clock Send 1526642792992 Recv 1526642792993.
+"18.05 13:26:33,046|" -- Clock Diff (1).
+"18.05 13:26:33,046|" -- Clock New Offset: -7 (Old: -6).
+"18.05 13:26:33,086|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:33,126|" -- Clock Got Adjust.
+"18.05 13:26:33,126|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:26:33,126|" -- Clock TransportDelay is 0.
+"18.05 13:26:33,126|" -- Clock Send 1526642793109 Recv 1526642793112.
+"18.05 13:26:33,126|" -- Clock Diff (3).
+"18.05 13:26:33,126|" -- Clock New Offset: -10 (Old: -7).
+"18.05 13:26:33,166|" -- Clock Got Adjust.
+"18.05 13:26:33,166|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:26:33,166|" -- Clock TransportDelay is 0.
+"18.05 13:26:33,166|" -- Clock Send 1526642793142 Recv 1526642793142.
+"18.05 13:26:33,166|" -- Clock Diff (0).
+"18.05 13:26:33,166|" -- Clock New Offset: -10 (Old: -10).
+"18.05 13:26:33,205|" -- Clock Got Adjust.
+"18.05 13:26:33,205|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:26:33,205|" -- Clock TransportDelay is 0.
+"18.05 13:26:33,205|" -- Clock Send 1526642793186 Recv 1526642793186.
+"18.05 13:26:33,205|" -- Clock Diff (0).
+"18.05 13:26:33,205|" -- Clock New Offset: -10 (Old: -10).
+"18.05 13:26:33,285|" -- Clock Got Adjust.
+"18.05 13:26:33,285|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:33,285|" -- Clock TransportDelay is 0.
+"18.05 13:26:33,285|" -- Clock Send 1526642793263 Recv 1526642793263.
+"18.05 13:26:33,285|" -- Clock Diff (0).
+"18.05 13:26:33,285|" -- Clock New Offset: -10 (Old: -10).
+"18.05 13:26:33,445|" -- Clock Got Adjust.
+"18.05 13:26:33,445|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:33,445|" -- Clock TransportDelay is 0.
+"18.05 13:26:33,445|" -- Clock Send 1526642793401 Recv 1526642793401.
+"18.05 13:26:33,445|" -- Clock Diff (0).
+"18.05 13:26:33,445|" -- Clock New Offset: -10 (Old: -10).
+"18.05 13:26:33,564|" -- Clock Got Adjust.
+"18.05 13:26:33,564|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:33,564|" -- Clock TransportDelay is 0.
+"18.05 13:26:33,564|" -- Clock Send 1526642793553 Recv 1526642793553.
+"18.05 13:26:33,564|" -- Clock Diff (0).
+"18.05 13:26:33,564|" -- Clock New Offset: -10 (Old: -10).
+"18.05 13:26:33,603|" -- Clock Got Adjust.
+"18.05 13:26:33,603|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:26:33,603|" -- Clock TransportDelay is 0.
+"18.05 13:26:33,603|" -- Clock Send 1526642793591 Recv 1526642793590.
+"18.05 13:26:33,603|" -- Clock Diff (-1).
+"18.05 13:26:33,603|" -- Clock New Offset: -9 (Old: -10).
+"18.05 13:26:33,843|" -- Clock Got Adjust.
+"18.05 13:26:33,843|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:33,843|" -- Clock TransportDelay is 0.
+"18.05 13:26:33,843|" -- Clock Send 1526642793818 Recv 1526642793816.
+"18.05 13:26:33,843|" -- Clock Diff (-2).
+"18.05 13:26:33,843|" -- Clock New Offset: -7 (Old: -9).
+"18.05 13:26:33,923|" -- Clock Got Adjust.
+"18.05 13:26:33,923|" -- Clock My Name: "team 06-01", other Name: "team 06-25".
+"18.05 13:26:33,923|" -- Clock TransportDelay is 0.
+"18.05 13:26:33,923|" -- Clock Send 1526642793915 Recv 1526642793916.
+"18.05 13:26:33,923|" -- Clock Diff (1).
+"18.05 13:26:33,923|" -- Clock New Offset: -8 (Old: -7).
+"18.05 13:26:34,002|" Core RestFrameTime = 4.
+"18.05 13:26:34,006|" -- Clock Schlief 4ms.
+"18.05 13:26:34,006|" Core Frame Ended after 1000  with NextInSendphase = true.
+"18.05 13:26:34,006|" Core New Frame Started at 1526642793998 with Slot 4 --------.
+"18.05 13:26:34,006|" -- Clock calc got: 1526642793998 4 = 1526642794138.
+"18.05 13:26:34,006|" - Send SendTimeMS at 1526642794138.
+"18.05 13:26:34,045|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:34,085|" -- Clock Got Adjust.
+"18.05 13:26:34,085|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:34,085|" -- Clock TransportDelay is 0.
+"18.05 13:26:34,085|" -- Clock Send 1526642794076 Recv 1526642794075.
+"18.05 13:26:34,085|" -- Clock Diff (-1).
+"18.05 13:26:34,085|" -- Clock New Offset: -7 (Old: -8).
+"18.05 13:26:34,125|" -- Clock Got Adjust.
+"18.05 13:26:34,125|" -- Clock My Name: "team 06-01", other Name: "team 06-07".
+"18.05 13:26:34,125|" -- Clock TransportDelay is 0.
+"18.05 13:26:34,125|" -- Clock Send 1526642794094 Recv 1526642794096.
+"18.05 13:26:34,125|" -- Clock Diff (2).
+"18.05 13:26:34,125|" -- Clock New Offset: -9 (Old: -7).
+"18.05 13:26:34,127|" - Send Got NextSlotnumber 4.
+"18.05 13:26:34,138|" - Send 1526642794138 (Seti) 1526642794129 (Now).
+"18.05 13:26:34,138|" - Send SendTime in the future: 9.
+"18.05 13:26:34,147|" - Send Frage nach Payload.
+"18.05 13:26:34,147|" - Send Took 0 to get Payload.
+"18.05 13:26:34,147|" - Send Sende Nachricht.
+"18.05 13:26:34,147|" - Send sended with: ok.
+"18.05 13:26:34,165|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:26:34,245|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:34,325|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:34,565|" -- Clock Got Adjust.
+"18.05 13:26:34,565|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:34,565|" -- Clock TransportDelay is 0.
+"18.05 13:26:34,565|" -- Clock Send 1526642794549 Recv 1526642794546.
+"18.05 13:26:34,565|" -- Clock Diff (-3).
+"18.05 13:26:34,565|" -- Clock New Offset: -6 (Old: -9).
+"18.05 13:26:34,605|" -- Clock Got Adjust.
+"18.05 13:26:34,605|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:26:34,605|" -- Clock TransportDelay is 0.
+"18.05 13:26:34,605|" -- Clock Send 1526642794587 Recv 1526642794587.
+"18.05 13:26:34,605|" -- Clock Diff (0).
+"18.05 13:26:34,605|" -- Clock New Offset: -6 (Old: -6).
+"18.05 13:26:34,644|" -- Clock Got Adjust.
+"18.05 13:26:34,644|" -- Clock My Name: "team 06-01", other Name: "team 06-19".
+"18.05 13:26:34,644|" -- Clock TransportDelay is 0.
+"18.05 13:26:34,644|" -- Clock Send 1526642794613 Recv 1526642794614.
+"18.05 13:26:34,644|" -- Clock Diff (1).
+"18.05 13:26:34,644|" -- Clock New Offset: -7 (Old: -6).
+"18.05 13:26:34,764|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:34,803|" -- Clock Got Adjust.
+"18.05 13:26:34,803|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:34,803|" -- Clock TransportDelay is 0.
+"18.05 13:26:34,803|" -- Clock Send 1526642794794 Recv 1526642794795.
+"18.05 13:26:34,803|" -- Clock Diff (1).
+"18.05 13:26:34,803|" -- Clock New Offset: -8 (Old: -7).
+"18.05 13:26:34,883|" -- Clock Got Adjust.
+"18.05 13:26:34,883|" -- Clock My Name: "team 06-01", other Name: "team 06-10".
+"18.05 13:26:34,883|" -- Clock TransportDelay is 0.
+"18.05 13:26:34,883|" -- Clock Send 1526642794854 Recv 1526642794854.
+"18.05 13:26:34,883|" -- Clock Diff (0).
+"18.05 13:26:34,883|" -- Clock New Offset: -8 (Old: -8).
+"18.05 13:26:34,923|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:34,963|" -- Clock Got Adjust.
+"18.05 13:26:34,963|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:26:34,963|" -- Clock TransportDelay is 0.
+"18.05 13:26:34,963|" -- Clock Send 1526642794951 Recv 1526642794951.
+"18.05 13:26:34,963|" -- Clock Diff (0).
+"18.05 13:26:34,963|" -- Clock New Offset: -8 (Old: -8).
+"18.05 13:26:35,003|" Core RestFrameTime = 7.
+"18.05 13:26:35,003|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:26:35,006|" -- Clock Schlief 3ms.
+"18.05 13:26:35,006|" Core Frame Ended after 993  with NextInSendphase = false.
+"18.05 13:26:35,006|" Core New Frame Started at 1526642794998 with Slot 0 --------.
+"18.05 13:26:35,166|" -- Clock Got Adjust.
+"18.05 13:26:35,166|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:35,166|" -- Clock TransportDelay is 0.
+"18.05 13:26:35,166|" -- Clock Send 1526642795151 Recv 1526642795151.
+"18.05 13:26:35,166|" -- Clock Diff (0).
+"18.05 13:26:35,166|" -- Clock New Offset: -8 (Old: -8).
+"18.05 13:26:35,326|" -- Clock Got Adjust.
+"18.05 13:26:35,326|" -- Clock My Name: "team 06-01", other Name: "team 06-19".
+"18.05 13:26:35,326|" -- Clock TransportDelay is 0.
+"18.05 13:26:35,326|" -- Clock Send 1526642795292 Recv 1526642795291.
+"18.05 13:26:35,326|" -- Clock Diff (-1).
+"18.05 13:26:35,326|" -- Clock New Offset: -7 (Old: -8).
+"18.05 13:26:35,365|" -- Clock Got Adjust.
+"18.05 13:26:35,365|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:26:35,365|" -- Clock TransportDelay is 0.
+"18.05 13:26:35,365|" -- Clock Send 1526642795351 Recv 1526642795352.
+"18.05 13:26:35,365|" -- Clock Diff (1).
+"18.05 13:26:35,365|" -- Clock New Offset: -8 (Old: -7).
+"18.05 13:26:35,525|" -- Clock Got Adjust.
+"18.05 13:26:35,525|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:35,525|" -- Clock TransportDelay is 0.
+"18.05 13:26:35,525|" -- Clock Send 1526642795514 Recv 1526642795512.
+"18.05 13:26:35,525|" -- Clock Diff (-2).
+"18.05 13:26:35,525|" -- Clock New Offset: -6 (Old: -8).
+"18.05 13:26:35,565|" -- Clock Got Adjust.
+"18.05 13:26:35,565|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:35,565|" -- Clock TransportDelay is 0.
+"18.05 13:26:35,565|" -- Clock Send 1526642795554 Recv 1526642795554.
+"18.05 13:26:35,565|" -- Clock Diff (0).
+"18.05 13:26:35,565|" -- Clock New Offset: -6 (Old: -6).
+"18.05 13:26:35,724|" -- Clock Got Adjust.
+"18.05 13:26:35,724|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:26:35,724|" -- Clock TransportDelay is 0.
+"18.05 13:26:35,724|" -- Clock Send 1526642795707 Recv 1526642795707.
+"18.05 13:26:35,724|" -- Clock Diff (0).
+"18.05 13:26:35,724|" -- Clock New Offset: -6 (Old: -6).
+"18.05 13:26:35,764|" -- Clock Got Adjust.
+"18.05 13:26:35,764|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:35,764|" -- Clock TransportDelay is 0.
+"18.05 13:26:35,764|" -- Clock Send 1526642795743 Recv 1526642795742.
+"18.05 13:26:35,764|" -- Clock Diff (-1).
+"18.05 13:26:35,764|" -- Clock New Offset: -5 (Old: -6).
+"18.05 13:26:35,844|" -- Clock Got Adjust.
+"18.05 13:26:35,844|" -- Clock My Name: "team 06-01", other Name: "team 06-10".
+"18.05 13:26:35,844|" -- Clock TransportDelay is 0.
+"18.05 13:26:35,844|" -- Clock Send 1526642795815 Recv 1526642795814.
+"18.05 13:26:35,844|" -- Clock Diff (-1).
+"18.05 13:26:35,844|" -- Clock New Offset: -4 (Old: -5).
+"18.05 13:26:36,004|" Core RestFrameTime = 0.
+"18.05 13:26:36,006|" -- Clock Schlief 2ms.
+"18.05 13:26:36,006|" Core Frame Ended after 994  with NextInSendphase = true.
+"18.05 13:26:36,006|" Core New Frame Started at 1526642796002 with Slot 24 --------.
+"18.05 13:26:36,006|" -- Clock calc got: 1526642796002 24 = 1526642796942.
+"18.05 13:26:36,006|" - Send SendTimeMS at 1526642796942.
+"18.05 13:26:36,046|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:36,125|" -- Clock Got Adjust.
+"18.05 13:26:36,125|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:26:36,125|" -- Clock TransportDelay is 0.
+"18.05 13:26:36,125|" -- Clock Send 1526642796097 Recv 1526642796098.
+"18.05 13:26:36,125|" -- Clock Diff (1).
+"18.05 13:26:36,125|" -- Clock New Offset: -5 (Old: -4).
+"18.05 13:26:36,164|" -- Clock Got Adjust.
+"18.05 13:26:36,164|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:36,164|" -- Clock TransportDelay is 0.
+"18.05 13:26:36,164|" -- Clock Send 1526642796156 Recv 1526642796156.
+"18.05 13:26:36,164|" -- Clock Diff (0).
+"18.05 13:26:36,164|" -- Clock New Offset: -5 (Old: -5).
+"18.05 13:26:36,203|" -- Clock Got Adjust.
+"18.05 13:26:36,203|" -- Clock My Name: "team 06-01", other Name: "team 06-10".
+"18.05 13:26:36,203|" -- Clock TransportDelay is 0.
+"18.05 13:26:36,203|" -- Clock Send 1526642796178 Recv 1526642796179.
+"18.05 13:26:36,203|" -- Clock Diff (1).
+"18.05 13:26:36,203|" -- Clock New Offset: -6 (Old: -5).
+"18.05 13:26:36,243|" -- Clock Got Adjust.
+"18.05 13:26:36,243|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:36,243|" -- Clock TransportDelay is 0.
+"18.05 13:26:36,243|" -- Clock Send 1526642796202 Recv 1526642796201.
+"18.05 13:26:36,243|" -- Clock Diff (-1).
+"18.05 13:26:36,243|" -- Clock New Offset: -5 (Old: -6).
+"18.05 13:26:36,403|" -- Clock Got Adjust.
+"18.05 13:26:36,403|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:36,403|" -- Clock TransportDelay is 0.
+"18.05 13:26:36,403|" -- Clock Send 1526642796385 Recv 1526642796387.
+"18.05 13:26:36,403|" -- Clock Diff (2).
+"18.05 13:26:36,403|" -- Clock New Offset: -7 (Old: -5).
+"18.05 13:26:36,523|" -- Clock Got Adjust.
+"18.05 13:26:36,523|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:36,523|" -- Clock TransportDelay is 0.
+"18.05 13:26:36,523|" -- Clock Send 1526642796477 Recv 1526642796477.
+"18.05 13:26:36,523|" -- Clock Diff (0).
+"18.05 13:26:36,523|" -- Clock New Offset: -7 (Old: -7).
+"18.05 13:26:36,642|" -- Clock Got Adjust.
+"18.05 13:26:36,642|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:26:36,642|" -- Clock TransportDelay is 0.
+"18.05 13:26:36,642|" -- Clock Send 1526642796618 Recv 1526642796618.
+"18.05 13:26:36,642|" -- Clock Diff (0).
+"18.05 13:26:36,642|" -- Clock New Offset: -7 (Old: -7).
+"18.05 13:26:36,682|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:36,722|" -- Clock Got Adjust.
+"18.05 13:26:36,722|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:36,722|" -- Clock TransportDelay is 0.
+"18.05 13:26:36,722|" -- Clock Send 1526642796704 Recv 1526642796704.
+"18.05 13:26:36,722|" -- Clock Diff (0).
+"18.05 13:26:36,722|" -- Clock New Offset: -7 (Old: -7).
+"18.05 13:26:36,762|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:36,882|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:36,922|" -- Clock Got Adjust.
+"18.05 13:26:36,922|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:36,922|" -- Clock TransportDelay is 0.
+"18.05 13:26:36,922|" -- Clock Send 1526642796901 Recv 1526642796900.
+"18.05 13:26:36,922|" -- Clock Diff (-1).
+"18.05 13:26:36,922|" -- Clock New Offset: -6 (Old: -7).
+"18.05 13:26:36,927|" - Send Got NextSlotnumber 5.
+"18.05 13:26:36,938|" - Send 1526642796942 (Seti) 1526642796932 (Now).
+"18.05 13:26:36,938|" - Send SendTime in the future: 10.
+"18.05 13:26:36,948|" - Send Frage nach Payload.
+"18.05 13:26:36,948|" - Send Took 0 to get Payload.
+"18.05 13:26:36,948|" - Send Sende Nachricht.
+"18.05 13:26:36,949|" - Send sended with: ok.
+"18.05 13:26:36,961|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:26:37,001|" Core RestFrameTime = 6.
+"18.05 13:26:37,001|" -- Clock Got Adjust.
+"18.05 13:26:37,001|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:26:37,001|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:37,001|" -- Clock TransportDelay is 0.
+"18.05 13:26:37,001|" -- Clock Send 1526642796958 Recv 1526642796959.
+"18.05 13:26:37,001|" -- Clock Diff (1).
+"18.05 13:26:37,001|" -- Clock New Offset: -7 (Old: -6).
+"18.05 13:26:37,006|" -- Clock Schlief 5ms.
+"18.05 13:26:37,006|" Core Frame Ended after 998  with NextInSendphase = false.
+"18.05 13:26:37,006|" Core New Frame Started at 1526642796999 with Slot 0 --------.
+"18.05 13:26:37,046|" -- Clock Got Adjust.
+"18.05 13:26:37,046|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:37,046|" -- Clock TransportDelay is 0.
+"18.05 13:26:37,046|" -- Clock Send 1526642797034 Recv 1526642797034.
+"18.05 13:26:37,046|" -- Clock Diff (0).
+"18.05 13:26:37,046|" -- Clock New Offset: -7 (Old: -7).
+"18.05 13:26:37,166|" -- Clock Got Adjust.
+"18.05 13:26:37,166|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:37,166|" -- Clock TransportDelay is 0.
+"18.05 13:26:37,166|" -- Clock Send 1526642797142 Recv 1526642797141.
+"18.05 13:26:37,166|" -- Clock Diff (-1).
+"18.05 13:26:37,166|" -- Clock New Offset: -6 (Old: -7).
+"18.05 13:26:37,246|" -- Clock Got Adjust.
+"18.05 13:26:37,246|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:37,246|" -- Clock TransportDelay is 0.
+"18.05 13:26:37,246|" -- Clock Send 1526642797219 Recv 1526642797218.
+"18.05 13:26:37,246|" -- Clock Diff (-1).
+"18.05 13:26:37,246|" -- Clock New Offset: -5 (Old: -6).
+"18.05 13:26:37,285|" -- Clock Got Adjust.
+"18.05 13:26:37,285|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:37,285|" -- Clock TransportDelay is 0.
+"18.05 13:26:37,285|" -- Clock Send 1526642797280 Recv 1526642797280.
+"18.05 13:26:37,285|" -- Clock Diff (0).
+"18.05 13:26:37,285|" -- Clock New Offset: -5 (Old: -5).
+"18.05 13:26:37,364|" -- Clock Got Adjust.
+"18.05 13:26:37,364|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:37,364|" -- Clock TransportDelay is 0.
+"18.05 13:26:37,364|" -- Clock Send 1526642797354 Recv 1526642797354.
+"18.05 13:26:37,364|" -- Clock Diff (0).
+"18.05 13:26:37,364|" -- Clock New Offset: -5 (Old: -5).
+"18.05 13:26:37,484|" -- Clock Got Adjust.
+"18.05 13:26:37,484|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:26:37,484|" -- Clock TransportDelay is 0.
+"18.05 13:26:37,484|" -- Clock Send 1526642797461 Recv 1526642797461.
+"18.05 13:26:37,484|" -- Clock Diff (0).
+"18.05 13:26:37,484|" -- Clock New Offset: -5 (Old: -5).
+"18.05 13:26:37,644|" -- Clock Got Adjust.
+"18.05 13:26:37,644|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:37,644|" -- Clock TransportDelay is 0.
+"18.05 13:26:37,644|" -- Clock Send 1526642797633 Recv 1526642797633.
+"18.05 13:26:37,644|" -- Clock Diff (0).
+"18.05 13:26:37,644|" -- Clock New Offset: -5 (Old: -5).
+"18.05 13:26:37,964|" -- Clock Got Adjust.
+"18.05 13:26:37,964|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:37,964|" -- Clock TransportDelay is 0.
+"18.05 13:26:37,964|" -- Clock Send 1526642797943 Recv 1526642797942.
+"18.05 13:26:37,964|" -- Clock Diff (-1).
+"18.05 13:26:37,964|" -- Clock New Offset: -4 (Old: -5).
+"18.05 13:26:38,004|" Core RestFrameTime = 3.
+"18.05 13:26:38,006|" -- Clock Schlief 2ms.
+"18.05 13:26:38,006|" Core Frame Ended after 997  with NextInSendphase = true.
+"18.05 13:26:38,006|" Core New Frame Started at 1526642798002 with Slot 10 --------.
+"18.05 13:26:38,006|" -- Clock calc got: 1526642798002 10 = 1526642798382.
+"18.05 13:26:38,006|" - Send SendTimeMS at 1526642798382.
+"18.05 13:26:38,085|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:38,125|" -- Clock Got Adjust.
+"18.05 13:26:38,125|" -- Clock My Name: "team 06-01", other Name: "team 06-10".
+"18.05 13:26:38,125|" -- Clock TransportDelay is 0.
+"18.05 13:26:38,125|" -- Clock Send 1526642798097 Recv 1526642798097.
+"18.05 13:26:38,125|" -- Clock Diff (0).
+"18.05 13:26:38,125|" -- Clock New Offset: -4 (Old: -4).
+"18.05 13:26:38,165|" -- Clock Got Adjust.
+"18.05 13:26:38,165|" -- Clock My Name: "team 06-01", other Name: "team 06-13".
+"18.05 13:26:38,165|" -- Clock TransportDelay is 0.
+"18.05 13:26:38,165|" -- Clock Send 1526642798148 Recv 1526642798149.
+"18.05 13:26:38,165|" -- Clock Diff (1).
+"18.05 13:26:38,165|" -- Clock New Offset: -5 (Old: -4).
+"18.05 13:26:38,364|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:38,367|" - Send Got NextSlotnumber 16.
+"18.05 13:26:38,378|" - Send 1526642798382 (Seti) 1526642798373 (Now).
+"18.05 13:26:38,378|" - Send SendTime in the future: 9.
+"18.05 13:26:38,387|" - Send Frage nach Payload.
+"18.05 13:26:38,387|" - Send Took 0 to get Payload.
+"18.05 13:26:38,387|" - Send Sende Nachricht.
+"18.05 13:26:38,388|" - Send sended with: ok.
+"18.05 13:26:38,403|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:26:38,443|" -- Clock Got Adjust.
+"18.05 13:26:38,443|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:38,443|" -- Clock TransportDelay is 0.
+"18.05 13:26:38,443|" -- Clock Send 1526642798428 Recv 1526642798427.
+"18.05 13:26:38,443|" -- Clock Diff (-1).
+"18.05 13:26:38,443|" -- Clock New Offset: -4 (Old: -5).
+"18.05 13:26:38,482|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:38,521|" -- Clock Got Adjust.
+"18.05 13:26:38,521|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:38,521|" -- Clock TransportDelay is 0.
+"18.05 13:26:38,521|" -- Clock Send 1526642798513 Recv 1526642798512.
+"18.05 13:26:38,521|" -- Clock Diff (-1).
+"18.05 13:26:38,521|" -- Clock New Offset: -3 (Old: -4).
+"18.05 13:26:38,561|" -- Clock Got Adjust.
+"18.05 13:26:38,561|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:38,561|" -- Clock TransportDelay is 0.
+"18.05 13:26:38,561|" -- Clock Send 1526642798544 Recv 1526642798543.
+"18.05 13:26:38,561|" -- Clock Diff (-1).
+"18.05 13:26:38,561|" -- Clock New Offset: -2 (Old: -3).
+"18.05 13:26:38,601|" -- Clock Got Adjust.
+"18.05 13:26:38,601|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:26:38,601|" -- Clock TransportDelay is 0.
+"18.05 13:26:38,601|" -- Clock Send 1526642798592 Recv 1526642798592.
+"18.05 13:26:38,601|" -- Clock Diff (0).
+"18.05 13:26:38,601|" -- Clock New Offset: -2 (Old: -2).
+"18.05 13:26:38,641|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:38,761|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:38,841|" -- Clock Got Adjust.
+"18.05 13:26:38,841|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:38,841|" -- Clock TransportDelay is 0.
+"18.05 13:26:38,841|" -- Clock Send 1526642798826 Recv 1526642798823.
+"18.05 13:26:38,841|" -- Clock Diff (-3).
+"18.05 13:26:38,841|" -- Clock New Offset: 1 (Old: -2).
+"18.05 13:26:38,880|" -- Clock Got Adjust.
+"18.05 13:26:38,881|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:38,881|" -- Clock TransportDelay is 0.
+"18.05 13:26:38,881|" -- Clock Send 1526642798881 Recv 1526642798881.
+"18.05 13:26:38,881|" -- Clock Diff (0).
+"18.05 13:26:38,881|" -- Clock New Offset: 1 (Old: 1).
+"18.05 13:26:38,960|" -- Clock Got Adjust.
+"18.05 13:26:38,960|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:38,960|" -- Clock TransportDelay is 0.
+"18.05 13:26:38,960|" -- Clock Send 1526642798961 Recv 1526642798960.
+"18.05 13:26:38,960|" -- Clock Diff (-1).
+"18.05 13:26:38,960|" -- Clock New Offset: 2 (Old: 1).
+"18.05 13:26:38,999|" Core RestFrameTime = 0.
+"18.05 13:26:38,999|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:26:39,006|" -- Clock Schlief 7ms.
+"18.05 13:26:39,006|" Core Frame Ended after 1002  with NextInSendphase = false.
+"18.05 13:26:39,006|" Core New Frame Started at 1526642799008 with Slot 0 --------.
+"18.05 13:26:39,046|" -- Clock Got Adjust.
+"18.05 13:26:39,046|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:39,046|" -- Clock TransportDelay is 0.
+"18.05 13:26:39,046|" -- Clock Send 1526642799009 Recv 1526642799010.
+"18.05 13:26:39,046|" -- Clock Diff (1).
+"18.05 13:26:39,046|" -- Clock New Offset: 1 (Old: 2).
+"18.05 13:26:39,126|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:39,166|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:39,486|" -- Clock Got Adjust.
+"18.05 13:26:39,486|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:39,486|" -- Clock TransportDelay is 0.
+"18.05 13:26:39,486|" -- Clock Send 1526642799487 Recv 1526642799487.
+"18.05 13:26:39,486|" -- Clock Diff (0).
+"18.05 13:26:39,486|" -- Clock New Offset: 1 (Old: 1).
+"18.05 13:26:39,526|" -- Clock Got Adjust.
+"18.05 13:26:39,526|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:39,526|" -- Clock TransportDelay is 0.
+"18.05 13:26:39,526|" -- Clock Send 1526642799517 Recv 1526642799516.
+"18.05 13:26:39,526|" -- Clock Diff (-1).
+"18.05 13:26:39,526|" -- Clock New Offset: 2 (Old: 1).
+"18.05 13:26:39,566|" -- Clock Got Adjust.
+"18.05 13:26:39,566|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:39,566|" -- Clock TransportDelay is 0.
+"18.05 13:26:39,566|" -- Clock Send 1526642799552 Recv 1526642799553.
+"18.05 13:26:39,566|" -- Clock Diff (1).
+"18.05 13:26:39,566|" -- Clock New Offset: 1 (Old: 2).
+"18.05 13:26:39,606|" -- Clock Got Adjust.
+"18.05 13:26:39,606|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:39,606|" -- Clock TransportDelay is 0.
+"18.05 13:26:39,606|" -- Clock Send 1526642799589 Recv 1526642799588.
+"18.05 13:26:39,606|" -- Clock Diff (-1).
+"18.05 13:26:39,606|" -- Clock New Offset: 2 (Old: 1).
+"18.05 13:26:39,686|" -- Clock Got Adjust.
+"18.05 13:26:39,686|" -- Clock My Name: "team 06-01", other Name: "team 06-13".
+"18.05 13:26:39,686|" -- Clock TransportDelay is 0.
+"18.05 13:26:39,686|" -- Clock Send 1526642799674 Recv 1526642799674.
+"18.05 13:26:39,686|" -- Clock Diff (0).
+"18.05 13:26:39,686|" -- Clock New Offset: 2 (Old: 2).
+"18.05 13:26:39,725|" -- Clock Got Adjust.
+"18.05 13:26:39,725|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:39,725|" -- Clock TransportDelay is 0.
+"18.05 13:26:39,725|" -- Clock Send 1526642799727 Recv 1526642799727.
+"18.05 13:26:39,725|" -- Clock Diff (0).
+"18.05 13:26:39,725|" -- Clock New Offset: 2 (Old: 2).
+"18.05 13:26:39,803|" -- Clock Got Adjust.
+"18.05 13:26:39,803|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:39,803|" -- Clock TransportDelay is 0.
+"18.05 13:26:39,803|" -- Clock Send 1526642799806 Recv 1526642799805.
+"18.05 13:26:39,803|" -- Clock Diff (-1).
+"18.05 13:26:39,803|" -- Clock New Offset: 3 (Old: 2).
+"18.05 13:26:39,922|" -- Clock Got Adjust.
+"18.05 13:26:39,922|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:39,922|" -- Clock TransportDelay is 0.
+"18.05 13:26:39,922|" -- Clock Send 1526642799914 Recv 1526642799914.
+"18.05 13:26:39,922|" -- Clock Diff (0).
+"18.05 13:26:39,922|" -- Clock New Offset: 3 (Old: 3).
+"18.05 13:26:40,002|" Core RestFrameTime = 0.
+"18.05 13:26:40,006|" -- Clock Schlief 4ms.
+"18.05 13:26:40,006|" Core Frame Ended after 1004  with NextInSendphase = true.
+"18.05 13:26:40,006|" Core New Frame Started at 1526642800009 with Slot 20 --------.
+"18.05 13:26:40,006|" -- Clock calc got: 1526642800009 20 = 1526642800789.
+"18.05 13:26:40,006|" - Send SendTimeMS at 1526642800789.
+"18.05 13:26:40,126|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:40,166|" -- Clock Got Adjust.
+"18.05 13:26:40,166|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:40,166|" -- Clock TransportDelay is 0.
+"18.05 13:26:40,166|" -- Clock Send 1526642800155 Recv 1526642800155.
+"18.05 13:26:40,166|" -- Clock Diff (0).
+"18.05 13:26:40,166|" -- Clock New Offset: 3 (Old: 3).
+"18.05 13:26:40,246|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:40,325|" -- Clock Got Adjust.
+"18.05 13:26:40,325|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:26:40,325|" -- Clock TransportDelay is 0.
+"18.05 13:26:40,325|" -- Clock Send 1526642800317 Recv 1526642800317.
+"18.05 13:26:40,325|" -- Clock Diff (0).
+"18.05 13:26:40,325|" -- Clock New Offset: 3 (Old: 3).
+"18.05 13:26:40,365|" -- Clock Got Adjust.
+"18.05 13:26:40,365|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:40,365|" -- Clock TransportDelay is 0.
+"18.05 13:26:40,365|" -- Clock Send 1526642800351 Recv 1526642800351.
+"18.05 13:26:40,365|" -- Clock Diff (0).
+"18.05 13:26:40,365|" -- Clock New Offset: 3 (Old: 3).
+"18.05 13:26:40,405|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:40,445|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:40,605|" -- Clock Got Adjust.
+"18.05 13:26:40,605|" -- Clock My Name: "team 06-01", other Name: "team 06-20".
+"18.05 13:26:40,605|" -- Clock TransportDelay is 0.
+"18.05 13:26:40,605|" -- Clock Send 1526642800607 Recv 1526642800606.
+"18.05 13:26:40,605|" -- Clock Diff (-1).
+"18.05 13:26:40,605|" -- Clock New Offset: 4 (Old: 3).
+"18.05 13:26:40,645|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:40,685|" -- Clock Got Adjust.
+"18.05 13:26:40,685|" -- Clock My Name: "team 06-01", other Name: "team 06-02".
+"18.05 13:26:40,685|" -- Clock TransportDelay is 0.
+"18.05 13:26:40,685|" -- Clock Send 1526642800676 Recv 1526642800677.
+"18.05 13:26:40,685|" -- Clock Diff (1).
+"18.05 13:26:40,685|" -- Clock New Offset: 3 (Old: 4).
+"18.05 13:26:40,725|" -- Clock Got Adjust.
+"18.05 13:26:40,725|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:40,725|" -- Clock TransportDelay is 0.
+"18.05 13:26:40,725|" -- Clock Send 1526642800714 Recv 1526642800713.
+"18.05 13:26:40,725|" -- Clock Diff (-1).
+"18.05 13:26:40,725|" -- Clock New Offset: 4 (Old: 3).
+"18.05 13:26:40,765|" -- Clock Got Adjust.
+"18.05 13:26:40,765|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:40,765|" -- Clock TransportDelay is 0.
+"18.05 13:26:40,765|" -- Clock Send 1526642800737 Recv 1526642800736.
+"18.05 13:26:40,765|" -- Clock Diff (-1).
+"18.05 13:26:40,765|" -- Clock New Offset: 5 (Old: 4).
+"18.05 13:26:40,767|" - Send Got NextSlotnumber 4.
+"18.05 13:26:40,778|" - Send 1526642800789 (Seti) 1526642800783 (Now).
+"18.05 13:26:40,778|" - Send SendTime in the future: 6.
+"18.05 13:26:40,784|" - Send Frage nach Payload.
+"18.05 13:26:40,784|" - Send Took 0 to get Payload.
+"18.05 13:26:40,784|" - Send Sende Nachricht.
+"18.05 13:26:40,785|" - Send sended with: ok.
+"18.05 13:26:40,805|" -- Clock Got Adjust.
+"18.05 13:26:40,806|" -- Clock My Name: "team 06-01", other Name: "team 06-01".
+"18.05 13:26:40,806|" -- Clock TransportDelay is 0.
+"18.05 13:26:40,806|" -- Clock Send 1526642800789 Recv 1526642800790.
+"18.05 13:26:40,806|" -- Clock Diff (1).
+"18.05 13:26:40,806|" -- Clock New Offset: 4 (Old: 5).
+"18.05 13:26:40,845|" -- Clock Got Adjust.
+"18.05 13:26:40,845|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:40,845|" -- Clock TransportDelay is 1.
+"18.05 13:26:40,845|" -- Clock Send 1526642800808 Recv 1526642800810.
+"18.05 13:26:40,845|" -- Clock Diff (2).
+"18.05 13:26:40,845|" -- Clock New Offset: 3 (Old: 4).
+"18.05 13:26:40,925|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:40,965|" -- Clock Got Adjust.
+"18.05 13:26:40,965|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:40,965|" -- Clock TransportDelay is 1.
+"18.05 13:26:40,965|" -- Clock Send 1526642800969 Recv 1526642800968.
+"18.05 13:26:40,965|" -- Clock Diff (-1).
+"18.05 13:26:40,965|" -- Clock New Offset: 5 (Old: 3).
+"18.05 13:26:41,004|" Core RestFrameTime = 7.
+"18.05 13:26:41,012|" Core stationwasinvolved,true was never received.
+"18.05 13:26:41,012|" Core Frame Ended after 993  with NextInSendphase = true.
+"18.05 13:26:41,012|" Core New Frame Started at 1526642801017 with Slot 4 --------.
+"18.05 13:26:41,012|" -- Clock calc got: 1526642801017 4 = 1526642801157.
+"18.05 13:26:41,012|" - Send SendTimeMS at 1526642801157.
+"18.05 13:26:41,091|" -- Clock Got Adjust.
+"18.05 13:26:41,091|" -- Clock My Name: "team 06-01", other Name: "team 06-02".
+"18.05 13:26:41,091|" -- Clock TransportDelay is 1.
+"18.05 13:26:41,091|" -- Clock Send 1526642801077 Recv 1526642801078.
+"18.05 13:26:41,091|" -- Clock Diff (1).
+"18.05 13:26:41,091|" -- Clock New Offset: 5 (Old: 5).
+"18.05 13:26:41,131|" -- Clock Got Adjust.
+"18.05 13:26:41,131|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:41,131|" -- Clock TransportDelay is 1.
+"18.05 13:26:41,131|" -- Clock Send 1526642801133 Recv 1526642801133.
+"18.05 13:26:41,131|" -- Clock Diff (0).
+"18.05 13:26:41,131|" -- Clock New Offset: 6 (Old: 5).
+"18.05 13:26:41,133|" - Send Got NextSlotnumber 19.
+"18.05 13:26:41,144|" - Send 1526642801157 (Seti) 1526642801150 (Now).
+"18.05 13:26:41,144|" - Send SendTime in the future: 7.
+"18.05 13:26:41,151|" - Send Frage nach Payload.
+"18.05 13:26:41,151|" - Send Took 0 to get Payload.
+"18.05 13:26:41,151|" - Send Sende Nachricht.
+"18.05 13:26:41,152|" - Send sended with: ok.
+"18.05 13:26:41,170|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:26:41,250|" -- Clock Got Adjust.
+"18.05 13:26:41,250|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:26:41,250|" -- Clock TransportDelay is 1.
+"18.05 13:26:41,250|" -- Clock Send 1526642801238 Recv 1526642801239.
+"18.05 13:26:41,250|" -- Clock Diff (1).
+"18.05 13:26:41,250|" -- Clock New Offset: 6 (Old: 6).
+"18.05 13:26:41,289|" -- Clock Got Adjust.
+"18.05 13:26:41,289|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:26:41,289|" -- Clock TransportDelay is 1.
+"18.05 13:26:41,289|" -- Clock Send 1526642801267 Recv 1526642801270.
+"18.05 13:26:41,289|" -- Clock Diff (3).
+"18.05 13:26:41,289|" -- Clock New Offset: 4 (Old: 6).
+"18.05 13:26:41,569|" -- Clock Got Adjust.
+"18.05 13:26:41,569|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:41,569|" -- Clock TransportDelay is 1.
+"18.05 13:26:41,569|" -- Clock Send 1526642801562 Recv 1526642801559.
+"18.05 13:26:41,569|" -- Clock Diff (-3).
+"18.05 13:26:41,569|" -- Clock New Offset: 8 (Old: 4).
+"18.05 13:26:41,609|" -- Clock Got Adjust.
+"18.05 13:26:41,609|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:41,609|" -- Clock TransportDelay is 1.
+"18.05 13:26:41,609|" -- Clock Send 1526642801599 Recv 1526642801601.
+"18.05 13:26:41,609|" -- Clock Diff (2).
+"18.05 13:26:41,609|" -- Clock New Offset: 7 (Old: 8).
+"18.05 13:26:41,928|" -- Clock Got Adjust.
+"18.05 13:26:41,928|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:26:41,928|" -- Clock TransportDelay is 1.
+"18.05 13:26:41,928|" -- Clock Send 1526642801920 Recv 1526642801920.
+"18.05 13:26:41,928|" -- Clock Diff (0).
+"18.05 13:26:41,928|" -- Clock New Offset: 8 (Old: 7).
+"18.05 13:26:42,008|" Core RestFrameTime = 3.
+"18.05 13:26:42,008|" -- Clock Got Adjust.
+"18.05 13:26:42,008|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:26:42,008|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:42,008|" -- Clock TransportDelay is 1.
+"18.05 13:26:42,008|" -- Clock Send 1526642801998 Recv 1526642802000.
+"18.05 13:26:42,008|" -- Clock Diff (2).
+"18.05 13:26:42,008|" -- Clock New Offset: 7 (Old: 8).
+"18.05 13:26:42,012|" -- Clock Schlief 4ms.
+"18.05 13:26:42,012|" Core Frame Ended after 1001  with NextInSendphase = false.
+"18.05 13:26:42,012|" Core New Frame Started at 1526642802019 with Slot 0 --------.
+"18.05 13:26:42,092|" -- Clock Got Adjust.
+"18.05 13:26:42,092|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:42,092|" -- Clock TransportDelay is 1.
+"18.05 13:26:42,092|" -- Clock Send 1526642802091 Recv 1526642802093.
+"18.05 13:26:42,092|" -- Clock Diff (2).
+"18.05 13:26:42,092|" -- Clock New Offset: 6 (Old: 7).
+"18.05 13:26:42,212|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:42,252|" -- Clock Got Adjust.
+"18.05 13:26:42,252|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:42,252|" -- Clock TransportDelay is 1.
+"18.05 13:26:42,252|" -- Clock Send 1526642802251 Recv 1526642802250.
+"18.05 13:26:42,252|" -- Clock Diff (-1).
+"18.05 13:26:42,252|" -- Clock New Offset: 8 (Old: 6).
+"18.05 13:26:42,292|" -- Clock Got Adjust.
+"18.05 13:26:42,292|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:26:42,292|" -- Clock TransportDelay is 1.
+"18.05 13:26:42,292|" -- Clock Send 1526642802281 Recv 1526642802281.
+"18.05 13:26:42,292|" -- Clock Diff (0).
+"18.05 13:26:42,292|" -- Clock New Offset: 9 (Old: 8).
+"18.05 13:26:42,332|" -- Clock Got Adjust.
+"18.05 13:26:42,332|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:26:42,332|" -- Clock TransportDelay is 1.
+"18.05 13:26:42,332|" -- Clock Send 1526642802322 Recv 1526642802323.
+"18.05 13:26:42,332|" -- Clock Diff (1).
+"18.05 13:26:42,332|" -- Clock New Offset: 9 (Old: 9).
+"18.05 13:26:42,372|" -- Clock Got Adjust.
+"18.05 13:26:42,372|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:42,372|" -- Clock TransportDelay is 1.
+"18.05 13:26:42,372|" -- Clock Send 1526642802362 Recv 1526642802363.
+"18.05 13:26:42,372|" -- Clock Diff (1).
+"18.05 13:26:42,372|" -- Clock New Offset: 9 (Old: 9).
+"18.05 13:26:42,452|" -- Clock Got Adjust.
+"18.05 13:26:42,452|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:42,452|" -- Clock TransportDelay is 1.
+"18.05 13:26:42,452|" -- Clock Send 1526642802436 Recv 1526642802437.
+"18.05 13:26:42,452|" -- Clock Diff (1).
+"18.05 13:26:42,452|" -- Clock New Offset: 9 (Old: 9).
+"18.05 13:26:42,492|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:42,531|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:42,571|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:42,691|" -- Clock Got Adjust.
+"18.05 13:26:42,691|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:42,691|" -- Clock TransportDelay is 1.
+"18.05 13:26:42,691|" -- Clock Send 1526642802689 Recv 1526642802690.
+"18.05 13:26:42,691|" -- Clock Diff (1).
+"18.05 13:26:42,691|" -- Clock New Offset: 9 (Old: 9).
+"18.05 13:26:42,851|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:42,891|" -- Clock Got Adjust.
+"18.05 13:26:42,891|" -- Clock My Name: "team 06-01", other Name: "team 06-07".
+"18.05 13:26:42,891|" -- Clock TransportDelay is 1.
+"18.05 13:26:42,891|" -- Clock Send 1526642802867 Recv 1526642802867.
+"18.05 13:26:42,891|" -- Clock Diff (0).
+"18.05 13:26:42,891|" -- Clock New Offset: 10 (Old: 9).
+"18.05 13:26:42,970|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:43,009|" Core RestFrameTime = 0.
+"18.05 13:26:43,009|" -- Clock Got Adjust.
+"18.05 13:26:43,009|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:26:43,009|" -- Clock TransportDelay is 1.
+"18.05 13:26:43,009|" -- Clock Send 1526642802989 Recv 1526642802988.
+"18.05 13:26:43,009|" -- Clock Diff (-1).
+"18.05 13:26:43,009|" -- Clock New Offset: 12 (Old: 10).
+"18.05 13:26:43,012|" -- Clock Schlief 3ms.
+"18.05 13:26:43,012|" Core Frame Ended after 1003  with NextInSendphase = true.
+"18.05 13:26:43,012|" Core New Frame Started at 1526642803024 with Slot 3 --------.
+"18.05 13:26:43,012|" -- Clock calc got: 1526642803024 3 = 1526642803124.
+"18.05 13:26:43,012|" - Send SendTimeMS at 1526642803124.
+"18.05 13:26:43,052|" -- Clock Got Adjust.
+"18.05 13:26:43,052|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:43,052|" -- Clock TransportDelay is 1.
+"18.05 13:26:43,052|" -- Clock Send 1526642803042 Recv 1526642803044.
+"18.05 13:26:43,052|" -- Clock Diff (2).
+"18.05 13:26:43,052|" -- Clock New Offset: 11 (Old: 12).
+"18.05 13:26:43,092|" -- Clock Got Adjust.
+"18.05 13:26:43,092|" -- Clock My Name: "team 06-01", other Name: "team 06-19".
+"18.05 13:26:43,092|" -- Clock TransportDelay is 1.
+"18.05 13:26:43,092|" -- Clock Send 1526642803068 Recv 1526642803068.
+"18.05 13:26:43,092|" -- Clock Diff (0).
+"18.05 13:26:43,092|" -- Clock New Offset: 12 (Old: 11).
+"18.05 13:26:43,093|" - Send Got NextSlotnumber 21.
+"18.05 13:26:43,104|" - Send 1526642803124 (Seti) 1526642803116 (Now).
+"18.05 13:26:43,104|" - Send SendTime in the future: 8.
+"18.05 13:26:43,112|" - Send Frage nach Payload.
+"18.05 13:26:43,112|" - Send Took 0 to get Payload.
+"18.05 13:26:43,112|" - Send Sende Nachricht.
+"18.05 13:26:43,113|" - Send sended with: ok.
+"18.05 13:26:43,132|" -- Clock Got Adjust.
+"18.05 13:26:43,132|" -- Clock My Name: "team 06-01", other Name: "team 06-01".
+"18.05 13:26:43,132|" -- Clock TransportDelay is 1.
+"18.05 13:26:43,132|" -- Clock Send 1526642803124 Recv 1526642803125.
+"18.05 13:26:43,132|" -- Clock Diff (1).
+"18.05 13:26:43,132|" -- Clock New Offset: 12 (Old: 12).
+"18.05 13:26:43,372|" -- Clock Got Adjust.
+"18.05 13:26:43,372|" -- Clock My Name: "team 06-01", other Name: "team 06-20".
+"18.05 13:26:43,372|" -- Clock TransportDelay is 1.
+"18.05 13:26:43,372|" -- Clock Send 1526642803335 Recv 1526642803351.
+"18.05 13:26:43,372|" -- Clock Diff (16).
+"18.05 13:26:43,372|" -- Clock New Offset: -3 (Old: 12).
+"18.05 13:26:43,411|" -- Clock Got Adjust.
+"18.05 13:26:43,411|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:43,411|" -- Clock TransportDelay is 1.
+"18.05 13:26:43,411|" -- Clock Send 1526642803376 Recv 1526642803377.
+"18.05 13:26:43,411|" -- Clock Diff (1).
+"18.05 13:26:43,411|" -- Clock New Offset: -3 (Old: -3).
+"18.05 13:26:43,450|" -- Clock Got Adjust.
+"18.05 13:26:43,450|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:26:43,450|" -- Clock TransportDelay is 1.
+"18.05 13:26:43,450|" -- Clock Send 1526642803443 Recv 1526642803444.
+"18.05 13:26:43,450|" -- Clock Diff (1).
+"18.05 13:26:43,450|" -- Clock New Offset: -3 (Old: -3).
+"18.05 13:26:43,490|" -- Clock Got Adjust.
+"18.05 13:26:43,490|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:26:43,490|" -- Clock TransportDelay is 1.
+"18.05 13:26:43,490|" -- Clock Send 1526642803486 Recv 1526642803487.
+"18.05 13:26:43,490|" -- Clock Diff (1).
+"18.05 13:26:43,490|" -- Clock New Offset: -3 (Old: -3).
+"18.05 13:26:43,568|" -- Clock Got Adjust.
+"18.05 13:26:43,568|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:26:43,568|" -- Clock TransportDelay is 1.
+"18.05 13:26:43,568|" -- Clock Send 1526642803553 Recv 1526642803553.
+"18.05 13:26:43,568|" -- Clock Diff (0).
+"18.05 13:26:43,568|" -- Clock New Offset: -2 (Old: -3).
+"18.05 13:26:43,688|" -- Clock Got Adjust.
+"18.05 13:26:43,688|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:43,688|" -- Clock TransportDelay is 1.
+"18.05 13:26:43,688|" -- Clock Send 1526642803657 Recv 1526642803658.
+"18.05 13:26:43,688|" -- Clock Diff (1).
+"18.05 13:26:43,688|" -- Clock New Offset: -2 (Old: -2).
+"18.05 13:26:43,887|" -- Clock Got Adjust.
+"18.05 13:26:43,887|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:43,887|" -- Clock TransportDelay is 1.
+"18.05 13:26:43,887|" -- Clock Send 1526642803857 Recv 1526642803857.
+"18.05 13:26:43,887|" -- Clock Diff (0).
+"18.05 13:26:43,887|" -- Clock New Offset: -1 (Old: -2).
+"18.05 13:26:44,007|" Core RestFrameTime = 1.
+"18.05 13:26:44,007|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:44,009|" Core stationwasinvolved,true was never received.
+"18.05 13:26:44,012|" -- Clock Schlief 3ms.
+"18.05 13:26:44,012|" Core Frame Ended after 999  with NextInSendphase = true.
+"18.05 13:26:44,012|" Core New Frame Started at 1526642804011 with Slot 21 --------.
+"18.05 13:26:44,012|" -- Clock calc got: 1526642804011 21 = 1526642804831.
+"18.05 13:26:44,012|" - Send SendTimeMS at 1526642804831.
+"18.05 13:26:44,052|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:44,092|" -- Clock Got Adjust.
+"18.05 13:26:44,092|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:44,092|" -- Clock TransportDelay is 1.
+"18.05 13:26:44,092|" -- Clock Send 1526642804073 Recv 1526642804076.
+"18.05 13:26:44,092|" -- Clock Diff (3).
+"18.05 13:26:44,092|" -- Clock New Offset: -3 (Old: -1).
+"18.05 13:26:44,172|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:44,212|" -- Clock Got Adjust.
+"18.05 13:26:44,212|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:44,212|" -- Clock TransportDelay is 1.
+"18.05 13:26:44,212|" -- Clock Send 1526642804194 Recv 1526642804194.
+"18.05 13:26:44,212|" -- Clock Diff (0).
+"18.05 13:26:44,212|" -- Clock New Offset: -2 (Old: -3).
+"18.05 13:26:44,252|" -- Clock Got Adjust.
+"18.05 13:26:44,252|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:26:44,252|" -- Clock TransportDelay is 1.
+"18.05 13:26:44,252|" -- Clock Send 1526642804232 Recv 1526642804233.
+"18.05 13:26:44,252|" -- Clock Diff (1).
+"18.05 13:26:44,252|" -- Clock New Offset: -2 (Old: -2).
+"18.05 13:26:44,292|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:44,412|" -- Clock Got Adjust.
+"18.05 13:26:44,412|" -- Clock My Name: "team 06-01", other Name: "team 06-19".
+"18.05 13:26:44,412|" -- Clock TransportDelay is 1.
+"18.05 13:26:44,412|" -- Clock Send 1526642804376 Recv 1526642804376.
+"18.05 13:26:44,412|" -- Clock Diff (0).
+"18.05 13:26:44,412|" -- Clock New Offset: -1 (Old: -2).
+"18.05 13:26:44,492|" -- Clock Got Adjust.
+"18.05 13:26:44,492|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:44,492|" -- Clock TransportDelay is 1.
+"18.05 13:26:44,492|" -- Clock Send 1526642804482 Recv 1526642804483.
+"18.05 13:26:44,492|" -- Clock Diff (1).
+"18.05 13:26:44,492|" -- Clock New Offset: -1 (Old: -1).
+"18.05 13:26:44,612|" -- Clock Got Adjust.
+"18.05 13:26:44,612|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:44,612|" -- Clock TransportDelay is 1.
+"18.05 13:26:44,612|" -- Clock Send 1526642804602 Recv 1526642804603.
+"18.05 13:26:44,612|" -- Clock Diff (1).
+"18.05 13:26:44,612|" -- Clock New Offset: -1 (Old: -1).
+"18.05 13:26:44,692|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:44,731|" -- Clock Got Adjust.
+"18.05 13:26:44,731|" -- Clock My Name: "team 06-01", other Name: "team 06-13".
+"18.05 13:26:44,731|" -- Clock TransportDelay is 1.
+"18.05 13:26:44,731|" -- Clock Send 1526642804708 Recv 1526642804708.
+"18.05 13:26:44,731|" -- Clock Diff (0).
+"18.05 13:26:44,731|" -- Clock New Offset: 0 (Old: -1).
+"18.05 13:26:44,771|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:44,813|" - Send Got NextSlotnumber 5.
+"18.05 13:26:44,824|" - Send 1526642804831 (Seti) 1526642804824 (Now).
+"18.05 13:26:44,824|" - Send SendTime in the future: 7.
+"18.05 13:26:44,831|" - Send Frage nach Payload.
+"18.05 13:26:44,831|" - Send Took 0 to get Payload.
+"18.05 13:26:44,831|" - Send Sende Nachricht.
+"18.05 13:26:44,832|" - Send sended with: ok.
+"18.05 13:26:44,850|" -- Clock Got Adjust.
+"18.05 13:26:44,850|" -- Clock My Name: "team 06-01", other Name: "team 06-01".
+"18.05 13:26:44,850|" -- Clock TransportDelay is 1.
+"18.05 13:26:44,850|" -- Clock Send 1526642804831 Recv 1526642804832.
+"18.05 13:26:44,850|" -- Clock Diff (1).
+"18.05 13:26:44,850|" -- Clock New Offset: 0 (Old: 0).
+"18.05 13:26:44,890|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:44,930|" -- Clock Got Adjust.
+"18.05 13:26:44,930|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:44,930|" -- Clock TransportDelay is 1.
+"18.05 13:26:44,930|" -- Clock Send 1526642804916 Recv 1526642804916.
+"18.05 13:26:44,930|" -- Clock Diff (0).
+"18.05 13:26:44,930|" -- Clock New Offset: 1 (Old: 0).
+"18.05 13:26:44,969|" -- Clock Got Adjust.
+"18.05 13:26:44,969|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:44,969|" -- Clock TransportDelay is 1.
+"18.05 13:26:44,969|" -- Clock Send 1526642804965 Recv 1526642804966.
+"18.05 13:26:44,969|" -- Clock Diff (1).
+"18.05 13:26:44,969|" -- Clock New Offset: 1 (Old: 1).
+"18.05 13:26:45,008|" Core RestFrameTime = 0.
+"18.05 13:26:45,008|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:45,008|" Core stationwasinvolved,true was never received.
+"18.05 13:26:45,012|" -- Clock Schlief 4ms.
+"18.05 13:26:45,012|" Core Frame Ended after 997  with NextInSendphase = true.
+"18.05 13:26:45,012|" Core New Frame Started at 1526642805013 with Slot 5 --------.
+"18.05 13:26:45,012|" -- Clock calc got: 1526642805013 5 = 1526642805193.
+"18.05 13:26:45,012|" - Send SendTimeMS at 1526642805193.
+"18.05 13:26:45,052|" -- Clock Got Adjust.
+"18.05 13:26:45,052|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:45,052|" -- Clock TransportDelay is 1.
+"18.05 13:26:45,052|" -- Clock Send 1526642805011 Recv 1526642805012.
+"18.05 13:26:45,052|" -- Clock Diff (1).
+"18.05 13:26:45,052|" -- Clock New Offset: 1 (Old: 1).
+"18.05 13:26:45,173|" - Send Got NextSlotnumber 12.
+"18.05 13:26:45,184|" - Send 1526642805193 (Seti) 1526642805185 (Now).
+"18.05 13:26:45,184|" - Send SendTime in the future: 8.
+"18.05 13:26:45,192|" - Send Frage nach Payload.
+"18.05 13:26:45,192|" - Send Took 0 to get Payload.
+"18.05 13:26:45,192|" - Send Sende Nachricht.
+"18.05 13:26:45,193|" - Send sended with: ok.
+"18.05 13:26:45,212|" -- Clock Got Adjust.
+"18.05 13:26:45,212|" -- Clock My Name: "team 06-01", other Name: "team 06-01".
+"18.05 13:26:45,212|" -- Clock TransportDelay is 1.
+"18.05 13:26:45,212|" -- Clock Send 1526642805193 Recv 1526642805194.
+"18.05 13:26:45,212|" -- Clock Diff (1).
+"18.05 13:26:45,212|" -- Clock New Offset: 1 (Old: 1).
+"18.05 13:26:45,251|" -- Clock Got Adjust.
+"18.05 13:26:45,251|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:45,251|" -- Clock TransportDelay is 1.
+"18.05 13:26:45,251|" -- Clock Send 1526642805237 Recv 1526642805238.
+"18.05 13:26:45,251|" -- Clock Diff (1).
+"18.05 13:26:45,251|" -- Clock New Offset: 1 (Old: 1).
+"18.05 13:26:45,331|" -- Clock Got Adjust.
+"18.05 13:26:45,331|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:45,331|" -- Clock TransportDelay is 1.
+"18.05 13:26:45,331|" -- Clock Send 1526642805319 Recv 1526642805319.
+"18.05 13:26:45,331|" -- Clock Diff (0).
+"18.05 13:26:45,331|" -- Clock New Offset: 2 (Old: 1).
+"18.05 13:26:45,371|" -- Clock Got Adjust.
+"18.05 13:26:45,371|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:45,371|" -- Clock TransportDelay is 1.
+"18.05 13:26:45,371|" -- Clock Send 1526642805365 Recv 1526642805366.
+"18.05 13:26:45,371|" -- Clock Diff (1).
+"18.05 13:26:45,371|" -- Clock New Offset: 2 (Old: 2).
+"18.05 13:26:45,571|" -- Clock Got Adjust.
+"18.05 13:26:45,571|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:45,571|" -- Clock TransportDelay is 1.
+"18.05 13:26:45,571|" -- Clock Send 1526642805557 Recv 1526642805557.
+"18.05 13:26:45,571|" -- Clock Diff (0).
+"18.05 13:26:45,571|" -- Clock New Offset: 3 (Old: 2).
+"18.05 13:26:45,611|" -- Clock Got Adjust.
+"18.05 13:26:45,611|" -- Clock My Name: "team 06-01", other Name: "team 06-13".
+"18.05 13:26:45,611|" -- Clock TransportDelay is 1.
+"18.05 13:26:45,611|" -- Clock Send 1526642805592 Recv 1526642805593.
+"18.05 13:26:45,611|" -- Clock Diff (1).
+"18.05 13:26:45,611|" -- Clock New Offset: 3 (Old: 3).
+"18.05 13:26:45,851|" -- Clock Got Adjust.
+"18.05 13:26:45,851|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:26:45,851|" -- Clock TransportDelay is 1.
+"18.05 13:26:45,851|" -- Clock Send 1526642805840 Recv 1526642805840.
+"18.05 13:26:45,851|" -- Clock Diff (0).
+"18.05 13:26:45,851|" -- Clock New Offset: 4 (Old: 3).
+"18.05 13:26:45,931|" -- Clock Got Adjust.
+"18.05 13:26:45,931|" -- Clock My Name: "team 06-01", other Name: "team 06-20".
+"18.05 13:26:45,931|" -- Clock TransportDelay is 1.
+"18.05 13:26:45,931|" -- Clock Send 1526642805897 Recv 1526642805898.
+"18.05 13:26:45,931|" -- Clock Diff (1).
+"18.05 13:26:45,931|" -- Clock New Offset: 4 (Old: 4).
+"18.05 13:26:45,970|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:46,009|" Core RestFrameTime = 3.
+"18.05 13:26:46,009|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:46,013|" Core stationwasinvolved,true was never received.
+"18.05 13:26:46,013|" Core Frame Ended after 1001  with NextInSendphase = true.
+"18.05 13:26:46,013|" Core New Frame Started at 1526642806017 with Slot 12 --------.
+"18.05 13:26:46,013|" -- Clock calc got: 1526642806017 12 = 1526642806477.
+"18.05 13:26:46,013|" - Send SendTimeMS at 1526642806477.
+"18.05 13:26:46,253|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:46,372|" -- Clock Got Adjust.
+"18.05 13:26:46,372|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:26:46,372|" -- Clock TransportDelay is 1.
+"18.05 13:26:46,372|" -- Clock Send 1526642806348 Recv 1526642806347.
+"18.05 13:26:46,372|" -- Clock Diff (-1).
+"18.05 13:26:46,372|" -- Clock New Offset: 6 (Old: 4).
+"18.05 13:26:46,411|" -- Clock Got Adjust.
+"18.05 13:26:46,411|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:46,411|" -- Clock TransportDelay is 1.
+"18.05 13:26:46,411|" -- Clock Send 1526642806398 Recv 1526642806399.
+"18.05 13:26:46,411|" -- Clock Diff (1).
+"18.05 13:26:46,411|" -- Clock New Offset: 6 (Old: 6).
+"18.05 13:26:46,451|" -- Clock Got Adjust.
+"18.05 13:26:46,451|" -- Clock My Name: "team 06-01", other Name: "team 06-13".
+"18.05 13:26:46,451|" -- Clock TransportDelay is 1.
+"18.05 13:26:46,451|" -- Clock Send 1526642806434 Recv 1526642806435.
+"18.05 13:26:46,451|" -- Clock Diff (1).
+"18.05 13:26:46,451|" -- Clock New Offset: 6 (Old: 6).
+"18.05 13:26:46,454|" - Send Got NextSlotnumber 3.
+"18.05 13:26:46,465|" - Send 1526642806477 (Seti) 1526642806471 (Now).
+"18.05 13:26:46,465|" - Send SendTime in the future: 6.
+"18.05 13:26:46,471|" - Send Frage nach Payload.
+"18.05 13:26:46,471|" - Send Took 0 to get Payload.
+"18.05 13:26:46,471|" - Send Sende Nachricht.
+"18.05 13:26:46,471|" - Send sended with: ok.
+"18.05 13:26:46,491|" -- Clock Got Adjust.
+"18.05 13:26:46,491|" -- Clock My Name: "team 06-01", other Name: "team 06-01".
+"18.05 13:26:46,491|" -- Clock TransportDelay is 1.
+"18.05 13:26:46,491|" -- Clock Send 1526642806477 Recv 1526642806478.
+"18.05 13:26:46,491|" -- Clock Diff (1).
+"18.05 13:26:46,491|" -- Clock New Offset: 6 (Old: 6).
+"18.05 13:26:46,531|" -- Clock Got Adjust.
+"18.05 13:26:46,531|" -- Clock My Name: "team 06-01", other Name: "team 06-11".
+"18.05 13:26:46,531|" -- Clock TransportDelay is 1.
+"18.05 13:26:46,531|" -- Clock Send 1526642806510 Recv 1526642806512.
+"18.05 13:26:46,531|" -- Clock Diff (2).
+"18.05 13:26:46,531|" -- Clock New Offset: 5 (Old: 6).
+"18.05 13:26:46,570|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:46,730|" -- Clock Got Adjust.
+"18.05 13:26:46,730|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:46,730|" -- Clock TransportDelay is 1.
+"18.05 13:26:46,730|" -- Clock Send 1526642806718 Recv 1526642806717.
+"18.05 13:26:46,730|" -- Clock Diff (-1).
+"18.05 13:26:46,730|" -- Clock New Offset: 7 (Old: 5).
+"18.05 13:26:46,769|" -- Clock Got Adjust.
+"18.05 13:26:46,769|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:46,769|" -- Clock TransportDelay is 1.
+"18.05 13:26:46,769|" -- Clock Send 1526642806768 Recv 1526642806770.
+"18.05 13:26:46,769|" -- Clock Diff (2).
+"18.05 13:26:46,769|" -- Clock New Offset: 6 (Old: 7).
+"18.05 13:26:46,808|" -- Clock Got Adjust.
+"18.05 13:26:46,808|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:46,808|" -- Clock TransportDelay is 1.
+"18.05 13:26:46,808|" -- Clock Send 1526642806800 Recv 1526642806799.
+"18.05 13:26:46,808|" -- Clock Diff (-1).
+"18.05 13:26:46,808|" -- Clock New Offset: 8 (Old: 6).
+"18.05 13:26:46,888|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:46,927|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:46,967|" -- Clock Got Adjust.
+"18.05 13:26:46,967|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:46,967|" -- Clock TransportDelay is 1.
+"18.05 13:26:46,967|" -- Clock Send 1526642806968 Recv 1526642806969.
+"18.05 13:26:46,967|" -- Clock Diff (1).
+"18.05 13:26:46,967|" -- Clock New Offset: 8 (Old: 8).
+"18.05 13:26:47,006|" Core RestFrameTime = 0.
+"18.05 13:26:47,006|" Core stationwasinvolved,true was never received.
+"18.05 13:26:47,006|" -- Clock Got Adjust.
+"18.05 13:26:47,006|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:26:47,006|" -- Clock TransportDelay is 1.
+"18.05 13:26:47,006|" -- Clock Send 1526642806996 Recv 1526642806996.
+"18.05 13:26:47,006|" -- Clock Diff (0).
+"18.05 13:26:47,006|" -- Clock New Offset: 9 (Old: 8).
+"18.05 13:26:47,013|" -- Clock Schlief 7ms.
+"18.05 13:26:47,013|" Core Frame Ended after 1000  with NextInSendphase = true.
+"18.05 13:26:47,013|" Core New Frame Started at 1526642807022 with Slot 3 --------.
+"18.05 13:26:47,013|" -- Clock calc got: 1526642807022 3 = 1526642807122.
+"18.05 13:26:47,013|" - Send SendTimeMS at 1526642807122.
+"18.05 13:26:47,053|" -- Clock Got Adjust.
+"18.05 13:26:47,053|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:47,053|" -- Clock TransportDelay is 1.
+"18.05 13:26:47,053|" -- Clock Send 1526642807057 Recv 1526642807058.
+"18.05 13:26:47,053|" -- Clock Diff (1).
+"18.05 13:26:47,053|" -- Clock New Offset: 9 (Old: 9).
+"18.05 13:26:47,094|" - Send Got NextSlotnumber 7.
+"18.05 13:26:47,105|" - Send 1526642807122 (Seti) 1526642807114 (Now).
+"18.05 13:26:47,105|" - Send SendTime in the future: 8.
+"18.05 13:26:47,113|" - Send Frage nach Payload.
+"18.05 13:26:47,113|" - Send Took 0 to get Payload.
+"18.05 13:26:47,113|" - Send Sende Nachricht.
+"18.05 13:26:47,114|" - Send sended with: ok.
+"18.05 13:26:47,133|" -- Clock Got Adjust.
+"18.05 13:26:47,133|" -- Clock My Name: "team 06-01", other Name: "team 06-01".
+"18.05 13:26:47,133|" -- Clock TransportDelay is 1.
+"18.05 13:26:47,133|" -- Clock Send 1526642807122 Recv 1526642807123.
+"18.05 13:26:47,133|" -- Clock Diff (1).
+"18.05 13:26:47,133|" -- Clock New Offset: 9 (Old: 9).
+"18.05 13:26:47,173|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:47,293|" -- Clock Got Adjust.
+"18.05 13:26:47,293|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:26:47,293|" -- Clock TransportDelay is 1.
+"18.05 13:26:47,293|" -- Clock Send 1526642807284 Recv 1526642807284.
+"18.05 13:26:47,293|" -- Clock Diff (0).
+"18.05 13:26:47,293|" -- Clock New Offset: 10 (Old: 9).
+"18.05 13:26:47,333|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:47,533|" -- Clock Got Adjust.
+"18.05 13:26:47,533|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:47,533|" -- Clock TransportDelay is 1.
+"18.05 13:26:47,533|" -- Clock Send 1526642807531 Recv 1526642807531.
+"18.05 13:26:47,533|" -- Clock Diff (0).
+"18.05 13:26:47,533|" -- Clock New Offset: 11 (Old: 10).
+"18.05 13:26:47,653|" -- Clock Got Adjust.
+"18.05 13:26:47,653|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:26:47,653|" -- Clock TransportDelay is 1.
+"18.05 13:26:47,653|" -- Clock Send 1526642807644 Recv 1526642807646.
+"18.05 13:26:47,653|" -- Clock Diff (2).
+"18.05 13:26:47,653|" -- Clock New Offset: 10 (Old: 11).
+"18.05 13:26:47,692|" -- Clock Got Adjust.
+"18.05 13:26:47,692|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:26:47,692|" -- Clock TransportDelay is 1.
+"18.05 13:26:47,692|" -- Clock Send 1526642807669 Recv 1526642807671.
+"18.05 13:26:47,692|" -- Clock Diff (2).
+"18.05 13:26:47,692|" -- Clock New Offset: 9 (Old: 10).
+"18.05 13:26:47,732|" -- Clock Got Adjust.
+"18.05 13:26:47,732|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:47,732|" -- Clock TransportDelay is 1.
+"18.05 13:26:47,732|" -- Clock Send 1526642807722 Recv 1526642807721.
+"18.05 13:26:47,732|" -- Clock Diff (-1).
+"18.05 13:26:47,732|" -- Clock New Offset: 11 (Old: 9).
+"18.05 13:26:47,852|" -- Clock Got Adjust.
+"18.05 13:26:47,852|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:47,852|" -- Clock TransportDelay is 1.
+"18.05 13:26:47,852|" -- Clock Send 1526642807848 Recv 1526642807848.
+"18.05 13:26:47,852|" -- Clock Diff (0).
+"18.05 13:26:47,852|" -- Clock New Offset: 12 (Old: 11).
+"18.05 13:26:47,931|" -- Clock Got Adjust.
+"18.05 13:26:47,931|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:47,931|" -- Clock TransportDelay is 1.
+"18.05 13:26:47,931|" -- Clock Send 1526642807941 Recv 1526642807941.
+"18.05 13:26:47,931|" -- Clock Diff (0).
+"18.05 13:26:47,931|" -- Clock New Offset: 13 (Old: 12).
+"18.05 13:26:47,971|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:48,011|" Core RestFrameTime = 0.
+"18.05 13:26:48,011|" Core stationwasinvolved,true was never received.
+"18.05 13:26:48,013|" -- Clock Schlief 2ms.
+"18.05 13:26:48,013|" Core Frame Ended after 999  with NextInSendphase = true.
+"18.05 13:26:48,013|" Core New Frame Started at 1526642808026 with Slot 7 --------.
+"18.05 13:26:48,013|" -- Clock calc got: 1526642808026 7 = 1526642808286.
+"18.05 13:26:48,013|" - Send SendTimeMS at 1526642808286.
+"18.05 13:26:48,173|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:48,213|" -- Clock Got Adjust.
+"18.05 13:26:48,213|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:48,213|" -- Clock TransportDelay is 1.
+"18.05 13:26:48,213|" -- Clock Send 1526642808212 Recv 1526642808212.
+"18.05 13:26:48,213|" -- Clock Diff (0).
+"18.05 13:26:48,213|" -- Clock New Offset: 14 (Old: 13).
+"18.05 13:26:48,253|" -- Clock Got Adjust.
+"18.05 13:26:48,253|" -- Clock My Name: "team 06-01", other Name: "team 06-19".
+"18.05 13:26:48,253|" -- Clock TransportDelay is 1.
+"18.05 13:26:48,253|" -- Clock Send 1526642808229 Recv 1526642808230.
+"18.05 13:26:48,253|" -- Clock Diff (1).
+"18.05 13:26:48,253|" -- Clock New Offset: 14 (Old: 14).
+"18.05 13:26:48,254|" - Send Got NextSlotnumber 21.
+"18.05 13:26:48,265|" - Send 1526642808286 (Seti) 1526642808279 (Now).
+"18.05 13:26:48,265|" - Send SendTime in the future: 7.
+"18.05 13:26:48,272|" - Send Frage nach Payload.
+"18.05 13:26:48,272|" - Send Took 0 to get Payload.
+"18.05 13:26:48,272|" - Send Sende Nachricht.
+"18.05 13:26:48,273|" - Send sended with: ok.
+"18.05 13:26:48,292|" -- Clock Got Adjust.
+"18.05 13:26:48,292|" -- Clock My Name: "team 06-01", other Name: "team 06-01".
+"18.05 13:26:48,292|" -- Clock TransportDelay is 1.
+"18.05 13:26:48,292|" -- Clock Send 1526642808286 Recv 1526642808287.
+"18.05 13:26:48,292|" -- Clock Diff (1).
+"18.05 13:26:48,292|" -- Clock New Offset: 14 (Old: 14).
+"18.05 13:26:48,331|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:48,610|" -- Clock Got Adjust.
+"18.05 13:26:48,610|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:26:48,610|" -- Clock TransportDelay is 1.
+"18.05 13:26:48,610|" -- Clock Send 1526642808606 Recv 1526642808605.
+"18.05 13:26:48,610|" -- Clock Diff (-1).
+"18.05 13:26:48,610|" -- Clock New Offset: 16 (Old: 14).
+"18.05 13:26:48,690|" -- Clock Got Adjust.
+"18.05 13:26:48,690|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:26:48,690|" -- Clock TransportDelay is 1.
+"18.05 13:26:48,690|" -- Clock Send 1526642808688 Recv 1526642808689.
+"18.05 13:26:48,690|" -- Clock Diff (1).
+"18.05 13:26:48,690|" -- Clock New Offset: 16 (Old: 16).
+"18.05 13:26:48,769|" -- Clock Got Adjust.
+"18.05 13:26:48,769|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:48,769|" -- Clock TransportDelay is 1.
+"18.05 13:26:48,769|" -- Clock Send 1526642808781 Recv 1526642808782.
+"18.05 13:26:48,769|" -- Clock Diff (1).
+"18.05 13:26:48,769|" -- Clock New Offset: 16 (Old: 16).
+"18.05 13:26:48,809|" -- Clock Got Adjust.
+"18.05 13:26:48,809|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:26:48,809|" -- Clock TransportDelay is 1.
+"18.05 13:26:48,809|" -- Clock Send 1526642808815 Recv 1526642808815.
+"18.05 13:26:48,809|" -- Clock Diff (0).
+"18.05 13:26:48,809|" -- Clock New Offset: 17 (Old: 16).
+"18.05 13:26:48,968|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:49,008|" Core RestFrameTime = 1.
+"18.05 13:26:49,008|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:49,010|" Core stationwasinvolved,true was never received.
+"18.05 13:26:49,013|" -- Clock Schlief 3ms.
+"18.05 13:26:49,013|" Core Frame Ended after 1002  with NextInSendphase = true.
+"18.05 13:26:49,013|" Core New Frame Started at 1526642809030 with Slot 21 --------.
+"18.05 13:26:49,013|" -- Clock calc got: 1526642809030 21 = 1526642809850.
+"18.05 13:26:49,013|" - Send SendTimeMS at 1526642809850.
+"18.05 13:26:49,132|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:49,172|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:49,331|" -- Clock Got Adjust.
+"18.05 13:26:49,331|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:49,331|" -- Clock TransportDelay is 1.
+"18.05 13:26:49,331|" -- Clock Send 1526642809344 Recv 1526642809346.
+"18.05 13:26:49,331|" -- Clock Diff (2).
+"18.05 13:26:49,331|" -- Clock New Offset: 16 (Old: 17).
+"18.05 13:26:49,370|" -- Clock Got Adjust.
+"18.05 13:26:49,370|" -- Clock My Name: "team 06-01", other Name: "team 06-11".
+"18.05 13:26:49,370|" -- Clock TransportDelay is 1.
+"18.05 13:26:49,370|" -- Clock Send 1526642809367 Recv 1526642809366.
+"18.05 13:26:49,370|" -- Clock Diff (-1).
+"18.05 13:26:49,370|" -- Clock New Offset: 18 (Old: 16).
+"18.05 13:26:49,410|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:49,570|" -- Clock Got Adjust.
+"18.05 13:26:49,570|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:26:49,570|" -- Clock TransportDelay is 1.
+"18.05 13:26:49,570|" -- Clock Send 1526642809574 Recv 1526642809575.
+"18.05 13:26:49,570|" -- Clock Diff (1).
+"18.05 13:26:49,570|" -- Clock New Offset: 18 (Old: 18).
+"18.05 13:26:49,689|" -- Clock Got Adjust.
+"18.05 13:26:49,689|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:49,689|" -- Clock TransportDelay is 1.
+"18.05 13:26:49,689|" -- Clock Send 1526642809699 Recv 1526642809700.
+"18.05 13:26:49,689|" -- Clock Diff (1).
+"18.05 13:26:49,689|" -- Clock New Offset: 18 (Old: 18).
+"18.05 13:26:49,808|" -- Clock Got Adjust.
+"18.05 13:26:49,808|" -- Clock My Name: "team 06-01", other Name: "team 06-13".
+"18.05 13:26:49,808|" -- Clock TransportDelay is 1.
+"18.05 13:26:49,808|" -- Clock Send 1526642809809 Recv 1526642809810.
+"18.05 13:26:49,808|" -- Clock Diff (1).
+"18.05 13:26:49,808|" -- Clock New Offset: 18 (Old: 18).
+"18.05 13:26:49,814|" - Send Got NextSlotnumber 23.
+"18.05 13:26:49,824|" - Send 1526642809850 (Seti) 1526642809842 (Now).
+"18.05 13:26:49,824|" - Send SendTime in the future: 8.
+"18.05 13:26:49,832|" - Send Frage nach Payload.
+"18.05 13:26:49,832|" - Send Took 0 to get Payload.
+"18.05 13:26:49,832|" - Send Sende Nachricht.
+"18.05 13:26:49,833|" - Send sended with: ok.
+"18.05 13:26:49,847|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:26:49,886|" -- Clock Got Adjust.
+"18.05 13:26:49,886|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:26:49,886|" -- Clock TransportDelay is 1.
+"18.05 13:26:49,886|" -- Clock Send 1526642809887 Recv 1526642809887.
+"18.05 13:26:49,886|" -- Clock Diff (0).
+"18.05 13:26:49,886|" -- Clock New Offset: 19 (Old: 18).
+"18.05 13:26:49,965|" -- Clock Got Adjust.
+"18.05 13:26:49,965|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:49,965|" -- Clock TransportDelay is 1.
+"18.05 13:26:49,965|" -- Clock Send 1526642809975 Recv 1526642809976.
+"18.05 13:26:49,965|" -- Clock Diff (1).
+"18.05 13:26:49,965|" -- Clock New Offset: 19 (Old: 19).
+"18.05 13:26:50,005|" Core RestFrameTime = 0.
+"18.05 13:26:50,005|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:26:50,013|" -- Clock Schlief 8ms.
+"18.05 13:26:50,013|" Core Frame Ended after 1000  with NextInSendphase = false.
+"18.05 13:26:50,013|" Core New Frame Started at 1526642810032 with Slot 0 --------.
+"18.05 13:26:50,133|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:50,172|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:50,252|" -- Clock Got Adjust.
+"18.05 13:26:50,252|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:26:50,252|" -- Clock TransportDelay is 1.
+"18.05 13:26:50,252|" -- Clock Send 1526642810251 Recv 1526642810251.
+"18.05 13:26:50,252|" -- Clock Diff (0).
+"18.05 13:26:50,252|" -- Clock New Offset: 20 (Old: 19).
+"18.05 13:26:50,331|" -- Clock Got Adjust.
+"18.05 13:26:50,331|" -- Clock My Name: "team 06-01", other Name: "team 06-19".
+"18.05 13:26:50,331|" -- Clock TransportDelay is 1.
+"18.05 13:26:50,331|" -- Clock Send 1526642810316 Recv 1526642810317.
+"18.05 13:26:50,331|" -- Clock Diff (1).
+"18.05 13:26:50,331|" -- Clock New Offset: 20 (Old: 20).
+"18.05 13:26:50,371|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:50,411|" -- Clock Got Adjust.
+"18.05 13:26:50,411|" -- Clock My Name: "team 06-01", other Name: "team 06-11".
+"18.05 13:26:50,411|" -- Clock TransportDelay is 1.
+"18.05 13:26:50,411|" -- Clock Send 1526642810409 Recv 1526642810408.
+"18.05 13:26:50,411|" -- Clock Diff (-1).
+"18.05 13:26:50,411|" -- Clock New Offset: 22 (Old: 20).
+"18.05 13:26:50,491|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:50,570|" -- Clock Got Adjust.
+"18.05 13:26:50,570|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:50,570|" -- Clock TransportDelay is 1.
+"18.05 13:26:50,570|" -- Clock Send 1526642810584 Recv 1526642810586.
+"18.05 13:26:50,570|" -- Clock Diff (2).
+"18.05 13:26:50,570|" -- Clock New Offset: 21 (Old: 22).
+"18.05 13:26:50,609|" -- Clock Got Adjust.
+"18.05 13:26:50,609|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:26:50,609|" -- Clock TransportDelay is 1.
+"18.05 13:26:50,609|" -- Clock Send 1526642810618 Recv 1526642810619.
+"18.05 13:26:50,609|" -- Clock Diff (1).
+"18.05 13:26:50,609|" -- Clock New Offset: 21 (Old: 21).
+"18.05 13:26:50,648|" -- Clock Got Adjust.
+"18.05 13:26:50,648|" -- Clock My Name: "team 06-01", other Name: "team 06-02".
+"18.05 13:26:50,648|" -- Clock TransportDelay is 1.
+"18.05 13:26:50,648|" -- Clock Send 1526642810651 Recv 1526642810651.
+"18.05 13:26:50,648|" -- Clock Diff (0).
+"18.05 13:26:50,648|" -- Clock New Offset: 22 (Old: 21).
+"18.05 13:26:50,688|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:50,808|" -- Clock Got Adjust.
+"18.05 13:26:50,808|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:50,808|" -- Clock TransportDelay is 1.
+"18.05 13:26:50,808|" -- Clock Send 1526642810821 Recv 1526642810821.
+"18.05 13:26:50,808|" -- Clock Diff (0).
+"18.05 13:26:50,808|" -- Clock New Offset: 23 (Old: 22).
+"18.05 13:26:50,968|" -- Clock Got Adjust.
+"18.05 13:26:50,968|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:50,968|" -- Clock TransportDelay is 1.
+"18.05 13:26:50,968|" -- Clock Send 1526642810975 Recv 1526642810975.
+"18.05 13:26:50,968|" -- Clock Diff (0).
+"18.05 13:26:50,968|" -- Clock New Offset: 24 (Old: 23).
+"18.05 13:26:51,008|" Core RestFrameTime = 0.
+"18.05 13:26:51,013|" -- Clock Schlief 5ms.
+"18.05 13:26:51,013|" Core Frame Ended after 982  with NextInSendphase = true.
+"18.05 13:26:51,013|" Core New Frame Started at 1526642811037 with Slot 20 --------.
+"18.05 13:26:51,013|" -- Clock calc got: 1526642811037 20 = 1526642811817.
+"18.05 13:26:51,013|" - Send SendTimeMS at 1526642811817.
+"18.05 13:26:51,173|" -- Clock Got Adjust.
+"18.05 13:26:51,173|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:51,173|" -- Clock TransportDelay is 1.
+"18.05 13:26:51,173|" -- Clock Send 1526642811187 Recv 1526642811187.
+"18.05 13:26:51,173|" -- Clock Diff (0).
+"18.05 13:26:51,173|" -- Clock New Offset: 25 (Old: 24).
+"18.05 13:26:51,293|" -- Clock Got Adjust.
+"18.05 13:26:51,293|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:51,293|" -- Clock TransportDelay is 1.
+"18.05 13:26:51,293|" -- Clock Send 1526642811303 Recv 1526642811303.
+"18.05 13:26:51,293|" -- Clock Diff (0).
+"18.05 13:26:51,293|" -- Clock New Offset: 26 (Old: 25).
+"18.05 13:26:51,373|" -- Clock Got Adjust.
+"18.05 13:26:51,373|" -- Clock My Name: "team 06-01", other Name: "team 06-19".
+"18.05 13:26:51,373|" -- Clock TransportDelay is 1.
+"18.05 13:26:51,373|" -- Clock Send 1526642811360 Recv 1526642811360.
+"18.05 13:26:51,373|" -- Clock Diff (0).
+"18.05 13:26:51,373|" -- Clock New Offset: 27 (Old: 26).
+"18.05 13:26:51,453|" -- Clock Got Adjust.
+"18.05 13:26:51,453|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:51,453|" -- Clock TransportDelay is 1.
+"18.05 13:26:51,453|" -- Clock Send 1526642811459 Recv 1526642811459.
+"18.05 13:26:51,453|" -- Clock Diff (0).
+"18.05 13:26:51,453|" -- Clock New Offset: 28 (Old: 27).
+"18.05 13:26:51,533|" -- Clock Got Adjust.
+"18.05 13:26:51,533|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:51,533|" -- Clock TransportDelay is 1.
+"18.05 13:26:51,533|" -- Clock Send 1526642811549 Recv 1526642811551.
+"18.05 13:26:51,533|" -- Clock Diff (2).
+"18.05 13:26:51,533|" -- Clock New Offset: 27 (Old: 28).
+"18.05 13:26:51,613|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:51,733|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:51,773|" -- Clock Got Adjust.
+"18.05 13:26:51,773|" -- Clock My Name: "team 06-01", other Name: "team 06-02".
+"18.05 13:26:51,773|" -- Clock TransportDelay is 1.
+"18.05 13:26:51,773|" -- Clock Send 1526642811776 Recv 1526642811777.
+"18.05 13:26:51,773|" -- Clock Diff (1).
+"18.05 13:26:51,773|" -- Clock New Offset: 27 (Old: 27).
+"18.05 13:26:51,774|" - Send Got NextSlotnumber 22.
+"18.05 13:26:51,785|" - Send 1526642811817 (Seti) 1526642811812 (Now).
+"18.05 13:26:51,785|" - Send SendTime in the future: 5.
+"18.05 13:26:51,790|" - Send Frage nach Payload.
+"18.05 13:26:51,790|" - Send Took 0 to get Payload.
+"18.05 13:26:51,790|" - Send Sende Nachricht.
+"18.05 13:26:51,791|" - Send sended with: ok.
+"18.05 13:26:51,812|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:26:51,891|" -- Clock Got Adjust.
+"18.05 13:26:51,891|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:51,891|" -- Clock TransportDelay is 1.
+"18.05 13:26:51,891|" -- Clock Send 1526642811911 Recv 1526642811912.
+"18.05 13:26:51,891|" -- Clock Diff (1).
+"18.05 13:26:51,891|" -- Clock New Offset: 27 (Old: 27).
+"18.05 13:26:51,930|" -- Clock Got Adjust.
+"18.05 13:26:51,930|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:26:51,930|" -- Clock TransportDelay is 1.
+"18.05 13:26:51,930|" -- Clock Send 1526642811939 Recv 1526642811941.
+"18.05 13:26:51,930|" -- Clock Diff (2).
+"18.05 13:26:51,930|" -- Clock New Offset: 26 (Old: 27).
+"18.05 13:26:52,010|" Core RestFrameTime = 18.
+"18.05 13:26:52,010|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:26:52,013|" -- Clock Schlief 3ms.
+"18.05 13:26:52,013|" Core Frame Ended after 987  with NextInSendphase = false.
+"18.05 13:26:52,013|" Core New Frame Started at 1526642812039 with Slot 0 --------.
+"18.05 13:26:52,053|" -- Clock Got Adjust.
+"18.05 13:26:52,053|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:52,053|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,053|" -- Clock Send 1526642812065 Recv 1526642812064.
+"18.05 13:26:52,053|" -- Clock Diff (-1).
+"18.05 13:26:52,053|" -- Clock New Offset: 28 (Old: 26).
+"18.05 13:26:52,093|" -- Clock Got Adjust.
+"18.05 13:26:52,093|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:52,093|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,093|" -- Clock Send 1526642812116 Recv 1526642812117.
+"18.05 13:26:52,093|" -- Clock Diff (1).
+"18.05 13:26:52,093|" -- Clock New Offset: 28 (Old: 28).
+"18.05 13:26:52,132|" -- Clock Got Adjust.
+"18.05 13:26:52,132|" -- Clock My Name: "team 06-01", other Name: "team 06-07".
+"18.05 13:26:52,132|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,132|" -- Clock Send 1526642812127 Recv 1526642812130.
+"18.05 13:26:52,132|" -- Clock Diff (3).
+"18.05 13:26:52,132|" -- Clock New Offset: 26 (Old: 28).
+"18.05 13:26:52,171|" -- Clock Got Adjust.
+"18.05 13:26:52,171|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:52,171|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,171|" -- Clock Send 1526642812165 Recv 1526642812165.
+"18.05 13:26:52,171|" -- Clock Diff (0).
+"18.05 13:26:52,171|" -- Clock New Offset: 27 (Old: 26).
+"18.05 13:26:52,250|" -- Clock Got Adjust.
+"18.05 13:26:52,250|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:26:52,250|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,251|" -- Clock Send 1526642812279 Recv 1526642812277.
+"18.05 13:26:52,251|" -- Clock Diff (-2).
+"18.05 13:26:52,251|" -- Clock New Offset: 30 (Old: 27).
+"18.05 13:26:52,330|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:52,410|" -- Clock Got Adjust.
+"18.05 13:26:52,410|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:26:52,410|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,410|" -- Clock Send 1526642812409 Recv 1526642812409.
+"18.05 13:26:52,410|" -- Clock Diff (0).
+"18.05 13:26:52,410|" -- Clock New Offset: 31 (Old: 30).
+"18.05 13:26:52,529|" -- Clock Got Adjust.
+"18.05 13:26:52,529|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:26:52,529|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,529|" -- Clock Send 1526642812542 Recv 1526642812543.
+"18.05 13:26:52,529|" -- Clock Diff (1).
+"18.05 13:26:52,529|" -- Clock New Offset: 31 (Old: 31).
+"18.05 13:26:52,568|" -- Clock Got Adjust.
+"18.05 13:26:52,568|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:26:52,568|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,568|" -- Clock Send 1526642812596 Recv 1526642812596.
+"18.05 13:26:52,568|" -- Clock Diff (0).
+"18.05 13:26:52,568|" -- Clock New Offset: 32 (Old: 31).
+"18.05 13:26:52,648|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:52,728|" -- Clock Got Adjust.
+"18.05 13:26:52,728|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:52,728|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,728|" -- Clock Send 1526642812724 Recv 1526642812725.
+"18.05 13:26:52,728|" -- Clock Diff (1).
+"18.05 13:26:52,728|" -- Clock New Offset: 32 (Old: 32).
+"18.05 13:26:52,768|" -- Clock Got Adjust.
+"18.05 13:26:52,768|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:26:52,768|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,768|" -- Clock Send 1526642812781 Recv 1526642812782.
+"18.05 13:26:52,768|" -- Clock Diff (1).
+"18.05 13:26:52,768|" -- Clock New Offset: 32 (Old: 32).
+"18.05 13:26:52,847|" -- Clock Got Adjust.
+"18.05 13:26:52,847|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:52,847|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,847|" -- Clock Send 1526642812861 Recv 1526642812863.
+"18.05 13:26:52,847|" -- Clock Diff (2).
+"18.05 13:26:52,847|" -- Clock New Offset: 31 (Old: 32).
+"18.05 13:26:52,887|" -- Clock Got Adjust.
+"18.05 13:26:52,887|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:52,887|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,887|" -- Clock Send 1526642812916 Recv 1526642812916.
+"18.05 13:26:52,887|" -- Clock Diff (0).
+"18.05 13:26:52,887|" -- Clock New Offset: 32 (Old: 31).
+"18.05 13:26:52,966|" -- Clock Got Adjust.
+"18.05 13:26:52,966|" -- Clock My Name: "team 06-01", other Name: "team 06-02".
+"18.05 13:26:52,966|" -- Clock TransportDelay is 1.
+"18.05 13:26:52,966|" -- Clock Send 1526642812994 Recv 1526642812995.
+"18.05 13:26:52,966|" -- Clock Diff (1).
+"18.05 13:26:52,966|" -- Clock New Offset: 32 (Old: 32).
+"18.05 13:26:53,005|" Core RestFrameTime = 2.
+"18.05 13:26:53,005|" -- Clock Got Adjust.
+"18.05 13:26:53,005|" -- Clock My Name: "team 06-01", other Name: "team 06-13".
+"18.05 13:26:53,005|" -- Clock TransportDelay is 1.
+"18.05 13:26:53,005|" -- Clock Send 1526642813017 Recv 1526642813017.
+"18.05 13:26:53,005|" -- Clock Diff (0).
+"18.05 13:26:53,005|" -- Clock New Offset: 33 (Old: 32).
+"18.05 13:26:53,013|" -- Clock Schlief 8ms.
+"18.05 13:26:53,013|" Core Frame Ended after 998  with NextInSendphase = true.
+"18.05 13:26:53,013|" Core New Frame Started at 1526642813046 with Slot 7 --------.
+"18.05 13:26:53,013|" -- Clock calc got: 1526642813046 7 = 1526642813306.
+"18.05 13:26:53,013|" - Send SendTimeMS at 1526642813306.
+"18.05 13:26:53,053|" -- Clock Got Adjust.
+"18.05 13:26:53,053|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:26:53,053|" -- Clock TransportDelay is 1.
+"18.05 13:26:53,053|" -- Clock Send 1526642813066 Recv 1526642813066.
+"18.05 13:26:53,053|" -- Clock Diff (0).
+"18.05 13:26:53,053|" -- Clock New Offset: 34 (Old: 33).
+"18.05 13:26:53,093|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:53,253|" -- Clock Got Adjust.
+"18.05 13:26:53,253|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:26:53,253|" -- Clock TransportDelay is 1.
+"18.05 13:26:53,253|" -- Clock Send 1526642813255 Recv 1526642813255.
+"18.05 13:26:53,253|" -- Clock Diff (0).
+"18.05 13:26:53,253|" -- Clock New Offset: 35 (Old: 34).
+"18.05 13:26:53,254|" - Send Got NextSlotnumber 12.
+"18.05 13:26:53,265|" - Send 1526642813306 (Seti) 1526642813300 (Now).
+"18.05 13:26:53,265|" - Send SendTime in the future: 6.
+"18.05 13:26:53,271|" - Send Frage nach Payload.
+"18.05 13:26:53,271|" - Send Took 0 to get Payload.
+"18.05 13:26:53,271|" - Send Sende Nachricht.
+"18.05 13:26:53,272|" - Send sended with: ok.
+"18.05 13:26:53,293|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:26:53,333|" -- Clock Got Adjust.
+"18.05 13:26:53,333|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:26:53,333|" -- Clock TransportDelay is 1.
+"18.05 13:26:53,333|" -- Clock Send 1526642813363 Recv 1526642813363.
+"18.05 13:26:53,333|" -- Clock Diff (0).
+"18.05 13:26:53,333|" -- Clock New Offset: 36 (Old: 35).
+"18.05 13:26:53,373|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:53,452|" -- Clock Got Adjust.
+"18.05 13:26:53,452|" -- Clock My Name: "team 06-01", other Name: "team 06-13".
+"18.05 13:26:53,452|" -- Clock TransportDelay is 1.
+"18.05 13:26:53,452|" -- Clock Send 1526642813464 Recv 1526642813465.
+"18.05 13:26:53,452|" -- Clock Diff (1).
+"18.05 13:26:53,452|" -- Clock New Offset: 36 (Old: 36).
+"18.05 13:26:53,491|" -- Clock Got Adjust.
+"18.05 13:26:53,491|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:26:53,491|" -- Clock TransportDelay is 1.
+"18.05 13:26:53,491|" -- Clock Send 1526642813508 Recv 1526642813509.
+"18.05 13:26:53,491|" -- Clock Diff (1).
+"18.05 13:26:53,491|" -- Clock New Offset: 36 (Old: 36).
+"18.05 13:26:53,571|" -- Clock Got Adjust.
+"18.05 13:26:53,571|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:53,571|" -- Clock TransportDelay is 1.
+"18.05 13:26:53,571|" -- Clock Send 1526642813590 Recv 1526642813588.
+"18.05 13:26:53,571|" -- Clock Diff (-2).
+"18.05 13:26:53,571|" -- Clock New Offset: 39 (Old: 36).
+"18.05 13:26:53,731|" -- Clock Got Adjust.
+"18.05 13:26:53,731|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:53,731|" -- Clock TransportDelay is 1.
+"18.05 13:26:53,731|" -- Clock Send 1526642813748 Recv 1526642813750.
+"18.05 13:26:53,731|" -- Clock Diff (2).
+"18.05 13:26:53,731|" -- Clock New Offset: 38 (Old: 39).
+"18.05 13:26:53,770|" -- Clock Got Adjust.
+"18.05 13:26:53,770|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:53,770|" -- Clock TransportDelay is 1.
+"18.05 13:26:53,770|" -- Clock Send 1526642813807 Recv 1526642813808.
+"18.05 13:26:53,770|" -- Clock Diff (1).
+"18.05 13:26:53,770|" -- Clock New Offset: 38 (Old: 38).
+"18.05 13:26:53,930|" -- Clock Got Adjust.
+"18.05 13:26:53,930|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:53,930|" -- Clock TransportDelay is 1.
+"18.05 13:26:53,930|" -- Clock Send 1526642813963 Recv 1526642813964.
+"18.05 13:26:53,930|" -- Clock Diff (1).
+"18.05 13:26:53,930|" -- Clock New Offset: 38 (Old: 38).
+"18.05 13:26:53,970|" -- Clock Got Adjust.
+"18.05 13:26:53,970|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:26:53,970|" -- Clock TransportDelay is 1.
+"18.05 13:26:53,970|" -- Clock Send 1526642813988 Recv 1526642813990.
+"18.05 13:26:53,970|" -- Clock Diff (2).
+"18.05 13:26:53,970|" -- Clock New Offset: 37 (Old: 38).
+"18.05 13:26:54,009|" Core RestFrameTime = 0.
+"18.05 13:26:54,009|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:26:54,009|" -- Clock Got Adjust.
+"18.05 13:26:54,009|" -- Clock My Name: "team 06-01", other Name: "team 06-02".
+"18.05 13:26:54,009|" -- Clock TransportDelay is 1.
+"18.05 13:26:54,009|" -- Clock Send 1526642814041 Recv 1526642814042.
+"18.05 13:26:54,009|" -- Clock Diff (1).
+"18.05 13:26:54,009|" -- Clock New Offset: 37 (Old: 37).
+"18.05 13:26:54,013|" -- Clock Schlief 4ms.
+"18.05 13:26:54,013|" Core Frame Ended after 1000  with NextInSendphase = false.
+"18.05 13:26:54,013|" Core New Frame Started at 1526642814050 with Slot 0 --------.
+"18.05 13:26:54,092|" -- Clock Got Adjust.
+"18.05 13:26:54,092|" -- Clock My Name: "team 06-01", other Name: "team 06-20".
+"18.05 13:26:54,092|" -- Clock TransportDelay is 1.
+"18.05 13:26:54,092|" -- Clock Send 1526642814099 Recv 1526642814100.
+"18.05 13:26:54,092|" -- Clock Diff (1).
+"18.05 13:26:54,092|" -- Clock New Offset: 37 (Old: 37).
+"18.05 13:26:54,132|" -- Clock Got Adjust.
+"18.05 13:26:54,132|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:54,132|" -- Clock TransportDelay is 1.
+"18.05 13:26:54,132|" -- Clock Send 1526642814167 Recv 1526642814166.
+"18.05 13:26:54,132|" -- Clock Diff (-1).
+"18.05 13:26:54,132|" -- Clock New Offset: 39 (Old: 37).
+"18.05 13:26:54,412|" -- Clock Got Adjust.
+"18.05 13:26:54,412|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:54,412|" -- Clock TransportDelay is 1.
+"18.05 13:26:54,412|" -- Clock Send 1526642814433 Recv 1526642814433.
+"18.05 13:26:54,412|" -- Clock Diff (0).
+"18.05 13:26:54,412|" -- Clock New Offset: 40 (Old: 39).
+"18.05 13:26:54,452|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:54,532|" -- Clock Got Adjust.
+"18.05 13:26:54,532|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:54,532|" -- Clock TransportDelay is 1.
+"18.05 13:26:54,532|" -- Clock Send 1526642814551 Recv 1526642814552.
+"18.05 13:26:54,532|" -- Clock Diff (1).
+"18.05 13:26:54,532|" -- Clock New Offset: 40 (Old: 40).
+"18.05 13:26:54,572|" -- Clock Got Adjust.
+"18.05 13:26:54,572|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:26:54,572|" -- Clock TransportDelay is 1.
+"18.05 13:26:54,572|" -- Clock Send 1526642814591 Recv 1526642814592.
+"18.05 13:26:54,572|" -- Clock Diff (1).
+"18.05 13:26:54,572|" -- Clock New Offset: 40 (Old: 40).
+"18.05 13:26:54,732|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:54,771|" -- Clock Got Adjust.
+"18.05 13:26:54,771|" -- Clock My Name: "team 06-01", other Name: "team 06-10".
+"18.05 13:26:54,772|" -- Clock TransportDelay is 1.
+"18.05 13:26:54,772|" -- Clock Send 1526642814772 Recv 1526642814773.
+"18.05 13:26:54,772|" -- Clock Diff (1).
+"18.05 13:26:54,772|" -- Clock New Offset: 40 (Old: 40).
+"18.05 13:26:54,811|" -- Clock Got Adjust.
+"18.05 13:26:54,811|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:54,811|" -- Clock TransportDelay is 1.
+"18.05 13:26:54,811|" -- Clock Send 1526642814812 Recv 1526642814811.
+"18.05 13:26:54,811|" -- Clock Diff (-1).
+"18.05 13:26:54,811|" -- Clock New Offset: 42 (Old: 40).
+"18.05 13:26:54,891|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:54,931|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:54,971|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:55,011|" Core RestFrameTime = 0.
+"18.05 13:26:55,013|" -- Clock Schlief 2ms.
+"18.05 13:26:55,013|" Core Frame Ended after 1004  with NextInSendphase = true.
+"18.05 13:26:55,013|" Core New Frame Started at 1526642815055 with Slot 17 --------.
+"18.05 13:26:55,013|" -- Clock calc got: 1526642815055 17 = 1526642815715.
+"18.05 13:26:55,013|" - Send SendTimeMS at 1526642815715.
+"18.05 13:26:55,093|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:55,133|" -- Clock Got Adjust.
+"18.05 13:26:55,133|" -- Clock My Name: "team 06-01", other Name: "team 06-11".
+"18.05 13:26:55,133|" -- Clock TransportDelay is 1.
+"18.05 13:26:55,133|" -- Clock Send 1526642815151 Recv 1526642815152.
+"18.05 13:26:55,133|" -- Clock Diff (1).
+"18.05 13:26:55,133|" -- Clock New Offset: 42 (Old: 42).
+"18.05 13:26:55,213|" -- Clock Got Adjust.
+"18.05 13:26:55,213|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:55,213|" -- Clock TransportDelay is 1.
+"18.05 13:26:55,213|" -- Clock Send 1526642815217 Recv 1526642815218.
+"18.05 13:26:55,213|" -- Clock Diff (1).
+"18.05 13:26:55,213|" -- Clock New Offset: 42 (Old: 42).
+"18.05 13:26:55,253|" -- Clock Got Adjust.
+"18.05 13:26:55,253|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:26:55,253|" -- Clock TransportDelay is 1.
+"18.05 13:26:55,253|" -- Clock Send 1526642815275 Recv 1526642815275.
+"18.05 13:26:55,253|" -- Clock Diff (0).
+"18.05 13:26:55,253|" -- Clock New Offset: 43 (Old: 42).
+"18.05 13:26:55,373|" -- Clock Got Adjust.
+"18.05 13:26:55,373|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:26:55,373|" -- Clock TransportDelay is 1.
+"18.05 13:26:55,373|" -- Clock Send 1526642815383 Recv 1526642815384.
+"18.05 13:26:55,373|" -- Clock Diff (1).
+"18.05 13:26:55,373|" -- Clock New Offset: 43 (Old: 43).
+"18.05 13:26:55,412|" -- Clock Got Adjust.
+"18.05 13:26:55,412|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:55,412|" -- Clock TransportDelay is 1.
+"18.05 13:26:55,412|" -- Clock Send 1526642815437 Recv 1526642815437.
+"18.05 13:26:55,412|" -- Clock Diff (0).
+"18.05 13:26:55,412|" -- Clock New Offset: 44 (Old: 43).
+"18.05 13:26:55,612|" -- Clock Got Adjust.
+"18.05 13:26:55,612|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:55,612|" -- Clock TransportDelay is 1.
+"18.05 13:26:55,612|" -- Clock Send 1526642815621 Recv 1526642815622.
+"18.05 13:26:55,612|" -- Clock Diff (1).
+"18.05 13:26:55,612|" -- Clock New Offset: 44 (Old: 44).
+"18.05 13:26:55,651|" -- Clock Got Adjust.
+"18.05 13:26:55,651|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:55,651|" -- Clock TransportDelay is 1.
+"18.05 13:26:55,651|" -- Clock Send 1526642815690 Recv 1526642815691.
+"18.05 13:26:55,651|" -- Clock Diff (1).
+"18.05 13:26:55,651|" -- Clock New Offset: 44 (Old: 44).
+"18.05 13:26:55,654|" - Send Got NextSlotnumber 23.
+"18.05 13:26:55,665|" - Send 1526642815715 (Seti) 1526642815709 (Now).
+"18.05 13:26:55,665|" - Send SendTime in the future: 6.
+"18.05 13:26:55,671|" - Send Frage nach Payload.
+"18.05 13:26:55,671|" - Send Took 0 to get Payload.
+"18.05 13:26:55,671|" - Send Sende Nachricht.
+"18.05 13:26:55,673|" - Send sended with: ok.
+"18.05 13:26:55,691|" -- Clock Got Adjust.
+"18.05 13:26:55,691|" -- Clock My Name: "team 06-01", other Name: "team 06-01".
+"18.05 13:26:55,691|" -- Clock TransportDelay is 1.
+"18.05 13:26:55,691|" -- Clock Send 1526642815715 Recv 1526642815717.
+"18.05 13:26:55,691|" -- Clock Diff (2).
+"18.05 13:26:55,691|" -- Clock New Offset: 43 (Old: 44).
+"18.05 13:26:55,851|" -- Clock Got Adjust.
+"18.05 13:26:55,851|" -- Clock My Name: "team 06-01", other Name: "team 06-20".
+"18.05 13:26:55,851|" -- Clock TransportDelay is 1.
+"18.05 13:26:55,851|" -- Clock Send 1526642815864 Recv 1526642815863.
+"18.05 13:26:55,851|" -- Clock Diff (-1).
+"18.05 13:26:55,851|" -- Clock New Offset: 45 (Old: 43).
+"18.05 13:26:55,930|" -- Clock Got Adjust.
+"18.05 13:26:55,930|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:55,930|" -- Clock TransportDelay is 1.
+"18.05 13:26:55,930|" -- Clock Send 1526642815953 Recv 1526642815955.
+"18.05 13:26:55,930|" -- Clock Diff (2).
+"18.05 13:26:55,930|" -- Clock New Offset: 44 (Old: 45).
+"18.05 13:26:55,970|" -- Clock Got Adjust.
+"18.05 13:26:55,970|" -- Clock My Name: "team 06-01", other Name: "team 06-25".
+"18.05 13:26:55,970|" -- Clock TransportDelay is 1.
+"18.05 13:26:55,970|" -- Clock Send 1526642816005 Recv 1526642816005.
+"18.05 13:26:55,970|" -- Clock Diff (0).
+"18.05 13:26:55,970|" -- Clock New Offset: 45 (Old: 44).
+"18.05 13:26:56,010|" Core RestFrameTime = 3.
+"18.05 13:26:56,010|" -- Clock Got Adjust.
+"18.05 13:26:56,010|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:56,010|" -- Clock TransportDelay is 1.
+"18.05 13:26:56,010|" -- Clock Send 1526642816051 Recv 1526642816052.
+"18.05 13:26:56,010|" -- Clock Diff (1).
+"18.05 13:26:56,010|" -- Clock New Offset: 45 (Old: 45).
+"18.05 13:26:56,014|" Core stationwasinvolved,true was never received.
+"18.05 13:26:56,014|" Core Frame Ended after 997  with NextInSendphase = true.
+"18.05 13:26:56,014|" Core New Frame Started at 1526642816059 with Slot 23 --------.
+"18.05 13:26:56,014|" -- Clock calc got: 1526642816059 23 = 1526642816959.
+"18.05 13:26:56,014|" - Send SendTimeMS at 1526642816959.
+"18.05 13:26:56,053|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:56,093|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:56,213|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:56,253|" -- Clock Got Adjust.
+"18.05 13:26:56,253|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:56,253|" -- Clock TransportDelay is 1.
+"18.05 13:26:56,253|" -- Clock Send 1526642816280 Recv 1526642816280.
+"18.05 13:26:56,253|" -- Clock Diff (0).
+"18.05 13:26:56,253|" -- Clock New Offset: 46 (Old: 45).
+"18.05 13:26:56,493|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:56,573|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:56,613|" -- Clock Got Adjust.
+"18.05 13:26:56,613|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:56,613|" -- Clock TransportDelay is 1.
+"18.05 13:26:56,613|" -- Clock Send 1526642816655 Recv 1526642816656.
+"18.05 13:26:56,613|" -- Clock Diff (1).
+"18.05 13:26:56,613|" -- Clock New Offset: 46 (Old: 46).
+"18.05 13:26:56,653|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:56,693|" -- Clock Got Adjust.
+"18.05 13:26:56,693|" -- Clock My Name: "team 06-01", other Name: "team 06-25".
+"18.05 13:26:56,693|" -- Clock TransportDelay is 1.
+"18.05 13:26:56,693|" -- Clock Send 1526642816728 Recv 1526642816729.
+"18.05 13:26:56,693|" -- Clock Diff (1).
+"18.05 13:26:56,693|" -- Clock New Offset: 46 (Old: 46).
+"18.05 13:26:56,732|" -- Clock Got Adjust.
+"18.05 13:26:56,732|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:26:56,732|" -- Clock TransportDelay is 1.
+"18.05 13:26:56,732|" -- Clock Send 1526642816759 Recv 1526642816758.
+"18.05 13:26:56,732|" -- Clock Diff (-1).
+"18.05 13:26:56,732|" -- Clock New Offset: 48 (Old: 46).
+"18.05 13:26:56,811|" -- Clock Got Adjust.
+"18.05 13:26:56,811|" -- Clock My Name: "team 06-01", other Name: "team 06-10".
+"18.05 13:26:56,811|" -- Clock TransportDelay is 1.
+"18.05 13:26:56,811|" -- Clock Send 1526642816819 Recv 1526642816821.
+"18.05 13:26:56,811|" -- Clock Diff (2).
+"18.05 13:26:56,811|" -- Clock New Offset: 47 (Old: 48).
+"18.05 13:26:56,890|" -- Clock Got Adjust.
+"18.05 13:26:56,890|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:26:56,890|" -- Clock TransportDelay is 1.
+"18.05 13:26:56,890|" -- Clock Send 1526642816902 Recv 1526642816904.
+"18.05 13:26:56,890|" -- Clock Diff (2).
+"18.05 13:26:56,890|" -- Clock New Offset: 46 (Old: 47).
+"18.05 13:26:56,895|" - Send Got NextSlotnumber 19.
+"18.05 13:26:56,906|" - Send 1526642816959 (Seti) 1526642816952 (Now).
+"18.05 13:26:56,906|" - Send SendTime in the future: 7.
+"18.05 13:26:56,913|" - Send Frage nach Payload.
+"18.05 13:26:56,913|" - Send Took 0 to get Payload.
+"18.05 13:26:56,913|" - Send Sende Nachricht.
+"18.05 13:26:56,915|" - Send sended with: ok.
+"18.05 13:26:56,930|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:26:57,010|" Core RestFrameTime = 0.
+"18.05 13:26:57,010|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:26:57,014|" -- Clock Schlief 4ms.
+"18.05 13:26:57,014|" Core Frame Ended after 1002  with NextInSendphase = false.
+"18.05 13:26:57,014|" Core New Frame Started at 1526642817060 with Slot 0 --------.
+"18.05 13:26:57,053|" -- Clock Got Adjust.
+"18.05 13:26:57,053|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:26:57,053|" -- Clock TransportDelay is 1.
+"18.05 13:26:57,053|" -- Clock Send 1526642817081 Recv 1526642817082.
+"18.05 13:26:57,053|" -- Clock Diff (1).
+"18.05 13:26:57,053|" -- Clock New Offset: 46 (Old: 46).
+"18.05 13:26:57,093|" -- Clock Got Adjust.
+"18.05 13:26:57,093|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:26:57,093|" -- Clock TransportDelay is 1.
+"18.05 13:26:57,093|" -- Clock Send 1526642817123 Recv 1526642817123.
+"18.05 13:26:57,093|" -- Clock Diff (0).
+"18.05 13:26:57,093|" -- Clock New Offset: 47 (Old: 46).
+"18.05 13:26:57,213|" -- Clock Got Adjust.
+"18.05 13:26:57,213|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:57,213|" -- Clock TransportDelay is 1.
+"18.05 13:26:57,213|" -- Clock Send 1526642817255 Recv 1526642817255.
+"18.05 13:26:57,213|" -- Clock Diff (0).
+"18.05 13:26:57,213|" -- Clock New Offset: 48 (Old: 47).
+"18.05 13:26:57,413|" -- Clock Got Adjust.
+"18.05 13:26:57,413|" -- Clock My Name: "team 06-01", other Name: "team 06-25".
+"18.05 13:26:57,413|" -- Clock TransportDelay is 1.
+"18.05 13:26:57,413|" -- Clock Send 1526642817450 Recv 1526642817451.
+"18.05 13:26:57,413|" -- Clock Diff (1).
+"18.05 13:26:57,413|" -- Clock New Offset: 48 (Old: 48).
+"18.05 13:26:57,533|" -- Clock Got Adjust.
+"18.05 13:26:57,533|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:26:57,533|" -- Clock TransportDelay is 1.
+"18.05 13:26:57,533|" -- Clock Send 1526642817546 Recv 1526642817548.
+"18.05 13:26:57,533|" -- Clock Diff (2).
+"18.05 13:26:57,533|" -- Clock New Offset: 47 (Old: 48).
+"18.05 13:26:57,613|" -- Clock Got Adjust.
+"18.05 13:26:57,613|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:26:57,613|" -- Clock TransportDelay is 1.
+"18.05 13:26:57,613|" -- Clock Send 1526642817625 Recv 1526642817625.
+"18.05 13:26:57,613|" -- Clock Diff (0).
+"18.05 13:26:57,613|" -- Clock New Offset: 48 (Old: 47).
+"18.05 13:26:57,812|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:57,932|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:57,971|" -- Clock Got Adjust.
+"18.05 13:26:57,971|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:57,971|" -- Clock TransportDelay is 1.
+"18.05 13:26:57,971|" -- Clock Send 1526642818015 Recv 1526642818017.
+"18.05 13:26:57,971|" -- Clock Diff (2).
+"18.05 13:26:57,971|" -- Clock New Offset: 47 (Old: 48).
+"18.05 13:26:58,011|" Core RestFrameTime = 0.
+"18.05 13:26:58,014|" -- Clock Schlief 3ms.
+"18.05 13:26:58,014|" Core Frame Ended after 1004  with NextInSendphase = true.
+"18.05 13:26:58,014|" Core New Frame Started at 1526642818061 with Slot 18 --------.
+"18.05 13:26:58,014|" -- Clock calc got: 1526642818061 18 = 1526642818761.
+"18.05 13:26:58,014|" - Send SendTimeMS at 1526642818761.
+"18.05 13:26:58,093|" -- Clock Got Adjust.
+"18.05 13:26:58,093|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:26:58,093|" -- Clock TransportDelay is 1.
+"18.05 13:26:58,093|" -- Clock Send 1526642818120 Recv 1526642818120.
+"18.05 13:26:58,093|" -- Clock Diff (0).
+"18.05 13:26:58,093|" -- Clock New Offset: 48 (Old: 47).
+"18.05 13:26:58,133|" -- Clock Got Adjust.
+"18.05 13:26:58,133|" -- Clock My Name: "team 06-01", other Name: "team 06-13".
+"18.05 13:26:58,133|" -- Clock TransportDelay is 1.
+"18.05 13:26:58,133|" -- Clock Send 1526642818157 Recv 1526642818157.
+"18.05 13:26:58,133|" -- Clock Diff (0).
+"18.05 13:26:58,133|" -- Clock New Offset: 49 (Old: 48).
+"18.05 13:26:58,213|" -- Clock Got Adjust.
+"18.05 13:26:58,213|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:58,213|" -- Clock TransportDelay is 1.
+"18.05 13:26:58,213|" -- Clock Send 1526642818257 Recv 1526642818260.
+"18.05 13:26:58,213|" -- Clock Diff (3).
+"18.05 13:26:58,213|" -- Clock New Offset: 47 (Old: 49).
+"18.05 13:26:58,293|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:58,372|" -- Clock Got Adjust.
+"18.05 13:26:58,372|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:58,372|" -- Clock TransportDelay is 1.
+"18.05 13:26:58,372|" -- Clock Send 1526642818417 Recv 1526642818415.
+"18.05 13:26:58,372|" -- Clock Diff (-2).
+"18.05 13:26:58,372|" -- Clock New Offset: 50 (Old: 47).
+"18.05 13:26:58,411|" -- Clock Got Adjust.
+"18.05 13:26:58,411|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:26:58,411|" -- Clock TransportDelay is 1.
+"18.05 13:26:58,411|" -- Clock Send 1526642818443 Recv 1526642818446.
+"18.05 13:26:58,411|" -- Clock Diff (3).
+"18.05 13:26:58,411|" -- Clock New Offset: 48 (Old: 50).
+"18.05 13:26:58,451|" -- Clock Got Adjust.
+"18.05 13:26:58,451|" -- Clock My Name: "team 06-01", other Name: "team 06-11".
+"18.05 13:26:58,451|" -- Clock TransportDelay is 1.
+"18.05 13:26:58,451|" -- Clock Send 1526642818477 Recv 1526642818479.
+"18.05 13:26:58,451|" -- Clock Diff (2).
+"18.05 13:26:58,451|" -- Clock New Offset: 47 (Old: 48).
+"18.05 13:26:58,491|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:58,530|" -- Clock Got Adjust.
+"18.05 13:26:58,530|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:26:58,530|" -- Clock TransportDelay is 1.
+"18.05 13:26:58,530|" -- Clock Send 1526642818561 Recv 1526642818564.
+"18.05 13:26:58,530|" -- Clock Diff (3).
+"18.05 13:26:58,530|" -- Clock New Offset: 45 (Old: 47).
+"18.05 13:26:58,609|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:58,695|" - Send Got NextSlotnumber 4.
+"18.05 13:26:58,706|" - Send 1526642818761 (Seti) 1526642818751 (Now).
+"18.05 13:26:58,706|" - Send SendTime in the future: 10.
+"18.05 13:26:58,716|" - Send Frage nach Payload.
+"18.05 13:26:58,716|" - Send Took 0 to get Payload.
+"18.05 13:26:58,716|" - Send Sende Nachricht.
+"18.05 13:26:58,717|" - Send sended with: ok.
+"18.05 13:26:58,729|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:26:58,809|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:58,929|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:59,008|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:59,008|" Core RestFrameTime = 1.
+"18.05 13:26:59,008|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:26:59,014|" -- Clock Schlief 6ms.
+"18.05 13:26:59,014|" Core Frame Ended after 999  with NextInSendphase = false.
+"18.05 13:26:59,014|" Core New Frame Started at 1526642819059 with Slot 0 --------.
+"18.05 13:26:59,053|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:59,092|" -- Clock Got Adjust.
+"18.05 13:26:59,092|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:26:59,092|" -- Clock TransportDelay is 1.
+"18.05 13:26:59,092|" -- Clock Send 1526642819123 Recv 1526642819122.
+"18.05 13:26:59,092|" -- Clock Diff (-1).
+"18.05 13:26:59,092|" -- Clock New Offset: 47 (Old: 45).
+"18.05 13:26:59,132|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:59,252|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:59,292|" -- Clock Got Adjust.
+"18.05 13:26:59,292|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:26:59,292|" -- Clock TransportDelay is 1.
+"18.05 13:26:59,292|" -- Clock Send 1526642819336 Recv 1526642819336.
+"18.05 13:26:59,292|" -- Clock Diff (0).
+"18.05 13:26:59,292|" -- Clock New Offset: 48 (Old: 47).
+"18.05 13:26:59,571|" -- Clock Got Adjust.
+"18.05 13:26:59,571|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:26:59,571|" -- Clock TransportDelay is 1.
+"18.05 13:26:59,571|" -- Clock Send 1526642819615 Recv 1526642819616.
+"18.05 13:26:59,571|" -- Clock Diff (1).
+"18.05 13:26:59,571|" -- Clock New Offset: 48 (Old: 48).
+"18.05 13:26:59,611|" -- Clock Got Adjust.
+"18.05 13:26:59,611|" -- Clock My Name: "team 06-01", other Name: "team 06-13".
+"18.05 13:26:59,611|" -- Clock TransportDelay is 1.
+"18.05 13:26:59,611|" -- Clock Send 1526642819635 Recv 1526642819634.
+"18.05 13:26:59,611|" -- Clock Diff (-1).
+"18.05 13:26:59,611|" -- Clock New Offset: 50 (Old: 48).
+"18.05 13:26:59,690|" -- Clock Got Adjust.
+"18.05 13:26:59,690|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:26:59,690|" -- Clock TransportDelay is 1.
+"18.05 13:26:59,690|" -- Clock Send 1526642819736 Recv 1526642819739.
+"18.05 13:26:59,690|" -- Clock Diff (3).
+"18.05 13:26:59,690|" -- Clock New Offset: 48 (Old: 50).
+"18.05 13:26:59,929|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:26:59,968|" -- Clock Got Adjust.
+"18.05 13:26:59,968|" -- Clock My Name: "team 06-01", other Name: "team 06-11".
+"18.05 13:26:59,968|" -- Clock TransportDelay is 1.
+"18.05 13:26:59,968|" -- Clock Send 1526642819996 Recv 1526642819997.
+"18.05 13:26:59,968|" -- Clock Diff (1).
+"18.05 13:26:59,968|" -- Clock New Offset: 48 (Old: 48).
+"18.05 13:27:00,008|" Core RestFrameTime = 0.
+"18.05 13:27:00,014|" -- Clock Schlief 6ms.
+"18.05 13:27:00,014|" Core Frame Ended after 994  with NextInSendphase = true.
+"18.05 13:27:00,014|" Core New Frame Started at 1526642820062 with Slot 8 --------.
+"18.05 13:27:00,014|" -- Clock calc got: 1526642820062 8 = 1526642820362.
+"18.05 13:27:00,014|" - Send SendTimeMS at 1526642820362.
+"18.05 13:27:00,094|" -- Clock Got Adjust.
+"18.05 13:27:00,094|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:27:00,094|" -- Clock TransportDelay is 1.
+"18.05 13:27:00,094|" -- Clock Send 1526642820136 Recv 1526642820136.
+"18.05 13:27:00,094|" -- Clock Diff (0).
+"18.05 13:27:00,094|" -- Clock New Offset: 49 (Old: 48).
+"18.05 13:27:00,133|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:00,173|" -- Clock Got Adjust.
+"18.05 13:27:00,173|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:27:00,173|" -- Clock TransportDelay is 1.
+"18.05 13:27:00,173|" -- Clock Send 1526642820202 Recv 1526642820202.
+"18.05 13:27:00,173|" -- Clock Diff (0).
+"18.05 13:27:00,173|" -- Clock New Offset: 50 (Old: 49).
+"18.05 13:27:00,295|" - Send Got NextSlotnumber 24.
+"18.05 13:27:00,306|" - Send 1526642820362 (Seti) 1526642820356 (Now).
+"18.05 13:27:00,306|" - Send SendTime in the future: 6.
+"18.05 13:27:00,312|" - Send Frage nach Payload.
+"18.05 13:27:00,312|" - Send Took 0 to get Payload.
+"18.05 13:27:00,312|" - Send Sende Nachricht.
+"18.05 13:27:00,313|" - Send sended with: ok.
+"18.05 13:27:00,333|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:27:00,373|" -- Clock Got Adjust.
+"18.05 13:27:00,373|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:27:00,373|" -- Clock TransportDelay is 1.
+"18.05 13:27:00,373|" -- Clock Send 1526642820410 Recv 1526642820412.
+"18.05 13:27:00,373|" -- Clock Diff (2).
+"18.05 13:27:00,373|" -- Clock New Offset: 49 (Old: 50).
+"18.05 13:27:00,452|" -- Clock Got Adjust.
+"18.05 13:27:00,452|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:27:00,452|" -- Clock TransportDelay is 1.
+"18.05 13:27:00,452|" -- Clock Send 1526642820466 Recv 1526642820467.
+"18.05 13:27:00,452|" -- Clock Diff (1).
+"18.05 13:27:00,452|" -- Clock New Offset: 49 (Old: 49).
+"18.05 13:27:00,572|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:00,692|" -- Clock Got Adjust.
+"18.05 13:27:00,692|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:27:00,692|" -- Clock TransportDelay is 1.
+"18.05 13:27:00,692|" -- Clock Send 1526642820724 Recv 1526642820725.
+"18.05 13:27:00,692|" -- Clock Diff (1).
+"18.05 13:27:00,692|" -- Clock New Offset: 49 (Old: 49).
+"18.05 13:27:00,731|" -- Clock Got Adjust.
+"18.05 13:27:00,731|" -- Clock My Name: "team 06-01", other Name: "team 06-11".
+"18.05 13:27:00,731|" -- Clock TransportDelay is 1.
+"18.05 13:27:00,731|" -- Clock Send 1526642820757 Recv 1526642820760.
+"18.05 13:27:00,731|" -- Clock Diff (3).
+"18.05 13:27:00,731|" -- Clock New Offset: 47 (Old: 49).
+"18.05 13:27:00,850|" -- Clock Got Adjust.
+"18.05 13:27:00,850|" -- Clock My Name: "team 06-01", other Name: "team 06-02".
+"18.05 13:27:00,850|" -- Clock TransportDelay is 1.
+"18.05 13:27:00,850|" -- Clock Send 1526642820896 Recv 1526642820897.
+"18.05 13:27:00,850|" -- Clock Diff (1).
+"18.05 13:27:00,850|" -- Clock New Offset: 47 (Old: 47).
+"18.05 13:27:00,969|" -- Clock Got Adjust.
+"18.05 13:27:00,969|" -- Clock My Name: "team 06-01", other Name: "team 06-25".
+"18.05 13:27:00,969|" -- Clock TransportDelay is 1.
+"18.05 13:27:00,969|" -- Clock Send 1526642821012 Recv 1526642821012.
+"18.05 13:27:00,969|" -- Clock Diff (0).
+"18.05 13:27:00,969|" -- Clock New Offset: 48 (Old: 47).
+"18.05 13:27:01,009|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:01,009|" Core RestFrameTime = 6.
+"18.05 13:27:01,009|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:27:01,014|" -- Clock Schlief 5ms.
+"18.05 13:27:01,014|" Core Frame Ended after 1002  with NextInSendphase = false.
+"18.05 13:27:01,014|" Core New Frame Started at 1526642821062 with Slot 0 --------.
+"18.05 13:27:01,054|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:01,094|" -- Clock Got Adjust.
+"18.05 13:27:01,094|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:27:01,094|" -- Clock TransportDelay is 1.
+"18.05 13:27:01,094|" -- Clock Send 1526642821137 Recv 1526642821138.
+"18.05 13:27:01,094|" -- Clock Diff (1).
+"18.05 13:27:01,094|" -- Clock New Offset: 48 (Old: 48).
+"18.05 13:27:01,134|" -- Clock Got Adjust.
+"18.05 13:27:01,134|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:27:01,134|" -- Clock TransportDelay is 1.
+"18.05 13:27:01,134|" -- Clock Send 1526642821161 Recv 1526642821162.
+"18.05 13:27:01,134|" -- Clock Diff (1).
+"18.05 13:27:01,134|" -- Clock New Offset: 48 (Old: 48).
+"18.05 13:27:01,173|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:01,293|" -- Clock Got Adjust.
+"18.05 13:27:01,293|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:27:01,293|" -- Clock TransportDelay is 1.
+"18.05 13:27:01,293|" -- Clock Send 1526642821305 Recv 1526642821306.
+"18.05 13:27:01,293|" -- Clock Diff (1).
+"18.05 13:27:01,293|" -- Clock New Offset: 48 (Old: 48).
+"18.05 13:27:01,413|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:01,653|" -- Clock Got Adjust.
+"18.05 13:27:01,653|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:27:01,653|" -- Clock TransportDelay is 1.
+"18.05 13:27:01,653|" -- Clock Send 1526642821683 Recv 1526642821683.
+"18.05 13:27:01,653|" -- Clock Diff (0).
+"18.05 13:27:01,653|" -- Clock New Offset: 49 (Old: 48).
+"18.05 13:27:01,732|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:01,772|" -- Clock Got Adjust.
+"18.05 13:27:01,772|" -- Clock My Name: "team 06-01", other Name: "team 06-19".
+"18.05 13:27:01,772|" -- Clock TransportDelay is 1.
+"18.05 13:27:01,772|" -- Clock Send 1526642821790 Recv 1526642821792.
+"18.05 13:27:01,772|" -- Clock Diff (2).
+"18.05 13:27:01,772|" -- Clock New Offset: 48 (Old: 49).
+"18.05 13:27:01,972|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:02,012|" Core RestFrameTime = 0.
+"18.05 13:27:02,012|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:02,014|" -- Clock Schlief 2ms.
+"18.05 13:27:02,014|" Core Frame Ended after 1000  with NextInSendphase = true.
+"18.05 13:27:02,014|" Core New Frame Started at 1526642822062 with Slot 6 --------.
+"18.05 13:27:02,014|" -- Clock calc got: 1526642822062 6 = 1526642822282.
+"18.05 13:27:02,014|" - Send SendTimeMS at 1526642822282.
+"18.05 13:27:02,215|" - Send Got NextSlotnumber 4.
+"18.05 13:27:02,226|" - Send 1526642822282 (Seti) 1526642822274 (Now).
+"18.05 13:27:02,226|" - Send SendTime in the future: 8.
+"18.05 13:27:02,234|" - Send Frage nach Payload.
+"18.05 13:27:02,234|" - Send Took 0 to get Payload.
+"18.05 13:27:02,235|" - Send Sende Nachricht.
+"18.05 13:27:02,235|" - Send sended with: ok.
+"18.05 13:27:02,254|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:27:02,333|" -- Clock Got Adjust.
+"18.05 13:27:02,333|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:27:02,333|" -- Clock TransportDelay is 1.
+"18.05 13:27:02,333|" -- Clock Send 1526642822350 Recv 1526642822350.
+"18.05 13:27:02,333|" -- Clock Diff (0).
+"18.05 13:27:02,333|" -- Clock New Offset: 49 (Old: 48).
+"18.05 13:27:02,372|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:02,451|" -- Clock Got Adjust.
+"18.05 13:27:02,451|" -- Clock My Name: "team 06-01", other Name: "team 06-02".
+"18.05 13:27:02,451|" -- Clock TransportDelay is 1.
+"18.05 13:27:02,451|" -- Clock Send 1526642822497 Recv 1526642822498.
+"18.05 13:27:02,451|" -- Clock Diff (1).
+"18.05 13:27:02,451|" -- Clock New Offset: 49 (Old: 49).
+"18.05 13:27:02,490|" -- Clock Got Adjust.
+"18.05 13:27:02,490|" -- Clock My Name: "team 06-01", other Name: "team 06-25".
+"18.05 13:27:02,490|" -- Clock TransportDelay is 1.
+"18.05 13:27:02,490|" -- Clock Send 1526642822533 Recv 1526642822534.
+"18.05 13:27:02,490|" -- Clock Diff (1).
+"18.05 13:27:02,490|" -- Clock New Offset: 49 (Old: 49).
+"18.05 13:27:02,529|" -- Clock Got Adjust.
+"18.05 13:27:02,529|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:27:02,529|" -- Clock TransportDelay is 1.
+"18.05 13:27:02,529|" -- Clock Send 1526642822564 Recv 1526642822564.
+"18.05 13:27:02,529|" -- Clock Diff (0).
+"18.05 13:27:02,529|" -- Clock New Offset: 50 (Old: 49).
+"18.05 13:27:02,569|" -- Clock Got Adjust.
+"18.05 13:27:02,569|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:27:02,569|" -- Clock TransportDelay is 1.
+"18.05 13:27:02,569|" -- Clock Send 1526642822586 Recv 1526642822588.
+"18.05 13:27:02,569|" -- Clock Diff (2).
+"18.05 13:27:02,569|" -- Clock New Offset: 49 (Old: 50).
+"18.05 13:27:02,648|" -- Clock Got Adjust.
+"18.05 13:27:02,648|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:27:02,648|" -- Clock TransportDelay is 1.
+"18.05 13:27:02,648|" -- Clock Send 1526642822688 Recv 1526642822687.
+"18.05 13:27:02,648|" -- Clock Diff (-1).
+"18.05 13:27:02,648|" -- Clock New Offset: 51 (Old: 49).
+"18.05 13:27:02,728|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:02,808|" -- Clock Got Adjust.
+"18.05 13:27:02,808|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:27:02,808|" -- Clock TransportDelay is 1.
+"18.05 13:27:02,808|" -- Clock Send 1526642822819 Recv 1526642822822.
+"18.05 13:27:02,808|" -- Clock Diff (3).
+"18.05 13:27:02,808|" -- Clock New Offset: 49 (Old: 51).
+"18.05 13:27:02,887|" -- Clock Got Adjust.
+"18.05 13:27:02,887|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:27:02,887|" -- Clock TransportDelay is 1.
+"18.05 13:27:02,887|" -- Clock Send 1526642822900 Recv 1526642822900.
+"18.05 13:27:02,887|" -- Clock Diff (0).
+"18.05 13:27:02,887|" -- Clock New Offset: 50 (Old: 49).
+"18.05 13:27:02,967|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:03,007|" Core RestFrameTime = 0.
+"18.05 13:27:03,007|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:27:03,014|" -- Clock Schlief 7ms.
+"18.05 13:27:03,014|" Core Frame Ended after 999  with NextInSendphase = false.
+"18.05 13:27:03,014|" Core New Frame Started at 1526642823064 with Slot 0 --------.
+"18.05 13:27:03,054|" -- Clock Got Adjust.
+"18.05 13:27:03,054|" -- Clock My Name: "team 06-01", other Name: "team 06-25".
+"18.05 13:27:03,054|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,054|" -- Clock Send 1526642823094 Recv 1526642823094.
+"18.05 13:27:03,054|" -- Clock Diff (0).
+"18.05 13:27:03,054|" -- Clock New Offset: 51 (Old: 50).
+"18.05 13:27:03,214|" -- Clock Got Adjust.
+"18.05 13:27:03,214|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:27:03,214|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,214|" -- Clock Send 1526642823244 Recv 1526642823245.
+"18.05 13:27:03,214|" -- Clock Diff (1).
+"18.05 13:27:03,214|" -- Clock New Offset: 51 (Old: 51).
+"18.05 13:27:03,293|" -- Clock Got Adjust.
+"18.05 13:27:03,293|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:27:03,293|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,293|" -- Clock Send 1526642823316 Recv 1526642823317.
+"18.05 13:27:03,293|" -- Clock Diff (1).
+"18.05 13:27:03,293|" -- Clock New Offset: 51 (Old: 51).
+"18.05 13:27:03,333|" -- Clock Got Adjust.
+"18.05 13:27:03,333|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:27:03,333|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,333|" -- Clock Send 1526642823347 Recv 1526642823348.
+"18.05 13:27:03,333|" -- Clock Diff (1).
+"18.05 13:27:03,333|" -- Clock New Offset: 51 (Old: 51).
+"18.05 13:27:03,493|" -- Clock Got Adjust.
+"18.05 13:27:03,493|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:27:03,493|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,493|" -- Clock Send 1526642823518 Recv 1526642823518.
+"18.05 13:27:03,493|" -- Clock Diff (0).
+"18.05 13:27:03,493|" -- Clock New Offset: 52 (Old: 51).
+"18.05 13:27:03,532|" -- Clock Got Adjust.
+"18.05 13:27:03,532|" -- Clock My Name: "team 06-01", other Name: "team 06-02".
+"18.05 13:27:03,532|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,532|" -- Clock Send 1526642823579 Recv 1526642823580.
+"18.05 13:27:03,532|" -- Clock Diff (1).
+"18.05 13:27:03,532|" -- Clock New Offset: 52 (Old: 52).
+"18.05 13:27:03,612|" -- Clock Got Adjust.
+"18.05 13:27:03,612|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:27:03,612|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,612|" -- Clock Send 1526642823656 Recv 1526642823656.
+"18.05 13:27:03,612|" -- Clock Diff (0).
+"18.05 13:27:03,612|" -- Clock New Offset: 53 (Old: 52).
+"18.05 13:27:03,652|" -- Clock Got Adjust.
+"18.05 13:27:03,652|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:27:03,652|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,652|" -- Clock Send 1526642823690 Recv 1526642823690.
+"18.05 13:27:03,652|" -- Clock Diff (0).
+"18.05 13:27:03,652|" -- Clock New Offset: 54 (Old: 53).
+"18.05 13:27:03,692|" -- Clock Got Adjust.
+"18.05 13:27:03,692|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:27:03,692|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,692|" -- Clock Send 1526642823741 Recv 1526642823741.
+"18.05 13:27:03,692|" -- Clock Diff (0).
+"18.05 13:27:03,692|" -- Clock New Offset: 55 (Old: 54).
+"18.05 13:27:03,732|" -- Clock Got Adjust.
+"18.05 13:27:03,732|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:27:03,732|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,732|" -- Clock Send 1526642823780 Recv 1526642823781.
+"18.05 13:27:03,732|" -- Clock Diff (1).
+"18.05 13:27:03,732|" -- Clock New Offset: 55 (Old: 55).
+"18.05 13:27:03,772|" -- Clock Got Adjust.
+"18.05 13:27:03,772|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:27:03,772|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,772|" -- Clock Send 1526642823805 Recv 1526642823807.
+"18.05 13:27:03,772|" -- Clock Diff (2).
+"18.05 13:27:03,772|" -- Clock New Offset: 54 (Old: 55).
+"18.05 13:27:03,811|" -- Clock Got Adjust.
+"18.05 13:27:03,811|" -- Clock My Name: "team 06-01", other Name: "team 06-19".
+"18.05 13:27:03,811|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,811|" -- Clock Send 1526642823833 Recv 1526642823835.
+"18.05 13:27:03,811|" -- Clock Diff (2).
+"18.05 13:27:03,811|" -- Clock New Offset: 53 (Old: 54).
+"18.05 13:27:03,890|" -- Clock Got Adjust.
+"18.05 13:27:03,890|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:27:03,890|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,890|" -- Clock Send 1526642823932 Recv 1526642823930.
+"18.05 13:27:03,890|" -- Clock Diff (-2).
+"18.05 13:27:03,890|" -- Clock New Offset: 56 (Old: 53).
+"18.05 13:27:03,930|" -- Clock Got Adjust.
+"18.05 13:27:03,930|" -- Clock My Name: "team 06-01", other Name: "team 06-10".
+"18.05 13:27:03,930|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,930|" -- Clock Send 1526642823945 Recv 1526642823948.
+"18.05 13:27:03,930|" -- Clock Diff (3).
+"18.05 13:27:03,930|" -- Clock New Offset: 54 (Old: 56).
+"18.05 13:27:03,970|" -- Clock Got Adjust.
+"18.05 13:27:03,970|" -- Clock My Name: "team 06-01", other Name: "team 06-11".
+"18.05 13:27:03,970|" -- Clock TransportDelay is 1.
+"18.05 13:27:03,970|" -- Clock Send 1526642823998 Recv 1526642823999.
+"18.05 13:27:03,970|" -- Clock Diff (1).
+"18.05 13:27:03,970|" -- Clock New Offset: 54 (Old: 54).
+"18.05 13:27:04,010|" Core RestFrameTime = 1.
+"18.05 13:27:04,010|" -- Clock Got Adjust.
+"18.05 13:27:04,010|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:27:04,010|" -- Clock TransportDelay is 1.
+"18.05 13:27:04,010|" -- Clock Send 1526642824032 Recv 1526642824034.
+"18.05 13:27:04,010|" -- Clock Diff (2).
+"18.05 13:27:04,010|" -- Clock New Offset: 53 (Old: 54).
+"18.05 13:27:04,014|" -- Clock Schlief 4ms.
+"18.05 13:27:04,014|" Core Frame Ended after 1002  with NextInSendphase = true.
+"18.05 13:27:04,014|" Core New Frame Started at 1526642824067 with Slot 16 --------.
+"18.05 13:27:04,014|" -- Clock calc got: 1526642824067 16 = 1526642824687.
+"18.05 13:27:04,014|" - Send SendTimeMS at 1526642824687.
+"18.05 13:27:04,054|" -- Clock Got Adjust.
+"18.05 13:27:04,054|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:27:04,054|" -- Clock TransportDelay is 1.
+"18.05 13:27:04,054|" -- Clock Send 1526642824105 Recv 1526642824105.
+"18.05 13:27:04,054|" -- Clock Diff (0).
+"18.05 13:27:04,054|" -- Clock New Offset: 54 (Old: 53).
+"18.05 13:27:04,134|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:04,213|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:04,252|" -- Clock Got Adjust.
+"18.05 13:27:04,252|" -- Clock My Name: "team 06-01", other Name: "team 06-16".
+"18.05 13:27:04,252|" -- Clock TransportDelay is 1.
+"18.05 13:27:04,252|" -- Clock Send 1526642824286 Recv 1526642824286.
+"18.05 13:27:04,252|" -- Clock Diff (0).
+"18.05 13:27:04,252|" -- Clock New Offset: 55 (Old: 54).
+"18.05 13:27:04,291|" -- Clock Got Adjust.
+"18.05 13:27:04,291|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:27:04,291|" -- Clock TransportDelay is 1.
+"18.05 13:27:04,291|" -- Clock Send 1526642824328 Recv 1526642824330.
+"18.05 13:27:04,291|" -- Clock Diff (2).
+"18.05 13:27:04,291|" -- Clock New Offset: 54 (Old: 55).
+"18.05 13:27:04,331|" -- Clock Got Adjust.
+"18.05 13:27:04,331|" -- Clock My Name: "team 06-01", other Name: "team 06-08".
+"18.05 13:27:04,331|" -- Clock TransportDelay is 1.
+"18.05 13:27:04,331|" -- Clock Send 1526642824352 Recv 1526642824350.
+"18.05 13:27:04,331|" -- Clock Diff (-2).
+"18.05 13:27:04,331|" -- Clock New Offset: 57 (Old: 54).
+"18.05 13:27:04,371|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:04,450|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:04,530|" -- Clock Got Adjust.
+"18.05 13:27:04,530|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:27:04,530|" -- Clock TransportDelay is 1.
+"18.05 13:27:04,530|" -- Clock Send 1526642824553 Recv 1526642824554.
+"18.05 13:27:04,530|" -- Clock Diff (1).
+"18.05 13:27:04,530|" -- Clock New Offset: 57 (Old: 57).
+"18.05 13:27:04,610|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:04,615|" - Send Got NextSlotnumber 24.
+"18.05 13:27:04,626|" - Send 1526642824687 (Seti) 1526642824683 (Now).
+"18.05 13:27:04,626|" - Send SendTime in the future: 4.
+"18.05 13:27:04,630|" - Send Frage nach Payload.
+"18.05 13:27:04,630|" - Send Took 0 to get Payload.
+"18.05 13:27:04,630|" - Send Sende Nachricht.
+"18.05 13:27:04,630|" - Send sended with: ok.
+"18.05 13:27:04,650|" -- Clock Got Adjust.
+"18.05 13:27:04,650|" -- Clock My Name: "team 06-01", other Name: "team 06-01".
+"18.05 13:27:04,650|" -- Clock TransportDelay is 1.
+"18.05 13:27:04,650|" -- Clock Send 1526642824687 Recv 1526642824687.
+"18.05 13:27:04,650|" -- Clock Diff (0).
+"18.05 13:27:04,650|" -- Clock New Offset: 58 (Old: 57).
+"18.05 13:27:04,689|" -- Clock Got Adjust.
+"18.05 13:27:04,689|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:27:04,689|" -- Clock TransportDelay is 1.
+"18.05 13:27:04,689|" -- Clock Send 1526642824727 Recv 1526642824731.
+"18.05 13:27:04,689|" -- Clock Diff (4).
+"18.05 13:27:04,689|" -- Clock New Offset: 55 (Old: 58).
+"18.05 13:27:04,769|" -- Clock Got Adjust.
+"18.05 13:27:04,769|" -- Clock My Name: "team 06-01", other Name: "team 06-11".
+"18.05 13:27:04,769|" -- Clock TransportDelay is 1.
+"18.05 13:27:04,769|" -- Clock Send 1526642824801 Recv 1526642824801.
+"18.05 13:27:04,769|" -- Clock Diff (0).
+"18.05 13:27:04,769|" -- Clock New Offset: 56 (Old: 55).
+"18.05 13:27:04,889|" -- Clock Got Adjust.
+"18.05 13:27:04,889|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:27:04,889|" -- Clock TransportDelay is 1.
+"18.05 13:27:04,889|" -- Clock Send 1526642824914 Recv 1526642824914.
+"18.05 13:27:04,889|" -- Clock Diff (0).
+"18.05 13:27:04,889|" -- Clock New Offset: 57 (Old: 56).
+"18.05 13:27:04,929|" -- Clock Got Adjust.
+"18.05 13:27:04,929|" -- Clock My Name: "team 06-01", other Name: "team 06-19".
+"18.05 13:27:04,929|" -- Clock TransportDelay is 1.
+"18.05 13:27:04,929|" -- Clock Send 1526642824956 Recv 1526642824957.
+"18.05 13:27:04,929|" -- Clock Diff (1).
+"18.05 13:27:04,929|" -- Clock New Offset: 57 (Old: 57).
+"18.05 13:27:05,009|" Core RestFrameTime = 2.
+"18.05 13:27:05,009|" -- Clock Got Adjust.
+"18.05 13:27:05,009|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:27:05,009|" -- Clock TransportDelay is 1.
+"18.05 13:27:05,009|" -- Clock Send 1526642825053 Recv 1526642825053.
+"18.05 13:27:05,009|" -- Clock Diff (0).
+"18.05 13:27:05,009|" -- Clock New Offset: 58 (Old: 57).
+"18.05 13:27:05,012|" Core stationwasinvolved,true was never received.
+"18.05 13:27:05,014|" -- Clock Schlief 2ms.
+"18.05 13:27:05,014|" Core Frame Ended after 998  with NextInSendphase = true.
+"18.05 13:27:05,014|" Core New Frame Started at 1526642825072 with Slot 24 --------.
+"18.05 13:27:05,014|" -- Clock calc got: 1526642825072 24 = 1526642826012.
+"18.05 13:27:05,014|" - Send SendTimeMS at 1526642826012.
+"18.05 13:27:05,094|" -- Clock Got Adjust.
+"18.05 13:27:05,094|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:27:05,094|" -- Clock TransportDelay is 1.
+"18.05 13:27:05,094|" -- Clock Send 1526642825118 Recv 1526642825118.
+"18.05 13:27:05,094|" -- Clock Diff (0).
+"18.05 13:27:05,094|" -- Clock New Offset: 59 (Old: 58).
+"18.05 13:27:05,135|" -- Clock Got Adjust.
+"18.05 13:27:05,135|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:27:05,135|" -- Clock TransportDelay is 1.
+"18.05 13:27:05,135|" -- Clock Send 1526642825171 Recv 1526642825173.
+"18.05 13:27:05,135|" -- Clock Diff (2).
+"18.05 13:27:05,135|" -- Clock New Offset: 58 (Old: 59).
+"18.05 13:27:05,174|" -- Clock Got Adjust.
+"18.05 13:27:05,174|" -- Clock My Name: "team 06-01", other Name: "team 06-10".
+"18.05 13:27:05,174|" -- Clock TransportDelay is 1.
+"18.05 13:27:05,174|" -- Clock Send 1526642825193 Recv 1526642825194.
+"18.05 13:27:05,174|" -- Clock Diff (1).
+"18.05 13:27:05,174|" -- Clock New Offset: 58 (Old: 58).
+"18.05 13:27:05,214|" -- Clock Got Adjust.
+"18.05 13:27:05,214|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:27:05,214|" -- Clock TransportDelay is 1.
+"18.05 13:27:05,214|" -- Clock Send 1526642825259 Recv 1526642825259.
+"18.05 13:27:05,214|" -- Clock Diff (0).
+"18.05 13:27:05,214|" -- Clock New Offset: 59 (Old: 58).
+"18.05 13:27:05,293|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:05,333|" -- Clock Got Adjust.
+"18.05 13:27:05,333|" -- Clock My Name: "team 06-01", other Name: "team 06-20".
+"18.05 13:27:05,333|" -- Clock TransportDelay is 1.
+"18.05 13:27:05,333|" -- Clock Send 1526642825365 Recv 1526642825365.
+"18.05 13:27:05,333|" -- Clock Diff (0).
+"18.05 13:27:05,333|" -- Clock New Offset: 60 (Old: 59).
+"18.05 13:27:05,693|" -- Clock Got Adjust.
+"18.05 13:27:05,693|" -- Clock My Name: "team 06-01", other Name: "team 06-11".
+"18.05 13:27:05,693|" -- Clock TransportDelay is 1.
+"18.05 13:27:05,693|" -- Clock Send 1526642825727 Recv 1526642825728.
+"18.05 13:27:05,693|" -- Clock Diff (1).
+"18.05 13:27:05,693|" -- Clock New Offset: 60 (Old: 60).
+"18.05 13:27:05,732|" -- Clock Got Adjust.
+"18.05 13:27:05,732|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:27:05,732|" -- Clock TransportDelay is 1.
+"18.05 13:27:05,732|" -- Clock Send 1526642825774 Recv 1526642825776.
+"18.05 13:27:05,732|" -- Clock Diff (2).
+"18.05 13:27:05,732|" -- Clock New Offset: 59 (Old: 60).
+"18.05 13:27:05,811|" -- Clock Got Adjust.
+"18.05 13:27:05,811|" -- Clock My Name: "team 06-01", other Name: "team 06-19".
+"18.05 13:27:05,811|" -- Clock TransportDelay is 1.
+"18.05 13:27:05,811|" -- Clock Send 1526642825840 Recv 1526642825840.
+"18.05 13:27:05,811|" -- Clock Diff (0).
+"18.05 13:27:05,811|" -- Clock New Offset: 60 (Old: 59).
+"18.05 13:27:05,891|" -- Clock Got Adjust.
+"18.05 13:27:05,891|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:27:05,891|" -- Clock TransportDelay is 1.
+"18.05 13:27:05,891|" -- Clock Send 1526642825948 Recv 1526642825949.
+"18.05 13:27:05,891|" -- Clock Diff (1).
+"18.05 13:27:05,891|" -- Clock New Offset: 60 (Old: 60).
+"18.05 13:27:05,935|" - Send Got NextSlotnumber 22.
+"18.05 13:27:05,946|" - Send 1526642826012 (Seti) 1526642826006 (Now).
+"18.05 13:27:05,946|" - Send SendTime in the future: 6.
+"18.05 13:27:05,952|" - Send Frage nach Payload.
+"18.05 13:27:05,952|" - Send Took 0 to get Payload.
+"18.05 13:27:05,952|" - Send Sende Nachricht.
+"18.05 13:27:05,953|" - Send sended with: ok.
+"18.05 13:27:05,970|" -- Clock Got Adjust.
+"18.05 13:27:05,970|" -- Clock My Name: "team 06-01", other Name: "team 06-01".
+"18.05 13:27:05,970|" -- Clock TransportDelay is 1.
+"18.05 13:27:05,970|" -- Clock Send 1526642826012 Recv 1526642826013.
+"18.05 13:27:05,970|" -- Clock Diff (1).
+"18.05 13:27:05,970|" -- Clock New Offset: 60 (Old: 60).
+"18.05 13:27:06,010|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:06,010|" Core RestFrameTime = 0.
+"18.05 13:27:06,010|" Core stationwasinvolved,true was never received.
+"18.05 13:27:06,014|" -- Clock Schlief 4ms.
+"18.05 13:27:06,014|" Core Frame Ended after 1000  with NextInSendphase = true.
+"18.05 13:27:06,014|" Core New Frame Started at 1526642826074 with Slot 22 --------.
+"18.05 13:27:06,014|" -- Clock calc got: 1526642826074 22 = 1526642826934.
+"18.05 13:27:06,014|" - Send SendTimeMS at 1526642826934.
+"18.05 13:27:06,054|" -- Clock Got Adjust.
+"18.05 13:27:06,054|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:27:06,054|" -- Clock TransportDelay is 1.
+"18.05 13:27:06,054|" -- Clock Send 1526642826096 Recv 1526642826096.
+"18.05 13:27:06,054|" -- Clock Diff (0).
+"18.05 13:27:06,054|" -- Clock New Offset: 61 (Old: 60).
+"18.05 13:27:06,134|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:06,214|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:06,254|" -- Clock Got Adjust.
+"18.05 13:27:06,254|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:27:06,254|" -- Clock TransportDelay is 1.
+"18.05 13:27:06,254|" -- Clock Send 1526642826296 Recv 1526642826296.
+"18.05 13:27:06,254|" -- Clock Diff (0).
+"18.05 13:27:06,254|" -- Clock New Offset: 62 (Old: 61).
+"18.05 13:27:06,294|" -- Clock Got Adjust.
+"18.05 13:27:06,294|" -- Clock My Name: "team 06-01", other Name: "team 06-11".
+"18.05 13:27:06,294|" -- Clock TransportDelay is 1.
+"18.05 13:27:06,294|" -- Clock Send 1526642826328 Recv 1526642826328.
+"18.05 13:27:06,294|" -- Clock Diff (0).
+"18.05 13:27:06,294|" -- Clock New Offset: 63 (Old: 62).
+"18.05 13:27:06,374|" -- Clock Got Adjust.
+"18.05 13:27:06,374|" -- Clock My Name: "team 06-01", other Name: "team 06-17".
+"18.05 13:27:06,374|" -- Clock TransportDelay is 1.
+"18.05 13:27:06,374|" -- Clock Send 1526642826426 Recv 1526642826426.
+"18.05 13:27:06,374|" -- Clock Diff (0).
+"18.05 13:27:06,374|" -- Clock New Offset: 64 (Old: 63).
+"18.05 13:27:06,454|" -- Clock Got Adjust.
+"18.05 13:27:06,454|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:27:06,454|" -- Clock TransportDelay is 1.
+"18.05 13:27:06,454|" -- Clock Send 1526642826480 Recv 1526642826481.
+"18.05 13:27:06,454|" -- Clock Diff (1).
+"18.05 13:27:06,455|" -- Clock New Offset: 64 (Old: 64).
+"18.05 13:27:06,533|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:06,613|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:06,732|" -- Clock Got Adjust.
+"18.05 13:27:06,732|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:27:06,732|" -- Clock TransportDelay is 1.
+"18.05 13:27:06,732|" -- Clock Send 1526642826780 Recv 1526642826781.
+"18.05 13:27:06,732|" -- Clock Diff (1).
+"18.05 13:27:06,732|" -- Clock New Offset: 64 (Old: 64).
+"18.05 13:27:06,851|" -- Clock Got Adjust.
+"18.05 13:27:06,851|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:27:06,851|" -- Clock TransportDelay is 1.
+"18.05 13:27:06,851|" -- Clock Send 1526642826910 Recv 1526642826910.
+"18.05 13:27:06,851|" -- Clock Diff (0).
+"18.05 13:27:06,851|" -- Clock New Offset: 65 (Old: 64).
+"18.05 13:27:06,855|" - Send Got NextSlotnumber 12.
+"18.05 13:27:06,866|" - Send 1526642826934 (Seti) 1526642826931 (Now).
+"18.05 13:27:06,866|" - Send SendTime in the future: 3.
+"18.05 13:27:06,869|" - Send Frage nach Payload.
+"18.05 13:27:06,869|" - Send Took 0 to get Payload.
+"18.05 13:27:06,869|" - Send Sende Nachricht.
+"18.05 13:27:06,870|" - Send sended with: ok.
+"18.05 13:27:06,890|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:27:06,930|" -- Clock Got Adjust.
+"18.05 13:27:06,930|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:27:06,930|" -- Clock TransportDelay is 1.
+"18.05 13:27:06,930|" -- Clock Send 1526642826953 Recv 1526642826955.
+"18.05 13:27:06,930|" -- Clock Diff (2).
+"18.05 13:27:06,930|" -- Clock New Offset: 64 (Old: 65).
+"18.05 13:27:06,970|" -- Clock Got Adjust.
+"18.05 13:27:06,970|" -- Clock My Name: "team 06-01", other Name: "team 06-13".
+"18.05 13:27:06,970|" -- Clock TransportDelay is 1.
+"18.05 13:27:06,970|" -- Clock Send 1526642827008 Recv 1526642827008.
+"18.05 13:27:06,970|" -- Clock Diff (0).
+"18.05 13:27:06,970|" -- Clock New Offset: 65 (Old: 64).
+"18.05 13:27:07,010|" Core RestFrameTime = 0.
+"18.05 13:27:07,010|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:27:07,014|" -- Clock Schlief 4ms.
+"18.05 13:27:07,014|" Core Frame Ended after 1004  with NextInSendphase = false.
+"18.05 13:27:07,014|" Core New Frame Started at 1526642827079 with Slot 0 --------.
+"18.05 13:27:07,054|" -- Clock Got Adjust.
+"18.05 13:27:07,054|" -- Clock My Name: "team 06-01", other Name: "team 06-04".
+"18.05 13:27:07,054|" -- Clock TransportDelay is 1.
+"18.05 13:27:07,054|" -- Clock Send 1526642827078 Recv 1526642827081.
+"18.05 13:27:07,054|" -- Clock Diff (3).
+"18.05 13:27:07,054|" -- Clock New Offset: 63 (Old: 65).
+"18.05 13:27:07,094|" -- Clock Got Adjust.
+"18.05 13:27:07,094|" -- Clock My Name: "team 06-01", other Name: "team 06-19".
+"18.05 13:27:07,094|" -- Clock TransportDelay is 1.
+"18.05 13:27:07,094|" -- Clock Send 1526642827124 Recv 1526642827125.
+"18.05 13:27:07,094|" -- Clock Diff (1).
+"18.05 13:27:07,094|" -- Clock New Offset: 63 (Old: 63).
+"18.05 13:27:07,134|" -- Clock Got Adjust.
+"18.05 13:27:07,134|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:27:07,134|" -- Clock TransportDelay is 1.
+"18.05 13:27:07,134|" -- Clock Send 1526642827183 Recv 1526642827185.
+"18.05 13:27:07,134|" -- Clock Diff (2).
+"18.05 13:27:07,134|" -- Clock New Offset: 62 (Old: 63).
+"18.05 13:27:07,253|" -- Clock Got Adjust.
+"18.05 13:27:07,253|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:27:07,253|" -- Clock TransportDelay is 1.
+"18.05 13:27:07,253|" -- Clock Send 1526642827289 Recv 1526642827288.
+"18.05 13:27:07,253|" -- Clock Diff (-1).
+"18.05 13:27:07,253|" -- Clock New Offset: 64 (Old: 62).
+"18.05 13:27:07,292|" -- Clock Got Adjust.
+"18.05 13:27:07,292|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:27:07,292|" -- Clock TransportDelay is 1.
+"18.05 13:27:07,292|" -- Clock Send 1526642827339 Recv 1526642827339.
+"18.05 13:27:07,292|" -- Clock Diff (0).
+"18.05 13:27:07,292|" -- Clock New Offset: 65 (Old: 64).
+"18.05 13:27:07,332|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:07,371|" -- Clock Got Adjust.
+"18.05 13:27:07,371|" -- Clock My Name: "team 06-01", other Name: "team 06-02".
+"18.05 13:27:07,371|" -- Clock TransportDelay is 1.
+"18.05 13:27:07,371|" -- Clock Send 1526642827433 Recv 1526642827434.
+"18.05 13:27:07,371|" -- Clock Diff (1).
+"18.05 13:27:07,371|" -- Clock New Offset: 65 (Old: 65).
+"18.05 13:27:07,410|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:07,490|" -- Clock Got Adjust.
+"18.05 13:27:07,490|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:27:07,490|" -- Clock TransportDelay is 1.
+"18.05 13:27:07,490|" -- Clock Send 1526642827553 Recv 1526642827552.
+"18.05 13:27:07,490|" -- Clock Diff (-1).
+"18.05 13:27:07,490|" -- Clock New Offset: 67 (Old: 65).
+"18.05 13:27:07,530|" -- Clock Got Adjust.
+"18.05 13:27:07,530|" -- Clock My Name: "team 06-01", other Name: "team 06-25".
+"18.05 13:27:07,530|" -- Clock TransportDelay is 1.
+"18.05 13:27:07,530|" -- Clock Send 1526642827587 Recv 1526642827587.
+"18.05 13:27:07,530|" -- Clock Diff (0).
+"18.05 13:27:07,530|" -- Clock New Offset: 68 (Old: 67).
+"18.05 13:27:07,650|" -- Clock Got Adjust.
+"18.05 13:27:07,650|" -- Clock My Name: "team 06-01", other Name: "team 06-11".
+"18.05 13:27:07,650|" -- Clock TransportDelay is 1.
+"18.05 13:27:07,650|" -- Clock Send 1526642827691 Recv 1526642827691.
+"18.05 13:27:07,650|" -- Clock Diff (0).
+"18.05 13:27:07,650|" -- Clock New Offset: 69 (Old: 68).
+"18.05 13:27:07,689|" -- Clock Got Adjust.
+"18.05 13:27:07,689|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:27:07,689|" -- Clock TransportDelay is 1.
+"18.05 13:27:07,689|" -- Clock Send 1526642827744 Recv 1526642827744.
+"18.05 13:27:07,689|" -- Clock Diff (0).
+"18.05 13:27:07,689|" -- Clock New Offset: 70 (Old: 69).
+"18.05 13:27:07,769|" -- Clock Got Adjust.
+"18.05 13:27:07,769|" -- Clock My Name: "team 06-01", other Name: "team 06-13".
+"18.05 13:27:07,769|" -- Clock TransportDelay is 1.
+"18.05 13:27:07,769|" -- Clock Send 1526642827811 Recv 1526642827812.
+"18.05 13:27:07,769|" -- Clock Diff (1).
+"18.05 13:27:07,769|" -- Clock New Offset: 70 (Old: 70).
+"18.05 13:27:07,849|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:07,928|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:07,967|" -- Clock Got Adjust.
+"18.05 13:27:07,967|" -- Clock My Name: "team 06-01", other Name: "team 06-03".
+"18.05 13:27:07,967|" -- Clock TransportDelay is 1.
+"18.05 13:27:07,967|" -- Clock Send 1526642828004 Recv 1526642828006.
+"18.05 13:27:07,967|" -- Clock Diff (2).
+"18.05 13:27:07,967|" -- Clock New Offset: 69 (Old: 70).
+"18.05 13:27:08,007|" Core RestFrameTime = 0.
+"18.05 13:27:08,014|" -- Clock Schlief 7ms.
+"18.05 13:27:08,014|" Core Frame Ended after 1003  with NextInSendphase = true.
+"18.05 13:27:08,014|" Core New Frame Started at 1526642828083 with Slot 24 --------.
+"18.05 13:27:08,014|" -- Clock calc got: 1526642828083 24 = 1526642829023.
+"18.05 13:27:08,014|" - Send SendTimeMS at 1526642829023.
+"18.05 13:27:08,133|" -- Clock Got Adjust.
+"18.05 13:27:08,133|" -- Clock My Name: "team 06-01", other Name: "team 06-07".
+"18.05 13:27:08,133|" -- Clock TransportDelay is 1.
+"18.05 13:27:08,133|" -- Clock Send 1526642828170 Recv 1526642828171.
+"18.05 13:27:08,133|" -- Clock Diff (1).
+"18.05 13:27:08,133|" -- Clock New Offset: 69 (Old: 69).
+"18.05 13:27:08,172|" -- Clock Got Adjust.
+"18.05 13:27:08,172|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:27:08,172|" -- Clock TransportDelay is 1.
+"18.05 13:27:08,172|" -- Clock Send 1526642828230 Recv 1526642828231.
+"18.05 13:27:08,172|" -- Clock Diff (1).
+"18.05 13:27:08,172|" -- Clock New Offset: 69 (Old: 69).
+"18.05 13:27:08,292|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:08,412|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:08,491|" -- Clock Got Adjust.
+"18.05 13:27:08,491|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:27:08,491|" -- Clock TransportDelay is 1.
+"18.05 13:27:08,491|" -- Clock Send 1526642828534 Recv 1526642828533.
+"18.05 13:27:08,491|" -- Clock Diff (-1).
+"18.05 13:27:08,491|" -- Clock New Offset: 71 (Old: 69).
+"18.05 13:27:08,691|" -- Clock Got Adjust.
+"18.05 13:27:08,691|" -- Clock My Name: "team 06-01", other Name: "team 06-21".
+"18.05 13:27:08,691|" -- Clock TransportDelay is 1.
+"18.05 13:27:08,691|" -- Clock Send 1526642828744 Recv 1526642828743.
+"18.05 13:27:08,691|" -- Clock Diff (-1).
+"18.05 13:27:08,691|" -- Clock New Offset: 73 (Old: 71).
+"18.05 13:27:08,730|" -- Clock Got Adjust.
+"18.05 13:27:08,730|" -- Clock My Name: "team 06-01", other Name: "team 06-15".
+"18.05 13:27:08,730|" -- Clock TransportDelay is 1.
+"18.05 13:27:08,730|" -- Clock Send 1526642828790 Recv 1526642828791.
+"18.05 13:27:08,730|" -- Clock Diff (1).
+"18.05 13:27:08,730|" -- Clock New Offset: 73 (Old: 73).
+"18.05 13:27:08,770|" -- Clock Got Adjust.
+"18.05 13:27:08,770|" -- Clock My Name: "team 06-01", other Name: "team 06-20".
+"18.05 13:27:08,770|" -- Clock TransportDelay is 1.
+"18.05 13:27:08,770|" -- Clock Send 1526642828817 Recv 1526642828817.
+"18.05 13:27:08,770|" -- Clock Diff (0).
+"18.05 13:27:08,770|" -- Clock New Offset: 74 (Old: 73).
+"18.05 13:27:08,809|" -- Clock Got Adjust.
+"18.05 13:27:08,809|" -- Clock My Name: "team 06-01", other Name: "team 06-22".
+"18.05 13:27:08,809|" -- Clock TransportDelay is 1.
+"18.05 13:27:08,809|" -- Clock Send 1526642828879 Recv 1526642828882.
+"18.05 13:27:08,809|" -- Clock Diff (3).
+"18.05 13:27:08,809|" -- Clock New Offset: 72 (Old: 74).
+"18.05 13:27:08,848|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:08,887|" -- Clock Got Adjust.
+"18.05 13:27:08,887|" -- Clock My Name: "team 06-01", other Name: "team 06-23".
+"18.05 13:27:08,887|" -- Clock TransportDelay is 1.
+"18.05 13:27:08,887|" -- Clock Send 1526642828921 Recv 1526642828922.
+"18.05 13:27:08,887|" -- Clock Diff (1).
+"18.05 13:27:08,887|" -- Clock New Offset: 72 (Old: 72).
+"18.05 13:27:08,935|" - Send Got NextSlotnumber 1.
+"18.05 13:27:08,946|" - Send 1526642829023 (Seti) 1526642829018 (Now).
+"18.05 13:27:08,946|" - Send SendTime in the future: 5.
+"18.05 13:27:08,951|" - Send Frage nach Payload.
+"18.05 13:27:08,951|" - Send Took 0 to get Payload.
+"18.05 13:27:08,951|" - Send Sende Nachricht.
+"18.05 13:27:08,952|" - Send sended with: ok.
+"18.05 13:27:08,967|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:27:09,006|" Core RestFrameTime = 0.
+"18.05 13:27:09,006|" -- Clock Got Adjust.
+"18.05 13:27:09,006|" Core Send_Loop end with true (Involved) true (Send).
+"18.05 13:27:09,006|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:27:09,006|" -- Clock TransportDelay is 1.
+"18.05 13:27:09,006|" -- Clock Send 1526642829064 Recv 1526642829067.
+"18.05 13:27:09,006|" -- Clock Diff (3).
+"18.05 13:27:09,007|" -- Clock New Offset: 70 (Old: 72).
+"18.05 13:27:09,014|" -- Clock Schlief 8ms.
+"18.05 13:27:09,014|" Core Frame Ended after 1000  with NextInSendphase = false.
+"18.05 13:27:09,014|" Core New Frame Started at 1526642829084 with Slot 0 --------.
+"18.05 13:27:09,054|" -- Clock Got Adjust.
+"18.05 13:27:09,054|" -- Clock My Name: "team 06-01", other Name: "team 06-10".
+"18.05 13:27:09,054|" -- Clock TransportDelay is 1.
+"18.05 13:27:09,054|" -- Clock Send 1526642829086 Recv 1526642829084.
+"18.05 13:27:09,054|" -- Clock Diff (-2).
+"18.05 13:27:09,054|" -- Clock New Offset: 73 (Old: 70).
+"18.05 13:27:09,134|" -- Clock Got Adjust.
+"18.05 13:27:09,134|" -- Clock My Name: "team 06-01", other Name: "team 06-07".
+"18.05 13:27:09,134|" -- Clock TransportDelay is 1.
+"18.05 13:27:09,134|" -- Clock Send 1526642829173 Recv 1526642829176.
+"18.05 13:27:09,134|" -- Clock Diff (3).
+"18.05 13:27:09,134|" -- Clock New Offset: 71 (Old: 73).
+"18.05 13:27:09,174|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:09,253|" -- Clock Got Adjust.
+"18.05 13:27:09,253|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:27:09,253|" -- Clock TransportDelay is 1.
+"18.05 13:27:09,253|" -- Clock Send 1526642829291 Recv 1526642829292.
+"18.05 13:27:09,253|" -- Clock Diff (1).
+"18.05 13:27:09,253|" -- Clock New Offset: 71 (Old: 71).
+"18.05 13:27:09,373|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:09,412|" -- Clock Got Adjust.
+"18.05 13:27:09,412|" -- Clock My Name: "team 06-01", other Name: "team 06-09".
+"18.05 13:27:09,412|" -- Clock TransportDelay is 1.
+"18.05 13:27:09,412|" -- Clock Send 1526642829457 Recv 1526642829459.
+"18.05 13:27:09,412|" -- Clock Diff (2).
+"18.05 13:27:09,412|" -- Clock New Offset: 70 (Old: 71).
+"18.05 13:27:09,652|" -- Clock Got Adjust.
+"18.05 13:27:09,652|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:27:09,652|" -- Clock TransportDelay is 1.
+"18.05 13:27:09,652|" -- Clock Send 1526642829691 Recv 1526642829691.
+"18.05 13:27:09,652|" -- Clock Diff (0).
+"18.05 13:27:09,652|" -- Clock New Offset: 71 (Old: 70).
+"18.05 13:27:09,731|" -- Clock Got Adjust.
+"18.05 13:27:09,731|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:27:09,731|" -- Clock TransportDelay is 1.
+"18.05 13:27:09,731|" -- Clock Send 1526642829790 Recv 1526642829790.
+"18.05 13:27:09,731|" -- Clock Diff (0).
+"18.05 13:27:09,731|" -- Clock New Offset: 72 (Old: 71).
+"18.05 13:27:09,811|" -- Clock Got Adjust.
+"18.05 13:27:09,811|" -- Clock My Name: "team 06-01", other Name: "team 06-06".
+"18.05 13:27:09,811|" -- Clock TransportDelay is 1.
+"18.05 13:27:09,811|" -- Clock Send 1526642829863 Recv 1526642829865.
+"18.05 13:27:09,811|" -- Clock Diff (2).
+"18.05 13:27:09,811|" -- Clock New Offset: 71 (Old: 72).
+"18.05 13:27:09,890|" -- Clock Got Adjust.
+"18.05 13:27:09,890|" -- Clock My Name: "team 06-01", other Name: "team 06-25".
+"18.05 13:27:09,890|" -- Clock TransportDelay is 1.
+"18.05 13:27:09,890|" -- Clock Send 1526642829960 Recv 1526642829961.
+"18.05 13:27:09,890|" -- Clock Diff (1).
+"18.05 13:27:09,890|" -- Clock New Offset: 71 (Old: 71).
+"18.05 13:27:09,970|" -- Clock Got Adjust.
+"18.05 13:27:09,970|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:27:09,970|" -- Clock TransportDelay is 1.
+"18.05 13:27:09,970|" -- Clock Send 1526642830028 Recv 1526642830028.
+"18.05 13:27:09,970|" -- Clock Diff (0).
+"18.05 13:27:09,970|" -- Clock New Offset: 72 (Old: 71).
+"18.05 13:27:10,010|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:10,010|" Core RestFrameTime = 0.
+"18.05 13:27:10,014|" -- Clock Schlief 4ms.
+"18.05 13:27:10,014|" Core Frame Ended after 1004  with NextInSendphase = true.
+"18.05 13:27:10,014|" Core New Frame Started at 1526642830086 with Slot 5 --------.
+"18.05 13:27:10,014|" -- Clock calc got: 1526642830086 5 = 1526642830266.
+"18.05 13:27:10,014|" - Send SendTimeMS at 1526642830266.
+"18.05 13:27:10,094|" -- Clock Got Adjust.
+"18.05 13:27:10,094|" -- Clock My Name: "team 06-01", other Name: "team 06-24".
+"18.05 13:27:10,094|" -- Clock TransportDelay is 1.
+"18.05 13:27:10,094|" -- Clock Send 1526642830149 Recv 1526642830149.
+"18.05 13:27:10,094|" -- Clock Diff (0).
+"18.05 13:27:10,094|" -- Clock New Offset: 73 (Old: 72).
+"18.05 13:27:10,175|" - Send Got NextSlotnumber 24.
+"18.05 13:27:10,186|" - Send 1526642830266 (Seti) 1526642830259 (Now).
+"18.05 13:27:10,186|" - Send SendTime in the future: 7.
+"18.05 13:27:10,193|" - Send Frage nach Payload.
+"18.05 13:27:10,193|" - Send Took 0 to get Payload.
+"18.05 13:27:10,193|" - Send Sende Nachricht.
+"18.05 13:27:10,195|" - Send sended with: ok.
+"18.05 13:27:10,213|" - Recv Was Involved: "team 06-01" "team 06-01".
+"18.05 13:27:10,253|" -- Clock Got Adjust.
+"18.05 13:27:10,253|" -- Clock My Name: "team 06-01", other Name: "team 06-14".
+"18.05 13:27:10,253|" -- Clock TransportDelay is 1.
+"18.05 13:27:10,253|" -- Clock Send 1526642830296 Recv 1526642830296.
+"18.05 13:27:10,253|" -- Clock Diff (0).
+"18.05 13:27:10,253|" -- Clock New Offset: 74 (Old: 73).
+"18.05 13:27:10,332|" - Recv Wasn't Involved: "team 06-01".
+"18.05 13:27:10,372|" -- Clock Got Adjust.
+"18.05 13:27:10,372|" -- Clock My Name: "team 06-01", other Name: "team 06-05".
+"18.05 13:27:10,372|" -- Clock TransportDelay is 1.
+"18.05 13:27:10,372|" -- Clock Send 1526642830431 Recv 1526642830433.
+"18.05 13:27:10,372|" -- Clock Diff (2).
+"18.05 13:27:10,372|" -- Clock New Offset: 73 (Old: 74).
+"18.05 13:27:10,532|" -- Clock Got Adjust.
+"18.05 13:27:10,532|" -- Clock My Name: "team 06-01", other Name: "team 06-12".
+"18.05 13:27:10,532|" -- Clock TransportDelay is 1.
+"18.05 13:27:10,532|" -- Clock Send 1526642830569 Recv 1526642830570.
+"18.05 13:27:10,532|" -- Clock Diff (1).
+"18.05 13:27:10,532|" -- Clock New Offset: 73 (Old: 73).
+"18.05 13:27:10,572|" -- Clock Got Adjust.
+"18.05 13:27:10,572|" -- Clock My Name: "team 06-01", other Name: "team 06-18".
+"18.05 13:27:10,572|" -- Clock TransportDelay is 1.
+"18.05 13:27:10,572|" -- Clock Send 1526642830643 Recv 1526642830643.
+"18.05 13:27:10,572|" -- Clock Diff (0).
+"18.05 13:27:10,572|" -- Clock New Offset: 74 (Old: 73).
+"18.05 13:27:10,654|" - Recv Wasn't Involved: "team 06-01".

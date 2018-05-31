@@ -1,0 +1,268 @@
+"28.05 12:15:55,465|" STATION Found Addr: {172,16,1,4}
+.
+"28.05 12:15:55,468|" STATION Starte "team 06-01" um 1527502555467 mit ["A",0,
+                                          {172,16,1,4},
+                                          {225,10,1,2},
+                                          '16000',
+                                          ["team 06-01",46,108,111,103]].
+"28.05 12:15:55,469|" -- Clock Starting with Offset: 0.
+"28.05 12:15:55,471|" - Send Sending to {225,10,1,2}:16000.
+"28.05 12:15:55,472|" ---- PYLD PayloadserverPID: <0.5.0> // Vessel3 with Send Pipe PID: <0.67.0>.
+"28.05 12:15:55,472|" -- Slot Startet.
+"28.05 12:15:55,474|" -- Slot Random Slotindex 11.
+"28.05 12:15:55,474|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 11.
+"28.05 12:15:55,475|" - Recv Listening to {225,10,1,2}:16000.
+"28.05 12:15:56,002|" Core New Frame Started at 1527502556001 with Slot 0 --------.
+"28.05 12:15:56,002|" -- Slot Random Slotindex 6.
+"28.05 12:15:56,002|" Core RestFrameTime = 999.
+"28.05 12:15:56,002|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 6.
+"28.05 12:15:56,002|" Core Schlafe 997ms.
+"28.05 12:15:56,999|" Core Needed 0ms for getFreeSlotNum.
+"28.05 12:15:57,001|" Core New Frame Started at 1527502557001 with Slot 6 --------.
+"28.05 12:15:57,001|" -- Slot Random Slotindex 10.
+"28.05 12:15:57,001|" Core RestFrameTime = 1000.
+"28.05 12:15:57,001|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 10.
+"28.05 12:15:57,001|" -- Clock calc got: 1527502557001 6 = 1527502557221.
+"28.05 12:15:57,002|" - Send SendTimeMS at 1527502557221.
+"28.05 12:15:57,212|" - Send 1527502557221 (Seti) 1527502557212 (Now).
+"28.05 12:15:57,212|" - Send SendTime in the future: 9.
+"28.05 12:15:57,221|" - Send Frage nach Payload.
+"28.05 12:15:57,221|" - Send Took 0 to get Payload.
+"28.05 12:15:57,221|" - Send Got NextSlotnumber 10.
+"28.05 12:15:57,222|" Core NewRestFrameTime 780.
+"28.05 12:15:57,222|" - Send Sende Nachricht.
+"28.05 12:15:57,222|" - Send sended with: ok.
+"28.05 12:15:58,001|" Core stationwasinvolved = true was never received.
+"28.05 12:15:58,001|" Core New Frame Started at 1527502558000 with Slot 10 --------.
+"28.05 12:15:58,002|" -- Slot Random Slotindex 22.
+"28.05 12:15:58,002|" Core RestFrameTime = 998.
+"28.05 12:15:58,002|" -- Clock calc got: 1527502558000 10 = 1527502558380.
+"28.05 12:15:58,002|" - Send SendTimeMS at 1527502558380.
+"28.05 12:15:58,002|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 22.
+"28.05 12:15:58,371|" - Send 1527502558380 (Seti) 1527502558371 (Now).
+"28.05 12:15:58,372|" - Send SendTime in the future: 9.
+"28.05 12:15:58,380|" - Send Frage nach Payload.
+"28.05 12:15:58,380|" - Send Took 0 to get Payload.
+"28.05 12:15:58,381|" - Send Got NextSlotnumber 22.
+"28.05 12:15:58,381|" Core NewRestFrameTime 619.
+"28.05 12:15:58,381|" - Send Sende Nachricht.
+"28.05 12:15:58,381|" - Send sended with: ok.
+"28.05 12:15:58,999|" Core stationwasinvolved = true was never received.
+"28.05 12:15:59,000|" Core New Frame Started at 1527502559000 with Slot 22 --------.
+"28.05 12:15:59,001|" -- Slot Random Slotindex 5.
+"28.05 12:15:59,001|" -- Clock calc got: 1527502559000 22 = 1527502559860.
+"28.05 12:15:59,001|" Core RestFrameTime = 999.
+"28.05 12:15:59,001|" - Send SendTimeMS at 1527502559860.
+"28.05 12:15:59,001|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 5.
+"28.05 12:15:59,851|" - Send 1527502559860 (Seti) 1527502559851 (Now).
+"28.05 12:15:59,852|" - Send SendTime in the future: 9.
+"28.05 12:15:59,860|" - Send Frage nach Payload.
+"28.05 12:15:59,861|" - Send Took 0 to get Payload.
+"28.05 12:15:59,861|" - Send Got NextSlotnumber 5.
+"28.05 12:15:59,861|" Core NewRestFrameTime 139.
+"28.05 12:15:59,861|" - Send Sende Nachricht.
+"28.05 12:15:59,861|" - Send sended with: ok.
+"28.05 12:15:59,999|" Core stationwasinvolved = true was never received.
+"28.05 12:16:00,001|" Core New Frame Started at 1527502560001 with Slot 5 --------.
+"28.05 12:16:00,001|" -- Slot Random Slotindex 19.
+"28.05 12:16:00,001|" Core RestFrameTime = 1000.
+"28.05 12:16:00,001|" -- Clock calc got: 1527502560001 5 = 1527502560181.
+"28.05 12:16:00,002|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 19.
+"28.05 12:16:00,002|" - Send SendTimeMS at 1527502560181.
+"28.05 12:16:00,172|" - Send 1527502560181 (Seti) 1527502560172 (Now).
+"28.05 12:16:00,172|" - Send SendTime in the future: 9.
+"28.05 12:16:00,181|" - Send Frage nach Payload.
+"28.05 12:16:00,182|" - Send Took 0 to get Payload.
+"28.05 12:16:00,182|" - Send Got NextSlotnumber 19.
+"28.05 12:16:00,182|" Core NewRestFrameTime 820.
+"28.05 12:16:00,182|" - Send Sende Nachricht.
+"28.05 12:16:00,182|" - Send sended with: ok.
+"28.05 12:16:01,001|" Core stationwasinvolved = true was never received.
+"28.05 12:16:01,002|" Core New Frame Started at 1527502561000 with Slot 19 --------.
+"28.05 12:16:01,002|" -- Slot Random Slotindex 10.
+"28.05 12:16:01,002|" Core RestFrameTime = 998.
+"28.05 12:16:01,003|" -- Clock calc got: 1527502561000 19 = 1527502561740.
+"28.05 12:16:01,003|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 10.
+"28.05 12:16:01,003|" - Send SendTimeMS at 1527502561740.
+"28.05 12:16:01,731|" - Send 1527502561740 (Seti) 1527502561731 (Now).
+"28.05 12:16:01,732|" - Send SendTime in the future: 9.
+"28.05 12:16:01,740|" - Send Frage nach Payload.
+"28.05 12:16:01,741|" - Send Took 0 to get Payload.
+"28.05 12:16:01,741|" - Send Got NextSlotnumber 10.
+"28.05 12:16:01,741|" Core NewRestFrameTime 260.
+"28.05 12:16:01,741|" - Send Sende Nachricht.
+"28.05 12:16:01,741|" - Send sended with: ok.
+"28.05 12:16:02,000|" Core stationwasinvolved = true was never received.
+"28.05 12:16:02,001|" Core New Frame Started at 1527502562001 with Slot 10 --------.
+"28.05 12:16:02,002|" -- Clock calc got: 1527502562001 10 = 1527502562381.
+"28.05 12:16:02,001|" -- Slot Random Slotindex 15.
+"28.05 12:16:02,002|" - Send SendTimeMS at 1527502562381.
+"28.05 12:16:02,002|" Core RestFrameTime = 1000.
+"28.05 12:16:02,002|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 15.
+"28.05 12:16:02,372|" - Send 1527502562381 (Seti) 1527502562372 (Now).
+"28.05 12:16:02,372|" - Send SendTime in the future: 9.
+"28.05 12:16:02,381|" - Send Frage nach Payload.
+"28.05 12:16:02,382|" - Send Took 0 to get Payload.
+"28.05 12:16:02,382|" - Send Got NextSlotnumber 15.
+"28.05 12:16:02,382|" Core NewRestFrameTime 620.
+"28.05 12:16:02,382|" - Send Sende Nachricht.
+"28.05 12:16:02,383|" - Send sended with: ok.
+"28.05 12:16:03,002|" Core stationwasinvolved = true was never received.
+"28.05 12:16:03,003|" Core New Frame Started at 1527502563000 with Slot 15 --------.
+"28.05 12:16:03,003|" -- Clock calc got: 1527502563000 15 = 1527502563580.
+"28.05 12:16:03,003|" -- Slot Random Slotindex 8.
+"28.05 12:16:03,003|" Core RestFrameTime = 997.
+"28.05 12:16:03,003|" - Send SendTimeMS at 1527502563580.
+"28.05 12:16:03,003|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 8.
+"28.05 12:16:03,571|" - Send 1527502563580 (Seti) 1527502563571 (Now).
+"28.05 12:16:03,572|" - Send SendTime in the future: 9.
+"28.05 12:16:03,580|" - Send Frage nach Payload.
+"28.05 12:16:03,581|" - Send Took 0 to get Payload.
+"28.05 12:16:03,581|" - Send Got NextSlotnumber 8.
+"28.05 12:16:03,581|" Core NewRestFrameTime 419.
+"28.05 12:16:03,581|" - Send Sende Nachricht.
+"28.05 12:16:03,582|" - Send sended with: ok.
+"28.05 12:16:04,000|" Core stationwasinvolved = true was never received.
+"28.05 12:16:04,001|" Core New Frame Started at 1527502564001 with Slot 8 --------.
+"28.05 12:16:04,002|" -- Clock calc got: 1527502564001 8 = 1527502564301.
+"28.05 12:16:04,002|" -- Slot Random Slotindex 1.
+"28.05 12:16:04,002|" Core RestFrameTime = 999.
+"28.05 12:16:04,002|" - Send SendTimeMS at 1527502564301.
+"28.05 12:16:04,002|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 1.
+"28.05 12:16:04,292|" - Send 1527502564301 (Seti) 1527502564292 (Now).
+"28.05 12:16:04,293|" - Send SendTime in the future: 9.
+"28.05 12:16:04,301|" - Send Frage nach Payload.
+"28.05 12:16:04,302|" - Send Took 0 to get Payload.
+"28.05 12:16:04,302|" - Send Got NextSlotnumber 1.
+"28.05 12:16:04,302|" Core NewRestFrameTime 699.
+"28.05 12:16:04,302|" - Send Sende Nachricht.
+"28.05 12:16:04,302|" - Send sended with: ok.
+"28.05 12:16:05,000|" Core stationwasinvolved = true was never received.
+"28.05 12:16:05,001|" Core New Frame Started at 1527502565000 with Slot 1 --------.
+"28.05 12:16:05,001|" -- Slot Random Slotindex 23.
+"28.05 12:16:05,001|" Core RestFrameTime = 999.
+"28.05 12:16:05,001|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 23.
+"28.05 12:16:05,001|" -- Clock calc got: 1527502565000 1 = 1527502565020.
+"28.05 12:16:05,001|" - Send SendTimeMS at 1527502565020.
+"28.05 12:16:05,001|" -- Clock alarm 'preperation' with -1ms already too late!.
+"28.05 12:16:05,010|" - Send 1527502565020 (Seti) 1527502565010 (Now).
+"28.05 12:16:05,011|" - Send SendTime in the future: 10.
+"28.05 12:16:05,020|" - Send Frage nach Payload.
+"28.05 12:16:05,020|" - Send Took 0 to get Payload.
+"28.05 12:16:05,020|" - Send Got NextSlotnumber 23.
+"28.05 12:16:05,021|" Core NewRestFrameTime 979.
+"28.05 12:16:05,021|" - Send Sende Nachricht.
+"28.05 12:16:05,021|" - Send sended with: ok.
+"28.05 12:16:05,999|" Core stationwasinvolved = true was never received.
+"28.05 12:16:06,001|" Core New Frame Started at 1527502566001 with Slot 23 --------.
+"28.05 12:16:06,002|" -- Slot Random Slotindex 18.
+"28.05 12:16:06,002|" Core RestFrameTime = 999.
+"28.05 12:16:06,002|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 18.
+"28.05 12:16:06,002|" -- Clock calc got: 1527502566001 23 = 1527502566901.
+"28.05 12:16:06,003|" - Send SendTimeMS at 1527502566901.
+"28.05 12:16:06,892|" - Send 1527502566901 (Seti) 1527502566892 (Now).
+"28.05 12:16:06,893|" - Send SendTime in the future: 9.
+"28.05 12:16:06,901|" - Send Frage nach Payload.
+"28.05 12:16:06,902|" - Send Took 1 to get Payload.
+"28.05 12:16:06,902|" - Send Got NextSlotnumber 18.
+"28.05 12:16:06,902|" Core NewRestFrameTime 100.
+"28.05 12:16:06,902|" - Send Sende Nachricht.
+"28.05 12:16:06,903|" - Send sended with: ok.
+"28.05 12:16:07,002|" Core stationwasinvolved = true was never received.
+"28.05 12:16:07,002|" Core New Frame Started at 1527502567001 with Slot 18 --------.
+"28.05 12:16:07,003|" -- Slot Random Slotindex 2.
+"28.05 12:16:07,003|" Core RestFrameTime = 998.
+"28.05 12:16:07,003|" -- Clock calc got: 1527502567001 18 = 1527502567701.
+"28.05 12:16:07,003|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 2.
+"28.05 12:16:07,003|" - Send SendTimeMS at 1527502567701.
+"28.05 12:16:07,692|" - Send 1527502567701 (Seti) 1527502567692 (Now).
+"28.05 12:16:07,692|" - Send SendTime in the future: 9.
+"28.05 12:16:07,701|" - Send Frage nach Payload.
+"28.05 12:16:07,701|" - Send Took 0 to get Payload.
+"28.05 12:16:07,701|" - Send Got NextSlotnumber 2.
+"28.05 12:16:07,702|" Core NewRestFrameTime 299.
+"28.05 12:16:07,702|" - Send Sende Nachricht.
+"28.05 12:16:07,702|" - Send sended with: ok.
+"28.05 12:16:08,000|" Core stationwasinvolved = true was never received.
+"28.05 12:16:08,000|" Core New Frame Started at 1527502568000 with Slot 2 --------.
+"28.05 12:16:08,001|" Core RestFrameTime = 999.
+"28.05 12:16:08,001|" -- Clock calc got: 1527502568000 2 = 1527502568060.
+"28.05 12:16:08,001|" - Send SendTimeMS at 1527502568060.
+"28.05 12:16:08,001|" -- Slot Random Slotindex 10.
+"28.05 12:16:08,001|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 10.
+"28.05 12:16:08,051|" - Send 1527502568060 (Seti) 1527502568051 (Now).
+"28.05 12:16:08,051|" - Send SendTime in the future: 9.
+"28.05 12:16:08,060|" - Send Frage nach Payload.
+"28.05 12:16:08,060|" - Send Took 0 to get Payload.
+"28.05 12:16:08,060|" - Send Got NextSlotnumber 10.
+"28.05 12:16:08,060|" Core NewRestFrameTime 940.
+"28.05 12:16:08,060|" - Send Sende Nachricht.
+"28.05 12:16:08,060|" - Send sended with: ok.
+"28.05 12:16:09,000|" Core stationwasinvolved = true was never received.
+"28.05 12:16:09,001|" Core New Frame Started at 1527502569001 with Slot 10 --------.
+"28.05 12:16:09,001|" -- Clock calc got: 1527502569001 10 = 1527502569381.
+"28.05 12:16:09,001|" -- Slot Random Slotindex 4.
+"28.05 12:16:09,001|" Core RestFrameTime = 1000.
+"28.05 12:16:09,001|" - Send SendTimeMS at 1527502569381.
+"28.05 12:16:09,001|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 4.
+"28.05 12:16:09,373|" - Send 1527502569381 (Seti) 1527502569373 (Now).
+"28.05 12:16:09,373|" - Send SendTime in the future: 8.
+"28.05 12:16:09,381|" - Send Frage nach Payload.
+"28.05 12:16:09,381|" - Send Took 0 to get Payload.
+"28.05 12:16:09,381|" - Send Got NextSlotnumber 4.
+"28.05 12:16:09,381|" Core NewRestFrameTime 620.
+"28.05 12:16:09,382|" - Send Sende Nachricht.
+"28.05 12:16:09,382|" - Send sended with: ok.
+"28.05 12:16:10,001|" Core stationwasinvolved = true was never received.
+"28.05 12:16:10,001|" Core New Frame Started at 1527502570000 with Slot 4 --------.
+"28.05 12:16:10,001|" -- Slot Random Slotindex 15.
+"28.05 12:16:10,002|" Core RestFrameTime = 999.
+"28.05 12:16:10,002|" -- Clock calc got: 1527502570000 4 = 1527502570140.
+"28.05 12:16:10,002|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 15.
+"28.05 12:16:10,002|" - Send SendTimeMS at 1527502570140.
+"28.05 12:16:10,131|" - Send 1527502570140 (Seti) 1527502570131 (Now).
+"28.05 12:16:10,131|" - Send SendTime in the future: 9.
+"28.05 12:16:10,140|" - Send Frage nach Payload.
+"28.05 12:16:10,140|" - Send Took 0 to get Payload.
+"28.05 12:16:10,140|" - Send Got NextSlotnumber 15.
+"28.05 12:16:10,140|" Core NewRestFrameTime 861.
+"28.05 12:16:10,141|" - Send Sende Nachricht.
+"28.05 12:16:10,141|" - Send sended with: ok.
+"28.05 12:16:11,001|" Core stationwasinvolved = true was never received.
+"28.05 12:16:11,002|" Core New Frame Started at 1527502571000 with Slot 15 --------.
+"28.05 12:16:11,002|" -- Slot Random Slotindex 18.
+"28.05 12:16:11,002|" Core RestFrameTime = 998.
+"28.05 12:16:11,002|" -- Clock calc got: 1527502571000 15 = 1527502571580.
+"28.05 12:16:11,002|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 18.
+"28.05 12:16:11,003|" - Send SendTimeMS at 1527502571580.
+"28.05 12:16:11,571|" - Send 1527502571580 (Seti) 1527502571571 (Now).
+"28.05 12:16:11,572|" - Send SendTime in the future: 9.
+"28.05 12:16:11,580|" - Send Frage nach Payload.
+"28.05 12:16:11,581|" - Send Took 1 to get Payload.
+"28.05 12:16:11,581|" - Send Got NextSlotnumber 18.
+"28.05 12:16:11,581|" Core NewRestFrameTime 420.
+"28.05 12:16:11,581|" - Send Sende Nachricht.
+"28.05 12:16:11,582|" - Send sended with: ok.
+"28.05 12:16:12,001|" Core stationwasinvolved = true was never received.
+"28.05 12:16:12,001|" Core New Frame Started at 1527502572001 with Slot 18 --------.
+"28.05 12:16:12,002|" -- Slot Random Slotindex 20.
+"28.05 12:16:12,002|" Core RestFrameTime = 999.
+"28.05 12:16:12,002|" -- Clock calc got: 1527502572001 18 = 1527502572701.
+"28.05 12:16:12,002|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 20.
+"28.05 12:16:12,002|" - Send SendTimeMS at 1527502572701.
+"28.05 12:16:12,692|" - Send 1527502572701 (Seti) 1527502572692 (Now).
+"28.05 12:16:12,692|" - Send SendTime in the future: 9.
+"28.05 12:16:12,701|" - Send Frage nach Payload.
+"28.05 12:16:12,701|" - Send Took 0 to get Payload.
+"28.05 12:16:12,701|" - Send Got NextSlotnumber 20.
+"28.05 12:16:12,701|" Core NewRestFrameTime 300.
+"28.05 12:16:12,701|" - Send Sende Nachricht.
+"28.05 12:16:12,702|" - Send sended with: ok.
+"28.05 12:16:13,001|" Core stationwasinvolved = true was never received.
+"28.05 12:16:13,001|" Core New Frame Started at 1527502573001 with Slot 20 --------.
+"28.05 12:16:13,002|" -- Slot Random Slotindex 4.
+"28.05 12:16:13,002|" -- Clock calc got: 1527502573001 20 = 1527502573781.
+"28.05 12:16:13,002|" Core RestFrameTime = 999.
+"28.05 12:16:13,002|" - Send SendTimeMS at 1527502573781.
+"28.05 12:16:13,002|" -- Slot From [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] selected 4.
+"28.05 12:16:13,772|" - Send 1527502573781 (Seti) 1527502573772 (Now).
