@@ -2,3 +2,8 @@
 First start the Middleware
 Second the Service (Calculator)
 Last the Client (The thing that uses the Calculator via Middleware)
+
+
+Middleware also starts Nameservice
+Via ObjectBroker new Services are registered in the nameservice, but they could be anywhere.
+Client via ObjectBroker resolved with nameservice for a specific service, and uses it.

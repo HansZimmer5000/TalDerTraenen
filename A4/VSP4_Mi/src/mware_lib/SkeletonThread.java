@@ -29,12 +29,14 @@ public class SkeletonThread extends Thread {
 	@Override
 	public void run() {
 		String msgFromClient;
+		boolean gotKill;
 		while (cSocket.isConnected()) {
 			try {
 				msgFromClient = in.readLine();
-				handleMsgFromClient(msgFromClient);
-
-
+				gotKill = handleMsgFromClient(msgFromClient);
+				if(gotKill) {
+					return;
+				}
 			} catch (IOException e) {
 				syso.println(cSocket.getInetAddress() + " disconected!");
 				return;
@@ -42,16 +44,17 @@ public class SkeletonThread extends Thread {
 		}
 	}
 
-	private void handleMsgFromClient(String msgFromClient) throws NoSuchObjectException, IOException {
+	private boolean handleMsgFromClient(String msgFromClient) throws NoSuchObjectException, IOException {
 		syso.println("folgende Nachricht wurde erhalten " + msgFromClient);
 		if (msgFromClient.equals("GET_NS")) {
 			getNameService();
 		} else if (msgFromClient.equals("KILL")) {
 			kill();
+			return true;
 		} else {
 			syso.println("get an unkown command " + msgFromClient + " from  " + cSocket.getInetAddress());
 		}
-		
+		return false;
 	}
 
 	private void getNameService() throws NoSuchObjectException, IOException {
@@ -64,7 +67,6 @@ public class SkeletonThread extends Thread {
 		objOut.close();
 		cSocket.close();
 		syso.println(cSocket.getInetAddress() + " disconected!");
-		return;
 	}
 	
 
