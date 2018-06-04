@@ -5,7 +5,10 @@ import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class Calculator extends UnicastRemoteObject implements math_ops._CalculatorImplBase {
+import math_ops._CalculatorImplBase;
+import mware_lib.INameService;
+
+public class Calculator extends UnicastRemoteObject implements _CalculatorImplBase {
 
 	private static final long serialVersionUID = -7247642077236723001L;
 
@@ -20,7 +23,7 @@ public class Calculator extends UnicastRemoteObject implements math_ops._Calcula
 	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
 
 		ObjectBroker objBroker = ObjectBroker.init("", 55555, false);
-		mware_lib.INameService nameSvc = objBroker.getNameService();
+		INameService nameSvc = objBroker.getNameService();
 		System.out.println(nameSvc);
 		nameSvc.rebind((Object) new Calculator(), "zumsel");
 		objBroker.shutDown();

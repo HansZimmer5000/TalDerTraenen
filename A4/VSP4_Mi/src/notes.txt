@@ -1,0 +1,4 @@
+
+First start the Middleware
+Second the Service (Calculator)
+Last the Client (The thing that uses the Calculator via Middleware)
