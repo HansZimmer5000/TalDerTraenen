@@ -2,8 +2,8 @@ package client;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-
 import math_ops._CalculatorImplBase;
+import mware_lib.ObjectBroker;
 
 public class Client {
 
@@ -18,14 +18,14 @@ public class Client {
 		System.out.println(rawObjRef);
 		System.out.println("Service-Referenz erhalten!");
 		_CalculatorImplBase remoteObj = _CalculatorImplBase.narrowCast(rawObjRef);
-		System.out.println(rawObjRef);
 
 		System.out.println("Methodenaufruf wird initiiert");
 		double calcNum = remoteObj.add(20d,30d);
-		System.out.println("Rechnung wurde durchgefï¿½hr das Ergebnis ist: " + calcNum);
+		System.out.println("Rechnung wurde durchgeführ das Ergebnis ist: " + calcNum);
 
 		objBroker.shutDown();
-
+	
+		
 	}
 
 }

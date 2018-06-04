@@ -1,10 +1,14 @@
-package mware_lib;
+package MiddleWare;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+
+import mware_lib.INameService;
+import mware_lib.NameService;
+import mware_lib.SkeletonThread;
 
 public class MiddleWare extends Thread {
 
@@ -16,7 +20,7 @@ public class MiddleWare extends Thread {
 
 	private MiddleWare(int port) throws RemoteException {
 		this.port = port;
-		nameService = new NameService();
+		//nameService = new NameService();
 	}
 
 	@Override
