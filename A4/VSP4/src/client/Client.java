@@ -22,7 +22,7 @@ public class Client {
 
 		System.out.println("Methodenaufruf wird initiiert");
 		double calcNum = remoteObj.add(20d,30d);
-		System.out.println("Rechnung wurde durchgeführ das Ergebnis ist: " + calcNum);
+		System.out.println("Rechnung wurde durchgefï¿½hr das Ergebnis ist: " + calcNum);
 
 		objBroker.shutDown();
 
