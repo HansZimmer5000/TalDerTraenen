@@ -12,13 +12,14 @@ public class ServiceListener extends Thread {
 	public ServiceListener(Object servant) {
 		this.servant = servant; 
 		ss = getServerWithAviablePort(PORT_START);
+		System.out.println("Service Server wurde gestartet");
 	}
 
 	@Override
 	public void run() {
 		while (!this.isInterrupted()) {
 			try {
-				new SkeletonThread(ss.accept(), this.servant);
+				new SkeletonThread(ss.accept(), this.servant).start();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
