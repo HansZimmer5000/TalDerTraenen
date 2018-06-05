@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 
 import math_ops._CalculatorImplBase;
 import mware_lib.INameService;
+import mware_lib.ObjectBroker;
 
 public class Client {
 

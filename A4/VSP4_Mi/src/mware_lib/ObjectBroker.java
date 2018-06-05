@@ -1,4 +1,4 @@
-package client;
+package mware_lib;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -6,8 +6,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
-import mware_lib.INameService;
 
 public class ObjectBroker {
 
