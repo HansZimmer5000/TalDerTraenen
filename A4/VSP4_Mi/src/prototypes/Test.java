@@ -1,8 +1,71 @@
 package prototypes;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
 public class Test {
 
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws Exception {
+		testHowToGetTCPConnection();
+	}
+	
+	
+	public static void testHowToGetTCPConnection() throws UnknownHostException, IOException{
+		GenSocketClass server = new GenSocketClass(null, 15000, true);
+		GenSocketClass client = new GenSocketClass(Inet4Address.getByName("127.0.0.1"), 15000, false);
+		new Thread(server).start();
+		client.connectTo();
+	}
+	
+	public static class GenSocketClass implements Runnable{
+		
+		ServerSocket serverSocket;
+		Socket socket;
+				
+		public GenSocketClass(InetAddress inetAddress, int port, boolean isServer) throws IOException {
+			if(isServer){
+				this.serverSocket = new ServerSocket(port);
+			} else {
+				this.socket = new Socket(inetAddress, port);
+			}
+		}
+		
+		public void connectTo() throws IOException{
+			BufferedWriter os = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
+			os.write("hihi");
+			System.out.println("send hihi");
+			os.flush();
+			os.close();
+			socket.close();
+		}
+
+		@Override
+		public void run() {
+			try {
+				Socket connection = this.serverSocket.accept();
+				BufferedReader is = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+				System.out.println("Got Connection from: " + connection.getPort() + " at: " + connection.getLocalPort());
+				System.out.println("Got " + is.readLine());
+				is.close();
+				serverSocket.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	
+	
+	public static void testIfObjectIsCallableAfterStartingItInAThread() throws InterruptedException{
 		TestClass testinstance = new TestClass("aaaaaa");
 		
 		testinstance.start();

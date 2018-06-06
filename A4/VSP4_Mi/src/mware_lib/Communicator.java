@@ -8,14 +8,14 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class ComHandler {
+public class Communicator {
 
 	private String host;
 	private int port;
 	private Boolean debug;
-	private ServiceListener serviceServer;
+	private SkeletonServer serviceServer;
 
-	public ComHandler(String host, int port, Boolean debug) {
+	public Communicator(String host, int port, Boolean debug) {
 		this.host = host;
 		this.port = port;
 		this.debug = debug;
@@ -29,7 +29,7 @@ public class ComHandler {
 			switch (command) {
 			case "rebind":
 				System.out.println("rebind anfrage versendet");
-				serviceServer = new ServiceListener(servant);
+				serviceServer = new SkeletonServer(servant);
 				serviceServer.start();
 
 				// TODO:: Protokoll definieren Host | Port | NsName | Command(rebind)
@@ -48,7 +48,7 @@ public class ComHandler {
 				String answerFromNS = is.readLine();
 				String nsAnswerSplited[] = answerFromNS.split("\\|");
 				System.out.println("entferntes Object erhalten: " + answerFromNS);
-				ComHandler retObject = new ComHandler(nsAnswerSplited[0], new Integer(nsAnswerSplited[1]), this.debug);
+				Communicator retObject = new Communicator(nsAnswerSplited[0], new Integer(nsAnswerSplited[1]), this.debug);
 
 				is.close();
 				os.close();

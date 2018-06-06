@@ -3,14 +3,14 @@ package math_ops;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import mware_lib.ComHandler;
+import mware_lib.Communicator;
 
 public class _CalculatorImplBaseStub implements _CalculatorImplBase {
 
-	private ComHandler rawObject;
+	private Communicator rawObject;
 
 	public _CalculatorImplBaseStub(Object rawObjectRef) {
-		this.rawObject = (ComHandler) rawObjectRef;
+		this.rawObject = (Communicator) rawObjectRef;
 	}
 
 	@Override
