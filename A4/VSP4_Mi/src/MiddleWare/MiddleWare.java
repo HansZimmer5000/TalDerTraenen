@@ -3,6 +3,9 @@ package MiddleWare;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import client.CalculatorServer;
+import mware_lib.SkeletonServer;
+
 public class MiddleWare extends Thread {
 
 	private static final int DEFAULT_PORT = 55555;
@@ -22,11 +25,12 @@ public class MiddleWare extends Thread {
 			System.out.println(
 					"Server wurde gestartet und hört auf: " + nsServer.getInetAddress() + ":" + nsServer.getLocalPort());
 
-			while (online) {
-				new SkeletonThread(nsServer.accept(), nameService).start();
-			}
-
-			nsServer.close();
+			//while (online) {
+			//	new SkeletonThread(nsServer.accept(), nameService).start();
+			//}
+			
+			SkeletonServer serviceServer = new SkeletonServer(this.nameService, nsServer);
+			serviceServer.start();
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

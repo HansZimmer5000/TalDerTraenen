@@ -19,49 +19,31 @@ public class SkeletonThread extends Thread {
 
 	public SkeletonThread(Socket clientSocket, Object servant) throws IOException {
 		this.cSocket = clientSocket;
-		this.in = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
-		this.out = new BufferedWriter(new OutputStreamWriter(cSocket.getOutputStream()));
 		this.servant = servant;
-		System.out.println("Client hat sich angemeldet");
+		System.out.println("Client hat sich angemeldet " + servant.getClass().getPackage());
 	}
 
 	@Override
 	public void run() {
 		String msgFromClient;
-		while (!this.isInterrupted()) {
+		//while (!this.isInterrupted()) {
 			try {
+				this.in = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
+				this.out = new BufferedWriter(new OutputStreamWriter(cSocket.getOutputStream()));
+				System.out.println("waiting for input");
+				System.out.println(cSocket.isConnected());
 				msgFromClient = in.readLine();
-				System.out.println("Got New Message from Client! " + msgFromClient);
 				if (msgFromClient != null) {
-
-					String[] splitedMsg = msgFromClient.split("\\|");
-					Object[] paramsRaw = splitedMsg[1].replaceAll(" ", "").split("\\,");
-					Object[] params = new Object[paramsRaw.length];
-					Class<?> paramClasses[] = new Class[paramsRaw.length];
-					for (int i = 0; i < paramsRaw.length; i++) {
-						System.out.println("_" + paramsRaw[i] + "_");
-						try {
-							params[i] = Double.parseDouble((String) paramsRaw[i]);
-							paramClasses[i] = double.class;
-						} catch (NumberFormatException | NullPointerException e) {
-							if (paramsRaw[i] instanceof Integer) {
-								paramClasses[i] = int.class;
-								params[i] = new Integer((int) paramsRaw[i]);
-							} else if (paramsRaw[i] instanceof String) {
-								paramClasses[i] = String.class;
-								params[i] = params[i];
-							}
-						}
-					}
+					System.out.println("Nachricht vom Client erhalten: " + msgFromClient);
 
 					try {
-						System.out.println("looking for Method named: " + splitedMsg[0] + " with "
-								+ Arrays.asList(paramClasses).toString() + " Parameters values:"
-								+ Arrays.asList(paramsRaw).toString());
-						Method myMethod = servant.getClass().getDeclaredMethod(splitedMsg[0], paramClasses);
-						System.out.println(myMethod);
-						System.out.println("Send Ergebnis an Client!");
-						out.write(myMethod.invoke(servant, params) + "\n");
+						// Oder mit Reflection (oder ohne) in Server Klasse
+						Message message = new Message(msgFromClient);
+
+						System.out.println("Reflecting: " + servant.getClass() + " " + message.getMethodName());
+						Method method = servant.getClass().getMethod(message.getMethodName(), message.getParameterClasses());
+						Object returnValue = method.invoke(servant, message.getParameterValues());
+						out.write(returnValue + "\n");
 						out.flush();
 
 					} catch (NoSuchMethodException | SecurityException | IllegalAccessException
@@ -74,8 +56,8 @@ public class SkeletonThread extends Thread {
 
 			} catch (IOException e) {
 				System.out.println(cSocket.getInetAddress() + " disconected!");
-				return;
 			}
-		}
+		//}
+		System.out.println("Done");
 	}
 }

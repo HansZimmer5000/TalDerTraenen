@@ -13,7 +13,6 @@ public class NameService implements INameService {
 	@Override
 	public void rebind(String servantSocket, String name) {
 		conNS.sendToNs(servantSocket, name, "rebind");
-		return;
 	}
 
 	@Override

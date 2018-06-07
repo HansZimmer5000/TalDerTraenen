@@ -17,7 +17,7 @@ public class _CalculatorImplBaseStub implements _CalculatorImplBase {
 	public int add(int a, int b) {
 		String params;
 		
-		params = "int " + a + ", int " + b;
+		params = "int " + a + ",int " + b;
 		
 		System.out.println(params);
 		return new Integer((String) rawObject.sendToService("add", params));

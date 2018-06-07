@@ -24,39 +24,41 @@ public class Communicator {
 	public Object sendToNs(String servantSocket, String nsName, String command) {
 		try {
 			Socket socketToNS = new Socket(this.host, this.port);
-			BufferedReader is = new BufferedReader(new InputStreamReader(socketToNS.getInputStream()));
-			BufferedWriter os = new BufferedWriter(new OutputStreamWriter(socketToNS.getOutputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(socketToNS.getInputStream()));
+			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socketToNS.getOutputStream()));
+			
 			switch (command) {
 			case "rebind":
 				System.out.println("rebind anfrage versendet");
 
-				os.write("rebind(" +
+				out.write("rebind(" +
 							"String " +
 								servantSocket + 
 							",String " +
 								nsName +
-						")");
+						")\n");
 				//os.write(serviceServer.getServerSocket().getInetAddress().getHostAddress() + "|"
 				//		+ serviceServer.getServerSocket().getLocalPort() + "|" + nsName + "|" + command);
-				os.flush();
-				is.close();
-				os.close();
+				out.flush();
+				in.close();
+				out.close();
 				break;
 			case "resolve":
-				System.out.println("resolve anfrage versendet");
-
-				os.write("resolve(" + 
+				out.write("resolve(" + 
 							"String " + nsName + 
-						")");
+						")\n");
 				//os.write("null" + "|" + "null" + "|" + nsName + "|" + command + "\n");
-				os.flush();
-				String answerFromNS = is.readLine();
-				String nsAnswerSplited[] = answerFromNS.split("\\|");
+				out.flush();
+				System.out.println("send (to: " + socketToNS.getInetAddress() +":"+socketToNS.getPort() + "):   -- resolve(" + "String " + nsName + ")");
+				System.out.println(socketToNS.getInetAddress() + ":" + socketToNS.getPort());
+				
+				String answerFromNS = in.readLine();
+				String nsAnswerSplited[] = answerFromNS.split(":");
 				System.out.println("entferntes Object erhalten: " + answerFromNS);
 				Communicator retObject = new Communicator(nsAnswerSplited[0], new Integer(nsAnswerSplited[1]), this.debug);
 
-				is.close();
-				os.close();
+				in.close();
+				out.close();
 				socketToNS.close();
 				return retObject;
 			}
@@ -79,7 +81,7 @@ public class Communicator {
 			System.out.println("Anfrage an Service gesendet	");
 			os.write(methodeName + "(" + 
 						params + 
-					")");
+					")\n");
 			//os.write(methodeName + "|" + params + "\n");
 			os.flush();
 

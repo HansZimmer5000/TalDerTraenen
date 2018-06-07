@@ -9,7 +9,7 @@ public class Client {
 
 	public static void main(String[] args) throws IOException  {
 
-		ObjectBroker objBroker = ObjectBroker.init("localhost", 55555, false);
+		ObjectBroker objBroker = ObjectBroker.init("", 55555, false);
 		mware_lib.INameService nameSvc = objBroker.getNameService();
 
 		System.out.println("NS-Referenz erhalten!");

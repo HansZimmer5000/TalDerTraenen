@@ -9,10 +9,16 @@ public class SkeletonServer extends Thread {
 	private final int PORT_START = 50000;
 	private Object servant;
 
+	public SkeletonServer(Object servant, ServerSocket ss){
+		this.servant = servant;
+		this.ss = ss;
+		System.out.println("Service Server wurde gestartet: " + this.ss.getInetAddress() + ":" + this.ss.getLocalPort());
+	}
+	
 	public SkeletonServer(Object servant) {
 		this.servant = servant; 
 		ss = getServerWithAviablePort(PORT_START);
-		System.out.println("Service Server wurde gestartet");
+		System.out.println("Service Server wurde gestartet: " + this.ss.getInetAddress() + ":" + this.ss.getLocalPort());
 	}
 
 	@Override
@@ -20,11 +26,17 @@ public class SkeletonServer extends Thread {
 		while (!this.isInterrupted()) {
 			try {
 				new SkeletonThread(ss.accept(), this.servant).start();
-				System.out.println("Got new Connection / Request!");
+				System.out.println("Got new Connection / Request! " + this.servant.getClass());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		try {
+			this.ss.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -32,7 +44,6 @@ public class SkeletonServer extends Thread {
 		try {
 			return new ServerSocket(port);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			return getServerWithAviablePort(port + 1);
 		}
 	}
