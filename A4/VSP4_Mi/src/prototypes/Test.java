@@ -14,9 +14,17 @@ import java.net.UnknownHostException;
 public class Test {
 
 	public static void main(String[] args) throws Exception {
-		testHowToGetTCPConnection();
+		stringsplittest();
 	}
 	
+	public static void stringsplittest(){
+		String testString = "rebind(String a, int b)";
+		System.out.println(testString.split("\\(")[1]);
+	}
+	
+	public static void intIntegerTest(Integer value1, int value2){
+		System.out.println(value1 + value2);
+	}
 	
 	public static void testHowToGetTCPConnection() throws UnknownHostException, IOException{
 		GenSocketClass server = new GenSocketClass(null, 15000, true);
@@ -61,8 +69,6 @@ public class Test {
 			}
 		}
 	}
-	
-	
 	
 	
 	public static void testIfObjectIsCallableAfterStartingItInAThread() throws InterruptedException{

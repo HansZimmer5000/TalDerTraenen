@@ -20,6 +20,7 @@ public class SkeletonServer extends Thread {
 		while (!this.isInterrupted()) {
 			try {
 				new SkeletonThread(ss.accept(), this.servant).start();
+				System.out.println("Got new Connection / Request!");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

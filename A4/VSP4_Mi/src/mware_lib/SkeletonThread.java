@@ -31,8 +31,9 @@ public class SkeletonThread extends Thread {
 		while (!this.isInterrupted()) {
 			try {
 				msgFromClient = in.readLine();
+				System.out.println("Got New Message from Client! " + msgFromClient);
 				if (msgFromClient != null) {
-					System.out.println("Nachricht vom Client erhalten: " + msgFromClient);
+
 					String[] splitedMsg = msgFromClient.split("\\|");
 					Object[] paramsRaw = splitedMsg[1].replaceAll(" ", "").split("\\,");
 					Object[] params = new Object[paramsRaw.length];

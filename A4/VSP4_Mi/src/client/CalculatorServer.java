@@ -10,7 +10,7 @@ public class CalculatorServer implements _CalculatorImplBase {
 		super();
 	}
 
-	public double add(double a, double b) {
+	public int add(int a, int b) {
 		return a + b;
 	}
 
@@ -19,7 +19,17 @@ public class CalculatorServer implements _CalculatorImplBase {
 	
 		ObjectBroker objBroker = ObjectBroker.init("", 55555, false);
 		NameService nameSvc = objBroker.getNameService();
-		nameSvc.rebind(new CalculatorServer(), "zumsel");
+		CalculatorServer calculatorServer = new CalculatorServer();
+		
+		SkeletonServer serviceServer = new SkeletonServer(calculatorServer);
+		serviceServer.start();
+
+
+		String calculatorServerSocket = 
+				serviceServer.getServerSocket().getInetAddress().getHostAddress()+":"+
+				serviceServer.getServerSocket().getLocalPort();
+		
+		nameSvc.rebind(calculatorServerSocket, "zumsel");
 		objBroker.shutDown();
 		System.out.println("Service wurde angemeldet");
 	}

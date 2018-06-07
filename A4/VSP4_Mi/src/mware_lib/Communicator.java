@@ -21,7 +21,7 @@ public class Communicator {
 		this.debug = debug;
 	}
 
-	public Object sendToNs(Object servant, String nsName, String command) {
+	public Object sendToNs(String servantSocket, String nsName, String command) {
 		try {
 			Socket socketToNS = new Socket(this.host, this.port);
 			BufferedReader is = new BufferedReader(new InputStreamReader(socketToNS.getInputStream()));
@@ -29,21 +29,26 @@ public class Communicator {
 			switch (command) {
 			case "rebind":
 				System.out.println("rebind anfrage versendet");
-				serviceServer = new SkeletonServer(servant);
-				serviceServer.start();
 
-				// TODO:: Protokoll definieren Host | Port | NsName | Command(rebind)
-				os.write(serviceServer.getServerSocket().getInetAddress().getHostAddress() + "|"
-						+ serviceServer.getServerSocket().getLocalPort() + "|" + nsName + "|" + command);
+				os.write("rebind(" +
+							"String " +
+								servantSocket + 
+							",String " +
+								nsName +
+						")");
+				//os.write(serviceServer.getServerSocket().getInetAddress().getHostAddress() + "|"
+				//		+ serviceServer.getServerSocket().getLocalPort() + "|" + nsName + "|" + command);
 				os.flush();
 				is.close();
 				os.close();
-				socketToNS.close();
-				return null;
+				break;
 			case "resolve":
 				System.out.println("resolve anfrage versendet");
-				// TODO:: Protokoll definieren null | null | NsName | Command(resolve)
-				os.write("null" + "|" + "null" + "|" + nsName + "|" + command + "\n");
+
+				os.write("resolve(" + 
+							"String " + nsName + 
+						")");
+				//os.write("null" + "|" + "null" + "|" + nsName + "|" + command + "\n");
 				os.flush();
 				String answerFromNS = is.readLine();
 				String nsAnswerSplited[] = answerFromNS.split("\\|");
@@ -55,12 +60,14 @@ public class Communicator {
 				socketToNS.close();
 				return retObject;
 			}
+			socketToNS.close();
+			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return 1;
+		return null;
 	}
 
 	public Object sendToService(String methodeName, String params) {
@@ -70,7 +77,10 @@ public class Communicator {
 			BufferedWriter os = new BufferedWriter(new OutputStreamWriter(socketToService.getOutputStream()));
 
 			System.out.println("Anfrage an Service gesendet	");
-			os.write(methodeName + "|" + params + "\n");
+			os.write(methodeName + "(" + 
+						params + 
+					")");
+			//os.write(methodeName + "|" + params + "\n");
 			os.flush();
 
 			System.out.println("Warte auf Antwort");

@@ -9,11 +9,10 @@ public class NameService implements INameService {
 		this.debug = debug;
 		this.conNS = con;
 	}
-	//TODO:: ENUMS verwenden
-	
+
 	@Override
-	public void rebind(Object servant, String name) {
-		conNS.sendToNs(servant, name, "rebind");
+	public void rebind(String servantSocket, String name) {
+		conNS.sendToNs(servantSocket, name, "rebind");
 		return;
 	}
 

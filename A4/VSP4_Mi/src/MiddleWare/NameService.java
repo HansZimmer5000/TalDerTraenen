@@ -7,11 +7,11 @@ import mware_lib.*;
 
 public class NameService implements INameService{
 	
-	Map<String, Object> services = new HashMap<String, Object>();
+	Map<String, String> services = new HashMap<String, String>();
 		
 	@Override
-	public synchronized void rebind(Object servant, String name) {
-		services.put(name, servant);
+	public synchronized void rebind(String servantSocket, String name) {
+		services.put(name, servantSocket);
 		System.out.println(name+ " wurde im NS registriert");
 		
 	}
@@ -20,5 +20,4 @@ public class NameService implements INameService{
 	public synchronized Object resolve(String name) {
 		return services.get(name);
 	}
-
 }

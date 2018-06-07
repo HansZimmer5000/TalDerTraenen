@@ -23,7 +23,7 @@ public class MiddleWare extends Thread {
 					"Server wurde gestartet und hört auf: " + nsServer.getInetAddress() + ":" + nsServer.getLocalPort());
 
 			while (online) {
-				new MiddleWareSkeleton(nsServer.accept(), nameService).start();
+				new SkeletonThread(nsServer.accept(), nameService).start();
 			}
 
 			nsServer.close();
