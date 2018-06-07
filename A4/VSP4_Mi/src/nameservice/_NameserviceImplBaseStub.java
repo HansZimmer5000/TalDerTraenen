@@ -1,13 +1,13 @@
-package mware_lib;
+package nameservice;
 
-public class NameService implements INameService {
+import mware_lib.Communicator;
 
-	private boolean debug;
+public class _NameserviceImplBaseStub implements _NameserviceImplBase {
+
 	private Communicator conNS;
 
-	public NameService(Communicator con, boolean debug) {
-		this.debug = debug;
-		this.conNS = con;
+	public _NameserviceImplBaseStub(Object con) {
+		this.conNS = (Communicator) con;
 	}
 
 	@Override

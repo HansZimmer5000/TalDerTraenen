@@ -1,8 +1,10 @@
-package client;
+package starter;
 
 import java.io.IOException;
+
+import calculator.*;
 import mware_lib.*;
-import math_ops.*;
+import nameservice._NameserviceImplBaseStub;
 
 public class CalculatorServer implements _CalculatorImplBase {
 	
@@ -18,7 +20,7 @@ public class CalculatorServer implements _CalculatorImplBase {
 
 	
 		ObjectBroker objBroker = ObjectBroker.init("", 55555, false);
-		NameService nameSvc = objBroker.getNameService();
+		_NameserviceImplBaseStub nameSvc = objBroker.getNameService();
 		CalculatorServer calculatorServer = new CalculatorServer();
 		
 		SkeletonServer serviceServer = new SkeletonServer(calculatorServer);

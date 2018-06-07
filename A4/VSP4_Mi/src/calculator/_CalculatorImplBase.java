@@ -1,4 +1,4 @@
-package math_ops;
+package calculator;
 
 public interface _CalculatorImplBase{
 
@@ -6,7 +6,6 @@ public interface _CalculatorImplBase{
 	
 	public static _CalculatorImplBase narrowCast(Object rawObjectRef){
 		return new _CalculatorImplBaseStub(rawObjectRef);
-		
 	}
 
 }

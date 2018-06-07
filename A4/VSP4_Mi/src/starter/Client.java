@@ -1,17 +1,17 @@
-package client;
+package starter;
 
 import java.io.IOException;
 
-import math_ops._CalculatorImplBase;
-import mware_lib.INameService;
+import calculator._CalculatorImplBase;
 import mware_lib.ObjectBroker;
+import nameservice._NameserviceImplBase;
 
 public class Client {
 
 	public static void main(String[] args) throws IOException  {
 
 		ObjectBroker objBroker = ObjectBroker.init("localhost", 55555, false);
-		INameService nameSvc = objBroker.getNameService();
+		_NameserviceImplBase nameSvc = objBroker.getNameService();
 
 		System.out.println("NS-Referenz erhalten!");
 		Object rawObjRef = nameSvc.resolve("zumsel");

@@ -2,14 +2,16 @@ package mware_lib;
 
 import java.io.IOException;
 
+import nameservice._NameserviceImplBaseStub;
+
 public class ObjectBroker {
 
 	private boolean debug;
-	private NameService ns;
+	private _NameserviceImplBaseStub ns;
 
 	public ObjectBroker(String host, int port, boolean debug) throws IOException {
 		Communicator con = new Communicator(host, port, debug);
-		ns = new NameService(con, debug);
+		ns = new _NameserviceImplBaseStub(con);
 		this.debug = debug;
 	}
 
@@ -18,7 +20,7 @@ public class ObjectBroker {
 	}
 
 	// Liefert den Namensdienst (Stellvetreterobjekt).
-	public NameService getNameService() {
+	public _NameserviceImplBaseStub getNameService() {
 		return this.ns;
 	}
 
