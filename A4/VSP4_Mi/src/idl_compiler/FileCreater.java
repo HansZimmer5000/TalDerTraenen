@@ -75,13 +75,18 @@ public class FileCreater {
 		String currentMethodLine;
 		MethodData[] methods = this.toCompilingClass.getMethods();
 		for(MethodData currentMethod : methods) {
+			
+			System.out.println("Compiling: " + this.toCompilingClass.getClassName() + "/" +  currentMethod.getName());
+
+			
 			String returnType = IDLCompiler.getSupportedJavaDataTypeName(currentMethod.getReturnType());
 			String methodName = currentMethod.getName();
 			String params = compileParams(currentMethod.getParamTypes());
 			currentMethodLine = createMethodLine("abstract", returnType, methodName, params);
 			methodLines.add(currentMethodLine);
 		}
-		currentMethodLine = createMethodLine("static", this.className, "narrowCast", "Object rawObjectReference", "{...}");
+		String narrowCastBody = createNarrowCastBody();
+		currentMethodLine = createMethodLine("static", this.className, "narrowCast", "Object rawObjectReference", narrowCastBody);
 		methodLines.add(currentMethodLine);
 		
 		return methodLines;
@@ -114,5 +119,10 @@ public class FileCreater {
 
 	private String createParamName(int charNumber) {
 		return Character.toString((char) charNumber);
+	}
+	
+	private String createNarrowCastBody() {
+		String emptyBody =  "{...}";
+		return "{ return new " + this.className + "Stub(rawObjectReference);}";
 	}
 }

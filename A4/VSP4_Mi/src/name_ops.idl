@@ -1,0 +1,6 @@
+module name_ops {
+class Name {
+void rebind(string a, string b);
+object resolve(string a);
+};
+};

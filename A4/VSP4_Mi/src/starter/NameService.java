@@ -8,7 +8,7 @@ import java.util.Map;
 import mware_lib.*;
 import name_ops._NameImplBase;
 
-public class NameService implements _NameImplBase{
+public class NameService extends _NameImplBase{
 	
 	Map<String, String> services = new HashMap<String, String>();
 		

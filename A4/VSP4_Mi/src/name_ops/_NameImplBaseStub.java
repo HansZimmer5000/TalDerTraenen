@@ -2,7 +2,7 @@ package name_ops;
 
 import mware_lib.SocketCommunicator;
 
-public class _NameImplBaseStub implements _NameImplBase {
+public class _NameImplBaseStub extends _NameImplBase {
 
 	private SocketCommunicator conNS;
 
@@ -10,12 +10,10 @@ public class _NameImplBaseStub implements _NameImplBase {
 		this.conNS = (SocketCommunicator) con;
 	}
 
-	@Override
 	public void rebind(String servantSocket, String name) {
 		conNS.sendToService("rebind", "String " + servantSocket + ",String " + name);
 	}
 
-	@Override
 	public Object resolve(String name) {
 		String socketString = conNS.sendToService("resolve", "String " + name);
 		

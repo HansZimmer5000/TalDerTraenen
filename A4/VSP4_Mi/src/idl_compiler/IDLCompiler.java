@@ -14,10 +14,14 @@ public class IDLCompiler {
 	public static final String IDL_KEYWORD_INT = "int";
 	public static final String IDL_KEYWORD_DOUBLE = "double";
 	public static final String IDL_KEYWORD_STRING = "string";
+	public static final String IDL_KEYWORD_VOID = "void";
+	public static final String IDL_KEYWORD_OBJECT = "object";
+	
 	public static final String JAVA_INT = "int";
 	public static final String JAVA_DOUBLE = "double";
 	public static final String JAVA_STRING = "String";
-		
+	public static final String JAVA_VOID = "void";
+	public static final String JAVA_OBJECT = "Object";
 	
 	// Supported data types
 	/**
@@ -36,7 +40,9 @@ public class IDLCompiler {
 		 * @uml.property  name="sTRING"
 		 * @uml.associationEnd  
 		 */
-		STRING
+		STRING,
+		VOID,
+		OBJECT
 	}
 	
 	/**
@@ -50,6 +56,8 @@ public class IDLCompiler {
 		case INT: return IDL_KEYWORD_INT;
 		case DOUBLE: return IDL_KEYWORD_DOUBLE;
 		case STRING: return IDL_KEYWORD_STRING;
+		case VOID: return IDL_KEYWORD_VOID;
+		case OBJECT: return IDL_KEYWORD_OBJECT;
 		default: return null;
 		}
 	}
@@ -65,6 +73,8 @@ public class IDLCompiler {
 		case INT: return JAVA_INT;
 		case DOUBLE: return JAVA_DOUBLE;
 		case STRING: return JAVA_STRING;
+		case VOID: return JAVA_VOID;
+		case OBJECT: return JAVA_OBJECT;
 		default: return null;
 		}
 	}
@@ -78,6 +88,8 @@ public class IDLCompiler {
 		if (keyword.equals(IDL_KEYWORD_DOUBLE)) return SupportedDataTypes.DOUBLE;
 		else if (keyword.equals(IDL_KEYWORD_INT)) return SupportedDataTypes.INT;
 		else if (keyword.equals(IDL_KEYWORD_STRING)) return SupportedDataTypes.STRING;
+		else if (keyword.equals(IDL_KEYWORD_VOID)) return SupportedDataTypes.VOID;
+		else if (keyword.equals(IDL_KEYWORD_OBJECT)) return SupportedDataTypes.OBJECT;
 		else return null;
 	}
 
