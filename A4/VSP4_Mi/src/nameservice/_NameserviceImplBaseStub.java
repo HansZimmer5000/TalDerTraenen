@@ -12,13 +12,19 @@ public class _NameserviceImplBaseStub implements _NameserviceImplBase {
 
 	@Override
 	public void rebind(String servantSocket, String name) {
-		conNS.sendToNs(servantSocket, name, "rebind");
+		conNS.sendToService("rebind", "String " + servantSocket + ",String " + name);
 	}
 
 	@Override
 	public Object resolve(String name) {
-		Object ret = conNS.sendToNs(null, name, "resolve");
-		return ret;
+		String socketString = conNS.sendToService("resolve", "String " + name);
+		
+		String[] splitSocketString = socketString.split(":");
+		String host = splitSocketString[0];
+		int port = Integer.valueOf(splitSocketString[1]);
+		
+		Communicator connectionToService = new Communicator(host, port);
+		return connectionToService;
 	}
 
 }
