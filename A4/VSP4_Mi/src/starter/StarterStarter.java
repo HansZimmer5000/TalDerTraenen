@@ -4,7 +4,7 @@ public class StarterStarter {
 
 	public static void main(String[] args) {
 		try {
-			new Thread(new NameserviceServerMainThread()).start();
+			new Thread(new NameServiceServerMainThread()).start();
 			Thread.sleep(1000);
 			new Thread(new CalculatorServerMainThread()).start();
 			Thread.sleep(1000);
@@ -25,11 +25,11 @@ public class StarterStarter {
 		}
 	}
 	
-	private static class NameserviceServerMainThread implements Runnable {
+	private static class NameServiceServerMainThread implements Runnable {
 		@Override
 		public void run() {
 			try {
-				Nameservice.main(null);
+				NameService.main(null);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

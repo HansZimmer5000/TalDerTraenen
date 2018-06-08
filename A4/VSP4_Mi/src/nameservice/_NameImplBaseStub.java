@@ -2,11 +2,11 @@ package nameservice;
 
 import mware_lib.SocketCommunicator;
 
-public class _NameserviceImplBaseStub implements _NameserviceImplBase {
+public class _NameImplBaseStub implements _NameImplBase {
 
 	private SocketCommunicator conNS;
 
-	public _NameserviceImplBaseStub(Object con) {
+	public _NameImplBaseStub(Object con) {
 		this.conNS = (SocketCommunicator) con;
 	}
 

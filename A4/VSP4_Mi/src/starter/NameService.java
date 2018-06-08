@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mware_lib.*;
-import nameservice._NameserviceImplBase;
+import nameservice._NameImplBase;
 
-public class Nameservice implements _NameserviceImplBase{
+public class NameService implements _NameImplBase{
 	
 	Map<String, String> services = new HashMap<String, String>();
 		
@@ -28,13 +28,13 @@ public class Nameservice implements _NameserviceImplBase{
 		int port = 55555;
 
 		ObjectBroker objBroker = new ObjectBroker(false);
-		Nameservice nameservice = new Nameservice();
+		NameService nameservice = new NameService();
 		
-		ServerSocket nameserviceServerSocket = new ServerSocket(port);
-		String nameserviceServerSocketString = objBroker.startNewService(nameservice, nameserviceServerSocket);
-		System.out.println("Server wurde gestartet und hoert auf: " + nameserviceServerSocketString);
+		ServerSocket nameServiceServerSocket = new ServerSocket(port);
+		String nameServiceServerSocketString = objBroker.startNewService(nameservice, nameServiceServerSocket);
+		System.out.println("Server wurde gestartet und hoert auf: " + nameServiceServerSocketString);
 		
-		objBroker.registerNewService("nameservice", nameserviceServerSocketString);
+		objBroker.registerNewService("nameservice", nameServiceServerSocketString);
 		System.out.println("Service wurde angemeldet");
 		
 		objBroker.shutDown();

@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import calculator.*;
 import mware_lib.*;
-import nameservice._NameserviceImplBase;
-import nameservice._NameserviceImplBaseStub;
+import nameservice._NameImplBase;
+import nameservice._NameImplBaseStub;
 
 public class CalculatorService implements _CalculatorImplBase {
 	
@@ -21,7 +21,7 @@ public class CalculatorService implements _CalculatorImplBase {
 		ObjectBroker objBroker = new ObjectBroker(false);
 		
 		SocketCommunicator nameserviceCommunicator = new SocketCommunicator("", 55555);
-		_NameserviceImplBase nameserviceClient = _NameserviceImplBase.narrowCast(nameserviceCommunicator);
+		_NameImplBase nameserviceClient = _NameImplBase.narrowCast(nameserviceCommunicator);
 		
 		CalculatorService calculatorServer = new CalculatorService();
 		
