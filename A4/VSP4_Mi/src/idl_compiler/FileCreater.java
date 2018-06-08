@@ -27,7 +27,10 @@ public class FileCreater {
 	}
 	
 	public void writeFile() {
-		Path file = Paths.get(this.fileName);
+		Path path = Paths.get("");
+		path.resolve("src/" + this.moduleName).toFile().mkdirs();
+		
+		Path file = Paths.get("src/" + this.moduleName + "/" + this.fileName);
 		try {
 			Files.write(file, this.linesToWrite, Charset.forName("UTF-8"));
 		} catch (IOException e) {
@@ -45,7 +48,7 @@ public class FileCreater {
 	}
 
 	private String createPackageLine() {
-		return "package " + this.moduleName;
+		return "package " + this.moduleName + ";";
 	}
 	
 	private ArrayList<String> createClassLines() {
@@ -72,7 +75,6 @@ public class FileCreater {
 		String currentMethodLine;
 		MethodData[] methods = this.toCompilingClass.getMethods();
 		for(MethodData currentMethod : methods) {
-			
 			String returnType = IDLCompiler.getSupportedJavaDataTypeName(currentMethod.getReturnType());
 			String methodName = currentMethod.getName();
 			String params = compileParams(currentMethod.getParamTypes());
@@ -95,6 +97,8 @@ public class FileCreater {
 	}
 	
 	private String compileParams(SupportedDataTypes[] paramTypes) {
+		int startCharNumber = 97;
+		int charNumber = startCharNumber;
 		String paramString = "";
 		String currentCompiledDataTypeString;
 		for(SupportedDataTypes currentDataType : paramTypes) {
@@ -102,20 +106,13 @@ public class FileCreater {
 				paramString += ", ";
 			}
 			currentCompiledDataTypeString = IDLCompiler.getSupportedJavaDataTypeName(currentDataType);
-			paramString += currentCompiledDataTypeString + " " + createParamName(currentCompiledDataTypeString);
+			paramString += currentCompiledDataTypeString + " " + createParamName(charNumber);
+			charNumber = charNumber + 1;
 		}
 		return paramString;
 	}
 
-	private String createParamName(String string) {
-		String restString = string.substring(1, string.length());
-		String firstChar = string.substring(0,1);
-		String firstCharLittle = firstChar.toLowerCase();
-		if(firstChar.equals(firstCharLittle)) {
-			return "_" + string;
-		} else {
-			return firstCharLittle + restString;
-		}
-		
+	private String createParamName(int charNumber) {
+		return Character.toString((char) charNumber);
 	}
 }

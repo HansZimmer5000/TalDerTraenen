@@ -1,6 +1,5 @@
 module math_ops {
 class Calculator {
-double add(int a, int b);
-string getStr(double a);
+int add(int a, int b);
 };
 };

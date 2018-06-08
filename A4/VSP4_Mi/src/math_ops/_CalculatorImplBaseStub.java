@@ -2,7 +2,7 @@ package math_ops;
 
 import mware_lib.SocketCommunicator;
 
-public class _CalculatorImplBaseStub implements _CalculatorImplBase {
+public class _CalculatorImplBaseStub extends _CalculatorImplBase {
 
 	private SocketCommunicator rawObject;
 

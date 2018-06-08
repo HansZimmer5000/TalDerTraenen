@@ -7,7 +7,7 @@ import mware_lib.*;
 import name_ops._NameImplBase;
 import name_ops._NameImplBaseStub;
 
-public class CalculatorService implements _CalculatorImplBase {
+public class CalculatorService extends _CalculatorImplBase {
 	
 	protected CalculatorService() {
 		super();
