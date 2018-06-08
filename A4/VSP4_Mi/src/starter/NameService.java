@@ -27,7 +27,7 @@ public class NameService extends _NameImplBase{
 	public static void main(String[] args) throws IOException{
 		int port = 15000;
 
-		ObjectBroker objBroker = new ObjectBroker(false);
+		ObjectBroker objBroker = new ObjectBroker();
 		NameService nameservice = new NameService();
 		
 		ServerSocket nameServiceServerSocket = new ServerSocket(port);

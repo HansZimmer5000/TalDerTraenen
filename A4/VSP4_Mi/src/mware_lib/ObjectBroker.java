@@ -7,11 +7,9 @@ import java.util.Map;
 
 public class ObjectBroker {
 
-	private boolean debug;
 	private Map<String, String> registeredServices = new HashMap<String, String>();
 
-	public ObjectBroker(boolean debug) throws IOException {
-		this.debug = debug;
+	public ObjectBroker() {
 	}
 
 	public void startAndRegisterNewService(String serviceName, Object service) {

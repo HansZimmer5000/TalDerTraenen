@@ -11,7 +11,7 @@ public class CalculatorClient {
 
 	public static void main(String[] args) throws IOException  {
 
-		ObjectBroker objBroker = new ObjectBroker(false);
+		ObjectBroker objBroker = new ObjectBroker();
 		
 		SocketCommunicator nameserviceCommunicator = new SocketCommunicator("", 15000);
 		_NameImplBase nameserviceClient = _NameImplBase.narrowCast(nameserviceCommunicator);
