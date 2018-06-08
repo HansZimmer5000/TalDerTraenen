@@ -2,53 +2,60 @@ package mware_lib;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 public class SkeletonServer extends Thread {
 
-	private ServerSocket ss;
-	private final int PORT_START = 50000;
+	private final static int PORT_START = 15001;
+	private ServerSocket serverSocket;
 	private Object servant;
 
-	public SkeletonServer(Object servant, ServerSocket ss){
-		this.servant = servant;
-		this.ss = ss;
-		System.out.println("Service Server wurde gestartet: " + this.ss.getInetAddress() + ":" + this.ss.getLocalPort());
+	public static SkeletonServer init(Object servant, ServerSocket serverSocket) {
+		return new SkeletonServer(servant, serverSocket);
 	}
-	
-	public SkeletonServer(Object servant) {
-		this.servant = servant; 
-		ss = getServerWithAviablePort(PORT_START);
-		System.out.println("Service Server wurde gestartet: " + this.ss.getInetAddress() + ":" + this.ss.getLocalPort());
+
+	public static SkeletonServer init(Object servant) {
+		ServerSocket serverSocket = createServerSocketWithNextAvailablePort(PORT_START);
+		return init(servant, serverSocket);
+	}
+
+	private SkeletonServer(Object servant, ServerSocket serverSocket) {
+		this.servant = servant;
+		this.serverSocket = serverSocket;
+		System.out.println("Service Server wurde gestartet: " + this.serverSocket.getInetAddress() + ":"
+				+ this.serverSocket.getLocalPort());
 	}
 
 	@Override
 	public void run() {
+		Socket newClientSocket;
 		while (!this.isInterrupted()) {
 			try {
+				newClientSocket = serverSocket.accept();
 				System.out.println("Got new Connection / Request!");
-				new SkeletonThread(ss.accept(), this.servant).start();
+				new SkeletonThread(newClientSocket, this.servant).start();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		try {
-			this.ss.close();
+			//TODO: How to close all sockets?
+			this.serverSocket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	private ServerSocket getServerWithAviablePort(int port) {
+	private static ServerSocket createServerSocketWithNextAvailablePort(int port) {
 		try {
 			return new ServerSocket(port);
 		} catch (IOException e) {
-			return getServerWithAviablePort(port + 1);
+			return createServerSocketWithNextAvailablePort(port + 1);
 		}
 	}
-
-	public ServerSocket getServerSocket() {
-		return ss;
+	
+	public String getServerSocketAsString() {
+		return this.serverSocket.getInetAddress().getHostAddress() + 
+				":" + this.serverSocket.getLocalPort();
 	}
 }

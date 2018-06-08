@@ -19,45 +19,59 @@ public class SkeletonThread extends Thread {
 
 	public SkeletonThread(Socket clientSocket, Object servant) throws IOException {
 		this.cSocket = clientSocket;
+		this.in = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
+		this.out = new BufferedWriter(new OutputStreamWriter(cSocket.getOutputStream()));
 		this.servant = servant;
-		System.out.println("Client hat sich angemeldet " + servant.getClass().getPackage());
 	}
 
 	@Override
 	public void run() {
-		String msgFromClient;
+		String incomingMessage;
 		while (!this.isInterrupted()) {
 			try {
-				this.in = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
-				this.out = new BufferedWriter(new OutputStreamWriter(cSocket.getOutputStream()));
 				System.out.println("Waiting for input");
 
-				msgFromClient = in.readLine();
-				if (msgFromClient != null) {
-					System.out.println("Nachricht vom Client erhalten: " + msgFromClient);
-
-					try {
-						// Oder mit Reflection (oder ohne) in Server Klasse
-						Message message = new Message(msgFromClient);
-
-						System.out.println("Reflecting: " + servant.getClass() + " " + message.getMethodName());
-						Method method = servant.getClass().getMethod(message.getMethodName(), message.getParameterClasses());
-						Object returnValue = method.invoke(servant, message.getParameterValues());
-						out.write(returnValue + "\n");
-						out.flush();
-
-					} catch (NoSuchMethodException | SecurityException | IllegalAccessException
-							| IllegalArgumentException | InvocationTargetException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
+				incomingMessage = in.readLine();
+				if (incomingMessage != null) {
+					executeInput(incomingMessage);
 				}
-
+				;
 			} catch (IOException e) {
 				System.out.println(cSocket.getInetAddress() + " disconected!");
 			}
 		}
-		System.out.println("Done");
+	}
+
+	private void executeInput(String msgFromClient) {
+		System.out.println("Nachricht vom Client erhalten: " + msgFromClient);
+
+		try {
+			// TODO Oder mit Reflection (oder ohne) in Server Klasse (dann mit Verwendung
+			// von einem Service Interface)
+			Message message = new Message(msgFromClient);
+			Object returnValue = reflectAndInvokeMethod(servant.getClass(), message);
+
+			this.out.write(returnValue + "\n");
+			this.out.flush();
+		} catch (SecurityException | IllegalArgumentException | IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private Object reflectAndInvokeMethod(Class<?> reflectedClass, Message message) {
+		Object returnValue = null;
+		String methodName = message.getMethodName();
+		Class<?>[] parameterClasses = message.getParameterClasses();
+		Object[] parameterValues = message.getParameterValues();
+
+		try {
+			Method method = reflectedClass.getMethod(methodName, parameterClasses);
+			returnValue = method.invoke(servant, parameterValues);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
+			e.printStackTrace();
+		}
+		return returnValue;
 	}
 }

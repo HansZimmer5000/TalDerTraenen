@@ -21,7 +21,6 @@ public class Message {
 			
 			Class<?>[] paramaterClasses = new Class<?>[parameter.length];
 			Object[] parameterValues = new Object[parameter.length];
-			Object[] classesAndValues = new Object[2];
 
 			String currentParameter, currentParameterClassString, currentParameterValueString;
 			Class<?> currentParameterClass;
@@ -71,32 +70,4 @@ public class Message {
 	public Class<?>[] getParameterClasses(){
 		return this.parameterClasses;
 	};
-
-	private static void printMessage(Message message){
-		printAllArrayElements(message.getParameterClasses());
-		printAllArrayElements(message.getParameterValues());
-	}
-	
-	private static void printAllArrayElements(Object[] arr){
-		for(int i = 0; i < arr.length ; i++){
-			System.out.print("," + arr[i]);
-		}
-		System.out.println("");
-	}
-	
-	public static void main(String[] args) {
-		Message currentMessage;
-
-		System.out.println("--1");
-		currentMessage = new Message("rebind()");
-		printMessage(currentMessage);
-
-		System.out.println("--2");
-		currentMessage =  new Message("rebind(String a)");
-		printMessage(currentMessage);
-		
-		System.out.println("--3");
-		currentMessage =  new Message("rebind(String a,String b)");
-		printMessage(currentMessage);
-	}
 }

@@ -11,35 +11,31 @@ import java.net.UnknownHostException;
 public class SocketCommunicator {
 
 	private Socket socketToService;
+	private BufferedReader in;
+	private BufferedWriter out;
 
 	public SocketCommunicator(String host, int port) {
 		try {
 			this.socketToService = new Socket(host, port);
+			this.in = new BufferedReader(new InputStreamReader(socketToService.getInputStream()));
+			this.out = new BufferedWriter(new OutputStreamWriter(socketToService.getOutputStream()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public String sendToService(String methodeName, String params) {
+		// TODO: Close Sockets at some point!
+		String result = null;
 		try {
-			BufferedReader is = new BufferedReader(new InputStreamReader(socketToService.getInputStream()));
-			BufferedWriter os = new BufferedWriter(new OutputStreamWriter(socketToService.getOutputStream()));
-
-			os.write(methodeName + "(" + 
-						params + 
-					")\n");
-			os.flush();
+			this.out.write(methodeName + "(" + params + ")\n");
+			this.out.flush();
 
 			System.out.println("Warte auf Antwort");
-			String msgFromNS = is.readLine();
-			
-			//TODO: Close Sockets at some point!
-			return msgFromNS;
-
+			result = this.in.readLine();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return result;
 	}
 }

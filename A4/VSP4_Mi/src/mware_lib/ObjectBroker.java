@@ -22,22 +22,19 @@ public class ObjectBroker {
 	}
 	
 	public String startNewService(Object service, ServerSocket serverSocket) {
-		SkeletonServer serviceServer = new SkeletonServer(service, serverSocket);
-		serviceServer.start();
-
-		String serverSocketString = 
-				serviceServer.getServerSocket().getInetAddress().getHostAddress() + 
-				":" + serviceServer.getServerSocket().getLocalPort();
-		return serverSocketString;
+		SkeletonServer serviceServer = SkeletonServer.init(service, serverSocket);
+		return startNewService(serviceServer);
 	}
 	
 	public String startNewService(Object service) {
-		SkeletonServer serviceServer = new SkeletonServer(service);
+		SkeletonServer serviceServer = SkeletonServer.init(service);
+		return startNewService(serviceServer);
+	}
+	
+	private String startNewService(SkeletonServer serviceServer) {
 		serviceServer.start();
-
-		String serverSocketString = 
-				serviceServer.getServerSocket().getInetAddress().getHostAddress() + 
-				":" + serviceServer.getServerSocket().getLocalPort();
+		
+		String serverSocketString = serviceServer.getServerSocketAsString();
 		return serverSocketString;
 	}
 	

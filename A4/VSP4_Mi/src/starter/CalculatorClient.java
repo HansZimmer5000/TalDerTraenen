@@ -13,7 +13,7 @@ public class CalculatorClient {
 
 		ObjectBroker objBroker = new ObjectBroker(false);
 		
-		SocketCommunicator nameserviceCommunicator = new SocketCommunicator("", 55555);
+		SocketCommunicator nameserviceCommunicator = new SocketCommunicator("", 15000);
 		_NameImplBase nameserviceClient = _NameImplBase.narrowCast(nameserviceCommunicator);
 		
 		Object rawObjRef = objBroker.getService("calculator");
