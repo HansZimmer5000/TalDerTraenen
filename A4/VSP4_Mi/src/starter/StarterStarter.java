@@ -18,7 +18,7 @@ public class StarterStarter {
 		@Override
 		public void run() {
 			try {
-				CalculatorServer.main(null);
+				CalculatorService.main(null);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -29,7 +29,7 @@ public class StarterStarter {
 		@Override
 		public void run() {
 			try {
-				NameserviceServer.main(null);
+				Nameservice.main(null);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -12,13 +12,11 @@ public class Communicator {
 
 	private String host;
 	private int port;
-	private Boolean debug;
 	private SkeletonServer serviceServer;
 
-	public Communicator(String host, int port, Boolean debug) {
+	public Communicator(String host, int port) {
 		this.host = host;
 		this.port = port;
-		this.debug = debug;
 	}
 
 	public Object sendToNs(String servantSocket, String nsName, String command) {
@@ -55,7 +53,7 @@ public class Communicator {
 				String answerFromNS = in.readLine();
 				String nsAnswerSplited[] = answerFromNS.split(":");
 				System.out.println("entferntes Object erhalten: " + answerFromNS);
-				Communicator retObject = new Communicator(nsAnswerSplited[0], new Integer(nsAnswerSplited[1]), this.debug);
+				Communicator retObject = new Communicator(nsAnswerSplited[0], new Integer(nsAnswerSplited[1]));
 
 				in.close();
 				out.close();

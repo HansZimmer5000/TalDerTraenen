@@ -1,48 +1,52 @@
 package mware_lib;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
-
-import nameservice._NameserviceImplBaseStub;
 
 public class ObjectBroker {
 
 	private boolean debug;
-	private _NameserviceImplBaseStub ns = null;
 	private Map<String, String> registeredServices = new HashMap<String, String>();
 
-	public ObjectBroker(String host, int port, boolean debug) throws IOException {
-		Communicator con = new Communicator(host, port, debug);
-		ns = new _NameserviceImplBaseStub(con);
+	public ObjectBroker(boolean debug) throws IOException {
 		this.debug = debug;
 	}
 
-	public static ObjectBroker init(String serviceHost, int port, boolean debug) throws IOException {
-		return new ObjectBroker(serviceHost, port, debug);
+	public void startAndRegisterNewService(String serviceName, Object service) {
+		String serverSocketString;
+		
+		serverSocketString = this.startNewService(service);
+		this.registerNewService(serviceName, serverSocketString);
 	}
+	
+	public String startNewService(Object service, ServerSocket serverSocket) {
+		SkeletonServer serviceServer = new SkeletonServer(service, serverSocket);
+		serviceServer.start();
 
-	public void registerNewService(String serviceName, Object service) {
+		String serverSocketString = 
+				serviceServer.getServerSocket().getInetAddress().getHostAddress() + 
+				":" + serviceServer.getServerSocket().getLocalPort();
+		return serverSocketString;
+	}
+	
+	public String startNewService(Object service) {
 		SkeletonServer serviceServer = new SkeletonServer(service);
 		serviceServer.start();
 
 		String serverSocketString = 
 				serviceServer.getServerSocket().getInetAddress().getHostAddress() + 
 				":" + serviceServer.getServerSocket().getLocalPort();
-		
+		return serverSocketString;
+	}
+	
+	public void registerNewService(String serviceName, String serverSocketString) {
 		this.registeredServices.put(serviceName, serverSocketString);
-		
-		if (this.ns != null) {
-			this.ns.rebind(serverSocketString, serviceName);
-		}
 	}
 
 	public Object getService(String serviceName) {
 		Object foundService = this.registeredServices.get(serviceName);
-
-		if (foundService == null && this.ns != null) {
-			foundService = this.ns.resolve(serviceName);
-		}
 		
 		return foundService;
 	}
@@ -50,6 +54,5 @@ public class ObjectBroker {
 	// Beendet die Benutzung der Middleware in dieser Anwendung.
 	public void shutDown() throws IOException {
 		System.out.println("Object Brooker heruntergefahren");
-		return;
 	}
 }
