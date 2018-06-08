@@ -8,10 +8,6 @@ import name_ops._NameImplBase;
 import name_ops._NameImplBaseStub;
 
 public class CalculatorService extends _CalculatorImplBase {
-	
-	protected CalculatorService() {
-		super();
-	}
 
 	public int add(int a, int b) {
 		return a + b;

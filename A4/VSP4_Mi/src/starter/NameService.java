@@ -10,7 +10,11 @@ import name_ops._NameImplBase;
 
 public class NameService extends _NameImplBase{
 	
-	Map<String, String> services = new HashMap<String, String>();
+	Map<String, String> services;
+	
+	public NameService() {
+		this.services = new HashMap<String, String>();
+	}
 		
 	@Override
 	public synchronized void rebind(String servantSocket, String name) {

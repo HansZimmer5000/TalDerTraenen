@@ -211,8 +211,6 @@ public class Parser {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Path srcFolder = Paths.get(""); //.resolve("src");
-		
 		ArrayList<String> allIDLFiles = getAllIDLFiles();
 		
 		for (String currentFileName : allIDLFiles) {
@@ -230,10 +228,8 @@ public class Parser {
 				
 
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
