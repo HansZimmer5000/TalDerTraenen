@@ -17,21 +17,11 @@ public class CalculatorServer implements _CalculatorImplBase {
 	}
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
-
-	
 		ObjectBroker objBroker = ObjectBroker.init("", 55555, false);
-		_NameserviceImplBaseStub nameSvc = objBroker.getNameService();
 		CalculatorServer calculatorServer = new CalculatorServer();
 		
-		SkeletonServer serviceServer = new SkeletonServer(calculatorServer);
-		serviceServer.start();
-
-
-		String calculatorServerSocket = 
-				serviceServer.getServerSocket().getInetAddress().getHostAddress()+":"+
-				serviceServer.getServerSocket().getLocalPort();
+		objBroker.registerNewService("calculator", calculatorServer);
 		
-		nameSvc.rebind(calculatorServerSocket, "zumsel");
 		objBroker.shutDown();
 		System.out.println("Service wurde angemeldet");
 	}

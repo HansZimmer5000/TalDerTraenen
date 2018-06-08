@@ -11,10 +11,8 @@ public class CalculatorClient {
 	public static void main(String[] args) throws IOException  {
 
 		ObjectBroker objBroker = ObjectBroker.init("localhost", 55555, false);
-		_NameserviceImplBase nameSvc = objBroker.getNameService();
-
-		System.out.println("NS-Referenz erhalten!");
-		Object rawObjRef = nameSvc.resolve("zumsel");
+		
+		Object rawObjRef = objBroker.getService("calculator");
 		_CalculatorImplBase remoteObj = _CalculatorImplBase.narrowCast(rawObjRef);
 
 		System.out.println("Methodenaufruf wird initiiert");
