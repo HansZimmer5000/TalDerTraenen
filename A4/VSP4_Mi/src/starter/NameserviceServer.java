@@ -8,7 +8,7 @@ import java.util.Map;
 import mware_lib.*;
 import nameservice._NameserviceImplBase;
 
-public class Nameservice implements _NameserviceImplBase{
+public class NameserviceServer implements _NameserviceImplBase{
 	
 	Map<String, String> services = new HashMap<String, String>();
 		
@@ -26,11 +26,11 @@ public class Nameservice implements _NameserviceImplBase{
 	
 	public static void main(String[] args) throws IOException{
 		int port = 55555;
-		Nameservice nameservice = new Nameservice();
+		NameserviceServer nameservice = new NameserviceServer();
 		
 		ServerSocket nsServer = new ServerSocket(port);
 		System.out.println(
-				"Server wurde gestartet und hört auf: " + nsServer.getInetAddress() + ":" + nsServer.getLocalPort());
+				"Server wurde gestartet und hï¿½rt auf: " + nsServer.getInetAddress() + ":" + nsServer.getLocalPort());
 		
 		SkeletonServer serviceServer = new SkeletonServer(nameservice, nsServer);
 		serviceServer.start();

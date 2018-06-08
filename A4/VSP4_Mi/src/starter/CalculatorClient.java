@@ -6,7 +6,7 @@ import calculator._CalculatorImplBase;
 import mware_lib.ObjectBroker;
 import nameservice._NameserviceImplBase;
 
-public class Client {
+public class CalculatorClient {
 
 	public static void main(String[] args) throws IOException  {
 
@@ -19,7 +19,7 @@ public class Client {
 
 		System.out.println("Methodenaufruf wird initiiert");
 		double calcNum = remoteObj.add(20,30);
-		System.out.println("Rechnung wurde durchgeführt das Ergebnis ist: " + calcNum);
+		System.out.println("Rechnung wurde durchgefï¿½hrt das Ergebnis ist: " + calcNum);
 
 		objBroker.shutDown();
 	}
