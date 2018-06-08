@@ -5,16 +5,33 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 public class Test {
 
 	public static void main(String[] args) throws Exception {
-		stringsplittest();
+		String test = "Abc";
+		System.out.println(test.substring(0,1));
+		System.out.println(test.substring(1, test.length()));
+	}
+	
+	public static void writeFiletest() throws IOException {
+		Path currentFolder = Paths.get("");
+		
+		List<String> lines = Arrays.asList("The first line", "The second line");
+		Path file = Paths.get("testfile.txt");
+		Files.write(file, lines, Charset.forName("UTF-8"));
 	}
 	
 	public static void stringsplittest(){
