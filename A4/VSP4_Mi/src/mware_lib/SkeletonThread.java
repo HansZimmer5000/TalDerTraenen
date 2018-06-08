@@ -26,12 +26,12 @@ public class SkeletonThread extends Thread {
 	@Override
 	public void run() {
 		String msgFromClient;
-		//while (!this.isInterrupted()) {
+		while (!this.isInterrupted()) {
 			try {
 				this.in = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
 				this.out = new BufferedWriter(new OutputStreamWriter(cSocket.getOutputStream()));
-				System.out.println("waiting for input");
-				System.out.println(cSocket.isConnected());
+				System.out.println("Waiting for input");
+
 				msgFromClient = in.readLine();
 				if (msgFromClient != null) {
 					System.out.println("Nachricht vom Client erhalten: " + msgFromClient);
@@ -57,7 +57,7 @@ public class SkeletonThread extends Thread {
 			} catch (IOException e) {
 				System.out.println(cSocket.getInetAddress() + " disconected!");
 			}
-		//}
+		}
 		System.out.println("Done");
 	}
 }

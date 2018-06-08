@@ -16,6 +16,10 @@ public class CalculatorService extends _CalculatorImplBase {
 	public int add(int a, int b) {
 		return a + b;
 	}
+	
+	public double div(double a, double b) {
+		return a / b;
+	}
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		ObjectBroker objBroker = new ObjectBroker(false);

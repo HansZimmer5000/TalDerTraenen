@@ -7,3 +7,12 @@ Last the Client (The thing that uses the Calculator via Middleware)
 Middleware also starts Nameservice
 Via ObjectBroker new Services are registered in the nameservice, but they could be anywhere.
 Client via ObjectBroker resolved with nameservice for a specific service, and uses it.
+
+Hinzufügen von neuen Typen (Return / Parameter):
+	- Hinzufügen im idl_compiler.IDLCompiler
+	- Hinzufügen in mware_lib.Message
+	
+Obacht!
+	- SocketCommunicator unterhält sich aktuell mit genau einem Socket über einen Socket.
+		Deswegen muss SkeletonThread aktiv bleiben, da man keinen neuen Socket oeffnet.
+		Was SocketServer triggern wuerde, damit er dann einen neuen SkeletonThread mit neuem Socket aufmacht.

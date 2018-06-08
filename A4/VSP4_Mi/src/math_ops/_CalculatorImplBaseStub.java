@@ -15,5 +15,11 @@ public class _CalculatorImplBaseStub extends _CalculatorImplBase {
 		String params = "int " + a + ",int " + b;
 		return Integer.valueOf((String) rawObject.sendToService("add", params));
 	}
+	
+	@Override
+	public double div(double a, double b) {
+		String params = "double " + a + ",double " + b;
+		return Double.valueOf((String) rawObject.sendToService("div", params));
+	}
 
 }

@@ -25,7 +25,6 @@ public class SocketCommunicator {
 			BufferedReader is = new BufferedReader(new InputStreamReader(socketToService.getInputStream()));
 			BufferedWriter os = new BufferedWriter(new OutputStreamWriter(socketToService.getOutputStream()));
 
-			System.out.println("Anfrage an Service gesendet	");
 			os.write(methodeName + "(" + 
 						params + 
 					")\n");
@@ -33,10 +32,8 @@ public class SocketCommunicator {
 
 			System.out.println("Warte auf Antwort");
 			String msgFromNS = is.readLine();
-			System.out.println("Antwort erhalten: " + msgFromNS);
-			is.close();
-			os.close();
-			socketToService.close();
+			
+			//TODO: Close Sockets at some point!
 			return msgFromNS;
 
 		} catch (IOException e) {

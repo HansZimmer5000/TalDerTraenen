@@ -22,9 +22,8 @@ public class CalculatorClient {
 		}
 		_CalculatorImplBase remoteObj = _CalculatorImplBase.narrowCast(rawObjRef);
 
-		System.out.println("Methodenaufruf wird initiiert");
-		double calcNum = remoteObj.add(20,30);
-		System.out.println("Rechnung wurde durchgef�hrt das Ergebnis ist: " + calcNum);
+		System.out.println("Rechnung wurde durchgefuehrt das Ergebnis ist: " + remoteObj.add(20,30));
+		System.out.println("Rechnung wurde durchgefuehrt das Ergebnis ist: " + remoteObj.div(10,3));
 
 		objBroker.shutDown();
 	}

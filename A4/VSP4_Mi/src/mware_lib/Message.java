@@ -46,6 +46,13 @@ public class Message {
 					paramaterClasses[parameterIndex] = currentParameterClass;
 					parameterValues[parameterIndex] = currentParameterValue;
 					break;
+				case ("double"):
+				case ("Double"):
+					currentParameterClass = double.class;
+					currentParameterValue = Double.parseDouble(currentParameterValueString);
+					paramaterClasses[parameterIndex] = currentParameterClass;
+					parameterValues[parameterIndex] = currentParameterValue;
+					break;
 				}
 			}
 			this.parameterClasses = paramaterClasses;

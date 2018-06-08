@@ -1,5 +1,6 @@
 module math_ops {
 class Calculator {
 int add(int a, int b);
+double div(double a, double b);
 };
 };
