@@ -1,4 +1,4 @@
-package nameservice;
+package name_ops;
 
 public interface _NameImplBase{
 	

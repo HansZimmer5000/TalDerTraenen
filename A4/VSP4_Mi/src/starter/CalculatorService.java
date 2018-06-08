@@ -2,10 +2,10 @@ package starter;
 
 import java.io.IOException;
 
-import calculator.*;
+import math_ops.*;
 import mware_lib.*;
-import nameservice._NameImplBase;
-import nameservice._NameImplBaseStub;
+import name_ops._NameImplBase;
+import name_ops._NameImplBaseStub;
 
 public class CalculatorService implements _CalculatorImplBase {
 	

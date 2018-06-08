@@ -2,10 +2,10 @@ package starter;
 
 import java.io.IOException;
 
-import calculator._CalculatorImplBase;
+import math_ops._CalculatorImplBase;
 import mware_lib.SocketCommunicator;
+import name_ops._NameImplBase;
 import mware_lib.ObjectBroker;
-import nameservice._NameImplBase;
 
 public class CalculatorClient {
 

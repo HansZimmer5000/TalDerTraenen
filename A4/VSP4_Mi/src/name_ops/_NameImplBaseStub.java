@@ -1,4 +1,4 @@
-package nameservice;
+package name_ops;
 
 import mware_lib.SocketCommunicator;
 

@@ -1,4 +1,4 @@
-package calculator;
+package math_ops;
 
 import mware_lib.SocketCommunicator;
 

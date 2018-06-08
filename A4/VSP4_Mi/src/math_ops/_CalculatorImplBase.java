@@ -1,4 +1,4 @@
-package calculator;
+package math_ops;
 
 public interface _CalculatorImplBase{
 
