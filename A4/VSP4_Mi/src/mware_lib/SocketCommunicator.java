@@ -8,11 +8,11 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class Communicator {
+public class SocketCommunicator {
 
 	private Socket socketToService;
 
-	public Communicator(String host, int port) {
+	public SocketCommunicator(String host, int port) {
 		try {
 			this.socketToService = new Socket(host, port);
 		} catch (IOException e) {

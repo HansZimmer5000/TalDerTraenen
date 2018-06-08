@@ -1,13 +1,13 @@
 package nameservice;
 
-import mware_lib.Communicator;
+import mware_lib.SocketCommunicator;
 
 public class _NameserviceImplBaseStub implements _NameserviceImplBase {
 
-	private Communicator conNS;
+	private SocketCommunicator conNS;
 
 	public _NameserviceImplBaseStub(Object con) {
-		this.conNS = (Communicator) con;
+		this.conNS = (SocketCommunicator) con;
 	}
 
 	@Override
@@ -23,7 +23,7 @@ public class _NameserviceImplBaseStub implements _NameserviceImplBase {
 		String host = splitSocketString[0];
 		int port = Integer.valueOf(splitSocketString[1]);
 		
-		Communicator connectionToService = new Communicator(host, port);
+		SocketCommunicator connectionToService = new SocketCommunicator(host, port);
 		return connectionToService;
 	}
 

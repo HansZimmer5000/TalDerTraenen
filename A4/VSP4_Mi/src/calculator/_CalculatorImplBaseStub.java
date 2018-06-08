@@ -1,13 +1,13 @@
 package calculator;
 
-import mware_lib.Communicator;
+import mware_lib.SocketCommunicator;
 
 public class _CalculatorImplBaseStub implements _CalculatorImplBase {
 
-	private Communicator rawObject;
+	private SocketCommunicator rawObject;
 
 	public _CalculatorImplBaseStub(Object rawObjectRef) {
-		this.rawObject = (Communicator) rawObjectRef;
+		this.rawObject = (SocketCommunicator) rawObjectRef;
 	}
 
 	@Override

@@ -20,7 +20,7 @@ public class CalculatorService implements _CalculatorImplBase {
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		ObjectBroker objBroker = new ObjectBroker(false);
 		
-		Communicator nameserviceCommunicator = new Communicator("", 55555);
+		SocketCommunicator nameserviceCommunicator = new SocketCommunicator("", 55555);
 		_NameserviceImplBase nameserviceClient = _NameserviceImplBase.narrowCast(nameserviceCommunicator);
 		
 		CalculatorService calculatorServer = new CalculatorService();
