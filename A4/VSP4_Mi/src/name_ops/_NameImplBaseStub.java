@@ -11,11 +11,15 @@ public class _NameImplBaseStub extends _NameImplBase {
 	}
 
 	public void rebind(String servantSocket, String name) {
-		objectReference.sendMethodAndParametersToServiceAndWaitForAnswer("rebind", "String " + servantSocket + ",String " + name);
+		String methodName = "rebind";
+		String parameters = "String " + servantSocket + ",String " + name;
+		objectReference.sendMethodAndParametersToServiceAndWaitForAnswer(methodName, parameters);
 	}
 
 	public Object resolve(String name) {
-		String socketString = objectReference.sendMethodAndParametersToServiceAndWaitForAnswer("resolve", "String " + name);
+		String methodName = "resolve";
+		String parameters = "String " + name;
+		String socketString = objectReference.sendMethodAndParametersToServiceAndWaitForAnswer(methodName, parameters);
 		return socketString;
 	}
 
