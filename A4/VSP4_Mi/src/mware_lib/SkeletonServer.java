@@ -39,7 +39,6 @@ public class SkeletonServer extends Thread {
 			}
 		}
 		try {
-			//TODO: How to close all sockets?
 			this.serverSocket.close();
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -25,7 +24,7 @@ public class Test {
 	}
 
 	public static void writeFiletest() throws IOException {
-		Path currentFolder = Paths.get("");
+		//Path currentFolder = Paths.get("");
 
 		List<String> lines = Arrays.asList("The first line", "The second line");
 		Path file = Paths.get("testfile.txt");
@@ -90,7 +89,7 @@ public class Test {
 		TestClass testinstance = new TestClass("aaaaaa");
 
 		testinstance.start();
-		Thread TestClassThread = testinstance.currentThread();
+		
 
 		Thread.sleep(1000);
 		testinstance.setMyStr("b");

@@ -122,7 +122,7 @@ public class FileCreater {
 	}
 	
 	private String createNarrowCastBody() {
-		String emptyBody =  "{...}";
+		//String emptyBody =  "{...}";
 		return "{ return new " + this.className + "Stub(rawObjectReference);}";
 	}
 }

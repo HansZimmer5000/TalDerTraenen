@@ -8,35 +8,35 @@ import java.util.Map;
 import mware_lib.*;
 import name_ops._NameImplBase;
 
-public class NameService extends _NameImplBase{
-	
-	Map<String, String> services;
-	
+public class NameService extends _NameImplBase {
+
+	Map<String, String> registeredServices;
+
 	public NameService(ObjectBroker objectBroker) throws IOException {
-		this.services = new HashMap<String, String>();
-		
+		this.registeredServices = new HashMap<String, String>();
+
 		ServerSocket nameServiceServerSocket = new ServerSocket(_NameImplBase.NAMESERVICEPORT);
 		String nameServiceServerSocketString = objectBroker.startNewService(this, nameServiceServerSocket);
-		System.out.println("Server wurde gestartet und hoert auf: " + nameServiceServerSocketString);
-		
+		System.out.println("Server started and listening to: " + nameServiceServerSocketString);
+
 		objectBroker.registerNewService("nameservice", nameServiceServerSocketString);
-		objectBroker.shutDown();
 	}
-	
+
 	@Override
 	public synchronized void rebind(String servantSocket, String name) {
-		services.put(name, servantSocket);
+		registeredServices.put(name, servantSocket);
 		System.out.println("New registration in nameservice: " + name);
 	}
-	
+
 	@Override
 	public synchronized Object resolve(String name) {
-		return services.get(name);
+		return registeredServices.get(name);
 	}
-	
-	public static void main(String[] args) throws IOException{
+
+	public static void main(String[] args) throws IOException {
 		ObjectBroker objectBroker = ObjectBroker.init();
 		new NameService(objectBroker);
+		objectBroker.shutDown();
 		System.out.println("NameService registered locally.");
 	}
 }
