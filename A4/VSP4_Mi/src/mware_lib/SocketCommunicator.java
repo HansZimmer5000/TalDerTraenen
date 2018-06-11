@@ -9,10 +9,10 @@ import java.util.Map.Entry;
 
 public class SocketCommunicator {
 
-	private HashMap<String, SocketHolder> hostPortToSocket;
+	private HashMap<String, SocketHolder> hostPortToSocketHolder;
 
 	private SocketCommunicator() {
-		this.hostPortToSocket = new HashMap<>();
+		this.hostPortToSocketHolder = new HashMap<>();
 	}
 
 	public static SocketCommunicator init() {
@@ -53,7 +53,7 @@ public class SocketCommunicator {
 
 	public void closeAllSockets() throws IOException {
 		SocketHolder currentSocket;
-		for (Entry<String, SocketHolder> pair : this.hostPortToSocket.entrySet()) {
+		for (Entry<String, SocketHolder> pair : this.hostPortToSocketHolder.entrySet()) {
 			currentSocket = pair.getValue();
 			this.sendToSocket(currentSocket, "shutdown", "");
 			currentSocket.close();
@@ -64,7 +64,7 @@ public class SocketCommunicator {
 	private SocketHolder getOrCreateSocket(String serviceServerSocketString) {
 		SocketHolder foundSocketHolder = null;
 
-		foundSocketHolder = this.hostPortToSocket.get(serviceServerSocketString);
+		foundSocketHolder = this.hostPortToSocketHolder.get(serviceServerSocketString);
 
 		if (foundSocketHolder == null) {
 			try {
@@ -73,7 +73,7 @@ public class SocketCommunicator {
 
 				Socket createdSocket = new Socket(host, port);
 				SocketHolder createdSocketHolder = new SocketHolder(createdSocket);
-				this.hostPortToSocket.put(serviceServerSocketString, createdSocketHolder);
+				this.hostPortToSocketHolder.put(serviceServerSocketString, createdSocketHolder);
 
 				foundSocketHolder = createdSocketHolder;
 			} catch (IOException e) {
