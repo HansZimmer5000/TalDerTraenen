@@ -7,9 +7,16 @@ import java.util.Map;
 
 public class ObjectBroker {
 
-	private Map<String, String> registeredServices = new HashMap<String, String>();
+	private Map<String, String> registeredServices;
+	private SocketCommunicator communicator;
 
-	public ObjectBroker() {
+	private ObjectBroker() {
+		this.registeredServices = new HashMap<>();
+		this.communicator = new SocketCommunicator();
+	}
+	
+	public static ObjectBroker init() {
+		return new ObjectBroker();
 	}
 
 	public void startAndRegisterNewService(String serviceName, Object service) {
@@ -40,14 +47,18 @@ public class ObjectBroker {
 		this.registeredServices.put(serviceName, serverSocketString);
 	}
 
-	public Object getService(String serviceName) {
-		Object foundService = this.registeredServices.get(serviceName);
-		
+	public String getService(String serviceName) {
+		String foundService = this.registeredServices.get(serviceName);
 		return foundService;
+	}
+	
+	public String sendMethodAndParametersToServiceAndWaitForAnswer(String serviceServerSocketString, String methodName, String parameters) {
+		return this.communicator.sendMethodAndParametersToServiceAndWaitForAnswer(serviceServerSocketString, methodName, parameters);
 	}
 
 	// Beendet die Benutzung der Middleware in dieser Anwendung.
 	public void shutDown() throws IOException {
+		this.communicator.closeAllSockets();
 		System.out.println("Object Brooker heruntergefahren");
 	}
 }

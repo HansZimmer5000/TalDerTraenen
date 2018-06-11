@@ -3,46 +3,49 @@ package starter;
 import java.io.IOException;
 
 import math_ops._CalculatorImplBase;
-import mware_lib.SocketCommunicator;
 import name_ops._NameImplBase;
 import mware_lib.ObjectBroker;
+import mware_lib.ObjectReference;
 
 public class CalculatorClient {
 
 	ObjectBroker objectBroker;
 	_CalculatorImplBase remoteObject;
 
-	public CalculatorClient() {
-		this.objectBroker = new ObjectBroker();
-
-		SocketCommunicator nameserviceCommunicator = new SocketCommunicator("", _NameImplBase.NAMESERVICEPORT);
-		_NameImplBase nameserviceClient = _NameImplBase.narrowCast(nameserviceCommunicator);
-
-		// TODO: Begruendung, warum wie ne Map (getService) in ObjectBroker haben
-		// TODO: Generell: Variablennamen umbauen.
-		Object objectReference = getObjectReference(objectBroker, nameserviceClient);
-		if (objectReference == null) {
-			System.out.println("Couldn't find Object Reference!");
-		} else {
-			this.remoteObject = _CalculatorImplBase.narrowCast(objectReference);
-		}
+	public CalculatorClient(ObjectBroker objectBroker) {
+		this.objectBroker = objectBroker;
+		this.remoteObject = null;
 	}
 
-	private Object getObjectReference(ObjectBroker objBroker, _NameImplBase nameserviceClient) {
-		Object rawObjRef = this.objectBroker.getService("calculator");
-		if (rawObjRef == null) {
-			rawObjRef = nameserviceClient.resolve("calculator");
+	private void setObjectReferenceViaBrokerAndNameService(_NameImplBase nameserviceClient) {
+		ObjectReference objectReference = null;
+		String objectReferenceServerSocketString = this.objectBroker.getService("calculator");
+		if (objectReferenceServerSocketString == null) {
+			objectReferenceServerSocketString = (String) nameserviceClient.resolve("calculator");
 		}
-		return rawObjRef;
+
+		if (objectReferenceServerSocketString != null) {
+			objectReference = ObjectReference.init(objectBroker, objectReferenceServerSocketString);
+			this.remoteObject = _CalculatorImplBase.narrowCast(objectReference);
+		} else {
+			System.out.println("Couldn't find Object Reference!");
+		}
 	}
 
 	public void testfunction() throws IOException {
-		System.out.println("Rechnung wurde durchgefuehrt das Ergebnis ist: " + remoteObject.add(20, 30));
-		System.out.println("Rechnung wurde durchgefuehrt das Ergebnis ist: " + remoteObject.div(10, 3));
+		System.out.println("Caluclation (add(20,30)) is done: " + remoteObject.add(20, 30));
+		System.out.println("Calculation (div(10,3)) is done: " + remoteObject.div(10, 3));
 		objectBroker.shutDown();
 	}
 
 	public static void main(String[] args) throws IOException {
-		new CalculatorClient().testfunction();
+		ObjectBroker objectBroker = ObjectBroker.init();
+		
+		ObjectReference nameServiceObjectReference = ObjectReference.init(objectBroker, "", _NameImplBase.NAMESERVICEPORT);
+		_NameImplBase nameserviceClient = _NameImplBase.narrowCast(nameServiceObjectReference);
+
+		CalculatorClient testclient = new CalculatorClient(objectBroker);
+		testclient.setObjectReferenceViaBrokerAndNameService(nameserviceClient);
+		testclient.testfunction();
 	}
 }

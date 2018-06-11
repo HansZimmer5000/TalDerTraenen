@@ -1,25 +1,25 @@
 package math_ops;
 
-import mware_lib.SocketCommunicator;
+import mware_lib.ObjectReference;
 
 public class _CalculatorImplBaseStub extends _CalculatorImplBase {
 
-	private SocketCommunicator rawObject;
+	private ObjectReference objectReference;
 
-	public _CalculatorImplBaseStub(Object rawObjectRef) {
-		this.rawObject = (SocketCommunicator) rawObjectRef;
+	public _CalculatorImplBaseStub(Object objectReference) {
+		this.objectReference = (ObjectReference) objectReference;
 	}
 
 	@Override
 	public int add(int a, int b) {
 		String params = "int " + a + ",int " + b;
-		return Integer.valueOf((String) rawObject.sendToService("add", params));
+		return Integer.valueOf((String) objectReference.sendMethodAndParametersToServiceAndWaitForAnswer("add", params));
 	}
 	
 	@Override
 	public double div(double a, double b) {
 		String params = "double " + a + ",double " + b;
-		return Double.valueOf((String) rawObject.sendToService("div", params));
+		return Double.valueOf((String) objectReference.sendMethodAndParametersToServiceAndWaitForAnswer("div", params));
 	}
 
 }

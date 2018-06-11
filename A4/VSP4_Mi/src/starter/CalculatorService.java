@@ -2,20 +2,18 @@ package starter;
 
 import java.io.IOException;
 
-import math_ops.*;
-import mware_lib.*;
+import math_ops._CalculatorImplBase;
+import mware_lib.ObjectBroker;
+import mware_lib.ObjectReference;
 import name_ops._NameImplBase;
-import name_ops._NameImplBaseStub;
 
 public class CalculatorService extends _CalculatorImplBase {
 
 	String serviceServerSocketString;
 	
-	public CalculatorService() throws IOException {
-		ObjectBroker objectBroker = new ObjectBroker();
+	public CalculatorService(ObjectBroker objectBroker) throws IOException {
 		this.serviceServerSocketString = objectBroker.startNewService(this);
 		objectBroker.registerNewService("calculator", this.serviceServerSocketString);
-		objectBroker.shutDown();
 	}
 	
 	private String getServiceServerSocketString() {
@@ -31,14 +29,17 @@ public class CalculatorService extends _CalculatorImplBase {
 	}
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
-		SocketCommunicator nameserviceCommunicator = new SocketCommunicator("", _NameImplBase.NAMESERVICEPORT);
-		_NameImplBase nameserviceClient = _NameImplBase.narrowCast(nameserviceCommunicator);
+		ObjectBroker objectBroker = ObjectBroker.init();
 		
-		CalculatorService calculatorServer = new CalculatorService();
+		CalculatorService calculatorServer = new CalculatorService(objectBroker);
 		String calculatorServiceServerSocketString = calculatorServer.getServiceServerSocketString();
 		
+		ObjectReference nameServiceObjectReference = ObjectReference.init(objectBroker, "", _NameImplBase.NAMESERVICEPORT);
+		_NameImplBase nameserviceClient = _NameImplBase.narrowCast(nameServiceObjectReference);
+		//TODO: Register in objectBroker
 		nameserviceClient.rebind(calculatorServiceServerSocketString, "calculator");
 		
+		objectBroker.shutDown();
 		System.out.println("CalculatorService registered locally and in nameservice.");
 	}
 

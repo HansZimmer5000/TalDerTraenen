@@ -7,35 +7,64 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class SocketCommunicator {
 
-	private Socket socketToService;
-	private BufferedReader in;
-	private BufferedWriter out;
+	private HashMap<String, Socket> hostPortToSocket;
 
-	public SocketCommunicator(String host, int port) {
-		try {
-			this.socketToService = new Socket(host, port);
-			this.in = new BufferedReader(new InputStreamReader(socketToService.getInputStream()));
-			this.out = new BufferedWriter(new OutputStreamWriter(socketToService.getOutputStream()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public SocketCommunicator() {
+		this.hostPortToSocket = new HashMap<>();
 	}
 
-	public String sendToService(String methodeName, String params) {
-		// TODO: Close Sockets at some point!
+	public String sendMethodAndParametersToServiceAndWaitForAnswer(String serviceServerSocketString, String methodeName,
+			String parameters) {
+		
+		Socket socketToService = getOrCreateSocket(serviceServerSocketString);
+		
 		String result = null;
 		try {
-			this.out.write(methodeName + "(" + params + ")\n");
-			this.out.flush();
+			BufferedReader in = new BufferedReader(new InputStreamReader(socketToService.getInputStream()));
+			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socketToService.getOutputStream()));
+			
+			out.write(methodeName + "(" + parameters + ")\n");
+			out.flush();
 
 			System.out.println("Warte auf Antwort");
-			result = this.in.readLine();
+			result = in.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	public void closeAllSockets() throws IOException {
+		for (Entry<String, Socket> pair : this.hostPortToSocket.entrySet()) {
+			pair.getValue().close();
+		}
+		System.out.println("All Sockets Closed!");
+	}
+
+	private Socket getOrCreateSocket(String serviceServerSocketString) {
+		Socket foundSocket = null;
+
+		foundSocket = this.hostPortToSocket.get(serviceServerSocketString);
+
+		if (foundSocket == null) {
+			try {
+				String host = serviceServerSocketString.split(":")[0];
+				int port = Integer.valueOf(serviceServerSocketString.split(":")[1]);
+				
+				Socket createdSocket = new Socket(host, port);
+				this.hostPortToSocket.put(serviceServerSocketString, createdSocket);
+				
+				foundSocket = createdSocket;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return foundSocket;
 	}
 }

@@ -11,12 +11,10 @@ import name_ops._NameImplBase;
 public class NameService extends _NameImplBase{
 	
 	Map<String, String> services;
-	String serviceServerSocketString;
 	
-	public NameService() throws IOException {
+	public NameService(ObjectBroker objectBroker) throws IOException {
 		this.services = new HashMap<String, String>();
 		
-		ObjectBroker objectBroker = new ObjectBroker();
 		ServerSocket nameServiceServerSocket = new ServerSocket(_NameImplBase.NAMESERVICEPORT);
 		String nameServiceServerSocketString = objectBroker.startNewService(this, nameServiceServerSocket);
 		System.out.println("Server wurde gestartet und hoert auf: " + nameServiceServerSocketString);
@@ -37,7 +35,8 @@ public class NameService extends _NameImplBase{
 	}
 	
 	public static void main(String[] args) throws IOException{
-		new NameService();
+		ObjectBroker objectBroker = ObjectBroker.init();
+		new NameService(objectBroker);
 		System.out.println("NameService registered locally.");
 	}
 }
