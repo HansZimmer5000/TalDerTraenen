@@ -13,7 +13,7 @@ public class CalculatorService extends _CalculatorImplBase {
 	
 	public CalculatorService(ObjectBroker objectBroker) throws IOException {
 		this.serviceServerSocketString = objectBroker.startNewService(this);
-		objectBroker.registerNewService("calculator", this.serviceServerSocketString);
+		objectBroker.registerNewService(_CalculatorImplBase.SERVICE_NAME, this.serviceServerSocketString);
 	}
 	
 	private String getServiceServerSocketString() {
@@ -37,7 +37,7 @@ public class CalculatorService extends _CalculatorImplBase {
 		ObjectReference nameServiceObjectReference = ObjectReference.init(objectBroker, "", _NameImplBase.NAMESERVICEPORT);
 		_NameImplBase nameserviceClient = _NameImplBase.narrowCast(nameServiceObjectReference);
 		//TODO: Register in objectBroker
-		nameserviceClient.rebind(calculatorServiceServerSocketString, "calculator");
+		nameserviceClient.rebind(calculatorServiceServerSocketString, _CalculatorImplBase.SERVICE_NAME);
 		
 		objectBroker.shutDown();
 		System.out.println("CalculatorService registered locally and in nameservice.");

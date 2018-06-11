@@ -19,7 +19,7 @@ public class CalculatorClient {
 
 	private void setObjectReferenceViaBrokerAndNameService(_NameImplBase nameserviceClient) {
 		ObjectReference objectReference = null;
-		String objectReferenceServerSocketString = this.objectBroker.getService("calculator");
+		String objectReferenceServerSocketString = this.objectBroker.getService(_CalculatorImplBase.SERVICE_NAME);
 		if (objectReferenceServerSocketString == null) {
 			objectReferenceServerSocketString = (String) nameserviceClient.resolve("calculator");
 		}

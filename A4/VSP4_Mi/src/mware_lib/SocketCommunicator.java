@@ -14,8 +14,12 @@ public class SocketCommunicator {
 
 	private HashMap<String, Socket> hostPortToSocket;
 
-	public SocketCommunicator() {
+	private SocketCommunicator() {
 		this.hostPortToSocket = new HashMap<>();
+	}
+	
+	public static SocketCommunicator init() {
+		return new SocketCommunicator();
 	}
 
 	public String sendMethodAndParametersToServiceAndWaitForAnswer(String serviceServerSocketString, String methodeName,

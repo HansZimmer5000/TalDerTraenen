@@ -12,7 +12,7 @@ public class ObjectBroker {
 
 	private ObjectBroker() {
 		this.registeredServices = new HashMap<>();
-		this.communicator = new SocketCommunicator();
+		this.communicator = SocketCommunicator.init();
 	}
 	
 	public static ObjectBroker init() {

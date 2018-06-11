@@ -17,11 +17,15 @@ public class SkeletonThread extends Thread {
 	private BufferedWriter out;
 	private Object servant;
 
-	public SkeletonThread(Socket clientSocket, Object servant) throws IOException {
+	private SkeletonThread(Socket clientSocket, Object servant) throws IOException {
 		this.cSocket = clientSocket;
 		this.in = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
 		this.out = new BufferedWriter(new OutputStreamWriter(cSocket.getOutputStream()));
 		this.servant = servant;
+	}
+	
+	public static SkeletonThread init(Socket clientSocket, Object servant) throws IOException {
+		return new SkeletonThread(clientSocket, servant);
 	}
 
 	@Override

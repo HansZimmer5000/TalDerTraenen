@@ -33,7 +33,7 @@ public class SkeletonServer extends Thread {
 			try {
 				newClientSocket = serverSocket.accept();
 				System.out.println("Got new Connection / Request!");
-				new SkeletonThread(newClientSocket, this.servant).start();
+				SkeletonThread.init(newClientSocket, this.servant).start();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
