@@ -9,6 +9,19 @@ import name_ops._NameImplBaseStub;
 
 public class CalculatorService extends _CalculatorImplBase {
 
+	String serviceServerSocketString;
+	
+	public CalculatorService() throws IOException {
+		ObjectBroker objectBroker = new ObjectBroker();
+		this.serviceServerSocketString = objectBroker.startNewService(this);
+		objectBroker.registerNewService("calculator", this.serviceServerSocketString);
+		objectBroker.shutDown();
+	}
+	
+	private String getServiceServerSocketString() {
+		return this.serviceServerSocketString;
+	}
+	
 	public int add(int a, int b) {
 		return a + b;
 	}
@@ -18,19 +31,15 @@ public class CalculatorService extends _CalculatorImplBase {
 	}
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
-		ObjectBroker objBroker = new ObjectBroker();
-		
-		SocketCommunicator nameserviceCommunicator = new SocketCommunicator("", 15000);
+		SocketCommunicator nameserviceCommunicator = new SocketCommunicator("", _NameImplBase.NAMESERVICEPORT);
 		_NameImplBase nameserviceClient = _NameImplBase.narrowCast(nameserviceCommunicator);
 		
 		CalculatorService calculatorServer = new CalculatorService();
+		String calculatorServiceServerSocketString = calculatorServer.getServiceServerSocketString();
 		
-		String calculatorServiceServerSocketString = objBroker.startNewService(calculatorServer);
-		objBroker.registerNewService("calculator", calculatorServiceServerSocketString);
 		nameserviceClient.rebind(calculatorServiceServerSocketString, "calculator");
 		
-		objBroker.shutDown();
-		System.out.println("Service wurde angemeldet");
+		System.out.println("CalculatorService registered locally and in nameservice.");
 	}
 
 }

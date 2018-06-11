@@ -9,22 +9,40 @@ import mware_lib.ObjectBroker;
 
 public class CalculatorClient {
 
-	public static void main(String[] args) throws IOException  {
+	ObjectBroker objectBroker;
+	_CalculatorImplBase remoteObject;
 
-		ObjectBroker objBroker = new ObjectBroker();
-		
-		SocketCommunicator nameserviceCommunicator = new SocketCommunicator("", 15000);
+	public CalculatorClient() {
+		this.objectBroker = new ObjectBroker();
+
+		SocketCommunicator nameserviceCommunicator = new SocketCommunicator("", _NameImplBase.NAMESERVICEPORT);
 		_NameImplBase nameserviceClient = _NameImplBase.narrowCast(nameserviceCommunicator);
-		
-		Object rawObjRef = objBroker.getService("calculator");
-		if(rawObjRef == null) {
+
+		// TODO: Begruendung, warum wie ne Map (getService) in ObjectBroker haben
+		// TODO: Generell: Variablennamen umbauen.
+		Object objectReference = getObjectReference(objectBroker, nameserviceClient);
+		if (objectReference == null) {
+			System.out.println("Couldn't find Object Reference!");
+		} else {
+			this.remoteObject = _CalculatorImplBase.narrowCast(objectReference);
+		}
+	}
+
+	private Object getObjectReference(ObjectBroker objBroker, _NameImplBase nameserviceClient) {
+		Object rawObjRef = this.objectBroker.getService("calculator");
+		if (rawObjRef == null) {
 			rawObjRef = nameserviceClient.resolve("calculator");
 		}
-		_CalculatorImplBase remoteObj = _CalculatorImplBase.narrowCast(rawObjRef);
+		return rawObjRef;
+	}
 
-		System.out.println("Rechnung wurde durchgefuehrt das Ergebnis ist: " + remoteObj.add(20,30));
-		System.out.println("Rechnung wurde durchgefuehrt das Ergebnis ist: " + remoteObj.div(10,3));
+	public void testfunction() throws IOException {
+		System.out.println("Rechnung wurde durchgefuehrt das Ergebnis ist: " + remoteObject.add(20, 30));
+		System.out.println("Rechnung wurde durchgefuehrt das Ergebnis ist: " + remoteObject.div(10, 3));
+		objectBroker.shutDown();
+	}
 
-		objBroker.shutDown();
+	public static void main(String[] args) throws IOException {
+		new CalculatorClient().testfunction();
 	}
 }

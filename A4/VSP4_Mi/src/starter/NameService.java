@@ -11,37 +11,33 @@ import name_ops._NameImplBase;
 public class NameService extends _NameImplBase{
 	
 	Map<String, String> services;
+	String serviceServerSocketString;
 	
-	public NameService() {
+	public NameService() throws IOException {
 		this.services = new HashMap<String, String>();
-	}
 		
+		ObjectBroker objectBroker = new ObjectBroker();
+		ServerSocket nameServiceServerSocket = new ServerSocket(_NameImplBase.NAMESERVICEPORT);
+		String nameServiceServerSocketString = objectBroker.startNewService(this, nameServiceServerSocket);
+		System.out.println("Server wurde gestartet und hoert auf: " + nameServiceServerSocketString);
+		
+		objectBroker.registerNewService("nameservice", nameServiceServerSocketString);
+		objectBroker.shutDown();
+	}
+	
 	@Override
 	public synchronized void rebind(String servantSocket, String name) {
 		services.put(name, servantSocket);
-		System.out.println(name+ " wurde im Nameservice registriert");
-		
+		System.out.println("New registration in nameservice: " + name);
 	}
-
+	
 	@Override
 	public synchronized Object resolve(String name) {
 		return services.get(name);
 	}
 	
 	public static void main(String[] args) throws IOException{
-		int port = 15000;
-
-		ObjectBroker objBroker = new ObjectBroker();
-		NameService nameservice = new NameService();
-		
-		ServerSocket nameServiceServerSocket = new ServerSocket(port);
-		String nameServiceServerSocketString = objBroker.startNewService(nameservice, nameServiceServerSocket);
-		System.out.println("Server wurde gestartet und hoert auf: " + nameServiceServerSocketString);
-		
-		objBroker.registerNewService("nameservice", nameServiceServerSocketString);
-		System.out.println("Service wurde angemeldet");
-		
-		objBroker.shutDown();
-		
+		new NameService();
+		System.out.println("NameService registered locally.");
 	}
 }
