@@ -19,12 +19,12 @@ public class SocketCommunicator {
 		return new SocketCommunicator();
 	}
 
-	public String sendMethodAndParametersToServiceAndWaitForAnswer(String serviceServerSocketString, String methodeName,
+	public synchronized String sendMethodAndParametersToServiceAndWaitForAnswer(String serviceServerSocketString, String methodeName,
 			String parameters) {
 
 		String result = null;
 		try {
-			SocketHolder socketToService = getOrCreateSocket(serviceServerSocketString);
+			SocketHolder socketToService = getOrCreateSocketHolder(serviceServerSocketString);
 			sendToSocket(socketToService, methodeName, parameters);
 			result = waitForResult(socketToService);
 		} catch (IOException e) {
@@ -52,24 +52,26 @@ public class SocketCommunicator {
 	}
 
 	public void closeAllSockets() throws IOException {
-		SocketHolder currentSocket;
+		SocketHolder currentSocketHolder;
 		for (Entry<String, SocketHolder> pair : this.hostPortToSocketHolder.entrySet()) {
-			currentSocket = pair.getValue();
-			this.sendToSocket(currentSocket, "shutdown", "");
-			currentSocket.close();
+			currentSocketHolder = pair.getValue();
+			this.sendToSocket(currentSocketHolder, "shutdown", "");
+			currentSocketHolder.close();
 		}
+		this.hostPortToSocketHolder.clear();
 		System.out.println("All Sockets Closed!");
 	}
 
-	private SocketHolder getOrCreateSocket(String serviceServerSocketString) {
+	private SocketHolder getOrCreateSocketHolder(String serviceServerSocketString) {
 		SocketHolder foundSocketHolder = null;
 
 		foundSocketHolder = this.hostPortToSocketHolder.get(serviceServerSocketString);
 
 		if (foundSocketHolder == null) {
 			try {
-				String host = serviceServerSocketString.split(":")[0];
-				int port = Integer.valueOf(serviceServerSocketString.split(":")[1]);
+				String[] splitServiceServerSocketString = serviceServerSocketString.split(":");
+				String host = splitServiceServerSocketString[0];
+				int port = Integer.valueOf(splitServiceServerSocketString[1]);
 
 				Socket createdSocket = new Socket(host, port);
 				SocketHolder createdSocketHolder = new SocketHolder(createdSocket);
