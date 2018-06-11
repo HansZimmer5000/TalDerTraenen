@@ -13,13 +13,13 @@ public class _CalculatorImplBaseStub extends _CalculatorImplBase {
 	@Override
 	public int add(int a, int b) {
 		String params = "int " + a + ",int " + b;
-		return Integer.valueOf((String) objectReference.sendMethodAndParametersToServiceAndWaitForAnswer("add", params));
+		return Integer.valueOf(objectReference.sendMethodAndParametersToServiceAndWaitForAnswer("add", params));
 	}
 	
 	@Override
 	public double div(double a, double b) {
 		String params = "double " + a + ",double " + b;
-		return Double.valueOf((String) objectReference.sendMethodAndParametersToServiceAndWaitForAnswer("div", params));
+		return Double.valueOf(objectReference.sendMethodAndParametersToServiceAndWaitForAnswer("div", params));
 	}
 
 }
