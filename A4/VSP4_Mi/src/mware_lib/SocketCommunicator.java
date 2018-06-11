@@ -34,18 +34,18 @@ public class SocketCommunicator {
 	}
 
 	private void sendToSocket(SocketHolder socketHolder, String methodeName, String parameters) throws IOException {
-		BufferedWriter out = socketHolder.getOut();
+		BufferedWriter writer = socketHolder.getWriter();
 
-		out.write(methodeName + "(" + parameters + ")\n");
-		out.flush();
+		writer.write(methodeName + "(" + parameters + ")\n");
+		writer.flush();
 		//out.close();
 	}
 
 	private String waitForResult(SocketHolder socketHolder) throws IOException {
-		BufferedReader in = socketHolder.getIn();
+		BufferedReader reader = socketHolder.getReader();
 
 		System.out.println("Wait for response.");
-		String result = in.readLine();
+		String result = reader.readLine();
 
 		//in.close();
 		return result;

@@ -22,11 +22,11 @@ public class SocketHolder {
 		return this.socket;
 	}
 
-	public BufferedReader getIn() {
+	public BufferedReader getReader() {
 		return this.reader;
 	}
 
-	public BufferedWriter getOut() {
+	public BufferedWriter getWriter() {
 		return this.writer;
 	}
 
