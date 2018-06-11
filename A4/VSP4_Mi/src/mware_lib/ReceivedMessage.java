@@ -7,7 +7,8 @@ public class ReceivedMessage {
 	private Class<?>[] parameterClasses;
 
 	public ReceivedMessage(String message) {
-		// message Example: "rebind(String 127.0.0.1:55555, String calculator)"
+		// Expected Message looks like: methodname(ParameterOneClass ParameterOneValue,ParameterTwoClass ParameterTwoValue)
+		// So A Parameter (Class + Value) is split with a " ", while Parameter are split with "," from each other.
 		String[] splitMessage = message.split("\\(");
 		String methodName = splitMessage[0];
 		this.methodName = methodName;
