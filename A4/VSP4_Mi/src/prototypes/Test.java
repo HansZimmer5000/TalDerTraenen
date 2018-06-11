@@ -15,12 +15,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class Test {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println(Character.toString((char) 97));
+		HashMap<String, Integer> map = new HashMap<>();
+		map.put("a", 1);
+		System.out.println(map.toString());
+		map.put("a", 2);
+		System.out.println(map.toString());
+		
 	}
 
 	public static void writeFiletest() throws IOException {
