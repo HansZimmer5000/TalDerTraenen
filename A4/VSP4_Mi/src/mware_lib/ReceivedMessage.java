@@ -1,12 +1,12 @@
 package mware_lib;
 
-public class Message {
+public class ReceivedMessage {
 
 	private String methodName;
 	private Object[] parameterValues;
 	private Class<?>[] parameterClasses;
 
-	public Message(String message) {
+	public ReceivedMessage(String message) {
 		// message Example: "rebind(String 127.0.0.1:55555, String calculator)"
 		String[] splitMessage = message.split("\\(");
 		String methodName = splitMessage[0];

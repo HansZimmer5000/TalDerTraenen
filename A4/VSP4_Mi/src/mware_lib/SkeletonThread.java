@@ -52,7 +52,7 @@ public class SkeletonThread extends Thread {
 		try {
 			// TODO Oder mit Reflection (oder ohne) in Server Klasse (dann mit Verwendung
 			// von einem Service Interface)
-			Message message = new Message(msgFromClient);
+			ReceivedMessage message = new ReceivedMessage(msgFromClient);
 			Object returnValue = reflectAndInvokeMethod(servant.getClass(), message);
 
 			this.out.write(returnValue + "\n");
@@ -63,7 +63,7 @@ public class SkeletonThread extends Thread {
 
 	}
 
-	private Object reflectAndInvokeMethod(Class<?> reflectedClass, Message message) {
+	private Object reflectAndInvokeMethod(Class<?> reflectedClass, ReceivedMessage message) {
 		Object returnValue = null;
 		String methodName = message.getMethodName();
 		Class<?>[] parameterClasses = message.getParameterClasses();
