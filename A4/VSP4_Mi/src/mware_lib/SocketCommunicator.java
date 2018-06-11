@@ -31,7 +31,7 @@ public class SocketCommunicator {
 			out.write(methodeName + "(" + parameters + ")\n");
 			out.flush();
 
-			System.out.println("Warte auf Antwort");
+			System.out.println("Wait for response.");
 			result = in.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();

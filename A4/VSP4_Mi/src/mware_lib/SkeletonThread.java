@@ -29,7 +29,7 @@ public class SkeletonThread extends Thread {
 		String incomingMessage;
 		while (!this.isInterrupted()) {
 			try {
-				System.out.println("Waiting for input");
+				//System.out.println("Waiting for input");
 
 				incomingMessage = in.readLine();
 				if (incomingMessage != null) {
@@ -43,7 +43,7 @@ public class SkeletonThread extends Thread {
 	}
 
 	private void executeInput(String msgFromClient) {
-		System.out.println("Nachricht vom Client erhalten: " + msgFromClient);
+		System.out.println("Recevied message from Client: " + msgFromClient);
 
 		try {
 			// TODO Oder mit Reflection (oder ohne) in Server Klasse (dann mit Verwendung

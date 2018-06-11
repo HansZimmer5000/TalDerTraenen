@@ -59,6 +59,6 @@ public class ObjectBroker {
 	// Beendet die Benutzung der Middleware in dieser Anwendung.
 	public void shutDown() throws IOException {
 		this.communicator.closeAllSockets();
-		System.out.println("Object Brooker heruntergefahren");
+		System.out.println("ObjectBroker is shutdown.");
 	}
 }

@@ -22,7 +22,7 @@ public class SkeletonServer extends Thread {
 	private SkeletonServer(Object servant, ServerSocket serverSocket) {
 		this.servant = servant;
 		this.serverSocket = serverSocket;
-		System.out.println("Service Server wurde gestartet: " + this.serverSocket.getInetAddress() + ":"
+		System.out.println("Service Server started at: " + this.serverSocket.getInetAddress() + ":"
 				+ this.serverSocket.getLocalPort());
 	}
 
