@@ -10,7 +10,7 @@ Client via ObjectBroker resolved with nameservice for a specific service, and us
 
 Hinzufügen von neuen Typen (Return / Parameter):
 	- Hinzufügen im idl_compiler.IDLCompiler
-	- Hinzufügen in mware_lib.Message
+	- Hinzufügen in mware_lib.ReceivedMessage
 	
 Obacht!
 	- SocketCommunicator unterhält sich aktuell mit genau einem Socket über einen Socket.

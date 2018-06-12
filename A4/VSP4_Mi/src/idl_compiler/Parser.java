@@ -218,7 +218,7 @@ public class Parser {
 				//printModule(module);
 
 				for(IDLclass currentClass : module.getClasses()) {
-					FileCreater newFile = new FileCreater(module.getModuleName(), currentClass);
+					FileCreator newFile = new FileCreator(module.getModuleName(), currentClass);
 					newFile.writeFile();
 				}
 				

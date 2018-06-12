@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import idl_compiler.IDLCompiler.MethodData;
 import idl_compiler.IDLCompiler.SupportedDataTypes;
 
-public class FileCreater {
+public class FileCreator {
 
 	String moduleName;
 	String className;
@@ -18,7 +18,7 @@ public class FileCreater {
 	IDLclass toCompilingClass;
 	ArrayList<String> linesToWrite;
 	
-	public FileCreater(String moduleName, IDLclass toCompilingClass) {
+	public FileCreator(String moduleName, IDLclass toCompilingClass) {
 		this.moduleName = moduleName;
 		this.className = "_" + toCompilingClass.getClassName() + "ImplBase";
 		this.fileName = this.className + ".java";
