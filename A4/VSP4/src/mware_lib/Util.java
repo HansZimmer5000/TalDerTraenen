@@ -18,7 +18,7 @@ public class Util {
 	 }
 	 
 	 public static int checkPort(String[] args){
-		 if (args.length == 3) {
+		 if (args !=null && args.length == 3) {
 				return Integer.parseInt(args[1]);
 			} else {
 				return DEFAULT_PORT;

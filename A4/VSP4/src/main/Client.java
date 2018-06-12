@@ -3,6 +3,7 @@ package main;
 import java.io.IOException;
 
 import math_ops._CalculatorImplBase;
+import mware_lib.MwareException;
 import mware_lib.ObjectBroker;
 
 /**
@@ -24,6 +25,9 @@ public class Client {
 
 		System.out.println("C> NS-Referenz erhalten!");
 		Object rawObjRef = nameSvc.resolve("zumsel");
+		if(rawObjRef instanceof MwareException ) {
+			return;
+		}
 		_CalculatorImplBase remoteObj = _CalculatorImplBase.narrowCast(rawObjRef);
 
 		System.out.println("C> Methodenaufruf wird initiiert");

@@ -1,11 +1,18 @@
 package test;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.ServerSocket;
 
 import junit.framework.TestCase;
 import math_ops._CalculatorImplBase;
+import mware_lib.ComHandler;
 import mware_lib.MwareException;
 import mware_lib.ObjectBroker;
+import mware_lib.Util;
 
 public class Test extends TestCase {
 
@@ -37,5 +44,9 @@ public class Test extends TestCase {
 		Object rawObjRef = nameSvc.resolve("mertTest");
 		assertTrue(rawObjRef != null && rawObjRef != "" && rawObjRef != new MwareException().toString());
 	}
-
+	
+	public void testUtilCheckPort() {
+		assertTrue(Util.checkPort(null) == 55555);
+	}
+	
 }

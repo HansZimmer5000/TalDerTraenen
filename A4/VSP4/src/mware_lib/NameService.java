@@ -22,14 +22,26 @@ public class NameService implements INameService {
 	
 	@Override
 	public void rebind(Object servant, String name) {
-		conNS.sendToNs(servant, name, "rebind");
+		try {
+			conNS.sendToNs(servant, name, "rebind");
+		} catch (MwareException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return;
 	}
 
 	@Override
 	public Object resolve(String name) {
-		Object ret = conNS.sendToNs(null, name, "resolve");
-		return ret;
+		Object ret;
+		try {
+			ret = conNS.sendToNs(null, name, "resolve");
+			return ret;
+		} catch (MwareException e) {
+			// TODO Auto-generated catch block
+			Util.println("C> Es gabs keinen Eintrag im NS", debug);
+			return e;
+		}
 	}
 
 }

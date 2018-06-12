@@ -41,7 +41,7 @@ public class ComHandler {
 		}
 	}
 
-	public Object sendToNs(Object servant, String nsName, String command) {
+	public Object sendToNs(Object servant, String nsName, String command) throws MwareException {
 		try {
 			switch (command) {
 			case "rebind":
@@ -58,6 +58,9 @@ public class ComHandler {
 				os.write("null" + "|" + "null" + "|" + nsName + "|" + command + "\n");
 				os.flush();
 				String answerFromNS = is.readLine();
+				if(answerFromNS == "noEntry") {
+					throw new MwareException();
+				}
 				Util.println("entferntes Object erhalten: " + answerFromNS, debug);
 				shutdown();
 				return answerFromNS;
