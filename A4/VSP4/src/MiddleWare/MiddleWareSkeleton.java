@@ -7,6 +7,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
+/**
+ * MiddlewareSkeleton class.
+ * 
+ * @author Mert Siginc Diese Klasse beantwortet die Anfragen der Clients und
+ *         Services
+ *
+ */
+
 public class MiddleWareSkeleton extends Thread {
 
 	private Socket client;
@@ -17,7 +25,7 @@ public class MiddleWareSkeleton extends Thread {
 	public MiddleWareSkeleton(Socket acceptedSocket, NameService nameService) {
 		this.client = acceptedSocket;
 		this.ns = nameService;
-		System.out.println("ein client hat sich verbunden");
+		System.out.println("MW> ein client hat sich verbunden");
 	}
 
 	@Override
@@ -31,24 +39,21 @@ public class MiddleWareSkeleton extends Thread {
 				// Protokoll == Host | Port | NsName | Command(rebind)
 				msgFromClient = is.readLine();
 				if (msgFromClient != "" && msgFromClient != null) {
-					System.out.println("received Msg:" + msgFromClient);
+					System.out.println("MW> received Msg:" + msgFromClient);
 					String[] splitedMsg = msgFromClient.split("\\|");
+					// wird geprüft welcher command gesendet wurde
 					switch (splitedMsg[3]) {
 					case "rebind":
 						ns.rebind(new String(splitedMsg[0] + "|" + splitedMsg[1]), splitedMsg[2]);
-						is.close();
-						os.close();
-						client.close();
+						shutdown();
 						return;
 
 					case "resolve":
 						String msgToClinet = (String) ns.resolve(splitedMsg[2]);
 						os.write(msgToClinet);
 						os.flush();
-						System.out.println("Service wurde an Client weitergeleitet " + msgToClinet);
-						is.close();
-						os.close();
-						client.close();
+						System.out.println("MW> Service wurde an Client weitergeleitet " + msgToClinet);
+						shutdown();
 						return;
 					}
 				}
@@ -60,6 +65,13 @@ public class MiddleWareSkeleton extends Thread {
 			return;
 		}
 
+	}
+
+	private void shutdown() throws IOException {
+		is.close();
+		os.close();
+		client.close();
+		this.interrupt();
 	}
 
 }

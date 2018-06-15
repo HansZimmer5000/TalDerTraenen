@@ -1,14 +1,24 @@
 package mware_lib;
 
+/**
+ * ObjectBroker class.
+ * 
+ * @author Mert Siginc
+ * In dieser Klasse wird eine Nameservice referenz erzeugt, 
+ * welches ein ComHandler beinhaltet mit der IP PORT vom NS.
+ *
+ */
+
 import java.io.IOException;
 
 public class ObjectBroker {
 
 	private boolean debug;
 	private NameService ns;
+	ComHandler con;
 
 	public ObjectBroker(String host, int port, boolean debug) throws IOException {
-		ComHandler con = new ComHandler(host, port, debug);
+		con = new ComHandler(host, port, debug);
 		ns = new NameService(con, debug);
 		this.debug = debug;
 	}
@@ -24,7 +34,8 @@ public class ObjectBroker {
 
 	// Beendet die Benutzung der Middleware in dieser Anwendung.
 	public void shutDown() throws IOException {
-		System.out.println("Object Brooker heruntergefahren");
+		con.shutdown();
+		Util.println("Object Brooker heruntergefahren", debug);
 		return;
 	}
 }

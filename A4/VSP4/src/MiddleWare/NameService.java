@@ -3,22 +3,34 @@ package MiddleWare;
 import java.util.HashMap;
 import java.util.Map;
 
-import mware_lib.*;
+import mware_lib.INameService;
 
-public class NameService implements INameService{
-	
+/**
+ * Nameservice class.
+ * 
+ * @author Mert Siginc In dieser Klasse wird der Namenservice realisiert Die
+ *         Methoden sind synchronized, da gleichzeitige zugriffe möglich sind
+ *
+ */
+public class NameService implements INameService {
+
 	Map<String, Object> services = new HashMap<String, Object>();
-		
+
 	@Override
 	public synchronized void rebind(Object servant, String name) {
 		services.put(name, servant);
-		System.out.println(name+ " wurde im NS registriert");
-		
+		System.out.println("MW> " + name + " wurde im NS registriert");
+
 	}
 
 	@Override
 	public synchronized Object resolve(String name) {
-		return services.get(name);
+		System.out.println("MW> " + name + " wird rausgesucht");
+		if (services.containsKey(name)) {
+			return services.get(name);
+		} else {
+			return "noEntry";
+		}
 	}
 
 }

@@ -6,7 +6,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
+
+/**
+ * ComHandler class.
+ * 
+ * @author Mert Siginc
+ * 
+ *         In dieser Klasse wird die kommunikation zwischen MW und Service
+ *         behandelt
+ *
+ */
 
 public class ComHandler {
 
@@ -14,73 +23,72 @@ public class ComHandler {
 	private int port;
 	private Boolean debug;
 	private ServiceListener serviceServer;
+	private Socket socketOut;
+	private BufferedReader is;
+	private BufferedWriter os;
 
 	public ComHandler(String host, int port, Boolean debug) {
 		this.host = host;
 		this.port = port;
 		this.debug = debug;
+		try {
+			socketOut = new Socket(this.host, this.port);
+			is = new BufferedReader(new InputStreamReader(socketOut.getInputStream()));
+			os = new BufferedWriter(new OutputStreamWriter(socketOut.getOutputStream()));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	public Object sendToNs(Object servant, String nsName, String command) {
+	public Object sendToNs(Object servant, String nsName, String command) throws MwareException {
 		try {
-			Socket socketToNS = new Socket(this.host, this.port);
-			BufferedReader is = new BufferedReader(new InputStreamReader(socketToNS.getInputStream()));
-			BufferedWriter os = new BufferedWriter(new OutputStreamWriter(socketToNS.getOutputStream()));
 			switch (command) {
 			case "rebind":
-				System.out.println("rebind anfrage versendet");
-				serviceServer = new ServiceListener(servant);
+				Util.println("rebind anfrage versendet", debug);
+				serviceServer = new ServiceListener(servant, debug);
 				serviceServer.start();
-
-				// TODO:: Protokoll definieren Host | Port | NsName | Command(rebind)
 				os.write(serviceServer.getServerSocket().getInetAddress().getHostAddress() + "|"
 						+ serviceServer.getServerSocket().getLocalPort() + "|" + nsName + "|" + command);
 				os.flush();
-				is.close();
-				os.close();
-				socketToNS.close();
+				shutdown();
 				return null;
 			case "resolve":
-				System.out.println("resolve anfrage versendet");
-				// TODO:: Protokoll definieren null | null | NsName | Command(resolve)
+				Util.println("resolve anfrage versendet", debug);
 				os.write("null" + "|" + "null" + "|" + nsName + "|" + command + "\n");
 				os.flush();
 				String answerFromNS = is.readLine();
-				String nsAnswerSplited[] = answerFromNS.split("\\|");
-				System.out.println("entferntes Object erhalten: " + answerFromNS);
-				ComHandler retObject = new ComHandler(nsAnswerSplited[0], new Integer(nsAnswerSplited[1]), this.debug);
-
-				is.close();
-				os.close();
-				socketToNS.close();
-				return retObject;
+				if(answerFromNS == "noEntry") {
+					throw new MwareException();
+				}
+				Util.println("entferntes Object erhalten: " + answerFromNS, debug);
+				shutdown();
+				return answerFromNS;
 			}
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
+			Util.println("falscher command übergeben " + command, debug);
+			shutdown();
+			return new MwareException().toString();
 		} catch (IOException e) {
 			e.printStackTrace();
+
 		}
+
 		return 1;
 	}
 
 	public Object sendToService(String methodeName, String params) {
 		try {
-			Socket socketToService = new Socket(this.host, this.port);
-			BufferedReader is = new BufferedReader(new InputStreamReader(socketToService.getInputStream()));
-			BufferedWriter os = new BufferedWriter(new OutputStreamWriter(socketToService.getOutputStream()));
-
-			System.out.println("Anfrage an Service gesendet	");
+			Util.println("Anfrage an Service gesendet", debug);
 			os.write(methodeName + "|" + params + "\n");
 			os.flush();
-
-			System.out.println("Warte auf Antwort");
 			String msgFromNS = is.readLine();
-			System.out.println("Antwort erhalten: " + msgFromNS);
-			is.close();
-			os.close();
-			socketToService.close();
+			if (testException(msgFromNS)) {
+				Util.println("Exception erhalten: " + msgFromNS, debug);
+				return msgFromNS;
+			}
+			Util.println("Antwort erhalten von Service erhalten: " + msgFromNS, debug);
+			shutdown();
 			return msgFromNS;
-
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -94,6 +102,16 @@ public class ComHandler {
 
 	public int getPort() {
 		return port;
+	}
+
+	public void shutdown() throws IOException {
+		is.close();
+		os.close();
+		socketOut.close();
+	}
+
+	private Boolean testException(String msg) {
+		return (msg == new MwareException().toString());
 	}
 
 }

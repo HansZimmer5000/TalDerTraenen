@@ -3,9 +3,17 @@ package MiddleWare;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import mware_lib.Util;
+
+/**
+ * Middleware main class.
+ * 
+ * @author Mert Siginc In dieser Klasse startet man die Middleware
+ *
+ */
+
 public class MiddleWare extends Thread {
 
-	private static final int DEFAULT_PORT = 55555;
 	private int port;
 	private NameService nameService;
 	private Boolean online = true;
@@ -19,8 +27,8 @@ public class MiddleWare extends Thread {
 	public void run() {
 		try {
 			ServerSocket nsServer = new ServerSocket(port);
-			System.out.println(
-					"Server wurde gestartet und hört auf: " + nsServer.getInetAddress() + ":" + nsServer.getLocalPort());
+			System.out.println("MW> Server wurde gestartet und hört auf: " + nsServer.getInetAddress() + ":"
+					+ nsServer.getLocalPort());
 
 			while (online) {
 				new MiddleWareSkeleton(nsServer.accept(), nameService).start();
@@ -33,15 +41,11 @@ public class MiddleWare extends Thread {
 			e.printStackTrace();
 		}
 	}
-	
-	
 
 	public static void main(String[] args) {
-		if (args.length == 1) {
-			new MiddleWare(new Integer(args[0])).start();
-		} else {
-			new MiddleWare(DEFAULT_PORT).start();
-		}
+
+		new MiddleWare(Util.checkPort(args)).start();
+
 	}
 
 }

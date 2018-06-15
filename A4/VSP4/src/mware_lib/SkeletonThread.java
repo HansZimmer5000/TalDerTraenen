@@ -10,19 +10,29 @@ import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.Arrays;
 
+/**
+ * SkeletonThread class.
+ * 
+ * @author Mert Siginc In dieser Klasse werden die Anfragen vom Client
+ *         beantwortet
+ *
+ */
+
 public class SkeletonThread extends Thread {
 
 	private Socket cSocket;
 	private BufferedReader in;
 	private BufferedWriter out;
 	private Object servant;
+	private Boolean debug;
 
-	public SkeletonThread(Socket clientSocket, Object servant) throws IOException {
+	public SkeletonThread(Socket clientSocket, Object servant, Boolean debug) throws IOException {
+		this.debug = debug;
 		this.cSocket = clientSocket;
 		this.in = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
 		this.out = new BufferedWriter(new OutputStreamWriter(cSocket.getOutputStream()));
 		this.servant = servant;
-		System.out.println("Client hat sich angemeldet");
+		Util.println("S> Client hat sich angemeldet", debug);
 	}
 
 	@Override
@@ -32,13 +42,13 @@ public class SkeletonThread extends Thread {
 			try {
 				msgFromClient = in.readLine();
 				if (msgFromClient != null) {
-					System.out.println("Nachricht vom Client erhalten: " + msgFromClient);
+					Util.println("Nachricht vom Client erhalten: " + msgFromClient, debug);
 					String[] splitedMsg = msgFromClient.split("\\|");
 					Object[] paramsRaw = splitedMsg[1].replaceAll(" ", "").split("\\,");
 					Object[] params = new Object[paramsRaw.length];
 					Class<?> paramClasses[] = new Class[paramsRaw.length];
 					for (int i = 0; i < paramsRaw.length; i++) {
-						System.out.println("_" + paramsRaw[i] + "_");
+						Util.println("_" + paramsRaw[i] + "_", debug);
 						try {
 							params[i] = Double.parseDouble((String) paramsRaw[i]);
 							paramClasses[i] = double.class;
@@ -54,27 +64,35 @@ public class SkeletonThread extends Thread {
 					}
 
 					try {
-						System.out.println("looking for Method named: " + splitedMsg[0] + " with "
+						Util.println("looking for Method named: " + splitedMsg[0] + " with "
 								+ Arrays.asList(paramClasses).toString() + " Parameters values:"
-								+ Arrays.asList(paramsRaw).toString());
+								+ Arrays.asList(paramsRaw).toString(), debug);
 						Method myMethod = servant.getClass().getDeclaredMethod(splitedMsg[0], paramClasses);
-						System.out.println(myMethod);
-						System.out.println("Send Ergebnis an Client!");
+						Util.println(myMethod.toString(), debug);
+						Util.println("Send Ergebnis an Client!", debug);
 						out.write(myMethod.invoke(servant, params) + "\n");
 						out.flush();
+						shutdown();
 
 					} catch (NoSuchMethodException | SecurityException | IllegalAccessException
 							| IllegalArgumentException | InvocationTargetException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						out.write(new MwareException().toString());
+						shutdown();
 					}
 
 				}
 
 			} catch (IOException e) {
-				System.out.println(cSocket.getInetAddress() + " disconected!");
+				Util.println(cSocket.getInetAddress() + " disconected!", debug);
 				return;
 			}
 		}
+	}
+
+	private void shutdown() throws IOException {
+		in.close();
+		out.close();
+		cSocket.close();
+		this.interrupt();
 	}
 }
