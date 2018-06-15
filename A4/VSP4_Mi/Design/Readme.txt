@@ -1,15 +1,24 @@
-Zu dem Paket gehoeren die Dateien
-mware_lib.jar
-idl_compiler.jar
-???
+Zu dem Paket gehoert der gesamt Code fuer die Aufgabe 4.
+
+Extra zu erwähnen:
+mware_lib: Die Middleware
+idl_compiler: Der Compiler fuer idl Dateien zu Java Dateien
+name_ops bzw name_ops.idl: Namensdienst
+prototypes: Enthält verschiedene Tests um gewisse Aspekte von Java zu verstehen.
 
 --------------------
 Starten Des Testsystems:
 --------------------
-Ausfuehren von starter/StarterStarter.java Main Methode. (Keine Parameter nötig).
+Ausfuehren der starter/StarterStarter.java Main Methode. (Keine Parameter nötig).
+
+
 
 --------------------
-Starten des Name Services:
+Alternativ:
 --------------------
-starter/NameService.java Mein Methode (Keine Parameter nötig). Ggf. Port beachten (default = 15000).
+Ausführen von:
+1. new Thread(NameServiceServerMainThread()).start(); (Merken auf welchem PC sich der NameService nun befindet, fuer NameClient)
+2. new Thread(CalculatorServerMainThread()).start(); 
+3. new Thread(CalculatorClientMainThread()).start();
+
 
